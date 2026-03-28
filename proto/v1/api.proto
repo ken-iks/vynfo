@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = "vynfo.com/vynfo/gen/proto/v1";
+
+message UploadVideoRequest {
+    bytes content = 1;
+    string title = 2;
+}
+
+message UploadProgressIndicator {
+    string video_id = 1;
+    double completion_percentage = 2;
+}
+
+message UploadFinishedIndicator {
+    string video_id = 1;
+}
+
+message UploadVideoResponse {
+    oneof upload_status {
+        UploadProgressIndicator ongoing = 1;
+        UploadFinishedIndicator finished = 2;
+    }
+}
+
+service VideoService {
+    rpc UploadVideo(UploadVideoRequest) returns (stream UploadVideoResponse);
+}

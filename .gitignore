@@ -1,0 +1,6 @@
+.env
+.cursor
+eden/src/gen/
+chichi/gen/
+chichi/external/
+chichi/segments/

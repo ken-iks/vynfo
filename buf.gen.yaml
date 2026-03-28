@@ -1,0 +1,15 @@
+version: v2
+
+plugins:
+  # 1. Go Protobuf (Structs)
+  - local: protoc-gen-go
+    out: chichi/gen
+    opt: paths=source_relative
+  # 2. Go Connect (Server/Client logic)
+  - local: protoc-gen-connect-go
+    out: chichi/gen
+    opt: paths=source_relative
+  # 3. TypeScript Protobuf (Classes/Interfaces)
+  - local: ./eden/node_modules/.bin/protoc-gen-es
+    out: eden/src/gen
+    opt: target=ts
