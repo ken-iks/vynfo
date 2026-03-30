@@ -23,7 +23,10 @@ type VideoSegment struct {
 
 // GenerateSegments splits the video stored at fp into .ts hls segements
 // of length segLength. Minimum segment length is 3 seconds, and its recommended to
-// stay around 3-6 seconds for your segments.
+// stay around 3-6 seconds for your segments. We also choose to re encode the video
+// with a keyframe interval of 0.5 seconds to allow editing at this granularity. Keyframe
+// interval should always cleanly divide into segLength in order to get consistent segment
+// lengths (segments have to start at keyframes).
 func GenerateSegments(
 	fp string,
 	videoID string,
@@ -51,7 +54,7 @@ func GenerateSegments(
 		"-loglevel", "info",
 		"-i", fp,
 		"-c:v", "libx264", // design decision: re-encode to force consistent key frames
-		"-force_key_frames", fmt.Sprintf("expr:gte(t,n_forced*%d)", segLength),
+		"-force_key_frames", fmt.Sprintf("expr:gte(t,n_forced*%.1f)", 0.5),
 		"-c:a", "aac",
 		"-hls_time", strconv.Itoa(segLength),
 		"-hls_list_size", "0",

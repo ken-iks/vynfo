@@ -4,16 +4,24 @@ package v1;
 
 option go_package = "vynfo.com/vynfo/gen/proto/v1";
 
+import "google/protobuf/empty.proto";
+
+// ========================  Uploader  ============================ //
+
+// UploadVideoRequest will upload video content to storage
 message UploadVideoRequest {
     bytes content = 1;
     string title = 2;
 }
 
+// UploadProgressIndicator allows clients to play the video up
+// until the uploaded point whilst a large video is still uploaded
 message UploadProgressIndicator {
     string video_id = 1;
     double completion_percentage = 2;
 }
 
+// UploadFinishedIndicator does as advertised...
 message UploadFinishedIndicator {
     string video_id = 1;
 }
@@ -25,6 +33,76 @@ message UploadVideoResponse {
     }
 }
 
+// =======================  PlayBack Editor ============================= //
+
+// MediaVideo is a reference to a video asset beginning at start_time_in_video
+// NOTE: start_time_millies must for now be divisible by 500. This is because
+// the backend currently only supports splitting a video at IFrame intervals which
+// are currently set at 0.5s in our upload path. This is subject to change
+message MediaVideo {
+    uint64 start_time_millis = 2;   
+}
+
+// MediaImage is a reference to an image asset that can either take up the full video frame,
+// or be displayed at a specific pixel value depending on whether or not pos is included.
+// Size clamping to the size of the video display should be handled on the client in both the
+// size case and the corner position case.
+message MediaImage {
+    optional MediaPosition pos = 1
+}
+
+// MediaText is a reference to a text asset that is positioned at some place in the video frame,
+// Size clamping to the size of the video display should be handled on the client in both the
+// size case and the corner position case.
+message MediaText {
+    MediaPosition pos = 1;
+    MediaTextColor color = 2;
+}
+
+enum MediaTextColor {
+    BLACK = 0;
+    WHITE = 1;
+    CLEAR = 2;
+}
+
+message MediaPosition {
+    uint64 left_corner_px = 1;
+    uint64 left_corner_py = 2;
+    uint64 size = 3;
+}
+
+// MediaAssets are the types of media that can be rendered on the playback editor for an
+// editing session.
+message MediaAsset {
+    string asset_id = 1;
+    oneof asset_type {
+        MediaVideo video = 2;
+        MediaImage image = 3;
+        MediaText text = 4;
+    }
+}
+
+// PlaybackSection represents a particular cut of playback that is displayed between 
+// these timestamps containing these assets. 
+// Note that if a given section must continain at least one asset, and can contain at
+// most one video segment.
+message PlaybackSection {
+    uint64 start_time_millis = 1;
+    uint64 end_time_millis = 2;
+    repeated MediaAsset assets = 3;
+}
+
+// PlaybackEditor holds a list of sections controlling the current edited state of
+// the playback editor. We can use this sections list to show split sections of the
+// video edit state
+message PlaybackEditor {
+    repeated PlaybackSection sections = 1;
+}
+
+
+
+// ====================== Service Definition ============================== //
 service VideoService {
     rpc UploadVideo(UploadVideoRequest) returns (stream UploadVideoResponse);
+    rpc SaveEdit(PlaybackEditor) returns (google.protobuf.Empty)
 }
