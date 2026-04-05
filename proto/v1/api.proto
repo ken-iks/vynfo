@@ -4,6 +4,8 @@ package v1;
 
 option go_package = "vynfo.com/vynfo/gen/proto/v1";
 
+import "google/protobuf/timestamp.proto";
+
 
 // ========================  Uploader  ============================ //
 
@@ -106,6 +108,8 @@ message SaveEditResponse {}
 
 // ========================  Projects CRUD  ============================ //
 
+// ProjectMetadata contains the core identifying information for a project
+// returned in list and detail views.
 message ProjectMetadata {
     string id = 1;
     string name = 2;
@@ -113,23 +117,49 @@ message ProjectMetadata {
     google.protobuf.Timestamp created_at = 4;
 }
 
+// ListProjectsRequest fetches all projects belonging to a given user.
 message ListProjectsRequest {
     string user_id = 1;
 }
 
+// ListProjectsResponse returns the set of projects owned by the requesting user.
 message ListProjectsResponse {
     repeated ProjectMetadata projects = 1;
 }
 
+// ListProjectAssetsRequest fetches every media asset (videos, images, text boxes)
+// that has been uploaded or created within a project.
 message ListProjectAssetsRequest {
     string project_id = 1;
     string user_id = 2;
 }
 
+// MediaVideoMetadata is the lightweight descriptor returned when listing video
+// assets — enough for thumbnails and duration display without streaming bytes.
+message MediaVideoMetadata {
+    string asset_id = 1;
+    string title = 2;
+    double duration = 3;
+}
+
+// MediaImageMetadata is the lightweight descriptor returned when listing image assets.
+message MediaImageMetadata {
+    string asset_id = 1;
+    // TODO
+}
+
+// MediaTextMetadata is the lightweight descriptor returned when listing text box assets.
+message MediaTextMetadata {
+    string asset_id = 1;
+    // TODO
+}
+
+// ListProjectAssetsResponse groups all asset types belonging to a project so the
+// client can populate the asset panel in a single round-trip.
 message ListProjectAssetsResponse {
-    repeated MediaVideo videos = 1;
-    repeated MediaText text_boxes = 2;
-    repeated MediaImage images = 3;
+    repeated MediaVideoMetadata videos = 1;
+    repeated MediaImageMetadata images = 2;
+    repeated MediaTextMetadata text_boxes = 3;
 }
 
 // ====================== Service Definition ============================== //
@@ -137,4 +167,5 @@ service ProjectService {
     rpc UploadVideo(UploadVideoRequest) returns (stream UploadVideoResponse);
     rpc SaveEdit(SaveEditRequest) returns (SaveEditResponse);
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
+    rpc ListProjectAssets(ListProjectAssetsRequest) returns (ListProjectAssetsResponse);
 }
