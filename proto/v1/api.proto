@@ -4,14 +4,15 @@ package v1;
 
 option go_package = "vynfo.com/vynfo/gen/proto/v1";
 
-import "google/protobuf/empty.proto";
 
 // ========================  Uploader  ============================ //
 
 // UploadVideoRequest will upload video content to storage
 message UploadVideoRequest {
-    bytes content = 1;
-    string title = 2;
+    string user_id = 1;
+    string project_id = 2;
+    bytes content = 3;
+    string title = 4;
 }
 
 // UploadProgressIndicator allows clients to play the video up
@@ -48,7 +49,7 @@ message MediaVideo {
 // Size clamping to the size of the video display should be handled on the client in both the
 // size case and the corner position case.
 message MediaImage {
-    optional MediaPosition pos = 1
+    optional MediaPosition pos = 1;
 }
 
 // MediaText is a reference to a text asset that is positioned at some place in the video frame,
@@ -60,9 +61,10 @@ message MediaText {
 }
 
 enum MediaTextColor {
-    BLACK = 0;
-    WHITE = 1;
-    CLEAR = 2;
+    MEDIA_TEXT_COLOR_UNSPECIFIED = 0;
+    MEDIA_TEXT_COLOR_BLACK = 1;
+    MEDIA_TEXT_COLOR_WHITE = 2;
+    MEDIA_TEXT_COLOR_CLEAR = 3;
 }
 
 message MediaPosition {
@@ -95,14 +97,44 @@ message PlaybackSection {
 // PlaybackEditor holds a list of sections controlling the current edited state of
 // the playback editor. We can use this sections list to show split sections of the
 // video edit state
-message PlaybackEditor {
-    repeated PlaybackSection sections = 1;
+message SaveEditRequest {
+    string project_id = 1;
+    repeated PlaybackSection sections = 2;
 }
 
+message SaveEditResponse {}
 
+// ========================  Projects CRUD  ============================ //
+
+message ProjectMetadata {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    google.protobuf.Timestamp created_at = 4;
+}
+
+message ListProjectsRequest {
+    string user_id = 1;
+}
+
+message ListProjectsResponse {
+    repeated ProjectMetadata projects = 1;
+}
+
+message ListProjectAssetsRequest {
+    string project_id = 1;
+    string user_id = 2;
+}
+
+message ListProjectAssetsResponse {
+    repeated MediaVideo videos = 1;
+    repeated MediaText text_boxes = 2;
+    repeated MediaImage images = 3;
+}
 
 // ====================== Service Definition ============================== //
-service VideoService {
+service ProjectService {
     rpc UploadVideo(UploadVideoRequest) returns (stream UploadVideoResponse);
-    rpc SaveEdit(PlaybackEditor) returns (google.protobuf.Empty)
+    rpc SaveEdit(SaveEditRequest) returns (SaveEditResponse);
+    rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
 }

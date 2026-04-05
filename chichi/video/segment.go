@@ -31,12 +31,9 @@ func GenerateSegments(
 	fp string,
 	videoID string,
 	segLength int,
+	videoDuration float64,
 ) (iter.Seq2[VideoSegment, error], error) {
-	videoDuration, err := probeDuration(fp)
-	if err != nil {
-		slog.Error("could not dertermine video length")
-		return nil, err
-	}
+
 	if segLength < MIN_SEGMENT_LENGTH {
 		slog.Error(
 			"segment length error",
@@ -123,7 +120,7 @@ func GenerateSegments(
 }
 
 // Gives exact video duration from ffprobe
-func probeDuration(fp string) (float64, error) {
+func ProbeDuration(fp string) (float64, error) {
 	out, err := exec.Command("ffprobe",
 		"-v", "error",
 		"-show_entries", "format=duration",

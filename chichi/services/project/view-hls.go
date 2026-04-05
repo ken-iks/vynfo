@@ -1,4 +1,4 @@
-package services
+package project
 
 import (
 	"context"
@@ -23,12 +23,12 @@ const (
 // GetManifest handles GET /video?videoId=abc&mode=abc
 // HLS protocal doesn't support endpoints over connect RPC - so we expose this endpoint
 // over pure https
-func (v *VideoServiceServer) GetManifest(w http.ResponseWriter, r *http.Request) {
+func (p *ProjectServiceServer) GetManifest(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	videoId := r.URL.Query().Get("videoId")
 	mode := ViewMode(r.URL.Query().Get("mode"))
 
-	bucket := v.storageClient.Bucket("vedit-v1")
+	bucket := p.storageClient.Bucket("vedit-v1")
 	switch mode {
 	case Live:
 		f, err := os.Open(fmt.Sprintf("%s.m3u8", videoId))

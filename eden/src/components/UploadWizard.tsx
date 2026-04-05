@@ -11,6 +11,9 @@ interface UploaderProps {
   onUploadCompleted: (videoId: string) => void;
 }
 
+const projectId = "27a485b2-3466-4e1c-a36f-f0e8ce9f0378";
+const userId = "d322efef-cb5f-4cb8-9dc7-92e5500265fe";
+
 export function UploadWizard({
   onUploadOngoing,
   onUploadCompleted,
@@ -25,6 +28,8 @@ export function UploadWizard({
     }
     setIsUploading(true);
     const request = create(UploadVideoRequestSchema, {
+      userId: userId,
+      projectId: projectId,
       content: new Uint8Array(await videoFile.arrayBuffer()),
       title: videoFile.name,
     });

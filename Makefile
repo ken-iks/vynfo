@@ -1,7 +1,4 @@
-.PHONY: dev format
-
-dev:
-	cd chichi && go run . & cd eden && pnpm dev & wait
+.PHONY: format
 
 format:
 	$(MAKE) -C chichi format
