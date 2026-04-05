@@ -14,14 +14,17 @@ type Column<T> = {
   };
 
 type TableProps<T> = {
+    title: string;
     data: T[];
     columns: Column<T>[];
     onSelectRow: (row: T) => void;
   };
 
-export function Table<T>({ data, columns, onSelectRow }: TableProps<T>) {
+export function Table<T>({ title, data, columns, onSelectRow }: TableProps<T>) {
     return (
-        <ShadcnTable>
+        <div>
+            {title && <h2 className="text-lg font-semibold mb-2">{title}</h2>}
+            <ShadcnTable>
             <TableHeader>
                 <TableRow>
                     {columns.map((col) => (
@@ -42,6 +45,7 @@ export function Table<T>({ data, columns, onSelectRow }: TableProps<T>) {
                     </TableRow>
                 ))}
             </TableBody>
-        </ShadcnTable>
+            </ShadcnTable>
+        </div>
     );
 }

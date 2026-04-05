@@ -1,10 +1,10 @@
+import { Projects } from "./projects/Projects";
 import { AuthProvider } from "./providers/AuthProvider";
-import { MediaHolder } from "./video/MediaHolder";
 
 function App() {
   return (
     <AuthProvider>
-      <MediaHolder />
+      <Projects />
     </AuthProvider>
   );
 }
