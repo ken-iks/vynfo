@@ -11,10 +11,14 @@ import (
 type ProjectServiceServer struct {
 	v1connect.UnimplementedProjectServiceHandler
 	storageClient *storage.Client
-	db *sql.DB
-	queries            *dbgen.Queries
+	db            *sql.DB
+	queries       *dbgen.Queries
 }
 
-func NewProjectServiceServer(c *storage.Client, db *sql.DB, queries *dbgen.Queries) *ProjectServiceServer {
-	return &ProjectServiceServer{storageClient: c, db: db, queries: queries }
+func NewProjectServiceServer(
+	c *storage.Client,
+	db *sql.DB,
+	queries *dbgen.Queries,
+) *ProjectServiceServer {
+	return &ProjectServiceServer{storageClient: c, db: db, queries: queries}
 }

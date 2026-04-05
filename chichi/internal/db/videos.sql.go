@@ -29,6 +29,17 @@ func (q *Queries) CreateVideo(ctx context.Context, arg CreateVideoParams) (Video
 	return i, err
 }
 
+const getVideoById = `-- name: GetVideoById :one
+SELECT asset_id, display_name, duration FROM videos WHERE asset_id = $1
+`
+
+func (q *Queries) GetVideoById(ctx context.Context, assetID uuid.UUID) (Video, error) {
+	row := q.db.QueryRowContext(ctx, getVideoById, assetID)
+	var i Video
+	err := row.Scan(&i.AssetID, &i.DisplayName, &i.Duration)
+	return i, err
+}
+
 const getVideos = `-- name: GetVideos :many
 SELECT asset_id, display_name, duration FROM videos WHERE asset_id = ANY($1::uuid[])
 `

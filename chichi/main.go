@@ -52,7 +52,9 @@ func main() {
 	defer storageClient.Close()
 	ProjectService := project.NewProjectServiceServer(storageClient, db, dbgen.New(db))
 	mux := http.NewServeMux()
+	// Proto service endpoints
 	mux.Handle(v1connect.NewProjectServiceHandler(ProjectService))
+	// Http service endpoints for HLS video serving
 	mux.HandleFunc("GET /video", ProjectService.GetManifest)
 	mux.Handle(
 		"GET /segments/",

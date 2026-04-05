@@ -30,17 +30,17 @@ func (p *ProjectServiceServer) UploadVideo(
 
 	// TODO: authenticate user
 	_, err = uuid.Parse(req.Msg.GetUserId())
-	
+
 	if err != nil {
 		slog.Error("error parsing user id")
 		return connect.NewError(connect.CodeInvalidArgument, err)
-	}	
+	}
 	projectID, err := uuid.Parse(req.Msg.GetProjectId())
 	if err != nil {
 		slog.Error("error parsing project id")
 		return connect.NewError(connect.CodeInvalidArgument, err)
 	}
-	
+
 	bytes := req.Msg.GetContent()
 	f, err := os.CreateTemp("external", "temp-*.mp4")
 	if err != nil {
@@ -69,15 +69,15 @@ func (p *ProjectServiceServer) UploadVideo(
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	video, err := q.CreateVideo(ctx, db.CreateVideoParams{
-		AssetID: asset.ID,
+		AssetID:     asset.ID,
 		DisplayName: req.Msg.GetTitle(),
-		Duration: videoDuration,
+		Duration:    videoDuration,
 	})
 	if err != nil {
 		slog.Error("error creating video")
 		return connect.NewError(connect.CodeInternal, err)
 	}
-	
+
 	segements, err := vid.GenerateSegments(f.Name(), video.AssetID.String(), 3, videoDuration)
 	if err != nil {
 		slog.Error("error initializing segemnter")
