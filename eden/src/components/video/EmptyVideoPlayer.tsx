@@ -1,14 +1,14 @@
 import { VideoCameraSlashIcon } from "@heroicons/react/24/outline";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 
 export function EmptyVideoPlayer() {
   return (
     <div
-      className={clsx(
+      className={cn(
         "w-full aspect-video rounded-lg",
-        "bg-neutral-100 dark:bg-neutral-800",
+        "bg-muted",
         "flex flex-col items-center justify-center gap-2",
-        "text-neutral-400",
+        "text-muted-foreground",
       )}
     >
       <VideoCameraSlashIcon className="size-8" />

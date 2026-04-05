@@ -1,8 +1,9 @@
 import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import { client } from "../lib/client";
+import { client } from "../../lib/client";
 import { create } from "@bufbuild/protobuf";
-import { UploadVideoRequestSchema } from "../gen/proto/v1/api_pb";
+import { UploadVideoRequestSchema } from "../../gen/proto/v1/api_pb";
+import { Button } from "@/components/ui/button";
 import { DragUploadArea } from "./DragUploadArea";
 import { ProgressBar } from "./ProgressBar";
 
@@ -51,13 +52,13 @@ export function UploadWizard({
       <DragUploadArea onFileSelected={setVideoFile} selectedFile={videoFile} />
       {videoFile !== null && (
         <div className="flex justify-center">
-          <button
+          <Button
             onClick={handleUpload}
             disabled={!videoFile || isUploading}
-            className="btn btn-primary btn-sm border p-1"
+            size="sm"
           >
-            Initate Upload
-          </button>
+            Initiate Upload
+          </Button>
         </div>
       )}
       {isUploading ? (

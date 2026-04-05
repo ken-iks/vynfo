@@ -1,5 +1,5 @@
-import clsx from "clsx";
 import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { EmptyVideoPlayer } from "./EmptyVideoPlayer";
 import { UploadWizard } from "./UploadWizard";
 import { VideoPlayer } from "./VideoPlayer";
@@ -15,17 +15,14 @@ export function MediaHolder() {
   };
 
   return (
-    <div
-      className={clsx(
-        "flex-col w-1/2 mx-auto",
-        "border rounded p-5 space-y-8",
-      )}
-    >
-      <UploadWizard
-        onUploadCompleted={handleUploaded}
-        onUploadOngoing={handleUploading}
-      />
-      {videoSrc !== "" ? <VideoPlayer src={videoSrc} /> : <EmptyVideoPlayer />}
-    </div>
+    <Card className="w-1/2 mx-auto">
+      <CardContent className="space-y-8">
+        <UploadWizard
+          onUploadCompleted={handleUploaded}
+          onUploadOngoing={handleUploading}
+        />
+        {videoSrc !== "" ? <VideoPlayer src={videoSrc} /> : <EmptyVideoPlayer />}
+      </CardContent>
+    </Card>
   );
 }
