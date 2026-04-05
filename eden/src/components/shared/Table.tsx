@@ -18,9 +18,10 @@ type TableProps<T> = {
     data: T[];
     columns: Column<T>[];
     onSelectRow: (row: T) => void;
+    rowActions?: (row: T) => React.ReactNode;
   };
 
-export function Table<T>({ title, data, columns, onSelectRow }: TableProps<T>) {
+export function Table<T>({ title, data, columns, onSelectRow, rowActions }: TableProps<T>) {
     return (
         <div>
             {title && <h2 className="text-lg font-semibold mb-2">{title}</h2>}
@@ -30,6 +31,7 @@ export function Table<T>({ title, data, columns, onSelectRow }: TableProps<T>) {
                     {columns.map((col) => (
                         <TableHead key={String(col.key)}>{col.header}</TableHead>
                     ))}
+                    {rowActions && <TableHead className="w-10" />}
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -42,6 +44,11 @@ export function Table<T>({ title, data, columns, onSelectRow }: TableProps<T>) {
                                     : String(row[col.key])}
                             </TableCell>
                         ))}
+                        {rowActions && (
+                            <TableCell onClick={(e) => e.stopPropagation()}>
+                                {rowActions(row)}
+                            </TableCell>
+                        )}
                     </TableRow>
                 ))}
             </TableBody>

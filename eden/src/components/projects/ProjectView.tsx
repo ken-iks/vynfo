@@ -6,7 +6,10 @@ import type { MediaImageMetadata, MediaTextMetadata, MediaVideoMetadata, Project
 import { VideoPlayer } from "../video/VideoPlayer";
 import { EmptyVideoPlayer } from "../video/EmptyVideoPlayer";
 import { Table } from "../shared/Table";
-
+import { editorStore } from "../stores/editor";
+import { AssetActions } from "./AssetActions";
+import { formatDuration } from "@/lib/utils";
+import { EditorTimeline } from "./EditorTimeline";
 
 export function ProjectView({ project }: { project: ProjectMetadata} ) {
     const [currVideoPlayingSrc, setCurrVideoPlayingSrc] = useState("");
@@ -27,6 +30,9 @@ export function ProjectView({ project }: { project: ProjectMetadata} ) {
             setCurrProjectVideos(assets.videos)
             setCurrProjectImages(assets.images)
             setCurrProjectTexts(assets.textBoxes)
+
+            // TODO: fetch commit state
+            editorStore.loadSections([]);
         }
         fetchAssets();
     }, [userId, project])
@@ -44,6 +50,14 @@ export function ProjectView({ project }: { project: ProjectMetadata} ) {
                         }
                     </CardContent>
                 </Card>
+                <Card className="flex-[3]">
+                    <h1 className="pl-5">
+                        Current branch: Main    
+                    </h1>
+                    <CardContent className="h-full">
+                        <EditorTimeline />
+                    </CardContent>
+                </Card>
                 <Card className="flex-[2]">
                     <CardContent >
                         {currProjectVideos.length > 0 &&
@@ -52,18 +66,10 @@ export function ProjectView({ project }: { project: ProjectMetadata} ) {
                             data={currProjectVideos}
                             columns={[
                                 { key: "title", header: "Title" },
-                                { key: "duration", header: "Duration", render: (_value, row) => {
-                                    const totalSeconds = Math.floor(row.duration)
-                                    const hrs = Math.floor(totalSeconds / 3600)
-                                    const mins = Math.floor((totalSeconds % 3600) / 60)
-                                    const secs = totalSeconds % 60
-                                    const pad = (n: number) => String(n).padStart(2, "0")
-                                    return hrs > 0
-                                        ? `${hrs}:${pad(mins)}:${pad(secs)}`
-                                        : `${mins}:${pad(secs)}`
-                                }}
+                                { key: "duration", header: "Duration", render: (_value, row) => formatDuration(row.duration * 1000) }
                             ]}
                             onSelectRow={(v) => handleVideoSelected(v)}
+                            rowActions={(row) => <AssetActions type="video" metadata={row} />}
                         />}
                         {currProjectTexts.length > 0 &&
                         <Table<MediaTextMetadata>
@@ -73,6 +79,7 @@ export function ProjectView({ project }: { project: ProjectMetadata} ) {
                                 { key: "assetId", "header": "Asset ID" }
                             ]}
                             onSelectRow={() => {}}
+                            rowActions={(row) => <AssetActions type="text" metadata={row} />}
                         />}
                         {currProjectImages.length > 0 &&
                         <Table<MediaImageMetadata>
@@ -82,12 +89,8 @@ export function ProjectView({ project }: { project: ProjectMetadata} ) {
                                 { key: "assetId", "header": "Asset ID" }
                             ]}
                             onSelectRow={() => {}}
+                            rowActions={(row) => <AssetActions type="image" metadata={row} />}
                         />}
-                    </CardContent>
-                </Card>
-                <Card className="flex-[1]">
-                    <CardContent>
-                            TODO: curr branch
                     </CardContent>
                 </Card>
             </div>

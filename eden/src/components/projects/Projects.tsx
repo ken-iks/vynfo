@@ -54,7 +54,7 @@ export function Projects() {
                             Back to Projects
                         </Button>
                     </div>
-                    <div className="absolute top-2 right-2 z-10">
+                    <div className="absolute top-2 right-8 z-10">
                         <ProjectConfigDropDown handlePageSelection={setProjectPage} />
                     </div>
                     { selectedProject && <ProjectView project={selectedProject} /> }

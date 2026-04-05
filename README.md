@@ -23,5 +23,7 @@ Clear the volume data:
 Run local db migration:
 `goose -dir database/schema postgres "postgres://dev:dev@localhost:5432/vynfo?sslmode=disable" up`
 
+Eden commands:
+
 Add shadcn components:
 `pnpm dlx shadcn@latest add X`
