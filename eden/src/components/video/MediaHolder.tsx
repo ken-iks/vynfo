@@ -4,7 +4,11 @@ import { EmptyVideoPlayer } from "./EmptyVideoPlayer";
 import { UploadWizard } from "./UploadWizard";
 import { VideoPlayer } from "./VideoPlayer";
 
-export function MediaHolder() {
+interface MediaHolderProps {
+  projectId: string
+}
+
+export function MediaHolder({projectId} : MediaHolderProps) {
   const [videoSrc, setVideoSrc] = useState("");
 
   const handleUploading = (videoId: string) => {
@@ -18,10 +22,15 @@ export function MediaHolder() {
     <Card className="w-1/2 mx-auto">
       <CardContent className="space-y-8">
         <UploadWizard
+          projectId={projectId}
           onUploadCompleted={handleUploaded}
           onUploadOngoing={handleUploading}
         />
-        {videoSrc !== "" ? <VideoPlayer src={videoSrc} /> : <EmptyVideoPlayer />}
+        {videoSrc !== "" ? (
+          <VideoPlayer src={videoSrc} />
+        ) : (
+          <EmptyVideoPlayer />
+        )}
       </CardContent>
     </Card>
   );

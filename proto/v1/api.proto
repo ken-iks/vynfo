@@ -77,28 +77,54 @@ message MediaOverlay {
     }
 }
 
-// PlaybackSection represents a particular cut of playback that is displayed between 
-// these timestamps containing these assets. 
+// The section video is the video that is used for this section, and start time
+// represent the start time within that video that this segment should begin playing from
 // NOTE: video_start_time_millies must for now be divisible by 500. This is because
 // the backend currently only supports splitting a video at IFrame intervals which
 // are currently set at 0.5s in our upload path. This is subject to change
+message SectionVideo {
+    MediaVideoMetadata meta = 1;
+    uint64 video_start_time_millies = 2;
+}
+
+// PlaybackSection represents a particular cut of playback that is displayed between 
+// these timestamps containing these assets. 
 message PlaybackSection {
     uint64 start_time_millis = 1;
     uint64 end_time_millis = 2;
-    MediaVideoMetadata video = 3;
-    uint64 video_start_time_millies = 4;
+    SectionVideo video = 3;
     repeated MediaOverlay overlays = 5;
 }
 
 // PlaybackEditor holds a list of sections controlling the current edited state of
-// the playback editor. We can use this sections list to show split sections of the
-// video edit state
-message SaveEditRequest {
+// the playback editor. When we make a commit, we optionally include a previous commit id.
+// NOTE: you can only not include the previous commit id when you are making the first commit
+// for a branch. 
+message CommitEditRequest {
     string project_id = 1;
-    repeated PlaybackSection sections = 2;
+    string branch_name = 2;
+    string commit_message = 3;
+    optional string previous_commit_id = 4;
+    repeated PlaybackSection commit_state = 5;
 }
 
-message SaveEditResponse {}
+message CommitEditResponse {
+    oneof response {
+        string new_commit_id = 1;
+        CommitEditError err = 2;
+    }
+}
+
+message CommitEditError {
+    oneof error_type {
+        StaleBranchError stale_branch = 2;
+    }
+}
+
+message StaleBranchError {
+    string assumed_branch_tip_uuid = 1;
+    string current_branch_tip_uuid = 2;
+}
 
 // ========================  Projects CRUD  ============================ //
 
@@ -156,10 +182,41 @@ message ListProjectAssetsResponse {
     repeated MediaTextMetadata text_boxes = 3;
 }
 
+// ListProjectBranchesRequest fetches every branch that belongs to a project.
+message ListProjectBranchesRequest {
+    string project_id = 1;
+}
+
+// BranchMetadata is the lightweight descriptor for a single branch.
+message BranchMetadata {
+    string name = 1;
+    optional string tip_commit_id = 2;
+}
+
+// ListProjectBranchesResponse returns the branches for the requested project.
+message ListProjectBranchesResponse {
+    repeated BranchMetadata branches = 1;
+}
+
+// ========================  Commits CRUD  ============================ //
+
+message GetCommitRequest {
+    string commit_id = 1;
+}
+
+message GetCommitResponse {
+    string commit_id = 1;
+    string project_id = 2;
+    string message = 3;
+    repeated PlaybackSection commit_state = 4;
+}
+
 // ====================== Service Definition ============================== //
 service ProjectService {
     rpc UploadVideo(UploadVideoRequest) returns (stream UploadVideoResponse);
-    rpc SaveEdit(SaveEditRequest) returns (SaveEditResponse);
+    rpc CommitEdit(CommitEditRequest) returns (CommitEditResponse);
+    rpc GetCommit(GetCommitRequest) returns (GetCommitResponse);
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
     rpc ListProjectAssets(ListProjectAssetsRequest) returns (ListProjectAssetsResponse);
+    rpc ListProjectBranches(ListProjectBranchesRequest) returns (ListProjectBranchesResponse);
 }

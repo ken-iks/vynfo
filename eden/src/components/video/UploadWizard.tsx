@@ -6,22 +6,23 @@ import { UploadVideoRequestSchema } from "../../gen/proto/v1/api_pb";
 import { Button } from "@/components/ui/button";
 import { DragUploadArea } from "./DragUploadArea";
 import { ProgressBar } from "./ProgressBar";
+import { useAuth } from "../providers/AuthProvider";
 
 interface UploaderProps {
+  projectId: string;
   onUploadOngoing: (videoId: string) => void;
   onUploadCompleted: (videoId: string) => void;
 }
 
-const projectId = "27a485b2-3466-4e1c-a36f-f0e8ce9f0378";
-const userId = "d322efef-cb5f-4cb8-9dc7-92e5500265fe";
-
 export function UploadWizard({
+  projectId,
   onUploadOngoing,
   onUploadCompleted,
 }: UploaderProps) {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadPercentage, setUploadPercentage] = useState(0);
+  const userId = useAuth();
 
   async function handleUpload() {
     if (!videoFile) {
