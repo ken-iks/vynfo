@@ -3,6 +3,7 @@ import { Card, CardContent } from "../ui/card";
 import { useAuth } from "../providers/AuthProvider";
 import { client } from "@/lib/client";
 import type {
+  BranchMetadata,
   MediaImageMetadata,
   MediaTextMetadata,
   MediaVideoMetadata,
@@ -16,6 +17,13 @@ import { AssetActions } from "./AssetActions";
 import { formatDuration } from "@/lib/utils";
 import { EditorTimeline } from "./EditorTimeline";
 import { SectionTitle } from "../shared/SectionTitle";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 export function ProjectView({ project }: { project: ProjectMetadata }) {
   const [currVideoPlayingSrc, setCurrVideoPlayingSrc] = useState("");
@@ -29,11 +37,24 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
   const [currProjectImages, setCurrProjectImages] = useState<
     MediaImageMetadata[]
   >([]);
+  const [branches, setBranches] = useState<BranchMetadata[]>([]);
+  const [selectedBranch, setSelectedBranch] = useState<string>("");
 
   const userId = useAuth();
 
   const handleVideoSelected = (v: MediaVideoMetadata) => {
     setCurrVideoPlayingSrc(`/video?videoId=${v.assetId}&mode=historical`);
+  };
+
+  const handleBranchChange = async (branchName: string) => {
+    setSelectedBranch(branchName);
+    const branch = branches.find((b) => b.name === branchName);
+    if (branch?.tipCommitId) {
+      const commit = await client.getCommit({ commitId: branch.tipCommitId });
+      editorStore.loadSections(commit.commitState);
+    } else {
+      editorStore.loadSections([]);
+    }
   };
 
   useEffect(() => {
@@ -45,12 +66,33 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
       setCurrProjectVideos(assets.videos);
       setCurrProjectImages(assets.images);
       setCurrProjectTexts(assets.textBoxes);
-
-      // TODO: fetch commit state
-      editorStore.loadSections([]);
     };
     fetchAssets();
   }, [userId, project]);
+
+  useEffect(() => {
+    const fetchBranches = async () => {
+      const res = await client.listProjectBranches({
+        projectId: project.id,
+      });
+      setBranches(res.branches);
+      if (res.branches.length > 0) {
+        const first = res.branches[0];
+        setSelectedBranch(first.name);
+        if (first.tipCommitId) {
+          const commit = await client.getCommit({
+            commitId: first.tipCommitId,
+          });
+          editorStore.loadSections(commit.commitState);
+        } else {
+          editorStore.loadSections([]);
+        }
+      } else {
+        editorStore.loadSections([]);
+      }
+    };
+    fetchBranches();
+  }, [project]);
 
   return (
     <div className="flex flex-col items-center">
@@ -66,11 +108,38 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
           </CardContent>
         </Card>
         <Card className="h-96">
-          <div className="pl-5">
-            <SectionTitle>Current branch: Main</SectionTitle>
+          <div className="pl-5 flex items-center gap-3">
+            <SectionTitle>Branch:</SectionTitle>
+            <Select value={selectedBranch} onValueChange={handleBranchChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a branch" />
+              </SelectTrigger>
+              <SelectContent>
+                {branches.map((b) => (
+                  <SelectItem key={b.name} value={b.name}>
+                    {b.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <CardContent className="h-full">
-            <EditorTimeline />
+            <EditorTimeline
+              projectId={project.id}
+              branchName={selectedBranch}
+              tipCommitId={
+                branches.find((b) => b.name === selectedBranch)?.tipCommitId
+              }
+              onCommitSuccess={(newCommitId) => {
+                setBranches((prev) =>
+                  prev.map((b) =>
+                    b.name === selectedBranch
+                      ? { ...b, tipCommitId: newCommitId }
+                      : b,
+                  ),
+                );
+              }}
+            />
           </CardContent>
         </Card>
         <Card>

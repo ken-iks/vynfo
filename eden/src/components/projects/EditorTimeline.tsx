@@ -1,11 +1,69 @@
+import { useState } from "react";
 import { useSnapshot } from "valtio";
 import { editorStore } from "../stores/editor";
 import { EditorTimelineSection } from "./EditorTimelineSection";
 import { formatDuration } from "@/lib/utils";
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { client } from "@/lib/client";
 
-export function EditorTimeline() {
+interface EditorTimelineProps {
+  projectId: string;
+  branchName: string;
+  tipCommitId: string | undefined;
+  onCommitSuccess: (newCommitId: string) => void;
+}
+
+export function EditorTimeline({
+  projectId,
+  branchName,
+  tipCommitId,
+  onCommitSuccess,
+}: EditorTimelineProps) {
   const snap = useSnapshot(editorStore);
   const totalDuration = snap.totalDurationMillis;
+
+  const [commitMessage, setCommitMessage] = useState("");
+  const [isCommitting, setIsCommitting] = useState(false);
+  const [commitError, setCommitError] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleCommit = async () => {
+    if (!commitMessage.trim()) return;
+    setIsCommitting(true);
+    setCommitError("");
+    try {
+      const res = await client.commitEdit({
+        projectId,
+        branchName,
+        commitMessage: commitMessage.trim(),
+        previousCommitId: tipCommitId,
+        commitState: [...editorStore.sections],
+      });
+      if (res.response.case === "newCommitId") {
+        onCommitSuccess(res.response.value);
+        setCommitMessage("");
+        setDialogOpen(false);
+      } else if (res.response.case === "err") {
+        setCommitError(
+          "Branch is stale — someone else committed. Refresh and try again.",
+        );
+      }
+    } catch (e) {
+      setCommitError(e instanceof Error ? e.message : "Commit failed");
+    } finally {
+      setIsCommitting(false);
+    }
+  };
 
   if (snap.sections.length === 0) {
     return (
@@ -37,7 +95,36 @@ export function EditorTimeline() {
           );
         })}
       </div>
-      <div className="flex justify-end px-2 py-1">
+      <div className="flex justify-between items-center px-2 py-1">
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm">Save</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Commit to {branchName}</DialogTitle>
+              <DialogDescription>
+                Describe what changed in this edit.
+              </DialogDescription>
+            </DialogHeader>
+            <Textarea
+              placeholder="Commit message..."
+              value={commitMessage}
+              onChange={(e) => setCommitMessage(e.target.value)}
+            />
+            {commitError && (
+              <p className="text-xs text-destructive">{commitError}</p>
+            )}
+            <DialogFooter>
+              <Button
+                onClick={handleCommit}
+                disabled={isCommitting || !commitMessage.trim()}
+              >
+                {isCommitting ? "Committing..." : "Commit"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <span className="text-xs text-muted-foreground">
           {formatDuration(Number(totalDuration))}
         </span>

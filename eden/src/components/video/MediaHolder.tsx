@@ -5,10 +5,10 @@ import { UploadWizard } from "./UploadWizard";
 import { VideoPlayer } from "./VideoPlayer";
 
 interface MediaHolderProps {
-  projectId: string
+  projectId: string;
 }
 
-export function MediaHolder({projectId} : MediaHolderProps) {
+export function MediaHolder({ projectId }: MediaHolderProps) {
   const [videoSrc, setVideoSrc] = useState("");
 
   const handleUploading = (videoId: string) => {

@@ -76,7 +76,6 @@ class EditorStore {
     this.sections = [];
     this.selectedSectionIndex = null;
   }
-
 }
 
 export const editorStore = proxy(new EditorStore());

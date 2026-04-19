@@ -79,7 +79,9 @@ export function Projects() {
               Back to Project
             </Button>
           </div>
-          {selectedProject ? <MediaHolder projectId = {selectedProject.id} /> : null}
+          {selectedProject ? (
+            <MediaHolder projectId={selectedProject.id} />
+          ) : null}
         </div>
       );
     default:
