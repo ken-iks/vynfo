@@ -35,12 +35,21 @@ type Commit struct {
 	State     json.RawMessage
 	Message   sql.NullString
 	CreatedAt sql.NullTime
+	UserID    uuid.UUID
 }
 
 type CommitParent struct {
 	CommitID uuid.UUID
 	ParentID uuid.UUID
 	Position int32
+}
+
+type Keyframe struct {
+	VideoID             uuid.UUID
+	TimestampInVideo    int64
+	SegmentIdx          int64
+	ByteOffsetInSegment int64
+	SizeInBytes         int64
 }
 
 type Project struct {

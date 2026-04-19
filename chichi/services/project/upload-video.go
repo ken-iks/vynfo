@@ -22,7 +22,7 @@ func (p *ProjectServiceServer) UploadVideo(
 ) error {
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
-		slog.Error("error starting transaction")
+		slog.Error("error starting transaction", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	defer tx.Rollback()
@@ -32,31 +32,31 @@ func (p *ProjectServiceServer) UploadVideo(
 	_, err = uuid.Parse(req.Msg.GetUserId())
 
 	if err != nil {
-		slog.Error("error parsing user id")
+		slog.Error("error parsing user id", "error", err)
 		return connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	projectID, err := uuid.Parse(req.Msg.GetProjectId())
 	if err != nil {
-		slog.Error("error parsing project id")
+		slog.Error("error parsing project id", "error", err)
 		return connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
 	bytes := req.Msg.GetContent()
 	f, err := os.CreateTemp("external", "temp-*.mp4")
 	if err != nil {
-		slog.Error("error opening up temporary file for writing")
+		slog.Error("error opening up temporary file for writing", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	defer os.Remove(f.Name())
 	defer f.Close()
 	_, err = f.Write(bytes)
 	if err != nil {
-		slog.Error("error writing video to temp file")
+		slog.Error("error writing video to temp file", "error", err)
 		return connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	videoDuration, err := vid.ProbeDuration(f.Name())
 	if err != nil {
-		slog.Error("could not dertermine video length")
+		slog.Error("could not dertermine video length", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -65,7 +65,7 @@ func (p *ProjectServiceServer) UploadVideo(
 		AssetType: "video",
 	})
 	if err != nil {
-		slog.Error("error creating asset")
+		slog.Error("error creating asset", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	video, err := q.CreateVideo(ctx, db.CreateVideoParams{
@@ -74,25 +74,25 @@ func (p *ProjectServiceServer) UploadVideo(
 		Duration:    videoDuration,
 	})
 	if err != nil {
-		slog.Error("error creating video")
+		slog.Error("error creating video", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 
 	segements, err := vid.GenerateSegments(f.Name(), video.AssetID.String(), 3, videoDuration)
 	if err != nil {
-		slog.Error("error initializing segemnter")
+		slog.Error("error initializing segemnter", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	manifestFile, err := os.Create(fmt.Sprintf("%s.m3u8", video.AssetID.String()))
 	if err != nil {
-		slog.Error("error initializing local manifest")
+		slog.Error("error initializing local manifest", "error", err)
 		return connect.NewError(connect.CodeAborted, err)
 	}
 	defer manifestFile.Close()
 	manifest := vid.StartManifest(video.AssetID.String(), manifestFile, p.storageClient)
 	for seg, err := range segements {
 		if err != nil {
-			slog.Error("segmentation error")
+			slog.Error("segmentation error", "error", err)
 			return connect.NewError(connect.CodeInternal, err)
 		}
 		if err := manifest.UploadSegment(seg, ctx); err != nil {
@@ -111,9 +111,16 @@ func (p *ProjectServiceServer) UploadVideo(
 			return err
 		}
 	}
-	_, err = manifest.FinishUpload(ctx)
+
+	err = manifest.PersistKeyframeMetadata(ctx, video.AssetID, q)
 	if err != nil {
-		slog.Error("error uploading manifest")
+		slog.Error("error persisting keyframe metadata", "error", err)
+		return connect.NewError(connect.CodeInternal, err)
+	}
+
+	err = manifest.FinishUpload(ctx)
+	if err != nil {
+		slog.Error("error uploading manifest", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 

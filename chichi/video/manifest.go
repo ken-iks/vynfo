@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+	"github.com/google/uuid"
+	"vynfo.com/vynfo/internal/db"
 )
 
 const MANIFEST_LIVE_BASE = `#EXTM3U
@@ -114,10 +116,46 @@ func (builder *ManifestBuilder) UploadSegment(seg VideoSegment, ctx context.Cont
 	if err != nil {
 		return err
 	}
-	// append signed url of segment to the in memory manifest
+	// Append segment to the live manifest so HLS players can stream mid-upload
 	fmt.Fprintf(builder.LiveFile, "\n#EXTINF:%s,\n%s", seg.durationString, seg.path)
 	builder.LiveFile.Sync()
 	slog.Info("Segment uploaded", "path", seg.path)
+	return nil
+}
+
+// Iterates over all segments that are have been written to in the manifest builder
+// and persists their individual keyframes to the table
+func (builder *ManifestBuilder) PersistKeyframeMetadata(
+	ctx context.Context,
+	videoID uuid.UUID,
+	queries *db.Queries,
+) error {
+	// generate all offsets for each file
+	segmentsDir := fmt.Sprintf("segments/%s", builder.VideoID)
+	segments, err := os.ReadDir(segmentsDir)
+	if err != nil {
+		slog.Error("manifest successfully uploaded but couldnt begin offsets", "error", err)
+		return err
+	}
+	// we iterate over the segments in order and end up with an index based array
+	// where the element at index i represents the keyframe offsets for segment i
+	for i, f := range segments {
+		segPath := fmt.Sprintf("%s/%s", segmentsDir, f.Name())
+		offsets, err := GenerateOffsets(segPath)
+		if err != nil {
+			return fmt.Errorf("offset generation failed for %s: %w", segPath, err)
+		}
+		for ts, kf := range offsets {
+			queries.CreateKeyFrame(ctx, db.CreateKeyFrameParams{
+				VideoID:             videoID,
+				TimestampInVideo:    int64(ts),
+				SegmentIdx:          int64(i),
+				ByteOffsetInSegment: int64(kf.ByteOffset),
+				SizeInBytes:         int64(kf.Size),
+			})
+		}
+	}
+	slog.Info("successfully written keyframe metadata to db")
 	return nil
 }
 
@@ -134,8 +172,8 @@ func PurgeLocalCache(videoID string) {
 }
 
 // Writes the historical manifest to cloud storage appending the final
-// line to it.
-func (builder *ManifestBuilder) FinishUpload(ctx context.Context) (string, error) {
+// line to it
+func (builder *ManifestBuilder) FinishUpload(ctx context.Context) error {
 	builder.LiveFile.WriteString("\n#EXT-X-ENDLIST")
 	builder.LiveFile.Sync()
 
@@ -150,7 +188,28 @@ func (builder *ManifestBuilder) FinishUpload(ctx context.Context) (string, error
 		nil,
 	)
 	if err != nil {
-		return "", err
+		return err
 	}
-	return "", nil
+	return nil
+}
+
+func UploadBranchManifestToCloud(
+	ctx context.Context,
+	client *storage.Client,
+	manifest string,
+	branchId string,
+) error {
+	bucket := client.Bucket("vedit-v1")
+	path := fmt.Sprintf("maifests/%s.m3u8", branchId)
+	w := bucket.Object(path).NewWriter(ctx)
+	_, err := uploadString(
+		w,
+		manifest,
+		path,
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
 }

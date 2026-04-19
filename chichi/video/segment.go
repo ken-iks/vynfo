@@ -47,11 +47,19 @@ func GenerateSegments(
 	segmentPath := fmt.Sprintf("segments/%s", videoID)
 	manifestPath := fmt.Sprintf("%s/manifest.m3u8", segmentPath)
 	os.MkdirAll(segmentPath, 0755)
+	// Re-encode with consistent keyframes for sub-second editing granularity.
+	// -r 30: CFR at 30fps so frames land exactly on 500ms boundaries (frame 15 = 500ms).
+	//        VFR sources drift and keyframe PTS won't be divisible by 500ms without this.
+	// -force_key_frames: IDR frame every 0.5s — must cleanly divide into segLength.
+	// -x264-params scenecut=-1: disable scene-cut detection so the ONLY keyframes are the
+	//        forced ones. Without this x264 injects extras at arbitrary timestamps.
 	cmd := exec.Command("ffmpeg",
 		"-loglevel", "info",
 		"-i", fp,
-		"-c:v", "libx264", // design decision: re-encode to force consistent key frames
+		"-c:v", "libx264",
+		"-r", "30",
 		"-force_key_frames", fmt.Sprintf("expr:gte(t,n_forced*%.1f)", 0.5),
+		"-x264-params", "scenecut=-1",
 		"-c:a", "aac",
 		"-hls_time", strconv.Itoa(segLength),
 		"-hls_list_size", "0",
