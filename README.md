@@ -6,12 +6,13 @@
 
 1. Make sure to have access credentials by generating an ssh key and adding it to the github. From there, `git clone` the repo so you have it local
 2. Install the base dependencies `brew install go node buf`
-3. Ensure you have docker desktop downloaded (can install from website or use `brew install --cask docker`)
-4. Generate and store access google app credentials and set up **.env** file with accurate path (TBD)
+3. Add the Go bin to PATH: `echo 'export PATH="$HOME/go/bin:$PATH"' >> ~/.zshrc`
+4. Ensure you have docker desktop downloaded (can install from website or use `brew install --cask docker`)
+5. Generate and store access google app credentials and set up **.env** file with accurate path (TBD). NOTE **make sure .env file lives in the chichi/ directory**
 
-5. Download frontend package manager: `npm install -g pnpm`
+6. Download frontend package manager: `npm install -g pnpm`
 
-6. Download Go CLI Tools:
+7. Download Go CLI Tools:
 ```
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 go install connectrpc.com/connect/cmd/protoc-gen-connect-go@latest
@@ -20,11 +21,11 @@ go install github.com/pressly/goose/v3/cmd/goose@latest
 go install github.com/segmentio/golines@latest
 ```
 
-7. Run `buf generate` to generate the API clients
-
 8. Get Go module deps `cd chichi && go mod download`
 
-9. Get node module deps `cd edent && pnpm install`
+9. Get node module deps `cd edent && pnpm i`
+
+10. Run `buf generate` to generate the API clients
 
 Now youre all set up! See the makefile for useful commands or see below! Happy hacking.
 
