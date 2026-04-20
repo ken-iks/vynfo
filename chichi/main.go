@@ -43,7 +43,7 @@ func main() {
 		os.Exit(1)
 	}
 	slog.Info("migrations, sucessful - starting up app")
-	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})))
+	//slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})))
 	ctx := context.Background()
 	storageClient, err := storage.NewClient(ctx)
 	if err != nil {

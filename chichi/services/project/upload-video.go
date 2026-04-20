@@ -77,7 +77,12 @@ func (p *ProjectServiceServer) UploadVideo(
 		return connect.NewError(connect.CodeInternal, err)
 	}
 
-	segements, tmpDir, err := vid.GenerateSegments(f.Name(), video.AssetID.String(), 3, videoDuration)
+	segements, tmpDir, err := vid.GenerateSegments(
+		f.Name(),
+		video.AssetID.String(),
+		3,
+		videoDuration,
+	)
 	if err != nil {
 		slog.Error("error initializing segemnter", "error", err)
 		return connect.NewError(connect.CodeInternal, err)

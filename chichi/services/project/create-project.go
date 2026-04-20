@@ -28,8 +28,8 @@ func (p *ProjectServiceServer) CreateProject(
 	q := p.queries.WithTx(tx)
 
 	project, err := q.CreateProject(ctx, db.CreateProjectParams{
-		UserID: userId,
-		ProjectName: req.Msg.GetProjectName(),
+		UserID:             userId,
+		ProjectName:        req.Msg.GetProjectName(),
 		ProjectDescription: req.Msg.GetProjectDescription(),
 	})
 	if err != nil {
@@ -41,9 +41,9 @@ func (p *ProjectServiceServer) CreateProject(
 		slog.Error("error creating main branch", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
-	updatedProject, err:= q.SetMainBranch(ctx, db.SetMainBranchParams{
-		ID: project.ID,
-		MainBranchID: uuid.NullUUID{ UUID: main.ID, Valid: true },
+	updatedProject, err := q.SetMainBranch(ctx, db.SetMainBranchParams{
+		ID:           project.ID,
+		MainBranchID: uuid.NullUUID{UUID: main.ID, Valid: true},
 	})
 	if err != nil {
 		slog.Error("error updating main branch id", "error", err)

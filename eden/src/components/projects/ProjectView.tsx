@@ -16,6 +16,7 @@ import { editorStore } from "../stores/editor";
 import { AssetActions } from "./AssetActions";
 import { formatDuration } from "@/lib/utils";
 import { EditorTimeline } from "./EditorTimeline";
+import { videoColors } from "./timelineGeometry";
 import { SectionTitle } from "../shared/SectionTitle";
 import {
   Select,
@@ -123,6 +124,7 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
             <EditorTimeline
               projectId={project.id}
               branchName={selectedBranch}
+              availableVideos={currProjectVideos}
               tipCommitId={
                 branches.find((b) => b.name === selectedBranch)?.tipCommitId
               }
@@ -151,6 +153,23 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
                 title="Videos"
                 data={currProjectVideos}
                 columns={[
+                  {
+                    key: "assetId",
+                    header: "",
+                    render: (_value, row) => {
+                      const colors = videoColors(row.assetId);
+                      return (
+                        <div
+                          className="size-4 rounded-sm ring-1"
+                          style={{
+                            backgroundColor: colors.background,
+                            boxShadow: `inset 0 0 0 1px ${colors.ring}`,
+                          }}
+                          aria-label="Timeline color"
+                        />
+                      );
+                    },
+                  },
                   { key: "title", header: "Title" },
                   {
                     key: "duration",
