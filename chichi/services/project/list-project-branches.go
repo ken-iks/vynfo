@@ -29,6 +29,7 @@ func (p *ProjectServiceServer) ListProjectBranches(
 	out := make([]*v1.BranchMetadata, 0, len(branches))
 	for _, b := range branches {
 		md := &v1.BranchMetadata{
+			Id:   b.ID.String(),
 			Name: b.Name,
 		}
 		if b.TipCommitID.Valid {

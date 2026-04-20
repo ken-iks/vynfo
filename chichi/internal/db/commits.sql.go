@@ -14,17 +14,23 @@ import (
 )
 
 const createCommit = `-- name: CreateCommit :one
-INSERT INTO commits (project_id, state, message) VALUES ($1, $2, $3) RETURNING id, project_id, state, message, created_at, user_id
+INSERT INTO commits (user_id, project_id, state, message) VALUES ($1, $2, $3, $4) RETURNING id, project_id, state, message, created_at, user_id
 `
 
 type CreateCommitParams struct {
+	UserID    uuid.UUID
 	ProjectID uuid.UUID
 	State     json.RawMessage
 	Message   sql.NullString
 }
 
 func (q *Queries) CreateCommit(ctx context.Context, arg CreateCommitParams) (Commit, error) {
-	row := q.db.QueryRowContext(ctx, createCommit, arg.ProjectID, arg.State, arg.Message)
+	row := q.db.QueryRowContext(ctx, createCommit,
+		arg.UserID,
+		arg.ProjectID,
+		arg.State,
+		arg.Message,
+	)
 	var i Commit
 	err := row.Scan(
 		&i.ID,

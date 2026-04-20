@@ -22,7 +22,15 @@ func (p *ProjectServiceServer) CommitEdit(
 		slog.Error("error parsing project id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
-	currBranch, err := p.queries.GetBranchByName(ctx, req.Msg.GetBranchName())
+	userId, err := uuid.Parse(req.Msg.GetUserId())
+	if err != nil {
+		slog.Error("error parsing user id", "error", err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	currBranch, err := p.queries.GetBranchByName(ctx, db.GetBranchByNameParams{
+		ProjectID: projectId,
+		Name:      req.Msg.GetBranchName(),
+	})
 	if err != nil {
 		slog.Error("error retrieve branch", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
@@ -66,6 +74,7 @@ func (p *ProjectServiceServer) CommitEdit(
 	defer tx.Rollback()
 	q := p.queries.WithTx(tx)
 	commit, err := q.CreateCommit(ctx, db.CreateCommitParams{
+		UserID:    userId,
 		ProjectID: projectId,
 		State:     stateJson,
 		Message: sql.NullString{
@@ -73,13 +82,20 @@ func (p *ProjectServiceServer) CommitEdit(
 			Valid:  req.Msg.GetCommitMessage() != "",
 		},
 	})
+	if err != nil {
+		slog.Error("error creating commit", "error", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
 	updatedBranch, err := q.SetBranchCommitID(ctx, db.SetBranchCommitIDParams{
 		TipCommitID: uuid.NullUUID{UUID: commit.ID, Valid: true},
 		ID:          currBranch.ID,
 	})
 	if err != nil {
-		slog.Error("error updating branch to new commit")
+		slog.Error("error updating branch to new commit", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	if err := tx.Commit(); err != nil {
+		slog.Error("error commiting db transaction", "error", err)
 	}
 
 	return connect.NewResponse(&v1.CommitEditResponse{

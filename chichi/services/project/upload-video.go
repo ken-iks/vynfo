@@ -2,7 +2,6 @@ package project
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"os"
 
@@ -42,7 +41,7 @@ func (p *ProjectServiceServer) UploadVideo(
 	}
 
 	bytes := req.Msg.GetContent()
-	f, err := os.CreateTemp("external", "temp-*.mp4")
+	f, err := os.CreateTemp("", "temp-*.mp4")
 	if err != nil {
 		slog.Error("error opening up temporary file for writing", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
@@ -78,18 +77,13 @@ func (p *ProjectServiceServer) UploadVideo(
 		return connect.NewError(connect.CodeInternal, err)
 	}
 
-	segements, err := vid.GenerateSegments(f.Name(), video.AssetID.String(), 3, videoDuration)
+	segements, tmpDir, err := vid.GenerateSegments(f.Name(), video.AssetID.String(), 3, videoDuration)
 	if err != nil {
 		slog.Error("error initializing segemnter", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
-	manifestFile, err := os.Create(fmt.Sprintf("%s.m3u8", video.AssetID.String()))
-	if err != nil {
-		slog.Error("error initializing local manifest", "error", err)
-		return connect.NewError(connect.CodeAborted, err)
-	}
-	defer manifestFile.Close()
-	manifest := vid.StartManifest(video.AssetID.String(), manifestFile, p.storageClient)
+	defer os.RemoveAll(tmpDir)
+	manifest := vid.StartManifest(video.AssetID.String(), video.AssetID, p.storageClient, q)
 	for seg, err := range segements {
 		if err != nil {
 			slog.Error("segmentation error", "error", err)
@@ -110,12 +104,6 @@ func (p *ProjectServiceServer) UploadVideo(
 		if err := stream.Send(msg); err != nil {
 			return err
 		}
-	}
-
-	err = manifest.PersistKeyframeMetadata(ctx, video.AssetID, q)
-	if err != nil {
-		slog.Error("error persisting keyframe metadata", "error", err)
-		return connect.NewError(connect.CodeInternal, err)
 	}
 
 	err = manifest.FinishUpload(ctx)

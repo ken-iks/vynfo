@@ -51,11 +51,16 @@ func (q *Queries) CreateMainBranch(ctx context.Context, projectID uuid.UUID) (Br
 }
 
 const getBranchByName = `-- name: GetBranchByName :one
-SELECT id, project_id, name, tip_commit_id FROM branches WHERE name = $1
+SELECT id, project_id, name, tip_commit_id FROM branches WHERE project_id = $1 AND name = $2
 `
 
-func (q *Queries) GetBranchByName(ctx context.Context, name string) (Branch, error) {
-	row := q.db.QueryRowContext(ctx, getBranchByName, name)
+type GetBranchByNameParams struct {
+	ProjectID uuid.UUID
+	Name      string
+}
+
+func (q *Queries) GetBranchByName(ctx context.Context, arg GetBranchByNameParams) (Branch, error) {
+	row := q.db.QueryRowContext(ctx, getBranchByName, arg.ProjectID, arg.Name)
 	var i Branch
 	err := row.Scan(
 		&i.ID,

@@ -43,7 +43,7 @@ func (q *Queries) CreateKeyFrame(ctx context.Context, arg CreateKeyFrameParams) 
 }
 
 const getKeyFrameRange = `-- name: GetKeyFrameRange :many
-SELECT video_id, timestamp_in_video, segment_idx, byte_offset_in_segment, size_in_bytes FROM keyframes WHERE video_id = $1 AND timestamp_in_video >= $2 ORDER BY (segment_idx, byte_offset_in_segment) DESC LIMIT $3
+SELECT video_id, timestamp_in_video, segment_idx, byte_offset_in_segment, size_in_bytes FROM keyframes WHERE video_id = $1 AND timestamp_in_video >= $2 ORDER BY (segment_idx, byte_offset_in_segment) ASC LIMIT $3
 `
 
 type GetKeyFrameRangeParams struct {

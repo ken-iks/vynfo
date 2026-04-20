@@ -14,7 +14,7 @@ INSERT INTO branches (project_id, name) VALUES ($1, 'main') RETURNING *;
 SELECT * FROM branches WHERE name = 'main';
 
 -- name: GetBranchByName :one
-SELECT * FROM branches WHERE name = $1;
+SELECT * FROM branches WHERE project_id = $1 AND name = $2;
 
 -- name: GetBranchCommitHistory :many
 WITH RECURSIVE history AS (

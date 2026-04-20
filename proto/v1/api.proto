@@ -106,6 +106,7 @@ message CommitEditRequest {
     string commit_message = 3;
     optional string previous_commit_id = 4;
     repeated PlaybackSection commit_state = 5;
+    string user_id = 6;
 }
 
 message CommitEditResponse {
@@ -191,11 +192,22 @@ message ListProjectBranchesRequest {
 message BranchMetadata {
     string name = 1;
     optional string tip_commit_id = 2;
+    string id = 3;
 }
 
 // ListProjectBranchesResponse returns the branches for the requested project.
 message ListProjectBranchesResponse {
     repeated BranchMetadata branches = 1;
+}
+
+message CreateProjectRequest {
+    string user_id = 1;
+    string project_name = 2;
+    string project_description = 3;
+}
+
+message CreateProjectResponse {
+    string created_project_id = 1;
 }
 
 // ========================  Commits CRUD  ============================ //
@@ -219,4 +231,5 @@ service ProjectService {
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
     rpc ListProjectAssets(ListProjectAssetsRequest) returns (ListProjectAssetsResponse);
     rpc ListProjectBranches(ListProjectBranchesRequest) returns (ListProjectBranchesResponse);
+    rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
 }

@@ -32,7 +32,7 @@ func GenerateSegments(
 	videoID string,
 	segLength int,
 	videoDuration float64,
-) (iter.Seq2[VideoSegment, error], error) {
+) (iter.Seq2[VideoSegment, error], string, error) {
 
 	if segLength < MIN_SEGMENT_LENGTH {
 		slog.Error(
@@ -42,11 +42,12 @@ func GenerateSegments(
 			"min segment size",
 			MIN_SEGMENT_LENGTH,
 		)
-		return nil, errors.New("SEGMENT LENGTH ERROR")
+		return nil, "", errors.New("SEGMENT LENGTH ERROR")
 	}
-	segmentPath := fmt.Sprintf("segments/%s", videoID)
-	manifestPath := fmt.Sprintf("%s/manifest.m3u8", segmentPath)
-	os.MkdirAll(segmentPath, 0755)
+	tmpDir, err := os.MkdirTemp("", "vynfo-seg-"+videoID+"-*")
+	if err != nil {
+		return nil, "", err
+	}
 	// Re-encode with consistent keyframes for sub-second editing granularity.
 	// -r 30: CFR at 30fps so frames land exactly on 500ms boundaries (frame 15 = 500ms).
 	//        VFR sources drift and keyframe PTS won't be divisible by 500ms without this.
@@ -57,18 +58,21 @@ func GenerateSegments(
 		"-loglevel", "info",
 		"-i", fp,
 		"-c:v", "libx264",
+		"-preset", "ultrafast",
+		"-tune", "zerolatency",
 		"-r", "30",
 		"-force_key_frames", fmt.Sprintf("expr:gte(t,n_forced*%.1f)", 0.5),
 		"-x264-params", "scenecut=-1",
 		"-c:a", "aac",
-		"-hls_time", strconv.Itoa(segLength),
-		"-hls_list_size", "0",
-		"-hls_playlist_type", "vod",
-		"-hls_segment_filename", fmt.Sprintf("%s/seg_%%03d.ts", segmentPath),
-		"-f", "hls",
-		manifestPath,
+		"-muxdelay", "0",
+		"-muxpreload", "0",
+		"-f", "segment",
+		"-segment_time", strconv.Itoa(segLength),
+		"-segment_format", "mpegts",
+		"-reset_timestamps", "0",
+		fmt.Sprintf("%s/seg_%%03d.ts", tmpDir),
 	)
-	reg := regexp.MustCompile(`segments/` + videoID + `/seg_\d+\.ts`)
+	reg := regexp.MustCompile(regexp.QuoteMeta(tmpDir) + `/seg_\d+\.ts`)
 	count := 0
 
 	return func(yield func(VideoSegment, error) bool) {
@@ -124,7 +128,7 @@ func GenerateSegments(
 				return
 			}
 		}
-	}, nil
+	}, tmpDir, nil
 }
 
 // Gives exact video duration from ffprobe

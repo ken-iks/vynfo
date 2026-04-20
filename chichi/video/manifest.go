@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -15,13 +16,13 @@ import (
 )
 
 const MANIFEST_LIVE_BASE = `#EXTM3U
-#EXT-X-VERSION:3
+#EXT-X-VERSION:4
 #EXT-X-TARGETDURATION:3
 #EXT-X-MEDIA-SEQUENCE:0
 #EXT-X-PLAYLIST-TYPE:EVENT`
 
 const MANIFEST_PERSISTED_BASE = `#EXTM3U
-#EXT-X-VERSION:3
+#EXT-X-VERSION:4
 #EXT-X-TARGETDURATION:3
 #EXT-X-MEDIA-SEQUENCE:0
 #EXT-X-PLAYLIST-TYPE:VOD`
@@ -33,19 +34,24 @@ const MANIFEST_PERSISTED_BASE = `#EXTM3U
 type ManifestBuilder struct {
 	Storage   *storage.Client
 	VideoID   string
-	LiveFile  *os.File
-	Persisted string
+	VideoUUID uuid.UUID
+	Queries   *db.Queries
+	segIndex  int64
+	lines     strings.Builder
 }
 
 // Writes the intital bytes to the manifest files
-func StartManifest(videoID string, manifestFile *os.File, client *storage.Client) ManifestBuilder {
-	manifestFile.WriteString(MANIFEST_LIVE_BASE)
-	manifestFile.Sync()
+func StartManifest(
+	videoID string,
+	videoUUID uuid.UUID,
+	client *storage.Client,
+	queries *db.Queries,
+) ManifestBuilder {
 	return ManifestBuilder{
 		Storage:   client,
 		VideoID:   videoID,
-		LiveFile:  manifestFile,
-		Persisted: MANIFEST_PERSISTED_BASE,
+		VideoUUID: videoUUID,
+		Queries:   queries,
 	}
 }
 
@@ -109,84 +115,53 @@ func uploadFile(
 // Uploads the video segment to the Builder's storage client and
 // adds the corresponding line to the mandifest files
 func (builder *ManifestBuilder) UploadSegment(seg VideoSegment, ctx context.Context) error {
-	builder.Persisted += fmt.Sprintf("\n#EXTINF:%s,\n%s", seg.durationString, seg.path)
+	objectKey := fmt.Sprintf("segments/%s/%s", builder.VideoID, filepath.Base(seg.path))
 	bucket := builder.Storage.Bucket("vedit-v1")
-	w := bucket.Object(seg.path).NewWriter(ctx)
-	_, err := uploadFile(w, seg.path, seg.path, nil)
-	if err != nil {
+	w := bucket.Object(objectKey).NewWriter(ctx)
+	if _, err := uploadFile(w, seg.path, objectKey, nil); err != nil {
 		return err
 	}
-	// Append segment to the live manifest so HLS players can stream mid-upload
-	fmt.Fprintf(builder.LiveFile, "\n#EXTINF:%s,\n%s", seg.durationString, seg.path)
-	builder.LiveFile.Sync()
-	slog.Info("Segment uploaded", "path", seg.path)
-	return nil
-}
 
-// Iterates over all segments that are have been written to in the manifest builder
-// and persists their individual keyframes to the table
-func (builder *ManifestBuilder) PersistKeyframeMetadata(
-	ctx context.Context,
-	videoID uuid.UUID,
-	queries *db.Queries,
-) error {
-	// generate all offsets for each file
-	segmentsDir := fmt.Sprintf("segments/%s", builder.VideoID)
-	segments, err := os.ReadDir(segmentsDir)
+	fmt.Fprintf(&builder.lines, "\n#EXTINF:%s,\n%s", seg.durationString, objectKey)
+
+	manifestPath := fmt.Sprintf("manifests/%s.m3u8", builder.VideoID)
+	mw := bucket.Object(manifestPath).NewWriter(ctx)
+	if _, err := uploadString(mw, MANIFEST_LIVE_BASE+builder.lines.String(), manifestPath, nil); err != nil {
+		slog.Warn("failed to write live manifest to gcs", "videoID", builder.VideoID, "error", err)
+	}
+
+	offsets, err := GenerateOffsets(seg.path)
 	if err != nil {
-		slog.Error("manifest successfully uploaded but couldnt begin offsets", "error", err)
-		return err
+		return fmt.Errorf("offset generation failed for %s: %w", seg.path, err)
 	}
-	// we iterate over the segments in order and end up with an index based array
-	// where the element at index i represents the keyframe offsets for segment i
-	for i, f := range segments {
-		segPath := fmt.Sprintf("%s/%s", segmentsDir, f.Name())
-		offsets, err := GenerateOffsets(segPath)
-		if err != nil {
-			return fmt.Errorf("offset generation failed for %s: %w", segPath, err)
-		}
-		for ts, kf := range offsets {
-			queries.CreateKeyFrame(ctx, db.CreateKeyFrameParams{
-				VideoID:             videoID,
-				TimestampInVideo:    int64(ts),
-				SegmentIdx:          int64(i),
-				ByteOffsetInSegment: int64(kf.ByteOffset),
-				SizeInBytes:         int64(kf.Size),
-			})
+	for ts, kf := range offsets {
+		if _, err := builder.Queries.CreateKeyFrame(ctx, db.CreateKeyFrameParams{
+			VideoID:             builder.VideoUUID,
+			TimestampInVideo:    int64(ts),
+			SegmentIdx:          builder.segIndex,
+			ByteOffsetInSegment: int64(kf.ByteOffset),
+			SizeInBytes:         int64(kf.Size),
+		}); err != nil {
+			return err
 		}
 	}
-	slog.Info("successfully written keyframe metadata to db")
-	return nil
-}
+	builder.segIndex++
 
-// Purges the segment files stored locally for a given videoID
-// Will be a no op if the manifest no longer exists for the file
-func PurgeLocalCache(videoID string) {
-	manifestPath := fmt.Sprintf("%s.m3u8", videoID)
-	if _, err := os.Stat(manifestPath); err != nil {
-		return
+	if err := os.Remove(seg.path); err != nil {
+		slog.Warn("failed to remove local segment", "path", seg.path, "error", err)
 	}
-	os.Remove(manifestPath)
-	os.RemoveAll(fmt.Sprintf("segments/%s", videoID))
-	slog.Info("Purged local cache", "videoID", videoID)
+	slog.Info("Segment uploaded", "path", objectKey)
+	return nil
 }
 
 // Writes the historical manifest to cloud storage appending the final
 // line to it
 func (builder *ManifestBuilder) FinishUpload(ctx context.Context) error {
-	builder.LiveFile.WriteString("\n#EXT-X-ENDLIST")
-	builder.LiveFile.Sync()
-
-	builder.Persisted += "\n#EXT-X-ENDLIST"
 	bucket := builder.Storage.Bucket("vedit-v1")
 	historicalPath := fmt.Sprintf("manifests/%s.m3u8", builder.VideoID)
 	w := bucket.Object(historicalPath).NewWriter(ctx)
-	_, err := uploadString(
-		w,
-		builder.Persisted,
-		historicalPath,
-		nil,
-	)
+	final := MANIFEST_PERSISTED_BASE + builder.lines.String() + "\n#EXT-X-ENDLIST"
+	_, err := uploadString(w, final, historicalPath, nil)
 	if err != nil {
 		return err
 	}
@@ -200,7 +175,7 @@ func UploadBranchManifestToCloud(
 	branchId string,
 ) error {
 	bucket := client.Bucket("vedit-v1")
-	path := fmt.Sprintf("maifests/%s.m3u8", branchId)
+	path := fmt.Sprintf("manifests/%s.m3u8", branchId)
 	w := bucket.Object(path).NewWriter(ctx)
 	_, err := uploadString(
 		w,

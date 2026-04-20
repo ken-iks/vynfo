@@ -12,10 +12,10 @@ export function MediaHolder({ projectId }: MediaHolderProps) {
   const [videoSrc, setVideoSrc] = useState("");
 
   const handleUploading = (videoId: string) => {
-    setVideoSrc(`/video?videoId=${videoId}&mode=live`);
+    setVideoSrc(`/video?videoId=${videoId}`);
   };
   const handleUploaded = (videoId: string) => {
-    setVideoSrc(`/video?videoId=${videoId}&mode=historical`);
+    setVideoSrc(`/video?videoId=${videoId}`);
   };
 
   return (

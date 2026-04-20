@@ -42,19 +42,21 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
 
   const userId = useAuth();
 
-  const handleVideoSelected = (v: MediaVideoMetadata) => {
-    setCurrVideoPlayingSrc(`/video?videoId=${v.assetId}&mode=historical`);
+  const loadBranchIntoEditor = async (branch: BranchMetadata | undefined) => {
+    if (branch?.tipCommitId) {
+      const commit = await client.getCommit({ commitId: branch.tipCommitId });
+      editorStore.loadSections(commit.commitState);
+      setCurrVideoPlayingSrc(`/video?branchId=${branch.id}`);
+    } else {
+      editorStore.loadSections([]);
+      setCurrVideoPlayingSrc("");
+    }
   };
 
   const handleBranchChange = async (branchName: string) => {
     setSelectedBranch(branchName);
     const branch = branches.find((b) => b.name === branchName);
-    if (branch?.tipCommitId) {
-      const commit = await client.getCommit({ commitId: branch.tipCommitId });
-      editorStore.loadSections(commit.commitState);
-    } else {
-      editorStore.loadSections([]);
-    }
+    await loadBranchIntoEditor(branch);
   };
 
   useEffect(() => {
@@ -79,16 +81,10 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
       if (res.branches.length > 0) {
         const first = res.branches[0];
         setSelectedBranch(first.name);
-        if (first.tipCommitId) {
-          const commit = await client.getCommit({
-            commitId: first.tipCommitId,
-          });
-          editorStore.loadSections(commit.commitState);
-        } else {
-          editorStore.loadSections([]);
-        }
+        await loadBranchIntoEditor(first);
       } else {
         editorStore.loadSections([]);
+        setCurrVideoPlayingSrc("");
       }
     };
     fetchBranches();
@@ -138,6 +134,12 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
                       : b,
                   ),
                 );
+                const branch = branches.find((b) => b.name === selectedBranch);
+                if (branch) {
+                  setCurrVideoPlayingSrc(
+                    `/video?branchId=${branch.id}&v=${newCommitId}`,
+                  );
+                }
               }}
             />
           </CardContent>
@@ -157,7 +159,7 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
                       formatDuration(row.duration * 1000),
                   },
                 ]}
-                onSelectRow={(v) => handleVideoSelected(v)}
+                onSelectRow={() => {}}
                 rowActions={(row) => (
                   <AssetActions type="video" metadata={row} />
                 )}

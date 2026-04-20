@@ -5,7 +5,7 @@
 
 
 1. Make sure to have access credentials by generating an ssh key and adding it to the github. From there, `git clone` the repo so you have it local
-2. Install the base dependencies `brew install go node buf`
+2. Install the base dependencies `brew install go node buf ffmpeg`
 3. Add the Go bin to PATH: `echo 'export PATH="$HOME/go/bin:$PATH"' >> ~/.zshrc`
 4. Ensure you have docker desktop downloaded (can install from website or use `brew install --cask docker`)
 5. Generate and store access google app credentials and set up **.env** file with accurate path (TBD). NOTE **make sure .env file lives in the chichi/ directory**

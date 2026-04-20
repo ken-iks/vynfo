@@ -3,7 +3,9 @@ package video
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"math"
+	"os"
 	"os/exec"
 	"strconv"
 )
@@ -71,37 +73,42 @@ func GenerateOffsets(segPath string) (KeyFrameOffsets, error) {
 	hasKeyframe := false
 
 	for _, frame := range probe.Frames {
-		pktSize, err := strconv.ParseUint(frame.PktSize, 10, 64)
+		if frame.KeyFrame != 1 {
+			continue
+		}
+		pktPos, err := strconv.ParseUint(frame.PktPos, 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse pkt_size %q: %w", frame.PktSize, err)
+			return nil, fmt.Errorf("failed to parse pkt_pos %q: %w", frame.PktPos, err)
 		}
-
-		if frame.KeyFrame == 1 {
-			// when we reach a keyframe, we check if we need to flush
-			// our current keyframe that we were doing the size tally for
-			if hasKeyframe {
-				offsets.addKeyframe(currentTs, currentOffset, gopSize)
+		// when we reach a keyframe, we check if we need to flush
+		// our current keyframe that we were doing the size tally for
+		if hasKeyframe {
+			gopSize = pktPos - currentOffset
+			if err := offsets.addKeyframe(currentTs, currentOffset, gopSize); err != nil {
+				slog.Error("error adding keyframe segment", "error", err)
+				return nil, err
 			}
-			ptsSeconds, err := strconv.ParseFloat(frame.PtsTime, 64)
-			if err != nil {
-				return nil, fmt.Errorf("failed to parse pts_time %q: %w", frame.PtsTime, err)
-			}
-			pktPos, err := strconv.ParseUint(frame.PktPos, 10, 64)
-			if err != nil {
-				return nil, fmt.Errorf("failed to parse pkt_pos %q: %w", frame.PktPos, err)
-			}
-			currentTs = uint64(math.Round(ptsSeconds * 1000))
-			currentOffset = pktPos
-			gopSize = pktSize
-			hasKeyframe = true
-		} else {
-			gopSize += pktSize
 		}
+		ptsSeconds, err := strconv.ParseFloat(frame.PtsTime, 64)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse pts_time %q: %w", frame.PtsTime, err)
+		}
+		currentTs = uint64(math.Round(ptsSeconds * 1000))
+		currentOffset = pktPos
+		hasKeyframe = true
 	}
 
 	// flush the last keyframe if there are any left
 	if hasKeyframe {
-		offsets.addKeyframe(currentTs, currentOffset, gopSize)
+		fi, err := os.Stat(segPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to stat segment %s: %w", segPath, err)
+		}
+		gopSize = uint64(fi.Size()) - currentOffset
+		if err := offsets.addKeyframe(currentTs, currentOffset, gopSize); err != nil {
+			slog.Error("error adding keyframe segment", "error", err)
+			return nil, err
+		}
 	}
 
 	return offsets, nil

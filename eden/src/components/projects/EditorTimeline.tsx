@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { client } from "@/lib/client";
+import { useAuth } from "../providers/AuthProvider";
 
 interface EditorTimelineProps {
   projectId: string;
@@ -31,6 +32,7 @@ export function EditorTimeline({
 }: EditorTimelineProps) {
   const snap = useSnapshot(editorStore);
   const totalDuration = snap.totalDurationMillis;
+  const userId = useAuth()
 
   const [commitMessage, setCommitMessage] = useState("");
   const [isCommitting, setIsCommitting] = useState(false);
@@ -48,6 +50,7 @@ export function EditorTimeline({
         commitMessage: commitMessage.trim(),
         previousCommitId: tipCommitId,
         commitState: [...editorStore.sections],
+        userId
       });
       if (res.response.case === "newCommitId") {
         onCommitSuccess(res.response.value);

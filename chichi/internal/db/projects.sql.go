@@ -86,3 +86,26 @@ func (q *Queries) GetUserProjects(ctx context.Context, userID uuid.UUID) ([]Proj
 	}
 	return items, nil
 }
+
+const setMainBranch = `-- name: SetMainBranch :one
+UPDATE projects SET main_branch_id = $1 WHERE id = $2 RETURNING id, user_id, project_name, project_description, created_at, main_branch_id
+`
+
+type SetMainBranchParams struct {
+	MainBranchID uuid.NullUUID
+	ID           uuid.UUID
+}
+
+func (q *Queries) SetMainBranch(ctx context.Context, arg SetMainBranchParams) (Project, error) {
+	row := q.db.QueryRowContext(ctx, setMainBranch, arg.MainBranchID, arg.ID)
+	var i Project
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.ProjectName,
+		&i.ProjectDescription,
+		&i.CreatedAt,
+		&i.MainBranchID,
+	)
+	return i, err
+}
