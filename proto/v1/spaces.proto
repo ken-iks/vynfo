@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = "vynfo.com/vynfo/gen/proto/v1";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+// ========================  Spaces CRUD  ============================ //
+
+// A User is a member of a ProjectSpace, identified by a stable
+// user_id and surfaced with their email for display purposes
+message User {
+    string user_id = 1;
+    string email = 2;
+}
+
+// A ProjectSpace is a collaboration container scoped to a single project.
+// The admin_user_id is the user who created the space and has elevated
+// permissions; users contains all members (including the admin)
+message ProjectSpace {
+    string space_id = 1;
+    string project_id = 2;
+    string admin_user_id = 3;
+    repeated User users = 4;
+}
+
+// A CreateSpaceRequest creates a new space for the given project.
+// The requesting user_id becomes the admin of the newly created space
+message CreateSpaceRequest {
+    string user_id = 1;
+    string project_id = 2;
+}
+
+message CreateSpaceResponse {
+    string created_space_id = 1;
+}
+
+// An AddSpaceUserRequest adds an existing user to a space as a member.
+// Only the space admin is permitted to add users
+message AddSpaceUserRequest {
+    string space_id = 1;
+    string user_id = 2; 
+}
+
+// A ListSpacesRequest returns all spaces that exist under a given project
+message ListSpacesRequest {
+    string project_id = 1;
+}
+
+message ListSpacesResponse {
+    repeated ProjectSpace spaces = 1;
+}
+
+// ========================  Spaces Messaging  ============================ //
+
+// A SpaceMessage defines a single message in a space
+message SpaceMessage {
+    string content = 1;
+    User author = 2;
+}
+
+// When reply_count > 0, you can request this message's
+// children to retrieve thread replies to the message
+message SpaceMessageWithMetadata {
+    string message_id = 1;
+    SpaceMessage space_message = 2;
+
+    google.protobuf.Timestamp created_at = 3;
+    uint64 reply_count = 4;
+}
+
+// A ListSpaceMessagesRequest will retrieve all messages
+// in the space's main thread of messages. 
+message ListSpaceMessagesRequest {
+    string space_id = 1;
+}
+
+// A ListMessageChildrenRequest will retrieve the child thread of a given
+// message. This only retrieves the 'next level' of messages - meaning that
+// any of the child messages could also themselves contain further child messages
+message ListSpaceMessageChildrenRequest {
+    string space_id = 1;
+    string message_id = 2;
+}
+
+message ListSpaceMessagesResponse {
+    repeated SpaceMessageWithMetadata messages = 1;
+}
+
+// A SendSpaceMessageRequest adds a new message to the space.
+//
+// Messages form a tree: parent_message_id is the id of the message
+// DIRECTLY above this one in the thread (i.e. the next level up),
+// NOT the most recently sent message in the conversation. If omitted,
+// the message is posted at the top level of the space.
+//
+// Example tree:
+//   A                      (top level, parent_message_id = none)
+//   ├── B                  (parent_message_id = A)
+//   │   └── C              (parent_message_id = B)
+//   └── D                  (parent_message_id = A)
+//
+// To reply to C, parent_message_id must be C - not D, even if D was
+// the most recently sent message in the space.
+message SendSpaceMessageRequest {
+    string space_id = 1;
+    SpaceMessage space_message = 2;
+    optional string parent_message_id = 3;
+}
+
+message SendSpaceMessageResponse {
+    string sent_message_id = 1;
+}
+
+// An OpenSpaceRequest opens a persisted connection to a space. When the client
+// recieves an open space response, it means that the there has been some change
+// to the underlying space and the client should trigger the appropraite re request
+message OpenSpaceRequest {
+    string user_id = 1;
+    string space_id = 2;
+}
+
+// OpenSpaceResponses take the form of SpaceChange's, which the client should use
+// to trigger re requests whenever it recieves a space change
+message OpenSpaceResponse {
+    bool new_message_alert = 1;
+}
+
+// ====================== Service Definition ============================== //
+service SpacesService {
+    rpc CreateSpace(CreateSpaceRequest) returns (CreateSpaceResponse);
+    rpc AddSpaceUser(AddSpaceUserRequest) returns (google.protobuf.Empty);
+    rpc ListSpaces(ListSpacesRequest) returns (ListSpacesResponse);
+    rpc OpenSpace(OpenSpaceRequest) returns (stream OpenSpaceResponse);
+    rpc ListSpaceMessages(ListSpaceMessagesRequest) returns (ListSpaceMessagesResponse);
+    rpc ListSpaceMessageChildren(ListSpaceMessageChildrenRequest) returns (ListSpaceMessagesResponse);
+    rpc SendSpaceMessage(SendSpaceMessageRequest) returns (SendSpaceMessageResponse);
+} 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../providers/AuthProvider";
 import { client } from "../../lib/client";
-import type { ProjectMetadata } from "../../gen/proto/v1/api_pb";
+import type { ProjectMetadata } from "../../gen/proto/v1/projects_pb";
 import { timestampDate } from "@bufbuild/protobuf/wkt";
 import { Table } from "../shared/Table";
 import { SectionTitle } from "../shared/SectionTitle";

@@ -1,4 +1,4 @@
-import type { PlaybackSection } from "@/gen/proto/v1/api_pb";
+import type { PlaybackSection } from "@/gen/proto/v1/projects_pb";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import type { Snapshot } from "valtio";
 import {

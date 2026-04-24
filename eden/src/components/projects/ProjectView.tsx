@@ -8,7 +8,7 @@ import type {
   MediaTextMetadata,
   MediaVideoMetadata,
   ProjectMetadata,
-} from "@/gen/proto/v1/api_pb";
+} from "@/gen/proto/v1/projects_pb";
 import { VideoPlayer } from "../video/VideoPlayer";
 import { EmptyVideoPlayer } from "../video/EmptyVideoPlayer";
 import { Table } from "../shared/Table";

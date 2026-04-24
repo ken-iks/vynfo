@@ -7,6 +7,7 @@ package db
 import (
 	"database/sql"
 	"encoding/json"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -52,6 +53,16 @@ type Keyframe struct {
 	SizeInBytes         int64
 }
 
+type Message struct {
+	ID         uuid.UUID
+	SpaceID    uuid.UUID
+	AuthorID   uuid.UUID
+	ParentID   uuid.NullUUID
+	Body       string
+	CreatedAt  time.Time
+	ReplyCount int32
+}
+
 type Project struct {
 	ID                 uuid.UUID
 	UserID             uuid.UUID
@@ -59,6 +70,18 @@ type Project struct {
 	ProjectDescription string
 	CreatedAt          sql.NullTime
 	MainBranchID       uuid.NullUUID
+}
+
+type Space struct {
+	ID        uuid.UUID
+	ProjectID uuid.UUID
+	AdminID   uuid.UUID
+	CreatedAt sql.NullTime
+}
+
+type SpaceMember struct {
+	SpaceID  uuid.UUID
+	MemberID uuid.UUID
 }
 
 type User struct {

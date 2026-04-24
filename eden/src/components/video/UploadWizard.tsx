@@ -2,7 +2,7 @@ import { ArrowPathIcon, ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { client } from "../../lib/client";
 import { create } from "@bufbuild/protobuf";
-import { UploadVideoRequestSchema } from "../../gen/proto/v1/api_pb";
+import { UploadVideoRequestSchema } from "../../gen/proto/v1/projects_pb";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

@@ -1,4 +1,4 @@
-import type { MediaVideoMetadata } from "@/gen/proto/v1/api_pb";
+import type { MediaVideoMetadata } from "@/gen/proto/v1/projects_pb";
 import { editorStore } from "../stores/editor";
 import {
   ContextMenuContent,

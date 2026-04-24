@@ -11,7 +11,7 @@ import type {
   MediaVideoMetadata,
   MediaImageMetadata,
   MediaTextMetadata,
-} from "@/gen/proto/v1/api_pb";
+} from "@/gen/proto/v1/projects_pb";
 
 type AssetActionProps =
   | { type: "video"; metadata: MediaVideoMetadata }

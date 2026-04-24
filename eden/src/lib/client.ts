@@ -1,7 +1,7 @@
 import { createClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-web";
 
-import { ProjectService } from "../gen/proto/v1/api_pb";
+import { ProjectService } from "../gen/proto/v1/projects_pb";
 
 const transport = createConnectTransport({
   baseUrl: "http://localhost:8080",

@@ -2,11 +2,11 @@ import type {
   MediaOverlay,
   MediaVideoMetadata,
   PlaybackSection,
-} from "@/gen/proto/v1/api_pb";
+} from "@/gen/proto/v1/projects_pb";
 import {
   PlaybackSectionSchema,
   SectionVideoSchema,
-} from "@/gen/proto/v1/api_pb";
+} from "@/gen/proto/v1/projects_pb";
 import { create } from "@bufbuild/protobuf";
 import { proxy } from "valtio";
 
