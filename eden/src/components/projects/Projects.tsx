@@ -11,8 +11,14 @@ import { MediaHolder } from "../video/MediaHolder";
 import { Button } from "../ui/button";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { CreateProjectDialog } from "./CreateProjectDialog";
+import { SpacesList } from "./SpacesList";
 
-export type ProjectPage = "list" | "view" | "uploadVideo" | "uploadImage";
+export type ProjectPage =
+  | "list"
+  | "view"
+  | "uploadVideo"
+  | "uploadImage"
+  | "spaces";
 
 export function Projects() {
   const [projectPage, setProjectPage] = useState<ProjectPage>("list");
@@ -83,7 +89,13 @@ export function Projects() {
               Back to Projects
             </Button>
           </div>
-          <div className="absolute top-2 right-8 z-10">
+          <div className="absolute top-2 right-8 z-10 flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setProjectPage("spaces")}
+            >
+              Spaces
+            </Button>
             <ProjectConfigDropDown handlePageSelection={setProjectPage} />
           </div>
           {selectedProject && <ProjectView project={selectedProject} />}
@@ -101,6 +113,18 @@ export function Projects() {
           {selectedProject ? (
             <MediaHolder projectId={selectedProject.id} />
           ) : null}
+        </div>
+      );
+    case "spaces":
+      return (
+        <div className="relative h-full">
+          <div className="absolute top-2 left-2 z-10">
+            <Button variant="outline" onClick={() => setProjectPage("view")}>
+              <ArrowLeftIcon className="size-4" />
+              Back to Project
+            </Button>
+          </div>
+          {selectedProject && <SpacesList project={selectedProject} />}
         </div>
       );
     default:
