@@ -9,19 +9,19 @@ import (
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 )
 
-func (s *SpacesServiceServer) ListSpaces(
+func (s *SpacesServiceServer) ListUserSpaces(
 	ctx context.Context,
-	req *connect.Request[v1.ListSpacesRequest],
+	req *connect.Request[v1.ListUserSpacesRequest],
 ) (*connect.Response[v1.ListSpacesResponse], error) {
-	projectId, err := uuid.Parse(req.Msg.GetProjectId())
+	userId, err := uuid.Parse(req.Msg.GetUserId())
 	if err != nil {
-		slog.Error("error parsing project id", "error", err)
+		slog.Error("error parsing user id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	rows, err := s.queries.GetProjectSpacesWithMembers(ctx, projectId)
+	rows, err := s.queries.GetUserSpacesWithMembers(ctx, userId)
 	if err != nil {
-		slog.Error("error fetching project spaces", "error", err)
+		slog.Error("error fetching user spaces", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 

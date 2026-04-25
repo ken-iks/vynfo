@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { editorStore } from "../stores/editor";
-import { msToPx } from "./timelineGeometry";
+import { editorStore } from "../../stores/editor";
+import { msToPx } from "./geometry";
 
 export interface ReorderState {
   fromIndex: number;

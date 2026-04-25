@@ -17,6 +17,7 @@ import (
 	"vynfo.com/vynfo/messages"
 	"vynfo.com/vynfo/services/project"
 	"vynfo.com/vynfo/services/spaces"
+	"vynfo.com/vynfo/services/users"
 )
 
 //go:embed database/schema/*.sql
@@ -72,11 +73,14 @@ func main() {
 	go listener.DispatchNotifications(ctx, observer)
 	SpacesService := spaces.NewSpacesServiceServer(db, dbgen.New(db), observer)
 
+	// ==================== UsersService Deps ========================== //
+	UsersService := users.NewUsersServiceServer(dbgen.New(db))
 
 	mux := http.NewServeMux()
 	// Proto service endpoints
 	mux.Handle(v1connect.NewProjectServiceHandler(ProjectService))
 	mux.Handle(v1connect.NewSpacesServiceHandler(SpacesService))
+	mux.Handle(v1connect.NewUsersServiceHandler(UsersService))
 	// Http service endpoints for HLS video serving
 	mux.HandleFunc("GET /video", ProjectService.GetManifest)
 	mux.Handle(

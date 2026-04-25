@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSnapshot } from "valtio";
 import type { MediaVideoMetadata } from "@/gen/proto/v1/projects_pb";
-import { editorStore } from "../stores/editor";
-import { EditorTimelineSection } from "./EditorTimelineSection";
+import { editorStore } from "../../stores/editor";
+import { TimelineSection } from "./TimelineSection";
 import { TimelineRuler } from "./TimelineRuler";
 import {
-  TimelineContextMenuContent,
+  TimelineContextMenu,
   type TimelineMenuContext,
-} from "./TimelineContextMenuContent";
+} from "./TimelineContextMenu";
 import { useTimelineReorder } from "./useTimelineReorder";
 import {
   DEFAULT_PX_PER_SECOND,
   MAX_PX_PER_SECOND,
   msToPx,
-} from "./timelineGeometry";
-import { ContextMenu, ContextMenuTrigger } from "../ui/context-menu";
+} from "./geometry";
+import { ContextMenu, ContextMenuTrigger } from "../../ui/context-menu";
 import { cn } from "@/lib/utils";
 
 interface TimelineTrackProps {
@@ -208,7 +208,7 @@ export function TimelineTrack({ availableVideos }: TimelineTrackProps) {
                         : 0;
                     const leftPx = isBeingDragged ? naturalLeft : previewLeft;
                     return (
-                      <EditorTimelineSection
+                      <TimelineSection
                         key={i}
                         section={section}
                         index={i}
@@ -229,7 +229,7 @@ export function TimelineTrack({ availableVideos }: TimelineTrackProps) {
           </div>
         </div>
       </ContextMenuTrigger>
-      <TimelineContextMenuContent
+      <TimelineContextMenu
         menuContext={menuContext}
         availableVideos={availableVideos}
         computeInsertIndex={computeInsertIndex}

@@ -1,5 +1,5 @@
 import type { MediaVideoMetadata } from "@/gen/proto/v1/projects_pb";
-import { editorStore } from "../stores/editor";
+import { editorStore } from "../../stores/editor";
 import {
   ContextMenuContent,
   ContextMenuItem,
@@ -7,24 +7,24 @@ import {
   ContextMenuSub,
   ContextMenuSubContent,
   ContextMenuSubTrigger,
-} from "../ui/context-menu";
+} from "../../ui/context-menu";
 
 export interface TimelineMenuContext {
   trackPx: number;
   sectionIndex: number | null;
 }
 
-interface TimelineContextMenuContentProps {
+interface TimelineContextMenuProps {
   menuContext: TimelineMenuContext | null;
   availableVideos: MediaVideoMetadata[];
   computeInsertIndex: (trackPx: number) => number;
 }
 
-export function TimelineContextMenuContent({
+export function TimelineContextMenu({
   menuContext,
   availableVideos,
   computeInsertIndex,
-}: TimelineContextMenuContentProps) {
+}: TimelineContextMenuProps) {
   return (
     <ContextMenuContent>
       {menuContext?.sectionIndex !== null &&

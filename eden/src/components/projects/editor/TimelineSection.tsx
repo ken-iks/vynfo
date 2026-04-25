@@ -6,13 +6,13 @@ import {
   editorStore,
   snap,
   sourceDurationMs,
-} from "../stores/editor";
+} from "../../stores/editor";
 import { cn, formatDuration } from "@/lib/utils";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
-import { pxToMs, videoColors } from "./timelineGeometry";
+import { pxToMs, videoColors } from "./geometry";
 
-interface EditorTimelineSectionProps {
+interface TimelineSectionProps {
   section: Snapshot<PlaybackSection>;
   index: number;
   isSelected: boolean;
@@ -25,7 +25,7 @@ interface EditorTimelineSectionProps {
   onBeginReorder: (index: number, clientX: number) => void;
 }
 
-export function EditorTimelineSection({
+export function TimelineSection({
   section,
   index,
   isSelected,
@@ -36,7 +36,7 @@ export function EditorTimelineSection({
   isAnyDragActive,
   dragOffsetPx,
   onBeginReorder,
-}: EditorTimelineSectionProps) {
+}: TimelineSectionProps) {
   const duration = section.endTimeMillis - section.startTimeMillis;
   const videoStart = section.video?.videoStartTimeMillies ?? 0n;
   const videoEnd = videoStart + duration;

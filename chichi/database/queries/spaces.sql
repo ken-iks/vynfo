@@ -6,6 +6,7 @@ SELECT
     s.id AS space_id,
     s.project_id,
     s.admin_id,
+    s.name,
     s.created_at,
     u.id AS member_id,
     u.email AS member_email
@@ -13,6 +14,22 @@ FROM spaces s
 LEFT JOIN space_members sm ON sm.space_id = s.id
 LEFT JOIN users u ON u.id = sm.member_id
 WHERE s.project_id = $1
+ORDER BY s.created_at DESC, u.email;
+
+-- name: GetUserSpacesWithMembers :many
+SELECT
+    s.id AS space_id,
+    s.project_id,
+    s.admin_id,
+    s.name,
+    s.created_at,
+    u.id AS member_id,
+    u.email AS member_email
+FROM spaces s
+JOIN space_members requested_member ON requested_member.space_id = s.id
+LEFT JOIN space_members sm ON sm.space_id = s.id
+LEFT JOIN users u ON u.id = sm.member_id
+WHERE requested_member.member_id = $1
 ORDER BY s.created_at DESC, u.email;
 
 -- name: GetUserSpaces :many
@@ -43,7 +60,7 @@ ORDER BY m.created_at DESC;
 SELECT pg_notify('space_change', @space_id::TEXT);
 
 -- name: CreateSpace :one
-INSERT INTO spaces (project_id, admin_id) VALUES ($1, $2) RETURNING *;
+INSERT INTO spaces (project_id, admin_id, name) VALUES ($1, $2, $3) RETURNING *;
 
 -- name: GetSpace :one
 SELECT * FROM spaces WHERE id = $1;

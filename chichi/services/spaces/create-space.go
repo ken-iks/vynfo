@@ -2,7 +2,9 @@ package spaces
 
 import (
 	"context"
+	"errors"
 	"log/slog"
+	"strings"
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
@@ -24,6 +26,10 @@ func (s *SpacesServiceServer) CreateSpace(
 		slog.Error("error parsing project id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
+	name := strings.TrimSpace(req.Msg.GetName())
+	if name == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("space name is required"))
+	}
 
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -36,6 +42,7 @@ func (s *SpacesServiceServer) CreateSpace(
 	space, err := q.CreateSpace(ctx, db.CreateSpaceParams{
 		ProjectID: projectId,
 		AdminID:   userId,
+		Name:      name,
 	})
 	if err != nil {
 		slog.Error("error creating space row", "error", err)

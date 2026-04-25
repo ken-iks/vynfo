@@ -1,4 +1,4 @@
-import { msToPx } from "./timelineGeometry";
+import { msToPx } from "./geometry";
 
 interface TimelineRulerProps {
   totalDurationMillis: bigint;

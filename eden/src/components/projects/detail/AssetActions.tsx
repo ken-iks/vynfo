@@ -3,10 +3,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { Button } from "../ui/button";
+} from "../../ui/dropdown-menu";
+import { Button } from "../../ui/button";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-import { editorStore } from "../stores/editor";
+import { editorStore } from "../../stores/editor";
 import type {
   MediaVideoMetadata,
   MediaImageMetadata,

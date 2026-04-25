@@ -6,15 +6,9 @@ option go_package = "vynfo.com/vynfo/gen/proto/v1";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
+import "proto/v1/users.proto";
 
 // ========================  Spaces CRUD  ============================ //
-
-// A User is a member of a ProjectSpace, identified by a stable
-// user_id and surfaced with their email for display purposes
-message User {
-    string user_id = 1;
-    string email = 2;
-}
 
 // A ProjectSpace is a collaboration container scoped to a single project.
 // The admin_user_id is the user who created the space and has elevated
@@ -24,6 +18,7 @@ message ProjectSpace {
     string project_id = 2;
     string admin_user_id = 3;
     repeated User users = 4;
+    string name = 5;
 }
 
 // A CreateSpaceRequest creates a new space for the given project.
@@ -31,6 +26,7 @@ message ProjectSpace {
 message CreateSpaceRequest {
     string user_id = 1;
     string project_id = 2;
+    string name = 3;
 }
 
 message CreateSpaceResponse {
@@ -47,6 +43,10 @@ message AddSpaceUserRequest {
 // A ListSpacesRequest returns all spaces that exist under a given project
 message ListSpacesRequest {
     string project_id = 1;
+}
+
+message ListUserSpacesRequest {
+    string user_id = 1;
 }
 
 message ListSpacesResponse {
@@ -133,6 +133,7 @@ service SpacesService {
     rpc CreateSpace(CreateSpaceRequest) returns (CreateSpaceResponse);
     rpc AddSpaceUser(AddSpaceUserRequest) returns (google.protobuf.Empty);
     rpc ListSpaces(ListSpacesRequest) returns (ListSpacesResponse);
+    rpc ListUserSpaces(ListUserSpacesRequest) returns (ListSpacesResponse);
     rpc OpenSpace(OpenSpaceRequest) returns (stream OpenSpaceResponse);
     rpc ListSpaceMessages(ListSpaceMessagesRequest) returns (ListSpaceMessagesResponse);
     rpc ListSpaceMessageChildren(ListSpaceMessageChildrenRequest) returns (ListSpaceMessagesResponse);

@@ -99,28 +99,30 @@ func (q *Queries) AddSpaceMember(ctx context.Context, arg AddSpaceMemberParams) 
 }
 
 const createSpace = `-- name: CreateSpace :one
-INSERT INTO spaces (project_id, admin_id) VALUES ($1, $2) RETURNING id, project_id, admin_id, created_at
+INSERT INTO spaces (project_id, admin_id, name) VALUES ($1, $2, $3) RETURNING id, project_id, admin_id, created_at, name
 `
 
 type CreateSpaceParams struct {
 	ProjectID uuid.UUID
 	AdminID   uuid.UUID
+	Name      string
 }
 
 func (q *Queries) CreateSpace(ctx context.Context, arg CreateSpaceParams) (Space, error) {
-	row := q.db.QueryRowContext(ctx, createSpace, arg.ProjectID, arg.AdminID)
+	row := q.db.QueryRowContext(ctx, createSpace, arg.ProjectID, arg.AdminID, arg.Name)
 	var i Space
 	err := row.Scan(
 		&i.ID,
 		&i.ProjectID,
 		&i.AdminID,
 		&i.CreatedAt,
+		&i.Name,
 	)
 	return i, err
 }
 
 const getProjectSpaces = `-- name: GetProjectSpaces :many
-SELECT id, project_id, admin_id, created_at FROM spaces WHERE project_id = $1 ORDER BY created_at DESC
+SELECT id, project_id, admin_id, created_at, name FROM spaces WHERE project_id = $1 ORDER BY created_at DESC
 `
 
 func (q *Queries) GetProjectSpaces(ctx context.Context, projectID uuid.UUID) ([]Space, error) {
@@ -137,6 +139,7 @@ func (q *Queries) GetProjectSpaces(ctx context.Context, projectID uuid.UUID) ([]
 			&i.ProjectID,
 			&i.AdminID,
 			&i.CreatedAt,
+			&i.Name,
 		); err != nil {
 			return nil, err
 		}
@@ -156,6 +159,7 @@ SELECT
     s.id AS space_id,
     s.project_id,
     s.admin_id,
+    s.name,
     s.created_at,
     u.id AS member_id,
     u.email AS member_email
@@ -170,6 +174,7 @@ type GetProjectSpacesWithMembersRow struct {
 	SpaceID     uuid.UUID
 	ProjectID   uuid.UUID
 	AdminID     uuid.UUID
+	Name        string
 	CreatedAt   sql.NullTime
 	MemberID    uuid.NullUUID
 	MemberEmail sql.NullString
@@ -188,6 +193,7 @@ func (q *Queries) GetProjectSpacesWithMembers(ctx context.Context, projectID uui
 			&i.SpaceID,
 			&i.ProjectID,
 			&i.AdminID,
+			&i.Name,
 			&i.CreatedAt,
 			&i.MemberID,
 			&i.MemberEmail,
@@ -206,7 +212,7 @@ func (q *Queries) GetProjectSpacesWithMembers(ctx context.Context, projectID uui
 }
 
 const getSpace = `-- name: GetSpace :one
-SELECT id, project_id, admin_id, created_at FROM spaces WHERE id = $1
+SELECT id, project_id, admin_id, created_at, name FROM spaces WHERE id = $1
 `
 
 func (q *Queries) GetSpace(ctx context.Context, id uuid.UUID) (Space, error) {
@@ -217,6 +223,7 @@ func (q *Queries) GetSpace(ctx context.Context, id uuid.UUID) (Space, error) {
 		&i.ProjectID,
 		&i.AdminID,
 		&i.CreatedAt,
+		&i.Name,
 	)
 	return i, err
 }
@@ -249,7 +256,7 @@ func (q *Queries) GetSpaceMembers(ctx context.Context, spaceID uuid.UUID) ([]Spa
 }
 
 const getUserSpaces = `-- name: GetUserSpaces :many
-SELECT id, project_id, admin_id, created_at FROM spaces WHERE id IN (
+SELECT id, project_id, admin_id, created_at, name FROM spaces WHERE id IN (
     SELECT space_id FROM space_members WHERE member_id = $1
 )
 `
@@ -268,6 +275,65 @@ func (q *Queries) GetUserSpaces(ctx context.Context, memberID uuid.UUID) ([]Spac
 			&i.ProjectID,
 			&i.AdminID,
 			&i.CreatedAt,
+			&i.Name,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUserSpacesWithMembers = `-- name: GetUserSpacesWithMembers :many
+SELECT
+    s.id AS space_id,
+    s.project_id,
+    s.admin_id,
+    s.name,
+    s.created_at,
+    u.id AS member_id,
+    u.email AS member_email
+FROM spaces s
+JOIN space_members requested_member ON requested_member.space_id = s.id
+LEFT JOIN space_members sm ON sm.space_id = s.id
+LEFT JOIN users u ON u.id = sm.member_id
+WHERE requested_member.member_id = $1
+ORDER BY s.created_at DESC, u.email
+`
+
+type GetUserSpacesWithMembersRow struct {
+	SpaceID     uuid.UUID
+	ProjectID   uuid.UUID
+	AdminID     uuid.UUID
+	Name        string
+	CreatedAt   sql.NullTime
+	MemberID    uuid.NullUUID
+	MemberEmail sql.NullString
+}
+
+func (q *Queries) GetUserSpacesWithMembers(ctx context.Context, memberID uuid.UUID) ([]GetUserSpacesWithMembersRow, error) {
+	rows, err := q.db.QueryContext(ctx, getUserSpacesWithMembers, memberID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUserSpacesWithMembersRow
+	for rows.Next() {
+		var i GetUserSpacesWithMembersRow
+		if err := rows.Scan(
+			&i.SpaceID,
+			&i.ProjectID,
+			&i.AdminID,
+			&i.Name,
+			&i.CreatedAt,
+			&i.MemberID,
+			&i.MemberEmail,
 		); err != nil {
 			return nil, err
 		}

@@ -1,4 +1,4 @@
-import { snap, SNAP_MS } from "../stores/editor";
+import { snap, SNAP_MS } from "../../stores/editor";
 
 export const MIN_PX_PER_SECOND = 20;
 export const MAX_PX_PER_SECOND = 400;

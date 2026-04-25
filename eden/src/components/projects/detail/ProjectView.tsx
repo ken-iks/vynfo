@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent } from "../ui/card";
-import { useAuth } from "../providers/AuthProvider";
+import { Card, CardContent } from "../../ui/card";
+import { useAuth } from "../../providers/AuthProvider";
 import { client } from "@/lib/client";
 import type {
   BranchMetadata,
@@ -9,22 +9,22 @@ import type {
   MediaVideoMetadata,
   ProjectMetadata,
 } from "@/gen/proto/v1/projects_pb";
-import { VideoPlayer } from "../video/VideoPlayer";
-import { EmptyVideoPlayer } from "../video/EmptyVideoPlayer";
-import { Table } from "../shared/Table";
-import { editorStore } from "../stores/editor";
+import { VideoPlayer } from "../../video/VideoPlayer";
+import { EmptyVideoPlayer } from "../../video/EmptyVideoPlayer";
+import { Table } from "../../shared/Table";
+import { editorStore } from "../../stores/editor";
 import { AssetActions } from "./AssetActions";
 import { formatDuration } from "@/lib/utils";
-import { EditorTimeline } from "./EditorTimeline";
-import { videoColors } from "./timelineGeometry";
-import { SectionTitle } from "../shared/SectionTitle";
+import { EditorTimeline } from "../editor/EditorTimeline";
+import { videoColors } from "../editor/geometry";
+import { SectionTitle } from "../../shared/SectionTitle";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "../../ui/select";
 
 export function ProjectView({ project }: { project: ProjectMetadata }) {
   const [currVideoPlayingSrc, setCurrVideoPlayingSrc] = useState("");

@@ -67,6 +67,41 @@ import { Input } from "@/components/ui/input";
 cd eden && pnpm dlx shadcn@latest add label
 ```
 
+### 3. Keep each turn tightly scoped
+
+Do only what the user asked for in the current turn. More work is not automatically better.
+
+- Keep implementation turns focused on the requested change and the minimum supporting edits needed to make that change coherent.
+- If you notice related improvements, extra UI work, refactors, cleanup, or hardening that might be useful, mention them as suggestions instead of doing them.
+- Do not expand scope because an adjacent task seems obvious. Ask or suggest first, then wait for the user to request it.
+- When a change has multiple layers, complete the directly requested layer first and pause before moving into optional follow-on work.
+
+**Examples:**
+
+```text
+❌ BAD — user asks for a DB field, so the agent also redesigns the UI flow,
+adds a dialog, and installs a new UI primitive.
+
+✅ GOOD — make the DB/proto/service change that was requested, then mention:
+"The create-space UI will also need a name input when you want that wired up."
+```
+
+```text
+❌ BAD — user asks for a required column migration, so the agent also adds
+extra indexes, constraints, or hardening that were not requested.
+
+✅ GOOD — add the required migration only. If an index or additional constraint
+might be useful, suggest it separately and wait.
+```
+
+```text
+❌ BAD — user asks to wire up a required field, so the agent uses
+window.prompt as a quick client-side input without being asked to touch UI.
+
+✅ GOOD — leave the UI alone unless requested. If UI work is necessary for the
+feature to be usable, call that out before implementing it.
+```
+
 <!--
 To add another rule, append:
 

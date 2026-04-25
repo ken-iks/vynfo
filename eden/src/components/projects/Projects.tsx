@@ -1,17 +1,12 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "../providers/AuthProvider";
-import { client } from "../../lib/client";
+import { useState } from "react";
 import type { ProjectMetadata } from "../../gen/proto/v1/projects_pb";
-import { timestampDate } from "@bufbuild/protobuf/wkt";
-import { Table } from "../shared/Table";
-import { SectionTitle } from "../shared/SectionTitle";
-import { ProjectView } from "./ProjectView";
-import { ProjectConfigDropDown } from "./ProjectConfigDropdown";
+import { ProjectView } from "./detail/ProjectView";
+import { ProjectConfigDropDown } from "./detail/ProjectConfigDropdown";
+import { SpacesList } from "./detail/SpacesList";
+import { ProjectsList } from "./list/ProjectsList";
 import { MediaHolder } from "../video/MediaHolder";
 import { Button } from "../ui/button";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import { CreateProjectDialog } from "./CreateProjectDialog";
-import { SpacesList } from "./SpacesList";
 
 export type ProjectPage =
   | "list"
@@ -22,64 +17,16 @@ export type ProjectPage =
 
 export function Projects() {
   const [projectPage, setProjectPage] = useState<ProjectPage>("list");
-  const [projectList, setProjectList] = useState<ProjectMetadata[]>([]);
   const [selectedProject, setSelectedProject] = useState<ProjectMetadata>();
-  const userId = useAuth();
 
-  const fetchProjects = async () => {
-    const projects = await client.listProjects({ userId });
-    setProjectList(projects.projects);
-    return projects.projects;
-  };
-
-  useEffect(() => {
-    fetchProjects();
-  }, [userId]);
-
-  const handleProjectCreated = async (projectId: string) => {
-    const projects = await fetchProjects();
-    const created = projects.find((p) => p.id === projectId);
-    if (created) {
-      setSelectedProject(created);
-      setProjectPage("view");
-    }
+  const openProject = (project: ProjectMetadata) => {
+    setSelectedProject(project);
+    setProjectPage("view");
   };
 
   switch (projectPage) {
     case "list":
-      return (
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <SectionTitle>Projects</SectionTitle>
-            <CreateProjectDialog onCreated={handleProjectCreated} />
-          </div>
-          <Table<ProjectMetadata>
-            title=""
-            data={projectList}
-            columns={[
-              { key: "name", header: "Project Title" },
-              { key: "description", header: "Project Descriptions" },
-              {
-                key: "createdAt",
-                header: "Created At",
-                render: (_value, row) => {
-                  if (!row.createdAt) return "—";
-                  const date = timestampDate(row.createdAt);
-                  return date.toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  });
-                },
-              },
-            ]}
-            onSelectRow={(row) => {
-              setSelectedProject(row);
-              setProjectPage("view");
-            }}
-          />
-        </div>
-      );
+      return <ProjectsList onSelect={openProject} />;
     case "view":
       return (
         <div className="relative h-full">
@@ -94,7 +41,7 @@ export function Projects() {
               variant="outline"
               onClick={() => setProjectPage("spaces")}
             >
-              Spaces
+              Project Spaces
             </Button>
             <ProjectConfigDropDown handlePageSelection={setProjectPage} />
           </div>

@@ -1,6 +1,6 @@
 import { useSnapshot } from "valtio";
 import type { MediaVideoMetadata } from "@/gen/proto/v1/projects_pb";
-import { editorStore } from "../stores/editor";
+import { editorStore } from "../../stores/editor";
 import { CommitDialog } from "./CommitDialog";
 import { TimelineTrack } from "./TimelineTrack";
 import { formatDuration } from "@/lib/utils";

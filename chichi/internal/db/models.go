@@ -77,6 +77,7 @@ type Space struct {
 	ProjectID uuid.UUID
 	AdminID   uuid.UUID
 	CreatedAt sql.NullTime
+	Name      string
 }
 
 type SpaceMember struct {

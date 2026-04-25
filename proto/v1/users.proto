@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = "vynfo.com/vynfo/gen/proto/v1";
+
+import "google/protobuf/timestamp.proto";
+
+// A User is a member of a ProjectSpace, identified by a stable
+// user_id and surfaced with their email for display purposes
+message User {
+    string user_id = 1;
+    string email = 2;
+}
+
+message ListUsersRequest {}
+message ListUsersResponse {
+    repeated User users = 1;
+}
+
+message CreateUserRequest {
+    string email = 1;
+}
+
+message CreateUserResponse {
+    string created_user_id = 1;
+}
+
+service UsersService {
+    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+    rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+}

@@ -3,9 +3,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { Button } from "../ui/button";
-import type { ProjectPage } from "./Projects";
+} from "../../ui/dropdown-menu";
+import { Button } from "../../ui/button";
+import type { ProjectPage } from "../Projects";
 
 interface ProjectConfigDropDownProps {
   handlePageSelection: (page: ProjectPage) => void;

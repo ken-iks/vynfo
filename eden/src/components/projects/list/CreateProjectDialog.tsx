@@ -7,12 +7,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
-import { client } from "../../lib/client";
-import { useAuth } from "../providers/AuthProvider";
+} from "../../ui/dialog";
+import { Button } from "../../ui/button";
+import { Input } from "../../ui/input";
+import { Textarea } from "../../ui/textarea";
+import { client } from "../../../lib/client";
+import { useAuth } from "../../providers/AuthProvider";
 
 interface CreateProjectDialogProps {
   onCreated: (projectId: string) => void | Promise<void>;
