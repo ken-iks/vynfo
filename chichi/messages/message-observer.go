@@ -79,7 +79,7 @@ func (o *MessageObserver) ResyncAll() {
 	for _, set := range o.subscribers {
 		for ch := range set {
 			select {
-			case ch <-struct{}{}:
+			case ch <- struct{}{}:
 			default:
 			}
 		}

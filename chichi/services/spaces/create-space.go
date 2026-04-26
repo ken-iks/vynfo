@@ -28,7 +28,10 @@ func (s *SpacesServiceServer) CreateSpace(
 	}
 	name := strings.TrimSpace(req.Msg.GetName())
 	if name == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("space name is required"))
+		return nil, connect.NewError(
+			connect.CodeInvalidArgument,
+			errors.New("space name is required"),
+		)
 	}
 
 	tx, err := s.db.BeginTx(ctx, nil)

@@ -10,7 +10,9 @@ import type {
   ProjectMetadata,
 } from "@/gen/proto/v1/projects_pb";
 import { VideoPlayer } from "../../video/VideoPlayer";
+import { VideoCanvas } from "../../video/VideoCanvas";
 import { EmptyVideoPlayer } from "../../video/EmptyVideoPlayer";
+import { PlaybackControls } from "../../video/PlaybackControls";
 import { Table } from "../../shared/Table";
 import { editorStore } from "../../stores/editor";
 import { AssetActions } from "./AssetActions";
@@ -28,6 +30,9 @@ import {
 
 export function ProjectView({ project }: { project: ProjectMetadata }) {
   const [currVideoPlayingSrc, setCurrVideoPlayingSrc] = useState("");
+  const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(
+    null,
+  );
 
   const [currProjectVideos, setCurrProjectVideos] = useState<
     MediaVideoMetadata[]
@@ -98,7 +103,21 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
         <Card>
           <CardContent>
             {currVideoPlayingSrc !== "" ? (
-              <VideoPlayer src={currVideoPlayingSrc} />
+              <div>
+                <div className="relative inline-block">
+                  <div
+                    className="pointer-events-none"
+                    style={{ visibility: "hidden" }}
+                  >
+                    <VideoPlayer
+                      src={currVideoPlayingSrc}
+                      ref={setVideoElement}
+                    />
+                  </div>
+                  <VideoCanvas video={videoElement} />
+                </div>
+                <PlaybackControls video={videoElement} />
+              </div>
             ) : (
               <EmptyVideoPlayer />
             )}

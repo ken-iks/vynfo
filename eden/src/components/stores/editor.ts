@@ -25,6 +25,7 @@ export function sourceDurationMs(durationSeconds: number | undefined): bigint {
 class EditorStore {
   sections: PlaybackSection[] = [];
   selectedSectionIndex: number | null = null;
+  playbackTimeMillis = 0n;
 
   get totalDurationMillis(): bigint {
     return this.sections.reduce(
@@ -35,6 +36,15 @@ class EditorStore {
 
   selectSection(index: number | null) {
     this.selectedSectionIndex = index;
+  }
+
+  setPlaybackTimeSeconds(seconds: number) {
+    if (!Number.isFinite(seconds) || seconds < 0) {
+      this.playbackTimeMillis = 0n;
+      return;
+    }
+
+    this.playbackTimeMillis = BigInt(Math.floor(seconds * 1000));
   }
 
   addSection(section: PlaybackSection, insertAtIndex?: number) {
@@ -161,12 +171,14 @@ class EditorStore {
   loadSections(sections: PlaybackSection[]) {
     this.sections = sections;
     this.selectedSectionIndex = null;
+    this.playbackTimeMillis = 0n;
     this.rippleRecompute();
   }
 
   reset() {
     this.sections = [];
     this.selectedSectionIndex = null;
+    this.playbackTimeMillis = 0n;
   }
 
   private rippleRecompute() {

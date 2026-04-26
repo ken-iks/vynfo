@@ -37,10 +37,7 @@ export function Projects() {
             </Button>
           </div>
           <div className="absolute top-2 right-8 z-10 flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setProjectPage("spaces")}
-            >
+            <Button variant="outline" onClick={() => setProjectPage("spaces")}>
               Project Spaces
             </Button>
             <ProjectConfigDropDown handlePageSelection={setProjectPage} />

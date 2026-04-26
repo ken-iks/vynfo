@@ -17,7 +17,10 @@ func (s *SpacesServiceServer) SendSpaceMessage(
 ) (*connect.Response[v1.SendSpaceMessageResponse], error) {
 	spaceMessage := req.Msg.GetSpaceMessage()
 	if spaceMessage == nil || spaceMessage.GetAuthor() == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("space_message and author are required"))
+		return nil, connect.NewError(
+			connect.CodeInvalidArgument,
+			errors.New("space_message and author are required"),
+		)
 	}
 
 	spaceId, err := uuid.Parse(req.Msg.GetSpaceId())

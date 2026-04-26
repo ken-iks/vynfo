@@ -173,7 +173,9 @@ export function SpacesList({ project }: SpacesListProps) {
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={availableUsers.length === 0 || addingMemberId !== ""}
+                  disabled={
+                    availableUsers.length === 0 || addingMemberId !== ""
+                  }
                 >
                   +
                 </Button>

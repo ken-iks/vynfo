@@ -10,8 +10,8 @@ import (
 
 type SpacesServiceServer struct {
 	v1connect.UnimplementedSpacesServiceHandler
-	db *sql.DB
-	queries *dbgen.Queries
+	db       *sql.DB
+	queries  *dbgen.Queries
 	observer *messages.MessageObserver
 }
 

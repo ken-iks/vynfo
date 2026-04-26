@@ -125,7 +125,9 @@ export function TimelineSection({
         transform: isBeingDragged ? `translateX(${dragOffsetPx}px)` : undefined,
         backgroundColor: colors.background,
         boxShadow:
-          isSelected || isBeingDragged ? undefined : `inset 0 0 0 1px ${colors.ring}`,
+          isSelected || isBeingDragged
+            ? undefined
+            : `inset 0 0 0 1px ${colors.ring}`,
       }}
       onPointerDown={handleBodyPointerDown}
     >

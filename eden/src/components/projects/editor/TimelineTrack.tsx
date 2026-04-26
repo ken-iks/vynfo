@@ -9,11 +9,7 @@ import {
   type TimelineMenuContext,
 } from "./TimelineContextMenu";
 import { useTimelineReorder } from "./useTimelineReorder";
-import {
-  DEFAULT_PX_PER_SECOND,
-  MAX_PX_PER_SECOND,
-  msToPx,
-} from "./geometry";
+import { DEFAULT_PX_PER_SECOND, MAX_PX_PER_SECOND, msToPx } from "./geometry";
 import { ContextMenu, ContextMenuTrigger } from "../../ui/context-menu";
 import { cn } from "@/lib/utils";
 
@@ -63,6 +59,8 @@ export function TimelineTrack({ availableVideos }: TimelineTrackProps) {
     pxPerSecond,
     clientXToTrackPx,
   });
+
+  const playheadLeft = msToPx(snap.playbackTimeMillis, pxPerSecond);
 
   const [menuContext, setMenuContext] = useState<TimelineMenuContext | null>(
     null,
@@ -223,6 +221,16 @@ export function TimelineTrack({ availableVideos }: TimelineTrackProps) {
                       />
                     );
                   })}
+                  {totalDuration > 0n && (
+                    <div
+                      className="pointer-events-none absolute top-0 bottom-0 z-20 w-px bg-primary"
+                      style={{
+                        left: Math.min(Math.max(playheadLeft, 0), trackWidth),
+                      }}
+                    >
+                      <div className="absolute -top-1 left-1/2 size-2 -translate-x-1/2 rotate-45 bg-primary" />
+                    </div>
+                  )}
                 </>
               )}
             </div>

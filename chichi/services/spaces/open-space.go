@@ -17,7 +17,7 @@ func (s *SpacesServiceServer) OpenSpace(
 
 	for {
 		select {
-		case <- ctx.Done():
+		case <-ctx.Done():
 			return nil
 		case <-ch:
 			if err := stream.Send(&v1.OpenSpaceResponse{

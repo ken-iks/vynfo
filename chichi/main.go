@@ -31,8 +31,8 @@ func runMigrations() (*sql.DB, error) {
 		return nil, err
 	}
 	if err := db.Ping(); err != nil {
-        return nil, err
-    }
+		return nil, err
+	}
 	goose.SetBaseFS(migrations)
 	goose.SetDialect("postgres")
 	if err := goose.Up(db, "database/schema"); err != nil {
