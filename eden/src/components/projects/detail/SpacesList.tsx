@@ -28,9 +28,10 @@ import { useAuth } from "../../providers/AuthProvider";
 
 interface SpacesListProps {
   project: ProjectMetadata;
+  onSelectSpace: (space: ProjectSpace) => void;
 }
 
-export function SpacesList({ project }: SpacesListProps) {
+export function SpacesList({ project, onSelectSpace }: SpacesListProps) {
   const userId = useAuth();
   const [spaces, setSpaces] = useState<ProjectSpace[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -169,7 +170,7 @@ export function SpacesList({ project }: SpacesListProps) {
           const availableUsers = getAvailableUsers(space);
           return (
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   size="sm"
@@ -200,7 +201,7 @@ export function SpacesList({ project }: SpacesListProps) {
             </DropdownMenu>
           );
         }}
-        onSelectRow={() => {}}
+        onSelectRow={onSelectSpace}
       />
     </div>
   );

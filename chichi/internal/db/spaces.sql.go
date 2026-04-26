@@ -362,7 +362,7 @@ FROM messages m
 JOIN users u ON u.id = m.author_id
 WHERE m.space_id = $1
   AND m.parent_id IS NOT DISTINCT FROM $2
-ORDER BY m.created_at DESC
+ORDER BY m.created_at
 `
 
 type ListSpaceMessagesParams struct {

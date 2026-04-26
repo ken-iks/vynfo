@@ -54,7 +54,7 @@ FROM messages m
 JOIN users u ON u.id = m.author_id
 WHERE m.space_id = sqlc.arg(space_id)
   AND m.parent_id IS NOT DISTINCT FROM sqlc.narg(parent_id)
-ORDER BY m.created_at DESC;
+ORDER BY m.created_at;
 
 -- name: TriggerSpaceNotification :exec
 SELECT pg_notify('space_change', @space_id::TEXT);

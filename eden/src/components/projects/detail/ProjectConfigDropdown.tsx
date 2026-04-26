@@ -16,7 +16,7 @@ export function ProjectConfigDropDown({
 }: ProjectConfigDropDownProps) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button> Upload Assets </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

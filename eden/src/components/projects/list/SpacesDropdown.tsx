@@ -10,7 +10,11 @@ import {
   DropdownMenuTrigger,
 } from "../../ui/dropdown-menu";
 
-export function SpacesDropdown() {
+interface SpacesDropdownProps {
+  onSelectSpace: (space: ProjectSpace) => void;
+}
+
+export function SpacesDropdown({ onSelectSpace }: SpacesDropdownProps) {
   const userId = useAuth();
   const [userSpaces, setUserSpaces] = useState<ProjectSpace[]>([]);
   const [loadingSpaces, setLoadingSpaces] = useState(false);
@@ -29,7 +33,7 @@ export function SpacesDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button variant="outline">Spaces</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
@@ -39,7 +43,10 @@ export function SpacesDropdown() {
           <DropdownMenuItem disabled>No spaces</DropdownMenuItem>
         ) : (
           userSpaces.map((space) => (
-            <DropdownMenuItem key={space.spaceId}>
+            <DropdownMenuItem
+              key={space.spaceId}
+              onSelect={() => onSelectSpace(space)}
+            >
               <div className="flex flex-col gap-1">
                 <span>{space.name}</span>
                 <span className="text-muted-foreground">

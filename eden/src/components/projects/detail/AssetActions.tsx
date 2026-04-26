@@ -21,7 +21,7 @@ type AssetActionProps =
 export function AssetActions(props: AssetActionProps) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="size-8">
           <EllipsisVerticalIcon className="size-4" />
         </Button>

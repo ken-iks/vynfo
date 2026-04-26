@@ -102,6 +102,34 @@ window.prompt as a quick client-side input without being asked to touch UI.
 feature to be usable, call that out before implementing it.
 ```
 
+### 4. Do not delete files just to change file types
+
+If a file only needs its extension or file type changed, do not delete and recreate it. Ask the user to rename or change the file type instead, then continue from the renamed file.
+
+Deleting and recreating loses editor continuity and can surprise the user, even when the final contents look similar.
+
+**Example:**
+
+```text
+❌ BAD — deleting `SpaceView.ts` and creating `SpaceView.tsx` because JSX was added.
+
+✅ GOOD — ask the user to change `SpaceView.ts` to `SpaceView.tsx`, then continue editing the renamed file.
+```
+
+### 5. Prefer shared helpers for repeated logic
+
+When similar formatting, conversion, parsing, or mapping logic appears in more than one place, prefer moving it into an existing shared helper module or a small colocated helper that can be reused.
+
+Keep this scoped: extract only the repeated logic needed for the current task, and do not turn a narrow change into a broad refactor.
+
+**Example:**
+
+```text
+❌ BAD — format protobuf timestamps separately inside each component.
+
+✅ GOOD — add `formatTimestampDate` / `formatTimestampTime` to `eden/src/lib/utils.ts` and reuse them at the call sites.
+```
+
 <!--
 To add another rule, append:
 

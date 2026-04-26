@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
-import { timestampDate } from "@bufbuild/protobuf/wkt";
 import { useAuth } from "../../providers/AuthProvider";
 import { client } from "../../../lib/client";
 import type { ProjectMetadata } from "../../../gen/proto/v1/projects_pb";
+import type { ProjectSpace } from "../../../gen/proto/v1/spaces_pb";
 import { Table } from "../../shared/Table";
 import { SectionTitle } from "../../shared/SectionTitle";
 import { CreateProjectDialog } from "./CreateProjectDialog";
 import { SpacesDropdown } from "./SpacesDropdown";
+import { formatTimestampDate } from "@/lib/utils";
 
 interface ProjectsListProps {
   onSelect: (project: ProjectMetadata) => void;
+  onSelectSpace: (space: ProjectSpace) => void;
 }
 
-export function ProjectsList({ onSelect }: ProjectsListProps) {
+export function ProjectsList({ onSelect, onSelectSpace }: ProjectsListProps) {
   const userId = useAuth();
   const [projectList, setProjectList] = useState<ProjectMetadata[]>([]);
 
@@ -37,7 +39,7 @@ export function ProjectsList({ onSelect }: ProjectsListProps) {
       <div className="mb-2 flex items-center justify-between">
         <SectionTitle>Projects</SectionTitle>
         <div className="flex items-center gap-2">
-          <SpacesDropdown />
+          <SpacesDropdown onSelectSpace={onSelectSpace} />
           <CreateProjectDialog onCreated={handleProjectCreated} />
         </div>
       </div>
@@ -52,12 +54,7 @@ export function ProjectsList({ onSelect }: ProjectsListProps) {
             header: "Created At",
             render: (_value, row) => {
               if (!row.createdAt) return "—";
-              const date = timestampDate(row.createdAt);
-              return date.toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              });
+              return formatTimestampDate(row.createdAt);
             },
           },
         ]}

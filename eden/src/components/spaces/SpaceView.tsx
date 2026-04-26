@@ -1,0 +1,98 @@
+import { useEffect, useState } from "react";
+import { instantiateSpaceWorker } from "./spaceWorker";
+import { useAuthSwitcher } from "../providers/AuthProvider";
+import { spacesClient } from "@/lib/client";
+import { create } from "@bufbuild/protobuf";
+import {
+  ListSpaceMessagesRequestSchema,
+  SendSpaceMessageRequestSchema,
+  type SpaceMessageWithMetadata,
+} from "@/gen/proto/v1/spaces_pb";
+import { AgentMessage } from "./AgentMessage";
+import { MessageInputBox } from "./MessageInputBox";
+import type { MessageInputValue } from "./useMessageInputEditor";
+import { NonUserMessage } from "./NonUserMessage";
+import { UserMessage } from "./UserMessage";
+
+export function SpaceView({ spaceId }: { spaceId: string }) {
+  const { userId, users } = useAuthSwitcher();
+  const [messages, setMessages] = useState<SpaceMessageWithMetadata[]>([]);
+  const [sendError, setSendError] = useState("");
+  const currentUser = users.find((user) => user.userId === userId);
+  const handleLoadMessages = async () => {
+    const request = create(ListSpaceMessagesRequestSchema, {
+      spaceId,
+    });
+    const response = await spacesClient.listSpaceMessages(request);
+    setMessages(response.messages);
+  };
+
+  const handleSubmitMessage = async (value: MessageInputValue) => {
+    if (!currentUser) {
+      const err = new Error("No user selected");
+      console.error("failed to send space message", err);
+      setSendError(err.message);
+      throw err;
+    }
+
+    setSendError("");
+    try {
+      const request = create(SendSpaceMessageRequestSchema, {
+        spaceId,
+        spaceMessage: {
+          content: value.text,
+          author: currentUser,
+        },
+      });
+
+      await spacesClient.sendSpaceMessage(request);
+      await handleLoadMessages();
+    } catch (err) {
+      console.error("failed to send space message", err);
+      setSendError(
+        err instanceof Error ? err.message : "Failed to send message",
+      );
+      throw err;
+    }
+  };
+
+  useEffect(() => {
+    handleLoadMessages();
+    const worker = instantiateSpaceWorker({ userId, spaceId });
+    worker.onmessage = async (event) => {
+      // this function stays registered and runs every time
+      // the worker sends a message
+      if (event.data.kind == "reload") {
+        await handleLoadMessages();
+      }
+    };
+
+    return () => {
+      worker.terminate();
+    };
+  }, []);
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
+        {messages.map((message) => {
+          if (message.spaceMessage?.author?.email === "VynfoAgent") {
+            return <AgentMessage key={message.messageId} message={message} />;
+          }
+
+          if (message.spaceMessage?.author?.userId === userId) {
+            return <UserMessage key={message.messageId} message={message} />;
+          }
+
+          return <NonUserMessage key={message.messageId} message={message} />;
+        })}
+      </div>
+      <div className="mt-auto border-t bg-background p-4">
+        {sendError && (
+          <p className="mb-2 text-xs text-destructive">{sendError}</p>
+        )}
+        <MessageInputBox onSubmit={handleSubmitMessage} />
+      </div>
+    </div>
+  );
+}
