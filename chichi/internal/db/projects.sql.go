@@ -11,6 +11,21 @@ import (
 	"github.com/google/uuid"
 )
 
+const addProjectMember = `-- name: AddProjectMember :exec
+INSERT INTO project_members (project_id, member_id) VALUES ($1, $2)
+ON CONFLICT (project_id, member_id) DO NOTHING
+`
+
+type AddProjectMemberParams struct {
+	ProjectID uuid.UUID
+	MemberID  uuid.UUID
+}
+
+func (q *Queries) AddProjectMember(ctx context.Context, arg AddProjectMemberParams) error {
+	_, err := q.db.ExecContext(ctx, addProjectMember, arg.ProjectID, arg.MemberID)
+	return err
+}
+
 const createProject = `-- name: CreateProject :one
 INSERT INTO projects (user_id, project_name, project_description) VALUES ($1, $2, $3) RETURNING id, user_id, project_name, project_description, created_at, main_branch_id
 `
@@ -53,12 +68,49 @@ func (q *Queries) GetProject(ctx context.Context, id uuid.UUID) (Project, error)
 	return i, err
 }
 
-const getUserProjects = `-- name: GetUserProjects :many
+const getUserCreatedProjects = `-- name: GetUserCreatedProjects :many
 SELECT id, user_id, project_name, project_description, created_at, main_branch_id FROM projects WHERE user_id = $1 ORDER BY created_at
 `
 
-func (q *Queries) GetUserProjects(ctx context.Context, userID uuid.UUID) ([]Project, error) {
-	rows, err := q.db.QueryContext(ctx, getUserProjects, userID)
+func (q *Queries) GetUserCreatedProjects(ctx context.Context, userID uuid.UUID) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, getUserCreatedProjects, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.ProjectName,
+			&i.ProjectDescription,
+			&i.CreatedAt,
+			&i.MainBranchID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUserMemberProjects = `-- name: GetUserMemberProjects :many
+SELECT projects.id, projects.user_id, projects.project_name, projects.project_description, projects.created_at, projects.main_branch_id FROM projects
+JOIN project_members ON project_members.project_id = projects.id
+WHERE project_members.member_id = $1 AND projects.user_id <> $1
+ORDER BY projects.created_at
+`
+
+func (q *Queries) GetUserMemberProjects(ctx context.Context, memberID uuid.UUID) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, getUserMemberProjects, memberID)
 	if err != nil {
 		return nil, err
 	}

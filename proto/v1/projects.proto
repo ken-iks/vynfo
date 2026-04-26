@@ -5,6 +5,7 @@ package v1;
 option go_package = "vynfo.com/vynfo/gen/proto/v1";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 
 // ========================  Uploader  ============================ //
@@ -145,7 +146,8 @@ message ListProjectsRequest {
 
 // ListProjectsResponse returns the set of projects owned by the requesting user.
 message ListProjectsResponse {
-    repeated ProjectMetadata projects = 1;
+    repeated ProjectMetadata user_created_projects = 1;
+    repeated ProjectMetadata user_member_projects = 2;
 }
 
 // ListProjectAssetsRequest fetches every media asset (videos, images, text boxes)
@@ -210,6 +212,11 @@ message CreateProjectResponse {
     string created_project_id = 1;
 }
 
+message AddProjectUserRequest {
+    string project_id = 1;
+    string user_id = 2;
+}
+
 // ========================  Commits CRUD  ============================ //
 
 message GetCommitRequest {
@@ -232,4 +239,5 @@ service ProjectService {
     rpc ListProjectAssets(ListProjectAssetsRequest) returns (ListProjectAssetsResponse);
     rpc ListProjectBranches(ListProjectBranchesRequest) returns (ListProjectBranchesResponse);
     rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
+    rpc AddProjectUser(AddProjectUserRequest) returns (google.protobuf.Empty);
 }

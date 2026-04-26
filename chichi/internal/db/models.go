@@ -72,6 +72,11 @@ type Project struct {
 	MainBranchID       uuid.NullUUID
 }
 
+type ProjectMember struct {
+	ProjectID uuid.UUID
+	MemberID  uuid.UUID
+}
+
 type Space struct {
 	ID        uuid.UUID
 	ProjectID uuid.UUID

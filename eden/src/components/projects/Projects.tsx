@@ -51,12 +51,7 @@ export function Projects() {
 
   switch (projectPage) {
     case "list":
-      return (
-        <ProjectsList
-          onSelect={openProject}
-          onSelectSpace={(space) => openSpace(space, "list")}
-        />
-      );
+      return <ProjectsList onSelect={openProject} />;
     case "view":
       return (
         <div className="relative h-full">
@@ -66,11 +61,11 @@ export function Projects() {
               Back to Projects
             </Button>
           </div>
-          <div className="absolute top-2 right-8 z-10 flex items-center gap-2">
+          <div className="absolute top-2 right-8 z-10 flex flex-col items-stretch gap-2">
+            <ProjectConfigDropDown handlePageSelection={setProjectPage} />
             <Button variant="outline" onClick={() => setProjectPage("spaces")}>
               Project Spaces
             </Button>
-            <ProjectConfigDropDown handlePageSelection={setProjectPage} />
           </div>
           {selectedProject && <ProjectView project={selectedProject} />}
         </div>

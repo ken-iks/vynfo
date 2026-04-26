@@ -9,6 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	v1 "vynfo.com/vynfo/gen/proto/v1"
+	"vynfo.com/vynfo/internal/db"
 )
 
 func (p *ProjectServiceServer) ListProjects(
@@ -21,12 +22,25 @@ func (p *ProjectServiceServer) ListProjects(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	projects, err := p.queries.GetUserProjects(ctx, userID)
+	userCreatedProjects, err := p.queries.GetUserCreatedProjects(ctx, userID)
 	if err != nil {
-		slog.Error("error fetching user projects", "error", err)
+		slog.Error("error fetching user created projects", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	userMemberProjects, err := p.queries.GetUserMemberProjects(ctx, userID)
+	if err != nil {
+		slog.Error("error fetching user member projects", "error", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	return connect.NewResponse(&v1.ListProjectsResponse{
+		UserCreatedProjects: projectMetadata(userCreatedProjects),
+		UserMemberProjects:  projectMetadata(userMemberProjects),
+	}), nil
+}
+
+func projectMetadata(projects []db.Project) []*v1.ProjectMetadata {
 	out := make([]*v1.ProjectMetadata, 0, len(projects))
 	for _, proj := range projects {
 		md := &v1.ProjectMetadata{
@@ -39,8 +53,5 @@ func (p *ProjectServiceServer) ListProjects(
 		}
 		out = append(out, md)
 	}
-
-	return connect.NewResponse(&v1.ListProjectsResponse{
-		Projects: out,
-	}), nil
+	return out
 }

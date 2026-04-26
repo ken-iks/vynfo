@@ -117,6 +117,9 @@ message SendSpaceMessageResponse {
 // An OpenSpaceRequest opens a persisted connection to a space. When the client
 // recieves an open space response, it means that the there has been some change
 // to the underlying space and the client should trigger the appropraite re request
+//
+// This opens a server streaming subscription - so the connection is closed when the
+// stream context is cancelled. 
 message OpenSpaceRequest {
     string user_id = 1;
     string space_id = 2;

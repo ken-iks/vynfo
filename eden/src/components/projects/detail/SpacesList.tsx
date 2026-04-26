@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { SyntheticEvent } from "react";
-import { spacesClient, usersClient } from "@/lib/client";
+import { spacesClient } from "@/lib/client";
 import type { ProjectSpace } from "@/gen/proto/v1/spaces_pb";
 import type { ProjectMetadata } from "@/gen/proto/v1/projects_pb";
 import type { User } from "@/gen/proto/v1/users_pb";
@@ -14,17 +14,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../../ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../ui/dropdown-menu";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import { Table } from "../../shared/Table";
 import { SectionTitle } from "../../shared/SectionTitle";
-import { useAuth } from "../../providers/AuthProvider";
+import { useAuthSwitcher } from "../../providers/AuthProvider";
+import { AddUserDropdown } from "../../shared/AddUserDropdown";
 
 interface SpacesListProps {
   project: ProjectMetadata;
@@ -32,9 +27,8 @@ interface SpacesListProps {
 }
 
 export function SpacesList({ project, onSelectSpace }: SpacesListProps) {
-  const userId = useAuth();
+  const { userId, users } = useAuthSwitcher();
   const [spaces, setSpaces] = useState<ProjectSpace[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
   const [spaceName, setSpaceName] = useState("");
   const [creating, setCreating] = useState(false);
@@ -48,16 +42,6 @@ export function SpacesList({ project, onSelectSpace }: SpacesListProps) {
   useEffect(() => {
     fetchSpaces();
   }, [project.id]);
-
-  useEffect(() => {
-    usersClient
-      .listUsers({})
-      .then((res) => setUsers(res.users))
-      .catch((err) => {
-        console.error("failed to load users", err);
-        setUsers([]);
-      });
-  }, []);
 
   const resetCreateForm = () => {
     setSpaceName("");
@@ -169,36 +153,14 @@ export function SpacesList({ project, onSelectSpace }: SpacesListProps) {
         rowActions={(space) => {
           const availableUsers = getAvailableUsers(space);
           return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={
-                    availableUsers.length === 0 || addingMemberId !== ""
-                  }
-                >
-                  +
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {availableUsers.length === 0 ? (
-                  <DropdownMenuItem disabled>No users to add</DropdownMenuItem>
-                ) : (
-                  availableUsers.map((user) => (
-                    <DropdownMenuItem
-                      key={user.userId}
-                      disabled={
-                        addingMemberId === `${space.spaceId}:${user.userId}`
-                      }
-                      onSelect={() => handleAddUser(space, user)}
-                    >
-                      {user.email}
-                    </DropdownMenuItem>
-                  ))
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <AddUserDropdown
+              users={availableUsers}
+              disabled={addingMemberId !== ""}
+              isAddingUser={(user) =>
+                addingMemberId === `${space.spaceId}:${user.userId}`
+              }
+              onSelectUser={(user) => handleAddUser(space, user)}
+            />
           );
         }}
         onSelectRow={onSelectSpace}
