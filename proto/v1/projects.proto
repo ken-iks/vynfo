@@ -78,6 +78,16 @@ message MediaOverlay {
     }
 }
 
+// MediaVideoEffects are effects that can be layed on top of video sections
+message MediaVideoEffect {
+    oneof effect {
+        BlurEffect blur = 1;
+        SepiaEffect sepia = 2;
+        SaturationEffect saturation = 3;
+        BrightnessEffect brightness = 4;
+    }
+}
+
 // The section video is the video that is used for this section, and start time
 // represent the start time within that video that this segment should begin playing from
 // NOTE: video_start_time_millies must for now be divisible by 500. This is because
@@ -86,6 +96,16 @@ message MediaOverlay {
 message SectionVideo {
     MediaVideoMetadata meta = 1;
     uint64 video_start_time_millies = 2;
+    // a video can also come with an ordered set of effects applied to the video
+    repeated MediaVideoEffect effects = 3;
+}
+
+// TODO: audio sections will be a separate editing experience from the video editing
+//       experience. Will support things like adding multiple differtent overlapping
+//       with things like audio effects and volume levels. Save for later!
+message SectionAudio {
+    MediaAudioMetadata meta = 1;
+    uint64 audio_start_time_millies = 2;
 }
 
 // PlaybackSection represents a particular cut of playback that is displayed between 
@@ -95,6 +115,12 @@ message PlaybackSection {
     uint64 end_time_millis = 2;
     SectionVideo video = 3;
     repeated MediaOverlay overlays = 5;
+}
+
+message PlaybackAudio {
+    uint64 start_time_millis = 1;
+    uint64 end_time_millies = 2;
+    SectionAudio audio = 3;
 }
 
 // PlaybackEditor holds a list of sections controlling the current edited state of
@@ -126,6 +152,25 @@ message CommitEditError {
 message StaleBranchError {
     string assumed_branch_tip_uuid = 1;
     string current_branch_tip_uuid = 2;
+}
+
+// ======================== Supported Effects =========================== //
+
+// Blur will apply a blur to the video section at a growing intensity scale
+message BlurEffect {
+    double intensity = 1; // 1 - 20. Recommended is 8
+}
+
+// Sepia will apply a default sepria effect to the full video segment
+// As a simplification, this is a grayscale + warm brown color tint
+message SepiaEffect {}
+
+message SaturationEffect {
+    double strength = 1; // -1 grayscale, 0 unchanged, 1 extra saturated
+}
+
+message BrightnessEffect {
+    double strength = 1; // >1 brighter than normal, <1 darker than normal
 }
 
 // ========================  Projects CRUD  ============================ //
@@ -163,6 +208,13 @@ message MediaVideoMetadata {
     string asset_id = 1;
     string title = 2;
     double duration = 3;
+}
+
+message MediaAudioMetadata {
+    string asset_id = 1;
+    string title = 2;
+    double duration = 3;
+    // plus more configuration!
 }
 
 // MediaImageMetadata is the lightweight descriptor returned when listing image assets.

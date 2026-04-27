@@ -1,9 +1,19 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Application, Sprite, Texture } from "pixi.js";
 import { videoRuntime } from "../stores/videoRuntime";
+import { useVideoEffects } from "./useVideoEffects";
 
 export function VideoCanvas({ video }: { video: HTMLVideoElement | null }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [spriteVersion, setSpriteVersion] = useState(0);
+  useVideoEffects(spriteVersion);
+
+  useEffect(() => {
+    if (!video) return;
+
+    videoRuntime.setVideo(video);
+    return () => videoRuntime.clearVideo(video);
+  }, [video]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -70,6 +80,9 @@ export function VideoCanvas({ video }: { video: HTMLVideoElement | null }) {
         sprite.height = height;
         app.stage.addChild(sprite);
         videoRuntime.setPixi(app, sprite);
+        // we add a state counter to force the canvas to rerender after the sprite is created
+        // this is so that the useVideoEffects hook can use it
+        setSpriteVersion((version) => version + 1);
         applySize(width, height);
       };
 

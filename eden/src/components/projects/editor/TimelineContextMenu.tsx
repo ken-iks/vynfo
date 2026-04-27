@@ -18,18 +18,29 @@ interface TimelineContextMenuProps {
   menuContext: TimelineMenuContext | null;
   availableVideos: MediaVideoMetadata[];
   computeInsertIndex: (trackPx: number) => number;
+  onEditEffects: (sectionIndex: number) => void;
 }
 
 export function TimelineContextMenu({
   menuContext,
   availableVideos,
   computeInsertIndex,
+  onEditEffects,
 }: TimelineContextMenuProps) {
   return (
     <ContextMenuContent>
       {menuContext?.sectionIndex !== null &&
         menuContext?.sectionIndex !== undefined && (
           <>
+            <ContextMenuItem
+              onSelect={() => {
+                if (menuContext.sectionIndex !== null) {
+                  onEditEffects(menuContext.sectionIndex);
+                }
+              }}
+            >
+              Edit effects...
+            </ContextMenuItem>
             <ContextMenuItem
               onSelect={() => {
                 if (menuContext.sectionIndex !== null) {

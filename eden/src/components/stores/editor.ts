@@ -1,5 +1,6 @@
 import type {
   MediaOverlay,
+  MediaVideoEffect,
   MediaVideoMetadata,
   PlaybackSection,
 } from "@/gen/proto/v1/projects_pb";
@@ -45,6 +46,10 @@ class EditorStore {
     }
 
     this.playbackTimeMillis = BigInt(Math.floor(seconds * 1000));
+  }
+
+  setPlaybackTimeMillis(ms: bigint) {
+    this.playbackTimeMillis = ms < 0n ? 0n : ms;
   }
 
   addSection(section: PlaybackSection, insertAtIndex?: number) {
@@ -135,6 +140,19 @@ class EditorStore {
 
   addOverlayToSection(sectionIndex: number, overlay: MediaOverlay) {
     this.sections[sectionIndex].overlays.push(overlay);
+  }
+
+  setSectionVideoEffects(sectionIndex: number, effects: MediaVideoEffect[]) {
+    const section = this.sections[sectionIndex];
+    if (!section?.video) return;
+
+    this.sections[sectionIndex] = {
+      ...section,
+      video: {
+        ...section.video,
+        effects,
+      },
+    };
   }
 
   addVideoSection(video: MediaVideoMetadata) {

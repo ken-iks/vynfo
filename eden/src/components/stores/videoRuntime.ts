@@ -6,6 +6,17 @@ import type { Application, Sprite } from "pixi.js";
 class VideoRuntime {
   app: Application | null = null;
   videoSprite: Sprite | null = null;
+  video: HTMLVideoElement | null = null;
+
+  setVideo(video: HTMLVideoElement) {
+    this.video = video;
+  }
+
+  clearVideo(video: HTMLVideoElement) {
+    if (this.video !== video) return;
+
+    this.video = null;
+  }
 
   setPixi(app: Application, videoSprite: Sprite) {
     this.app = app;
@@ -17,6 +28,12 @@ class VideoRuntime {
 
     this.app = null;
     this.videoSprite = null;
+  }
+
+  seekToMillis(ms: bigint) {
+    if (!this.video) return;
+
+    this.video.currentTime = Number(ms) / 1000;
   }
 }
 

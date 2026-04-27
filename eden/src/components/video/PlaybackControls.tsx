@@ -62,17 +62,6 @@ export function PlaybackControls({
     video.pause();
   };
 
-  const seek = (value: number[]) => {
-    if (!video) return;
-
-    const nextTime = value[0] ?? 0;
-    if (Number.isFinite(nextTime)) {
-      video.currentTime = nextTime;
-      setCurrentTime(nextTime);
-      editorStore.setPlaybackTimeSeconds(nextTime);
-    }
-  };
-
   const toggleMuted = () => {
     if (!video) return;
 
@@ -104,16 +93,7 @@ export function PlaybackControls({
       <span className="w-24 tabular-nums">
         {formatDuration(currentTime * 1000)} / {formatDuration(duration * 1000)}
       </span>
-      <Slider
-        aria-label="Playback position"
-        className="flex-1"
-        disabled={!video || duration === 0}
-        max={duration || 0}
-        min={0}
-        onValueChange={seek}
-        step={0.01}
-        value={[Math.min(currentTime, duration || currentTime)]}
-      />
+      <div className="flex-1" />
       <Button
         aria-label={isMuted ? "Unmute" : "Mute"}
         disabled={!video}
