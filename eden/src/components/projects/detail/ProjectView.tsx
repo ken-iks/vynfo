@@ -102,49 +102,49 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
 
   return (
     <div className="flex flex-col items-center">
-      <SectionTitle>{project.name}</SectionTitle>
-      <div className="flex flex-col w-2/3 gap-4">
-        <Card>
-          <CardContent>
+      <div className="flex w-2/3 items-center justify-between gap-4">
+        <SectionTitle>{project.name}</SectionTitle>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span>Branch</span>
+          <Select value={selectedBranch} onValueChange={handleBranchChange}>
+            <SelectTrigger size="sm">
+              <SelectValue placeholder="Select a branch" />
+            </SelectTrigger>
+            <SelectContent>
+              {branches.map((b) => (
+                <SelectItem key={b.name} value={b.name}>
+                  {b.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <Card className="w-2/3 gap-0 py-0">
+        <CardContent className="px-0">
+          <div className="flex justify-center px-4 py-4">
             {currVideoPlayingSrc !== "" ? (
-              <div>
-                <div className="relative inline-block">
-                  <div
-                    className="pointer-events-none"
-                    style={{ visibility: "hidden" }}
-                  >
-                    <VideoPlayer
-                      src={currVideoPlayingSrc}
-                      ref={setVideoElement}
-                    />
-                  </div>
-                  <VideoCanvas video={videoElement} />
-                  <MediaOverlayCanvas />
+              <div className="relative inline-block">
+                <div
+                  className="pointer-events-none"
+                  style={{ visibility: "hidden" }}
+                >
+                  <VideoPlayer
+                    src={currVideoPlayingSrc}
+                    ref={setVideoElement}
+                  />
                 </div>
-                <PlaybackControls video={videoElement} />
+                <VideoCanvas video={videoElement} />
+                <MediaOverlayCanvas />
               </div>
             ) : (
               <EmptyVideoPlayer />
             )}
-          </CardContent>
-        </Card>
-        <Card className="h-96">
-          <div className="pl-5 flex items-center gap-3">
-            <SectionTitle>Branch:</SectionTitle>
-            <Select value={selectedBranch} onValueChange={handleBranchChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a branch" />
-              </SelectTrigger>
-              <SelectContent>
-                {branches.map((b) => (
-                  <SelectItem key={b.name} value={b.name}>
-                    {b.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
-          <CardContent className="h-full">
+          <div className="border-y bg-muted/20 px-3 py-1">
+            <PlaybackControls video={videoElement} />
+          </div>
+          <div className="h-96 px-4 py-3">
             <EditorTimeline
               projectId={project.id}
               branchName={selectedBranch}
@@ -170,9 +170,9 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
                 }
               }}
             />
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

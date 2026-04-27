@@ -79,7 +79,7 @@ export function PlaybackControls({
   };
 
   return (
-    <div className="flex items-center gap-2 border bg-background/95 p-2 text-xs">
+    <div className="flex items-center gap-2 text-xs">
       <Button
         aria-label={isPaused ? "Play" : "Pause"}
         disabled={!video}
