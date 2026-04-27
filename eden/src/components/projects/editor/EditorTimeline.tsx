@@ -1,5 +1,9 @@
 import { useSnapshot } from "valtio";
-import type { MediaVideoMetadata } from "@/gen/proto/v1/projects_pb";
+import type {
+  MediaImageMetadata,
+  MediaTextMetadata,
+  MediaVideoMetadata,
+} from "@/gen/proto/v1/projects_pb";
 import { editorStore } from "../../stores/editor";
 import { CommitDialog } from "./CommitDialog";
 import { TimelineTrack } from "./TimelineTrack";
@@ -10,6 +14,8 @@ interface EditorTimelineProps {
   branchName: string;
   tipCommitId: string | undefined;
   availableVideos: MediaVideoMetadata[];
+  availableImages: MediaImageMetadata[];
+  availableTexts: MediaTextMetadata[];
   onCommitSuccess: (newCommitId: string) => void;
 }
 
@@ -18,6 +24,8 @@ export function EditorTimeline({
   branchName,
   tipCommitId,
   availableVideos,
+  availableImages,
+  availableTexts,
   onCommitSuccess,
 }: EditorTimelineProps) {
   const snap = useSnapshot(editorStore);
@@ -25,7 +33,11 @@ export function EditorTimeline({
 
   return (
     <div className="flex h-full flex-col gap-2">
-      <TimelineTrack availableVideos={availableVideos} />
+      <TimelineTrack
+        availableVideos={availableVideos}
+        availableImages={availableImages}
+        availableTexts={availableTexts}
+      />
       <div className="flex items-center justify-between px-2 py-1">
         <CommitDialog
           projectId={projectId}

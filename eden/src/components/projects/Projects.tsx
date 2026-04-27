@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ProjectMetadata } from "../../gen/proto/v1/projects_pb";
 import type { ProjectSpace } from "../../gen/proto/v1/spaces_pb";
 import { ProjectView } from "./detail/ProjectView";
@@ -16,7 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 import { SpaceView } from "../spaces/SpaceView";
 
 export type ProjectPage =
@@ -30,12 +30,38 @@ export type ProjectPage =
 
 type SpaceReturnPage = "list" | "spaces";
 
+function UploadFinishedNotice({ message }: { message: string }) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="pointer-events-none absolute left-1/2 top-4 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full border bg-background px-4 py-2 text-sm font-medium text-foreground shadow-lg"
+    >
+      <CheckCircleIcon className="size-5 text-emerald-500" />
+      {message}
+    </div>
+  );
+}
+
 export function Projects() {
   const [projectPage, setProjectPage] = useState<ProjectPage>("list");
   const [selectedProject, setSelectedProject] = useState<ProjectMetadata>();
   const [selectedSpace, setSelectedSpace] = useState<ProjectSpace>();
   const [spaceReturnPage, setSpaceReturnPage] =
     useState<SpaceReturnPage>("list");
+  const [uploadNotice, setUploadNotice] = useState<{
+    message: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (uploadNotice === null) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setUploadNotice(null);
+    }, 3500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [uploadNotice]);
 
   const openProject = (project: ProjectMetadata) => {
     setSelectedProject(project);
@@ -52,12 +78,22 @@ export function Projects() {
     setProjectPage(spaceReturnPage);
   };
 
+  const showUploadNotice = (message: string) => {
+    setUploadNotice({ message });
+  };
+
+  const uploadNoticeElement =
+    uploadNotice !== null ? (
+      <UploadFinishedNotice message={uploadNotice.message} />
+    ) : null;
+
   switch (projectPage) {
     case "list":
       return <ProjectsList onSelect={openProject} />;
     case "view":
       return (
         <div className="relative h-full">
+          {uploadNoticeElement}
           <div className="absolute top-2 left-2 z-10">
             <Button variant="outline" onClick={() => setProjectPage("list")}>
               <ArrowLeftIcon className="size-4" />
@@ -76,6 +112,7 @@ export function Projects() {
     case "uploadVideo":
       return (
         <div className="relative h-full">
+          {uploadNoticeElement}
           <div className="absolute top-2 left-2 z-10">
             <Button variant="outline" onClick={() => setProjectPage("view")}>
               <ArrowLeftIcon className="size-4" />
@@ -83,7 +120,12 @@ export function Projects() {
             </Button>
           </div>
           {selectedProject ? (
-            <MediaHolder projectId={selectedProject.id} />
+            <MediaHolder
+              projectId={selectedProject.id}
+              onUploadCompleted={() =>
+                showUploadNotice("Video upload finished")
+              }
+            />
           ) : null}
         </div>
       );
@@ -109,7 +151,10 @@ export function Projects() {
                 {selectedProject ? (
                   <UploadImageWizard
                     projectId={selectedProject.id}
-                    onUploadCompleted={() => setProjectPage("view")}
+                    onUploadCompleted={() => {
+                      showUploadNotice("Image upload finished");
+                      setProjectPage("view");
+                    }}
                   />
                 ) : null}
               </CardContent>
@@ -139,7 +184,10 @@ export function Projects() {
                 {selectedProject ? (
                   <UploadTextWizard
                     projectId={selectedProject.id}
-                    onUploadCompleted={() => setProjectPage("view")}
+                    onUploadCompleted={() => {
+                      showUploadNotice("Text upload finished");
+                      setProjectPage("view");
+                    }}
                   />
                 ) : null}
               </CardContent>

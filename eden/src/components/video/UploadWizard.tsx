@@ -65,6 +65,7 @@ export function UploadWizard({
             break;
           case "finished":
             onUploadCompleted(response.uploadStatus.value.videoId);
+            resetUploadState();
             break;
         }
       }

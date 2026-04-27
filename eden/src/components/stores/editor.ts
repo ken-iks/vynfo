@@ -194,8 +194,10 @@ class EditorStore {
     this.sections[sectionIndex].overlays.push(overlay);
   }
 
-  addImageOverlay(image: MediaImageMetadata): boolean {
-    const sectionIndex = this.targetSectionIndex;
+  addImageOverlay(
+    image: MediaImageMetadata,
+    sectionIndex = this.targetSectionIndex,
+  ): boolean {
     if (sectionIndex === null) return false;
 
     const overlay = create(MediaOverlaySchema, {
@@ -219,8 +221,10 @@ class EditorStore {
     return true;
   }
 
-  addTextOverlay(text: MediaTextMetadata): boolean {
-    const sectionIndex = this.targetSectionIndex;
+  addTextOverlay(
+    text: MediaTextMetadata,
+    sectionIndex = this.targetSectionIndex,
+  ): boolean {
     if (sectionIndex === null) return false;
 
     const overlay = create(MediaOverlaySchema, {

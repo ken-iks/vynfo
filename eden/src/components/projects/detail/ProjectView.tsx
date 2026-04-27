@@ -14,10 +14,8 @@ import { VideoCanvas } from "../../video/VideoCanvas";
 import { MediaOverlayCanvas } from "../../video/MediaOverlayCanvas";
 import { EmptyVideoPlayer } from "../../video/EmptyVideoPlayer";
 import { PlaybackControls } from "../../video/PlaybackControls";
-import { Table } from "../../shared/Table";
 import { editorStore } from "../../stores/editor";
 import { mediaAssetStore } from "../../stores/mediaAssets";
-import { AssetActions } from "./AssetActions";
 import { EditorTimeline } from "../editor/EditorTimeline";
 import { SectionTitle } from "../../shared/SectionTitle";
 import {
@@ -151,6 +149,8 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
               projectId={project.id}
               branchName={selectedBranch}
               availableVideos={currProjectVideos}
+              availableImages={currProjectImages}
+              availableTexts={currProjectTexts}
               tipCommitId={
                 branches.find((b) => b.name === selectedBranch)?.tipCommitId
               }
@@ -172,40 +172,6 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
             />
           </CardContent>
         </Card>
-        {(currProjectTexts.length > 0 || currProjectImages.length > 0) && (
-          <Card>
-            <CardContent>
-              {currProjectTexts.length > 0 && (
-                <Table<MediaTextMetadata>
-                  title="Text Boxes"
-                  data={currProjectTexts}
-                  columns={[
-                    { key: "title", header: "Title" },
-                    { key: "assetId", header: "Asset ID" },
-                  ]}
-                  onSelectRow={() => {}}
-                  rowActions={(row) => (
-                    <AssetActions type="text" metadata={row} />
-                  )}
-                />
-              )}
-              {currProjectImages.length > 0 && (
-                <Table<MediaImageMetadata>
-                  title="Images"
-                  data={currProjectImages}
-                  columns={[
-                    { key: "title", header: "Title" },
-                    { key: "assetId", header: "Asset ID" },
-                  ]}
-                  onSelectRow={() => {}}
-                  rowActions={(row) => (
-                    <AssetActions type="image" metadata={row} />
-                  )}
-                />
-              )}
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );

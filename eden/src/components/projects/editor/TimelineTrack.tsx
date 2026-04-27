@@ -4,7 +4,11 @@ import {
 } from "@heroicons/react/24/outline";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSnapshot } from "valtio";
-import type { MediaVideoMetadata } from "@/gen/proto/v1/projects_pb";
+import type {
+  MediaImageMetadata,
+  MediaTextMetadata,
+  MediaVideoMetadata,
+} from "@/gen/proto/v1/projects_pb";
 import { editorStore } from "../../stores/editor";
 import { videoRuntime } from "../../stores/videoRuntime";
 import { TimelineSection } from "./TimelineSection";
@@ -27,6 +31,8 @@ import { Button } from "@/components/ui/button";
 
 interface TimelineTrackProps {
   availableVideos: MediaVideoMetadata[];
+  availableImages: MediaImageMetadata[];
+  availableTexts: MediaTextMetadata[];
 }
 
 interface TimelineLane {
@@ -43,7 +49,11 @@ const LABEL_WIDTH = 160;
 const RULER_HEIGHT = 22;
 const MAX_ZOOM_LEVEL = 4;
 
-export function TimelineTrack({ availableVideos }: TimelineTrackProps) {
+export function TimelineTrack({
+  availableVideos,
+  availableImages,
+  availableTexts,
+}: TimelineTrackProps) {
   const snap = useSnapshot(editorStore);
   const totalDuration = snap.totalDurationMillis;
 
@@ -480,6 +490,8 @@ export function TimelineTrack({ availableVideos }: TimelineTrackProps) {
         <TimelineContextMenu
           menuContext={menuContext}
           availableVideos={availableVideos}
+          availableImages={availableImages}
+          availableTexts={availableTexts}
           computeInsertIndex={computeInsertIndex}
           onEditEffects={(sectionIndex) => {
             editorStore.selectSection(sectionIndex);

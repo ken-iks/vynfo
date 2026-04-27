@@ -6,9 +6,13 @@ import { VideoPlayer } from "./VideoPlayer";
 
 interface MediaHolderProps {
   projectId: string;
+  onUploadCompleted: () => void;
 }
 
-export function MediaHolder({ projectId }: MediaHolderProps) {
+export function MediaHolder({
+  projectId,
+  onUploadCompleted,
+}: MediaHolderProps) {
   const [videoSrc, setVideoSrc] = useState("");
 
   const handleUploading = (videoId: string) => {
@@ -16,6 +20,7 @@ export function MediaHolder({ projectId }: MediaHolderProps) {
   };
   const handleUploaded = (videoId: string) => {
     setVideoSrc(`/video?videoId=${videoId}`);
+    onUploadCompleted();
   };
 
   return (

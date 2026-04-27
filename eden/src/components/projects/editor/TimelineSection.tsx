@@ -11,6 +11,16 @@ import { cn, formatDuration } from "@/lib/utils";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { pxToMs, videoColors } from "./geometry";
+import {
+  AdjustmentsHorizontalIcon,
+  Square2StackIcon,
+} from "@heroicons/react/24/outline";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface TimelineSectionProps {
   section: Snapshot<PlaybackSection>;
@@ -45,6 +55,14 @@ export function TimelineSection({
   const videoStart = section.video?.videoStartTimeMillies ?? 0n;
   const videoEnd = videoStart + duration;
   const colors = videoColors(section.video?.meta?.assetId);
+  const effectCount = section.video?.effects.length ?? 0;
+  const overlayCount = section.overlays.length;
+  const hasEffects = effectCount > 0;
+  const hasOverlays = overlayCount > 0;
+  const effectsLabel =
+    effectCount === 1 ? "1 effect" : `${effectCount} effects`;
+  const overlaysLabel =
+    overlayCount === 1 ? "1 overlay" : `${overlayCount} overlays`;
 
   const handleLeftPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     e.stopPropagation();
@@ -167,9 +185,45 @@ export function TimelineSection({
       >
         <HugeiconsIcon icon={Cancel01Icon} size={10} strokeWidth={2} />
       </button>
-      <div className="flex h-full cursor-grab flex-col justify-center gap-0.5 px-2 py-1 active:cursor-grabbing">
-        <span className="truncate text-[11px] font-medium leading-none">
-          {section.video?.meta?.title ?? "Untitled"}
+      <div className="flex h-full cursor-grab flex-col justify-center gap-0.5 px-2 py-1 pr-8 active:cursor-grabbing">
+        <span className="flex min-w-0 items-center gap-1 text-[11px] font-medium leading-none">
+          <TooltipProvider>
+            {hasEffects ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span
+                    className="flex shrink-0 items-center"
+                    aria-label={effectsLabel}
+                  >
+                    <AdjustmentsHorizontalIcon
+                      className="size-3 text-white/80"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top">{effectsLabel}</TooltipContent>
+              </Tooltip>
+            ) : null}
+            {hasOverlays ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span
+                    className="flex shrink-0 items-center"
+                    aria-label={overlaysLabel}
+                  >
+                    <Square2StackIcon
+                      className="size-3 text-white/80"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top">{overlaysLabel}</TooltipContent>
+              </Tooltip>
+            ) : null}
+          </TooltipProvider>
+          <span className="truncate">
+            {section.video?.meta?.title ?? "Untitled"}
+          </span>
         </span>
         <span className="truncate text-[9px] leading-none text-white/75 tabular-nums">
           {formatDuration(Number(videoStart))} -{" "}
