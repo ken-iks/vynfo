@@ -38,7 +38,7 @@ export function Table<T>({
             {columns.map((col) => (
               <TableHead key={String(col.key)}>{col.header}</TableHead>
             ))}
-            {rowActions && <TableHead className="w-16" />}
+            {rowActions && <TableHead className="w-48" />}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -57,7 +57,7 @@ export function Table<T>({
               ))}
               {rowActions && (
                 <TableCell
-                  className="w-16 pr-6"
+                  className="w-48 pr-6"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {rowActions(row)}

@@ -17,6 +17,9 @@ INSERT INTO projects (user_id, project_name, project_description) VALUES ($1, $2
 INSERT INTO project_members (project_id, member_id) VALUES ($1, $2)
 ON CONFLICT (project_id, member_id) DO NOTHING;
 
+-- name: DeleteProject :execrows
+DELETE FROM projects WHERE id = $1 AND user_id = $2;
+
 -- name: SetMainBranch :one
 UPDATE projects SET main_branch_id = $1 WHERE id = $2 RETURNING *; 
 

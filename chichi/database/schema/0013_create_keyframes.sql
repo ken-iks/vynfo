@@ -1,6 +1,6 @@
 -- +goose Up
 CREATE TABLE keyframes (
-    video_id UUID NOT NULL REFERENCES videos(asset_id),
+    video_id UUID NOT NULL REFERENCES videos(asset_id) ON DELETE CASCADE,
     timestamp_in_video BIGINT NOT NULL,
     segment_idx BIGINT NOT NULL,
     byte_offset_in_segment BIGINT NOT NULL,

@@ -1,7 +1,7 @@
 -- +goose Up
 CREATE TABLE spaces (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    project_id UUID NOT NULL REFERENCES projects(id),
+    project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     admin_id UUID NOT NULL REFERENCES users(id),
     created_at TIMESTAMP DEFAULT NOW()
 );

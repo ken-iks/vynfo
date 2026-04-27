@@ -8,6 +8,15 @@ import { SectionTitle } from "../../shared/SectionTitle";
 import { CreateProjectDialog } from "./CreateProjectDialog";
 import { formatTimestampDate } from "@/lib/utils";
 import { AddUserDropdown } from "../../shared/AddUserDropdown";
+import { Button } from "../../ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../ui/dialog";
 
 interface ProjectsListProps {
   onSelect: (project: ProjectMetadata) => void;
@@ -22,6 +31,7 @@ export function ProjectsList({ onSelect }: ProjectsListProps) {
     ProjectMetadata[]
   >([]);
   const [addingMemberId, setAddingMemberId] = useState("");
+  const [deletingProjectId, setDeletingProjectId] = useState("");
 
   const fetchProjects = async () => {
     const projects = await client.listProjects({ userId });
@@ -56,6 +66,22 @@ export function ProjectsList({ onSelect }: ProjectsListProps) {
     }
   };
 
+  const handleDeleteProject = async (project: ProjectMetadata) => {
+    setDeletingProjectId(project.id);
+    try {
+      await client.deleteProject({
+        projectId: project.id,
+        userId,
+      });
+      await fetchProjects();
+    } catch (err) {
+      console.error("failed to delete project", err);
+      throw err;
+    } finally {
+      setDeletingProjectId("");
+    }
+  };
+
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
@@ -70,14 +96,22 @@ export function ProjectsList({ onSelect }: ProjectsListProps) {
           projects={userCreatedProjects}
           onSelect={onSelect}
           rowActions={(project) => (
-            <AddUserDropdown
-              users={availableUsers}
-              disabled={addingMemberId !== ""}
-              isAddingUser={(user) =>
-                addingMemberId === `${project.id}:${user.userId}`
-              }
-              onSelectUser={(user) => handleAddProjectUser(project, user)}
-            />
+            <div className="flex items-center justify-end gap-2">
+              <AddUserDropdown
+                users={availableUsers}
+                disabled={addingMemberId !== "" || deletingProjectId !== ""}
+                isAddingUser={(user) =>
+                  addingMemberId === `${project.id}:${user.userId}`
+                }
+                onSelectUser={(user) => handleAddProjectUser(project, user)}
+              />
+              <DeleteProjectDialog
+                project={project}
+                disabled={addingMemberId !== "" || deletingProjectId !== ""}
+                deleting={deletingProjectId === project.id}
+                onConfirm={() => handleDeleteProject(project)}
+              />
+            </div>
           )}
         />
         <ProjectTable
@@ -87,6 +121,69 @@ export function ProjectsList({ onSelect }: ProjectsListProps) {
         />
       </div>
     </div>
+  );
+}
+
+function DeleteProjectDialog({
+  project,
+  disabled,
+  deleting,
+  onConfirm,
+}: {
+  project: ProjectMetadata;
+  disabled: boolean;
+  deleting: boolean;
+  onConfirm: () => Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+
+  const handleConfirm = async () => {
+    try {
+      await onConfirm();
+      setOpen(false);
+    } catch {
+      return;
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <Button
+        type="button"
+        variant="destructive"
+        disabled={disabled}
+        onClick={() => setOpen(true)}
+      >
+        Delete
+      </Button>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete project?</DialogTitle>
+          <DialogDescription>
+            This will permanently delete {project.name} and all of its media,
+            commits, branches, and spaces.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={deleting}
+            onClick={() => setOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            disabled={deleting}
+            onClick={handleConfirm}
+          >
+            {deleting ? "Deleting..." : "Delete Project"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

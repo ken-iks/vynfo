@@ -300,6 +300,11 @@ message AddProjectUserRequest {
     string user_id = 2;
 }
 
+message DeleteProjectRequest {
+    string project_id = 1;
+    string user_id = 2;
+}
+
 // ========================  Commits CRUD  ============================ //
 
 message GetCommitRequest {
@@ -325,4 +330,5 @@ service ProjectService {
     rpc ListProjectBranches(ListProjectBranchesRequest) returns (ListProjectBranchesResponse);
     rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
     rpc AddProjectUser(AddProjectUserRequest) returns (google.protobuf.Empty);
+    rpc DeleteProject(DeleteProjectRequest) returns (google.protobuf.Empty);
 }
