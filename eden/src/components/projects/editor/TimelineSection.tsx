@@ -17,7 +17,9 @@ interface TimelineSectionProps {
   index: number;
   isSelected: boolean;
   leftPx: number;
+  topPx: number;
   widthPx: number;
+  heightPx: number;
   pxPerSecond: number;
   isBeingDragged: boolean;
   isAnyDragActive: boolean;
@@ -30,7 +32,9 @@ export function TimelineSection({
   index,
   isSelected,
   leftPx,
+  topPx,
   widthPx,
+  heightPx,
   pxPerSecond,
   isBeingDragged,
   isAnyDragActive,
@@ -111,17 +115,19 @@ export function TimelineSection({
       data-selected={isSelected}
       data-dragging={isBeingDragged}
       className={cn(
-        "group/section absolute top-0 bottom-0 select-none overflow-hidden",
+        "group/section absolute select-none overflow-hidden rounded-sm",
         "text-white",
         isAnyDragActive &&
           !isBeingDragged &&
-          "transition-[left] duration-150 ease-out",
+          "transition-[left,top] duration-150 ease-out",
         isSelected && "ring-2 ring-primary",
         isBeingDragged && "z-20 shadow-lg ring-2 ring-primary",
       )}
       style={{
         left: leftPx,
+        top: topPx,
         width: widthPx,
+        height: heightPx,
         transform: isBeingDragged ? `translateX(${dragOffsetPx}px)` : undefined,
         backgroundColor: colors.background,
         boxShadow:
@@ -161,11 +167,11 @@ export function TimelineSection({
       >
         <HugeiconsIcon icon={Cancel01Icon} size={10} strokeWidth={2} />
       </button>
-      <div className="flex h-full cursor-grab flex-col justify-between px-3 py-2 active:cursor-grabbing">
-        <span className="truncate text-xs font-medium">
+      <div className="flex h-full cursor-grab flex-col justify-center gap-0.5 px-2 py-1 active:cursor-grabbing">
+        <span className="truncate text-[11px] font-medium leading-none">
           {section.video?.meta?.title ?? "Untitled"}
         </span>
-        <span className="text-[10px] text-white/75 tabular-nums">
+        <span className="truncate text-[9px] leading-none text-white/75 tabular-nums">
           {formatDuration(Number(videoStart))} -{" "}
           {formatDuration(Number(videoEnd))}
         </span>

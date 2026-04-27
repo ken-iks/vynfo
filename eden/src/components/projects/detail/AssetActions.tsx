@@ -6,6 +6,7 @@ import {
 } from "../../ui/dropdown-menu";
 import { Button } from "../../ui/button";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import { useSnapshot } from "valtio";
 import { editorStore } from "../../stores/editor";
 import type {
   MediaVideoMetadata,
@@ -19,6 +20,9 @@ type AssetActionProps =
   | { type: "text"; metadata: MediaTextMetadata };
 
 export function AssetActions(props: AssetActionProps) {
+  const snap = useSnapshot(editorStore);
+  const canAddOverlay = snap.targetSectionIndex !== null;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -37,10 +41,24 @@ export function AssetActions(props: AssetActionProps) {
           </DropdownMenuItem>
         )}
         {props.type === "image" && (
-          <DropdownMenuItem disabled>Add to Editor (TODO)</DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={!canAddOverlay}
+            onSelect={() => {
+              editorStore.addImageOverlay(props.metadata);
+            }}
+          >
+            Add to Current Section
+          </DropdownMenuItem>
         )}
         {props.type === "text" && (
-          <DropdownMenuItem disabled>Add to Editor (TODO)</DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={!canAddOverlay}
+            onSelect={() => {
+              editorStore.addTextOverlay(props.metadata);
+            }}
+          >
+            Add to Current Section
+          </DropdownMenuItem>
         )}
       </DropdownMenuContent>
     </DropdownMenu>

@@ -37,6 +37,32 @@ message UploadVideoResponse {
     }
 }
 
+// UploadImageRequest will upload image content to storage
+message UploadImageRequest {
+    string user_id = 1;
+    string project_id = 2;
+    bytes content = 3;
+    string title = 4;
+    MediaImageOverlay meta = 5;
+}
+
+message UploadImageResponse {
+    string uploaded_asset_id = 1;
+}
+
+// UploadImageRequest will upload image content to storage
+message UploadTextRequest {
+    string user_id = 1;
+    string project = 2;
+    string content = 3;
+    string title = 4;
+    MediaTextOverlay meta = 6;
+}
+
+message UploadTextResponse {
+    string uploaded_asset_id = 1;
+}
+
 // =======================  PlayBack Editor ============================= //
 
 // MediaImage is a reference to an image asset that can either take up the full video frame,
@@ -220,6 +246,9 @@ message MediaAudioMetadata {
 // MediaImageMetadata is the lightweight descriptor returned when listing image assets.
 message MediaImageMetadata {
     string asset_id = 1;
+    string signed_url = 2;
+    string title = 3;
+    string content_type = 4;
     // TODO
 }
 
@@ -227,6 +256,8 @@ message MediaImageMetadata {
 message MediaTextMetadata {
     string asset_id = 1;
     // TODO
+    string content = 2;
+    string title = 3;
 }
 
 // ListProjectAssetsResponse groups all asset types belonging to a project so the
@@ -285,6 +316,8 @@ message GetCommitResponse {
 // ====================== Service Definition ============================== //
 service ProjectService {
     rpc UploadVideo(UploadVideoRequest) returns (stream UploadVideoResponse);
+    rpc UploadImage(UploadImageRequest) returns (UploadImageResponse);
+    rpc UploadText(UploadTextRequest) returns (UploadTextResponse);
     rpc CommitEdit(CommitEditRequest) returns (CommitEditResponse);
     rpc GetCommit(GetCommitRequest) returns (GetCommitResponse);
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);

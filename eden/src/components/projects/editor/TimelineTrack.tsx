@@ -29,7 +29,17 @@ interface TimelineTrackProps {
   availableVideos: MediaVideoMetadata[];
 }
 
-const TIMELINE_HEIGHT = 72;
+interface TimelineLane {
+  key: string;
+  title: string;
+  video: MediaVideoMetadata | undefined;
+  topPx: number;
+}
+
+const EMPTY_TIMELINE_HEIGHT = 72;
+const LANE_HEIGHT = 34;
+const LANE_GAP = 3;
+const LABEL_WIDTH = 160;
 const RULER_HEIGHT = 22;
 const MAX_ZOOM_LEVEL = 4;
 
@@ -62,6 +72,52 @@ export function TimelineTrack({ availableVideos }: TimelineTrackProps) {
 
   const naturalTrackWidth = msToPx(totalDuration, pxPerSecond);
   const trackWidth = Math.max(containerWidth || 0, naturalTrackWidth);
+  const timelineLayout = useMemo(() => {
+    const lanes: TimelineLane[] = [];
+    const sectionLaneIndices: number[] = [];
+    const laneIndicesByKey = new Map<string, number>();
+
+    const addLane = (
+      key: string,
+      title: string,
+      video: MediaVideoMetadata | undefined,
+    ): number => {
+      const existingLaneIndex = laneIndicesByKey.get(key);
+      if (existingLaneIndex !== undefined) return existingLaneIndex;
+      const laneIndex = lanes.length;
+      laneIndicesByKey.set(key, laneIndex);
+      lanes.push({
+        key,
+        title,
+        video,
+        topPx: laneIndex * (LANE_HEIGHT + LANE_GAP),
+      });
+      return laneIndex;
+    };
+
+    for (const video of availableVideos) {
+      if (!video.assetId) continue;
+      addLane(video.assetId, video.title || "Untitled", video);
+    }
+
+    for (let i = 0; i < editorStore.sections.length; i++) {
+      const section = editorStore.sections[i];
+      const key = section.video?.meta?.assetId ?? `section-${i}`;
+      sectionLaneIndices[i] = addLane(
+        key,
+        section.video?.meta?.title ?? "Untitled",
+        section.video?.meta,
+      );
+    }
+
+    const totalLaneHeight =
+      lanes.length === 0
+        ? EMPTY_TIMELINE_HEIGHT
+        : lanes.length * LANE_HEIGHT + (lanes.length - 1) * LANE_GAP;
+
+    return { lanes, sectionLaneIndices, totalLaneHeight };
+  }, [availableVideos, snap.sections]);
+  const timelineHeight = timelineLayout.totalLaneHeight;
 
   const clientXToTrackPx = useCallback((clientX: number): number => {
     const viewport = viewportRef.current;
@@ -110,6 +166,27 @@ export function TimelineTrack({ availableVideos }: TimelineTrackProps) {
   });
 
   const playheadLeft = msToPx(snap.playbackTimeMillis, pxPerSecond);
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || totalDuration <= 0n) return;
+
+    const padding = 24;
+    const visibleLeft = viewport.scrollLeft;
+    const visibleRight = visibleLeft + viewport.clientWidth;
+
+    if (playheadLeft < visibleLeft + padding) {
+      viewport.scrollLeft = Math.max(0, playheadLeft - padding);
+      return;
+    }
+
+    if (playheadLeft > visibleRight - padding) {
+      viewport.scrollLeft = Math.min(
+        trackWidth - viewport.clientWidth,
+        playheadLeft - viewport.clientWidth + padding,
+      );
+    }
+  }, [playheadLeft, totalDuration, trackWidth]);
 
   const [menuContext, setMenuContext] = useState<TimelineMenuContext | null>(
     null,
@@ -172,6 +249,15 @@ export function TimelineTrack({ availableVideos }: TimelineTrackProps) {
     [snap.sections, pxPerSecond],
   );
 
+  const insertVideoFromLane = useCallback(
+    (video: MediaVideoMetadata | undefined, clientX: number) => {
+      if (!video) return;
+      const insertIndex = computeInsertIndex(clientXToTrackPx(clientX));
+      editorStore.insertVideoAt(insertIndex, video);
+    },
+    [clientXToTrackPx, computeInsertIndex],
+  );
+
   return (
     <div className="flex flex-1 flex-col gap-2">
       <div className="flex items-center justify-end gap-1">
@@ -204,131 +290,189 @@ export function TimelineTrack({ availableVideos }: TimelineTrackProps) {
         }}
       >
         <ContextMenuTrigger asChild>
-          <div
-            className={cn(
-              "relative flex-1 overflow-x-auto overflow-y-hidden rounded-none",
-              "border border-border bg-muted/10",
-            )}
-            onContextMenu={handleTrackContextMenu}
-            ref={viewportRef}
-          >
+          <div className="flex flex-1 overflow-x-hidden overflow-y-auto rounded-none border border-border bg-muted/10">
             <div
-              className="relative h-full w-full"
+              className="shrink-0 border-r border-border bg-background/40"
               style={{
-                minHeight: TIMELINE_HEIGHT + RULER_HEIGHT,
-                width: trackWidth,
+                width: LABEL_WIDTH,
+                minHeight: timelineHeight + RULER_HEIGHT,
               }}
             >
+              <div className="h-[22px] border-b border-border/60" />
+              <div className="relative" style={{ height: timelineHeight }}>
+                {timelineLayout.lanes.map((lane) => (
+                  <div
+                    key={lane.key}
+                    className="absolute inset-x-0 flex items-center border-b border-border/40 px-2 text-left text-[10px] font-medium text-muted-foreground hover:bg-muted/40"
+                    style={{
+                      top: lane.topPx,
+                      height: LANE_HEIGHT,
+                    }}
+                  >
+                    <span className="truncate">{lane.title}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div
+              className="relative flex-1 overflow-x-auto overflow-y-hidden"
+              onContextMenu={handleTrackContextMenu}
+              ref={viewportRef}
+            >
               <div
-                onPointerDown={(e) => {
-                  if (e.button !== 0) return;
-                  e.preventDefault();
-                  editorStore.selectSection(null);
-                  beginTimelineSeek(e.clientX);
+                className="relative h-full w-full"
+                style={{
+                  minHeight: timelineHeight + RULER_HEIGHT,
+                  width: trackWidth,
                 }}
               >
-                <TimelineRuler
-                  totalDurationMillis={totalDuration}
-                  pxPerSecond={pxPerSecond}
-                  height={RULER_HEIGHT}
-                />
-              </div>
-              <div
-                className="relative"
-                style={{ height: TIMELINE_HEIGHT, width: trackWidth }}
-                onPointerDown={(e) => {
-                  if (e.target === e.currentTarget) {
+                <div
+                  onPointerDown={(e) => {
+                    if (e.button !== 0) return;
+                    e.preventDefault();
                     editorStore.selectSection(null);
                     beginTimelineSeek(e.clientX);
-                  }
-                }}
-              >
-                {snap.sections.length === 0 ? (
-                  <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-                    Right-click to add a video, or drop one in from the assets
-                    list
-                  </div>
-                ) : (
-                  <>
-                    {reorder && (
-                      <div
-                        className={cn(
-                          "pointer-events-none absolute top-0 bottom-0",
-                          "rounded-none bg-card/50 backdrop-blur-sm",
-                          "ring-1 ring-dashed ring-primary/60",
-                        )}
-                        style={{
-                          left: msToPx(
-                            snap.sections[reorder.fromIndex].startTimeMillis,
-                            pxPerSecond,
-                          ),
-                          width: msToPx(
-                            snap.sections[reorder.fromIndex].endTimeMillis -
-                              snap.sections[reorder.fromIndex].startTimeMillis,
-                            pxPerSecond,
-                          ),
-                        }}
-                      >
+                  }}
+                >
+                  <TimelineRuler
+                    totalDurationMillis={totalDuration}
+                    pxPerSecond={pxPerSecond}
+                    height={RULER_HEIGHT}
+                  />
+                </div>
+                <div
+                  className="relative"
+                  style={{ height: timelineHeight, width: trackWidth }}
+                  onPointerDown={(e) => {
+                    if (e.target === e.currentTarget) {
+                      editorStore.selectSection(null);
+                      beginTimelineSeek(e.clientX);
+                    }
+                  }}
+                >
+                  {timelineLayout.lanes.length === 0 ? (
+                    <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
+                      Upload a video to create a timeline track
+                    </div>
+                  ) : (
+                    <>
+                      {timelineLayout.lanes.map((lane) => (
+                        <button
+                          key={lane.key}
+                          type="button"
+                          className="absolute inset-x-0 rounded-sm border border-border/60 bg-background/30 text-left hover:bg-muted/30"
+                          style={{
+                            top: lane.topPx,
+                            height: LANE_HEIGHT,
+                          }}
+                          onPointerDown={(e) => {
+                            if (e.button !== 0) return;
+                            e.preventDefault();
+                            e.stopPropagation();
+                            insertVideoFromLane(lane.video, e.clientX);
+                          }}
+                        >
+                          <span className="sr-only">Add {lane.title}</span>
+                        </button>
+                      ))}
+                      {reorder && (
                         <div
                           className={cn(
-                            "flex h-full items-center justify-center",
-                            "text-[10px] font-medium uppercase tracking-wider",
-                            "text-muted-foreground/80",
+                            "pointer-events-none absolute",
+                            "rounded-none bg-card/50 backdrop-blur-sm",
+                            "ring-1 ring-dashed ring-primary/60",
                           )}
+                          style={{
+                            top:
+                              timelineLayout.lanes[
+                                timelineLayout.sectionLaneIndices[
+                                  reorder.fromIndex
+                                ]
+                              ]?.topPx ?? 0,
+                            left: msToPx(
+                              snap.sections[reorder.fromIndex].startTimeMillis,
+                              pxPerSecond,
+                            ),
+                            width: msToPx(
+                              snap.sections[reorder.fromIndex].endTimeMillis -
+                                snap.sections[reorder.fromIndex]
+                                  .startTimeMillis,
+                              pxPerSecond,
+                            ),
+                            height: LANE_HEIGHT,
+                          }}
                         >
-                          Moving
+                          <div
+                            className={cn(
+                              "flex h-full items-center justify-center",
+                              "text-[10px] font-medium uppercase tracking-wider",
+                              "text-muted-foreground/80",
+                            )}
+                          >
+                            Moving
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {snap.sections.map((section, i) => {
-                      const sectionDuration =
-                        section.endTimeMillis - section.startTimeMillis;
-                      const naturalLeft = msToPx(
-                        section.startTimeMillis,
-                        pxPerSecond,
-                      );
-                      const widthPx = msToPx(sectionDuration, pxPerSecond);
-                      const isBeingDragged = reorder?.fromIndex === i;
-                      const previewLeft = previewLefts?.[i] ?? naturalLeft;
-                      const dragOffsetPx =
-                        isBeingDragged && reorder
-                          ? reorder.currentClientX - reorder.startClientX
-                          : 0;
-                      const leftPx = isBeingDragged ? naturalLeft : previewLeft;
-                      return (
-                        <TimelineSection
-                          key={i}
-                          section={section}
-                          index={i}
-                          isSelected={snap.selectedSectionIndex === i}
-                          leftPx={leftPx}
-                          widthPx={widthPx}
-                          pxPerSecond={pxPerSecond}
-                          isBeingDragged={isBeingDragged}
-                          isAnyDragActive={reorder !== null}
-                          dragOffsetPx={dragOffsetPx}
-                          onBeginReorder={handleBeginReorder}
-                        />
-                      );
-                    })}
-                    {totalDuration > 0n && (
-                      <div
-                        className="absolute top-0 bottom-0 z-20 w-px cursor-ew-resize bg-primary"
-                        style={{
-                          left: Math.min(Math.max(playheadLeft, 0), trackWidth),
-                        }}
-                        onPointerDown={(e) => {
-                          if (e.button !== 0) return;
-                          e.preventDefault();
-                          e.stopPropagation();
-                          beginTimelineSeek(e.clientX);
-                        }}
-                      >
-                        <div className="absolute -top-1 left-1/2 size-2 -translate-x-1/2 rotate-45 bg-primary" />
-                      </div>
-                    )}
-                  </>
-                )}
+                      )}
+                      {snap.sections.map((section, i) => {
+                        const sectionDuration =
+                          section.endTimeMillis - section.startTimeMillis;
+                        const naturalLeft = msToPx(
+                          section.startTimeMillis,
+                          pxPerSecond,
+                        );
+                        const widthPx = msToPx(sectionDuration, pxPerSecond);
+                        const isBeingDragged = reorder?.fromIndex === i;
+                        const previewLeft = previewLefts?.[i] ?? naturalLeft;
+                        const laneIndex = timelineLayout.sectionLaneIndices[i];
+                        const topPx =
+                          timelineLayout.lanes[laneIndex]?.topPx ?? 0;
+                        const dragOffsetPx =
+                          isBeingDragged && reorder
+                            ? reorder.currentClientX - reorder.startClientX
+                            : 0;
+                        const leftPx = isBeingDragged
+                          ? naturalLeft
+                          : previewLeft;
+                        return (
+                          <TimelineSection
+                            key={i}
+                            section={section}
+                            index={i}
+                            isSelected={snap.selectedSectionIndex === i}
+                            leftPx={leftPx}
+                            topPx={topPx}
+                            widthPx={widthPx}
+                            heightPx={LANE_HEIGHT}
+                            pxPerSecond={pxPerSecond}
+                            isBeingDragged={isBeingDragged}
+                            isAnyDragActive={reorder !== null}
+                            dragOffsetPx={dragOffsetPx}
+                            onBeginReorder={handleBeginReorder}
+                          />
+                        );
+                      })}
+                      {totalDuration > 0n && (
+                        <div
+                          className="absolute top-0 bottom-0 z-20 w-px cursor-ew-resize bg-primary"
+                          style={{
+                            left: Math.min(
+                              Math.max(playheadLeft, 0),
+                              trackWidth,
+                            ),
+                          }}
+                          onPointerDown={(e) => {
+                            if (e.button !== 0) return;
+                            e.preventDefault();
+                            e.stopPropagation();
+                            beginTimelineSeek(e.clientX);
+                          }}
+                        >
+                          <div className="absolute -top-1 left-1/2 size-2 -translate-x-1/2 rotate-45 bg-primary" />
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>

@@ -11,14 +11,14 @@ import type {
 } from "@/gen/proto/v1/projects_pb";
 import { VideoPlayer } from "../../video/VideoPlayer";
 import { VideoCanvas } from "../../video/VideoCanvas";
+import { MediaOverlayCanvas } from "../../video/MediaOverlayCanvas";
 import { EmptyVideoPlayer } from "../../video/EmptyVideoPlayer";
 import { PlaybackControls } from "../../video/PlaybackControls";
 import { Table } from "../../shared/Table";
 import { editorStore } from "../../stores/editor";
+import { mediaAssetStore } from "../../stores/mediaAssets";
 import { AssetActions } from "./AssetActions";
-import { formatDuration } from "@/lib/utils";
 import { EditorTimeline } from "../editor/EditorTimeline";
-import { videoColors } from "../editor/geometry";
 import { SectionTitle } from "../../shared/SectionTitle";
 import {
   Select,
@@ -73,6 +73,12 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
       });
       setCurrProjectVideos(assets.videos);
       setCurrProjectImages(assets.images);
+      for (const image of assets.images) {
+        mediaAssetStore.setImageUrl(image.assetId, image.signedUrl);
+      }
+      for (const text of assets.textBoxes) {
+        mediaAssetStore.setTextMarkdown(text.assetId, text.content);
+      }
       setCurrProjectTexts(assets.textBoxes);
     };
     fetchAssets();
@@ -115,6 +121,7 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
                     />
                   </div>
                   <VideoCanvas video={videoElement} />
+                  <MediaOverlayCanvas />
                 </div>
                 <PlaybackControls video={videoElement} />
               </div>
@@ -165,68 +172,40 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
             />
           </CardContent>
         </Card>
-        <Card>
-          <CardContent>
-            {currProjectVideos.length > 0 && (
-              <Table<MediaVideoMetadata>
-                title="Videos"
-                data={currProjectVideos}
-                columns={[
-                  {
-                    key: "assetId",
-                    header: "",
-                    render: (_value, row) => {
-                      const colors = videoColors(row.assetId);
-                      return (
-                        <div
-                          className="size-4 rounded-sm ring-1"
-                          style={{
-                            backgroundColor: colors.background,
-                            boxShadow: `inset 0 0 0 1px ${colors.ring}`,
-                          }}
-                          aria-label="Timeline color"
-                        />
-                      );
-                    },
-                  },
-                  { key: "title", header: "Title" },
-                  {
-                    key: "duration",
-                    header: "Duration",
-                    render: (_value, row) =>
-                      formatDuration(row.duration * 1000),
-                  },
-                ]}
-                onSelectRow={() => {}}
-                rowActions={(row) => (
-                  <AssetActions type="video" metadata={row} />
-                )}
-              />
-            )}
-            {currProjectTexts.length > 0 && (
-              <Table<MediaTextMetadata>
-                title="Images"
-                data={currProjectTexts}
-                columns={[{ key: "assetId", header: "Asset ID" }]}
-                onSelectRow={() => {}}
-                rowActions={(row) => (
-                  <AssetActions type="text" metadata={row} />
-                )}
-              />
-            )}
-            {currProjectImages.length > 0 && (
-              <Table<MediaImageMetadata>
-                title="Text Boxes"
-                data={currProjectImages}
-                columns={[{ key: "assetId", header: "Asset ID" }]}
-                onSelectRow={() => {}}
-                rowActions={(row) => (
-                  <AssetActions type="image" metadata={row} />
-                )}
-              />
-            )}
-          </CardContent>
-        </Card>
+        {(currProjectTexts.length > 0 || currProjectImages.length > 0) && (
+          <Card>
+            <CardContent>
+              {currProjectTexts.length > 0 && (
+                <Table<MediaTextMetadata>
+                  title="Text Boxes"
+                  data={currProjectTexts}
+                  columns={[
+                    { key: "title", header: "Title" },
+                    { key: "assetId", header: "Asset ID" },
+                  ]}
+                  onSelectRow={() => {}}
+                  rowActions={(row) => (
+                    <AssetActions type="text" metadata={row} />
+                  )}
+                />
+              )}
+              {currProjectImages.length > 0 && (
+                <Table<MediaImageMetadata>
+                  title="Images"
+                  data={currProjectImages}
+                  columns={[
+                    { key: "title", header: "Title" },
+                    { key: "assetId", header: "Asset ID" },
+                  ]}
+                  onSelectRow={() => {}}
+                  rowActions={(row) => (
+                    <AssetActions type="image" metadata={row} />
+                  )}
+                />
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

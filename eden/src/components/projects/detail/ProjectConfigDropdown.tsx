@@ -26,6 +26,9 @@ export function ProjectConfigDropDown({
         <DropdownMenuItem onSelect={() => handlePageSelection("uploadImage")}>
           Upload Image
         </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => handlePageSelection("uploadText")}>
+          Upload Text
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

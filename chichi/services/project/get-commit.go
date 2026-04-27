@@ -2,11 +2,11 @@ package project
 
 import (
 	"context"
-	"encoding/json"
 	"log/slog"
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/encoding/protojson"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 )
 
@@ -24,8 +24,8 @@ func (p *ProjectServiceServer) GetCommit(
 		slog.Error("error fetching commit", "error", err)
 		return nil, connect.NewError(connect.CodeNotFound, err)
 	}
-	var sections []*v1.PlaybackSection
-	if err := json.Unmarshal(commit.State, &sections); err != nil {
+	var state v1.CommitEditRequest
+	if err := protojson.Unmarshal(commit.State, &state); err != nil {
 		slog.Error("error unmarshalling commit state", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -33,6 +33,6 @@ func (p *ProjectServiceServer) GetCommit(
 		CommitId:    commit.ID.String(),
 		ProjectId:   commit.ProjectID.String(),
 		Message:     commit.Message.String,
-		CommitState: sections,
+		CommitState: state.GetCommitState(),
 	}), nil
 }

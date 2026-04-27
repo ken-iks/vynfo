@@ -5,11 +5,17 @@ import { useRef, useState } from "react";
 interface DragUploadAreaProps {
   onFileSelected: (f: File) => void;
   selectedFile: File | null;
+  accept?: string;
+  label?: string;
+  isAcceptedFile?: (file: File) => boolean;
 }
 
 export function DragUploadArea({
   onFileSelected,
   selectedFile,
+  accept = "video/mp4",
+  label = "Upload Video",
+  isAcceptedFile = (file) => file.type === "video/mp4",
 }: DragUploadAreaProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -32,7 +38,7 @@ export function DragUploadArea({
         e.preventDefault();
         setIsDragging(false);
         const file = e.dataTransfer.files[0];
-        if (file?.type === "video/mp4") onFileSelected(file);
+        if (file && isAcceptedFile(file)) onFileSelected(file);
       }}
       className={clsx(
         "flex flex-col items-center justify-center gap-2",
@@ -46,11 +52,11 @@ export function DragUploadArea({
       <input
         ref={fileInputRef}
         type="file"
-        accept="video/mp4"
+        accept={accept}
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];
-          if (file) onFileSelected(file);
+          if (file && isAcceptedFile(file)) onFileSelected(file);
         }}
       />
       <ArrowUpTrayIcon
@@ -68,7 +74,7 @@ export function DragUploadArea({
             active ? "text-primary" : "text-base-content/50",
           )}
         >
-          Upload Video
+          {label}
         </p>
       )}
     </div>

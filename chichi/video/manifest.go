@@ -3,16 +3,15 @@ package video
 import (
 	"context"
 	"fmt"
-	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"cloud.google.com/go/storage"
 	"github.com/google/uuid"
 	"vynfo.com/vynfo/internal/db"
+	"vynfo.com/vynfo/shared"
 )
 
 const MANIFEST_LIVE_BASE = `#EXTM3U
@@ -55,47 +54,6 @@ func StartManifest(
 	}
 }
 
-// Base uploader for writing to bytes to cloud storage
-// use withSignedUrl to generate a signed url for the recently uploaded bytes
-// Default url lifetime is 15 mins
-func uploadBytes(
-	writer *storage.Writer,
-	source io.Reader,
-	objectPath string,
-	withSignedUrl *storage.BucketHandle,
-) (string, error) {
-	if _, err := io.Copy(writer, source); err != nil {
-		writer.Close()
-		return "", err
-	}
-	if err := writer.Close(); err != nil {
-		return "", err
-	}
-	if withSignedUrl != nil {
-		opts := &storage.SignedURLOptions{
-			Method:  "GET",
-			Expires: time.Now().Add(15 * time.Minute),
-		}
-		url, err := withSignedUrl.SignedURL(objectPath, opts)
-		if err != nil {
-			return "", err
-		}
-		return url, nil
-	}
-	return "", nil
-}
-
-// uploads a string to the cloud store
-// include bucket handle if you want to generate a signed url for the uploaded string
-func uploadString(
-	writer *storage.Writer,
-	s string,
-	objectPath string,
-	withSignedUrl *storage.BucketHandle,
-) (string, error) {
-	return uploadBytes(writer, strings.NewReader(s), objectPath, withSignedUrl)
-}
-
 // uploads a local file stored at fp to the cloud store
 // include bucket handle if you want to generate a signed url for the uploaded file
 func uploadFile(
@@ -109,7 +67,7 @@ func uploadFile(
 		return "", err
 	}
 	defer f.Close()
-	return uploadBytes(writer, f, objectPath, withSignedUrl)
+	return shared.UploadBytes(writer, f, objectPath, withSignedUrl)
 }
 
 // Uploads the video segment to the Builder's storage client and
@@ -126,7 +84,7 @@ func (builder *ManifestBuilder) UploadSegment(seg VideoSegment, ctx context.Cont
 
 	manifestPath := fmt.Sprintf("manifests/%s.m3u8", builder.VideoID)
 	mw := bucket.Object(manifestPath).NewWriter(ctx)
-	if _, err := uploadString(mw, MANIFEST_LIVE_BASE+builder.lines.String(), manifestPath, nil); err != nil {
+	if _, err := shared.UploadString(mw, MANIFEST_LIVE_BASE+builder.lines.String(), manifestPath, nil); err != nil {
 		slog.Warn("failed to write live manifest to gcs", "videoID", builder.VideoID, "error", err)
 	}
 
@@ -161,7 +119,7 @@ func (builder *ManifestBuilder) FinishUpload(ctx context.Context) error {
 	historicalPath := fmt.Sprintf("manifests/%s.m3u8", builder.VideoID)
 	w := bucket.Object(historicalPath).NewWriter(ctx)
 	final := MANIFEST_PERSISTED_BASE + builder.lines.String() + "\n#EXT-X-ENDLIST"
-	_, err := uploadString(w, final, historicalPath, nil)
+	_, err := shared.UploadString(w, final, historicalPath, nil)
 	if err != nil {
 		return err
 	}
@@ -177,7 +135,7 @@ func UploadBranchManifestToCloud(
 	bucket := client.Bucket("vedit-v1")
 	path := fmt.Sprintf("manifests/%s.m3u8", branchId)
 	w := bucket.Object(path).NewWriter(ctx)
-	_, err := uploadString(
+	_, err := shared.UploadString(
 		w,
 		manifest,
 		path,

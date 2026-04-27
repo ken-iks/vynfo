@@ -45,6 +45,13 @@ type CommitParent struct {
 	Position int32
 }
 
+type Image struct {
+	AssetID     uuid.UUID
+	DisplayName string
+	ObjectPath  string
+	ContentType string
+}
+
 type Keyframe struct {
 	VideoID             uuid.UUID
 	TimestampInVideo    int64
@@ -88,6 +95,12 @@ type Space struct {
 type SpaceMember struct {
 	SpaceID  uuid.UUID
 	MemberID uuid.UUID
+}
+
+type Text struct {
+	AssetID     uuid.UUID
+	DisplayName string
+	Content     string
 }
 
 type User struct {

@@ -3,11 +3,11 @@ package project
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"log/slog"
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/encoding/protojson"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
 	"vynfo.com/vynfo/video"
@@ -61,7 +61,9 @@ func (p *ProjectServiceServer) CommitEdit(
 		slog.Error("unable to write manifest to cloud", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
-	stateJson, err := json.Marshal(req.Msg.GetCommitState())
+	stateJson, err := protojson.Marshal(&v1.CommitEditRequest{
+		CommitState: req.Msg.GetCommitState(),
+	})
 	if err != nil {
 		slog.Error("error serializing state to json", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)

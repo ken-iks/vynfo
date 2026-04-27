@@ -6,6 +6,8 @@ import { ProjectConfigDropDown } from "./detail/ProjectConfigDropdown";
 import { SpacesList } from "./detail/SpacesList";
 import { ProjectsList } from "./list/ProjectsList";
 import { MediaHolder } from "../video/MediaHolder";
+import { UploadImageWizard } from "../video/UploadImageWizard";
+import { UploadTextWizard } from "../text/UploadTextWizard";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -22,6 +24,7 @@ export type ProjectPage =
   | "view"
   | "uploadVideo"
   | "uploadImage"
+  | "uploadText"
   | "spaces"
   | "space";
 
@@ -82,6 +85,66 @@ export function Projects() {
           {selectedProject ? (
             <MediaHolder projectId={selectedProject.id} />
           ) : null}
+        </div>
+      );
+    case "uploadImage":
+      return (
+        <div className="relative h-full">
+          <div className="absolute top-2 left-2 z-10">
+            <Button variant="outline" onClick={() => setProjectPage("view")}>
+              <ArrowLeftIcon className="size-4" />
+              Back to Project
+            </Button>
+          </div>
+          <div className="flex h-full justify-center px-12 pt-20">
+            <Card className="h-fit w-full max-w-2xl">
+              <CardHeader>
+                <CardTitle>Upload Image</CardTitle>
+                <CardDescription>
+                  Add an image asset that can be positioned on the editor
+                  canvas.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {selectedProject ? (
+                  <UploadImageWizard
+                    projectId={selectedProject.id}
+                    onUploadCompleted={() => setProjectPage("view")}
+                  />
+                ) : null}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      );
+    case "uploadText":
+      return (
+        <div className="relative h-full">
+          <div className="absolute top-2 left-2 z-10">
+            <Button variant="outline" onClick={() => setProjectPage("view")}>
+              <ArrowLeftIcon className="size-4" />
+              Back to Project
+            </Button>
+          </div>
+          <div className="flex h-full justify-center px-12 pt-20">
+            <Card className="h-fit w-full max-w-4xl">
+              <CardHeader>
+                <CardTitle>Upload Text</CardTitle>
+                <CardDescription>
+                  Write markdown text that can be positioned on the editor
+                  canvas.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {selectedProject ? (
+                  <UploadTextWizard
+                    projectId={selectedProject.id}
+                    onUploadCompleted={() => setProjectPage("view")}
+                  />
+                ) : null}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       );
     case "spaces":

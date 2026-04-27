@@ -1,10 +1,17 @@
 import type {
   MediaOverlay,
+  MediaImageMetadata,
+  MediaTextMetadata,
   MediaVideoEffect,
   MediaVideoMetadata,
   PlaybackSection,
 } from "@/gen/proto/v1/projects_pb";
 import {
+  MediaImageOverlaySchema,
+  MediaOverlaySchema,
+  MediaPositionSchema,
+  MediaTextColor,
+  MediaTextOverlaySchema,
   PlaybackSectionSchema,
   SectionVideoSchema,
 } from "@/gen/proto/v1/projects_pb";
@@ -23,9 +30,15 @@ export function sourceDurationMs(durationSeconds: number | undefined): bigint {
   return BigInt(Math.floor(durationSeconds * 1000));
 }
 
+interface SelectedOverlay {
+  sectionIndex: number;
+  overlayIndex: number;
+}
+
 class EditorStore {
   sections: PlaybackSection[] = [];
   selectedSectionIndex: number | null = null;
+  selectedOverlay: SelectedOverlay | null = null;
   playbackTimeMillis = 0n;
 
   get totalDurationMillis(): bigint {
@@ -35,8 +48,35 @@ class EditorStore {
     );
   }
 
+  get activeSectionIndex(): number | null {
+    const activeIndex = this.sections.findIndex(
+      (section) =>
+        section.startTimeMillis <= this.playbackTimeMillis &&
+        this.playbackTimeMillis < section.endTimeMillis,
+    );
+    return activeIndex >= 0 ? activeIndex : null;
+  }
+
+  get targetSectionIndex(): number | null {
+    if (
+      this.selectedSectionIndex !== null &&
+      this.selectedSectionIndex >= 0 &&
+      this.selectedSectionIndex < this.sections.length
+    ) {
+      return this.selectedSectionIndex;
+    }
+
+    return this.activeSectionIndex;
+  }
+
   selectSection(index: number | null) {
     this.selectedSectionIndex = index;
+    this.selectedOverlay = null;
+  }
+
+  selectOverlay(sectionIndex: number, overlayIndex: number) {
+    this.selectedSectionIndex = sectionIndex;
+    this.selectedOverlay = { sectionIndex, overlayIndex };
   }
 
   setPlaybackTimeSeconds(seconds: number) {
@@ -65,11 +105,23 @@ class EditorStore {
     this.sections.splice(index, 1);
     if (this.selectedSectionIndex === index) {
       this.selectedSectionIndex = null;
+      this.selectedOverlay = null;
     } else if (
       this.selectedSectionIndex !== null &&
       this.selectedSectionIndex > index
     ) {
       this.selectedSectionIndex -= 1;
+    }
+    if (this.selectedOverlay?.sectionIndex === index) {
+      this.selectedOverlay = null;
+    } else if (
+      this.selectedOverlay !== null &&
+      this.selectedOverlay.sectionIndex > index
+    ) {
+      this.selectedOverlay = {
+        ...this.selectedOverlay,
+        sectionIndex: this.selectedOverlay.sectionIndex - 1,
+      };
     }
     this.rippleRecompute();
   }
@@ -142,6 +194,91 @@ class EditorStore {
     this.sections[sectionIndex].overlays.push(overlay);
   }
 
+  addImageOverlay(image: MediaImageMetadata): boolean {
+    const sectionIndex = this.targetSectionIndex;
+    if (sectionIndex === null) return false;
+
+    const overlay = create(MediaOverlaySchema, {
+      assetId: image.assetId,
+      assetType: {
+        case: "image",
+        value: create(MediaImageOverlaySchema, {
+          pos: create(MediaPositionSchema, {
+            leftCornerPx: 32n,
+            leftCornerPy: 32n,
+            size: 160n,
+          }),
+        }),
+      },
+    });
+    this.addOverlayToSection(sectionIndex, overlay);
+    this.selectOverlay(
+      sectionIndex,
+      this.sections[sectionIndex].overlays.length - 1,
+    );
+    return true;
+  }
+
+  addTextOverlay(text: MediaTextMetadata): boolean {
+    const sectionIndex = this.targetSectionIndex;
+    if (sectionIndex === null) return false;
+
+    const overlay = create(MediaOverlaySchema, {
+      assetId: text.assetId,
+      assetType: {
+        case: "text",
+        value: create(MediaTextOverlaySchema, {
+          color: MediaTextColor.WHITE,
+          pos: create(MediaPositionSchema, {
+            leftCornerPx: 32n,
+            leftCornerPy: 32n,
+            size: 240n,
+          }),
+        }),
+      },
+    });
+    this.addOverlayToSection(sectionIndex, overlay);
+    this.selectOverlay(
+      sectionIndex,
+      this.sections[sectionIndex].overlays.length - 1,
+    );
+    return true;
+  }
+
+  updateOverlayPosition(
+    sectionIndex: number,
+    overlayIndex: number,
+    leftPx: number,
+    topPy: number,
+    size: bigint,
+  ) {
+    const overlay = this.sections[sectionIndex]?.overlays[overlayIndex];
+    if (!overlay) return;
+
+    const pos = create(MediaPositionSchema, {
+      leftCornerPx: BigInt(Math.max(0, Math.round(leftPx))),
+      leftCornerPy: BigInt(Math.max(0, Math.round(topPy))),
+      size,
+    });
+
+    if (overlay.assetType.case === "image") {
+      overlay.assetType.value.pos = pos;
+    } else if (overlay.assetType.case === "text") {
+      overlay.assetType.value.pos = pos;
+    }
+  }
+
+  setTextOverlayColor(
+    sectionIndex: number,
+    overlayIndex: number,
+    color: MediaTextColor,
+  ) {
+    const overlay = this.sections[sectionIndex]?.overlays[overlayIndex];
+    if (overlay?.assetType.case !== "text") return;
+
+    overlay.assetType.value.color = color;
+  }
+
   setSectionVideoEffects(sectionIndex: number, effects: MediaVideoEffect[]) {
     const section = this.sections[sectionIndex];
     if (!section?.video) return;
@@ -189,6 +326,7 @@ class EditorStore {
   loadSections(sections: PlaybackSection[]) {
     this.sections = sections;
     this.selectedSectionIndex = null;
+    this.selectedOverlay = null;
     this.playbackTimeMillis = 0n;
     this.rippleRecompute();
   }
@@ -196,6 +334,7 @@ class EditorStore {
   reset() {
     this.sections = [];
     this.selectedSectionIndex = null;
+    this.selectedOverlay = null;
     this.playbackTimeMillis = 0n;
   }
 
