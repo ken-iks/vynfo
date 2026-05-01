@@ -48,7 +48,9 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
 
   const userId = useAuth();
   const editorSnap = useSnapshot(editorStore);
-  const selectedBranchMetadata = branches.find((b) => b.name === selectedBranch);
+  const selectedBranchMetadata = branches.find(
+    (b) => b.name === selectedBranch,
+  );
 
   const loadBranchIntoEditor = async (branch: BranchMetadata | undefined) => {
     if (branch?.tipCommitId) {

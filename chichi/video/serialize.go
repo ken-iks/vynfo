@@ -26,7 +26,7 @@ func serializeSection(
 	videoID := v.GetMeta().AssetId
 	videoStartMs := v.GetVideoStartTimeMillies()
 	durationMs := section.GetEndTimeMillis() - section.GetStartTimeMillis()
-	limit := int32(durationMs * KEYFRAMES_PER_SECOND / 1000) 
+	limit := int32(durationMs * KEYFRAMES_PER_SECOND / 1000)
 	if limit == 0 {
 		limit = 1
 	}

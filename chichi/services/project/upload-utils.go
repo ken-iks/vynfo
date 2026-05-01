@@ -37,7 +37,13 @@ func (p *ProjectServiceServer) uploadVideoSegments(
 			if uploadErr == nil {
 				uploadErr = result.Err
 				cancelUpload()
-				slog.Error("error uploading segment", "objectKey", result.ObjectKey, "error", result.Err)
+				slog.Error(
+					"error uploading segment",
+					"objectKey",
+					result.ObjectKey,
+					"error",
+					result.Err,
+				)
 			}
 			continue
 		}

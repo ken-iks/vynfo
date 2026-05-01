@@ -20,10 +20,7 @@ interface UploaderProps {
   onUploadCompleted: (videoId: string) => void;
 }
 
-export function UploadWizard({
-  projectId,
-  onUploadCompleted,
-}: UploaderProps) {
+export function UploadWizard({ projectId, onUploadCompleted }: UploaderProps) {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [hasFirstResponse, setHasFirstResponse] = useState(false);
@@ -95,11 +92,7 @@ export function UploadWizard({
           />
           {videoFile !== null && (
             <div className="flex justify-center">
-              <Button
-                onClick={handleUpload}
-                disabled={!videoFile}
-                size="sm"
-              >
+              <Button onClick={handleUpload} disabled={!videoFile} size="sm">
                 Initiate Upload
               </Button>
             </div>

@@ -43,7 +43,8 @@ export function TimelineContextMenu({
   onEditEffects,
 }: TimelineContextMenuProps) {
   const sectionIndex = menuContext?.sectionIndex ?? null;
-  const hasCopiedSection = localStorage.getItem(COPIED_SECTION_STORAGE_KEY) !== null;
+  const hasCopiedSection =
+    localStorage.getItem(COPIED_SECTION_STORAGE_KEY) !== null;
   const copySection = (index: number) => {
     const section = editorStore.sections[index];
     if (!section) return;
