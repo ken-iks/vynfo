@@ -6,6 +6,7 @@ import (
 	"cloud.google.com/go/storage"
 	"vynfo.com/vynfo/gen/proto/v1/v1connect"
 	dbgen "vynfo.com/vynfo/internal/db"
+	"vynfo.com/vynfo/video"
 )
 
 type ProjectServiceServer struct {
@@ -13,6 +14,7 @@ type ProjectServiceServer struct {
 	storageClient *storage.Client
 	db            *sql.DB
 	queries       *dbgen.Queries
+	manifestCache *video.ManifestCache
 }
 
 func NewProjectServiceServer(
@@ -20,5 +22,10 @@ func NewProjectServiceServer(
 	db *sql.DB,
 	queries *dbgen.Queries,
 ) *ProjectServiceServer {
-	return &ProjectServiceServer{storageClient: c, db: db, queries: queries}
+	return &ProjectServiceServer{
+		storageClient: c,
+		db:            db,
+		queries:       queries,
+		manifestCache: video.InitateManifestCache(),
+	}
 }

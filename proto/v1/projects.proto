@@ -169,6 +169,16 @@ message CommitEditResponse {
     }
 }
 
+// AutoSave's will store the branches edited playback state in an in memory cache for
+// 15 mins since the edit. We reserve the right to clear the cache after 15 mins, or
+// if the pod happens to roll - so encourage users to make frequent commits
+message AutoSaveRequest {
+    string user_id = 1;
+    string project_id = 2;
+    string branch_id = 3;
+    repeated PlaybackSection auto_save_state = 4;
+}
+
 message CommitEditError {
     oneof error_type {
         StaleBranchError stale_branch = 2;
@@ -309,6 +319,10 @@ message DeleteProjectRequest {
 
 message GetCommitRequest {
     string commit_id = 1;
+    // state is independent of branch, but loading the state also clears
+    // the edit cache for this branch which is why the extra fields are needed
+    string user_id = 2;
+    string branch_id = 3;
 }
 
 message GetCommitResponse {
@@ -331,4 +345,5 @@ service ProjectService {
     rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
     rpc AddProjectUser(AddProjectUserRequest) returns (google.protobuf.Empty);
     rpc DeleteProject(DeleteProjectRequest) returns (google.protobuf.Empty);
+    rpc AutoSave(AutoSaveRequest) returns (google.protobuf.Empty);
 }

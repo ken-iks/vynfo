@@ -143,6 +143,43 @@ func (q *Queries) GetMainBranch(ctx context.Context) (Branch, error) {
 	return i, err
 }
 
+const listBranchesByTipCommit = `-- name: ListBranchesByTipCommit :many
+SELECT id, project_id, name, tip_commit_id FROM branches WHERE project_id = $1 AND tip_commit_id = $2
+`
+
+type ListBranchesByTipCommitParams struct {
+	ProjectID   uuid.UUID
+	TipCommitID uuid.NullUUID
+}
+
+func (q *Queries) ListBranchesByTipCommit(ctx context.Context, arg ListBranchesByTipCommitParams) ([]Branch, error) {
+	rows, err := q.db.QueryContext(ctx, listBranchesByTipCommit, arg.ProjectID, arg.TipCommitID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Branch
+	for rows.Next() {
+		var i Branch
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProjectID,
+			&i.Name,
+			&i.TipCommitID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listProjectBranches = `-- name: ListProjectBranches :many
 SELECT id, project_id, name, tip_commit_id FROM branches WHERE project_id = $1
 `

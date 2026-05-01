@@ -100,6 +100,7 @@ func (p *ProjectServiceServer) CommitEdit(
 		slog.Error("error commiting db transaction", "error", err)
 	}
 
+	p.manifestCache.Drop(req.Msg.GetUserId(), currBranch.ID.String())
 	return connect.NewResponse(&v1.CommitEditResponse{
 		Response: &v1.CommitEditResponse_NewCommitId{
 			NewCommitId: updatedBranch.TipCommitID.UUID.String(),

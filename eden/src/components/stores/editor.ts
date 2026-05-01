@@ -40,6 +40,7 @@ class EditorStore {
   selectedSectionIndex: number | null = null;
   selectedOverlay: SelectedOverlay | null = null;
   playbackTimeMillis = 0n;
+  editRevision = 0;
 
   get totalDurationMillis(): bigint {
     return this.sections.reduce(
@@ -99,6 +100,7 @@ class EditorStore {
       this.sections.splice(insertAtIndex, 0, section);
     }
     this.rippleRecompute();
+    this.markEdited();
   }
 
   removeSection(index: number) {
@@ -124,6 +126,7 @@ class EditorStore {
       };
     }
     this.rippleRecompute();
+    this.markEdited();
   }
 
   splitSection(index: number, atMillis: bigint) {
@@ -138,6 +141,7 @@ class EditorStore {
     };
     this.sections.splice(index, 1, left, right);
     this.rippleRecompute();
+    this.markEdited();
   }
 
   trimStart(index: number, newDurationMs: bigint, newVideoStartMs: bigint) {
@@ -158,6 +162,7 @@ class EditorStore {
       video: { ...section.video, videoStartTimeMillies: videoStart },
     };
     this.rippleRecompute();
+    this.markEdited();
   }
 
   trimEnd(index: number, newDurationMs: bigint) {
@@ -175,6 +180,7 @@ class EditorStore {
       endTimeMillis: section.startTimeMillis + duration,
     };
     this.rippleRecompute();
+    this.markEdited();
   }
 
   reorder(fromIndex: number, toIndex: number) {
@@ -188,10 +194,12 @@ class EditorStore {
       this.selectedSectionIndex = adjusted;
     }
     this.rippleRecompute();
+    this.markEdited();
   }
 
   addOverlayToSection(sectionIndex: number, overlay: MediaOverlay) {
     this.sections[sectionIndex].overlays.push(overlay);
+    this.markEdited();
   }
 
   addImageOverlay(
@@ -270,6 +278,7 @@ class EditorStore {
     } else if (overlay.assetType.case === "text") {
       overlay.assetType.value.pos = pos;
     }
+    this.markEdited();
   }
 
   setTextOverlayColor(
@@ -281,6 +290,7 @@ class EditorStore {
     if (overlay?.assetType.case !== "text") return;
 
     overlay.assetType.value.color = color;
+    this.markEdited();
   }
 
   setSectionVideoEffects(sectionIndex: number, effects: MediaVideoEffect[]) {
@@ -294,6 +304,7 @@ class EditorStore {
         effects,
       },
     };
+    this.markEdited();
   }
 
   addVideoSection(video: MediaVideoMetadata) {
@@ -309,6 +320,7 @@ class EditorStore {
     this.sections.push(section);
     this.selectedSectionIndex = this.sections.length - 1;
     this.rippleRecompute();
+    this.markEdited();
   }
 
   insertVideoAt(insertIndex: number, video: MediaVideoMetadata) {
@@ -325,6 +337,7 @@ class EditorStore {
     this.sections.splice(clamped, 0, section);
     this.selectedSectionIndex = clamped;
     this.rippleRecompute();
+    this.markEdited();
   }
 
   loadSections(sections: PlaybackSection[]) {
@@ -333,6 +346,7 @@ class EditorStore {
     this.selectedOverlay = null;
     this.playbackTimeMillis = 0n;
     this.rippleRecompute();
+    this.editRevision = 0;
   }
 
   reset() {
@@ -340,6 +354,11 @@ class EditorStore {
     this.selectedSectionIndex = null;
     this.selectedOverlay = null;
     this.playbackTimeMillis = 0n;
+    this.editRevision = 0;
+  }
+
+  private markEdited() {
+    this.editRevision += 1;
   }
 
   private rippleRecompute() {

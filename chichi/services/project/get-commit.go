@@ -14,6 +14,11 @@ func (p *ProjectServiceServer) GetCommit(
 	ctx context.Context,
 	req *connect.Request[v1.GetCommitRequest],
 ) (*connect.Response[v1.GetCommitResponse], error) {
+	_, err := uuid.Parse(req.Msg.GetUserId())
+	if err != nil {
+		slog.Error("error parsing user id", "error", err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
 	commitID, err := uuid.Parse(req.Msg.GetCommitId())
 	if err != nil {
 		slog.Error("error parsing commit id", "error", err)
@@ -29,6 +34,12 @@ func (p *ProjectServiceServer) GetCommit(
 		slog.Error("error unmarshalling commit state", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	branchID, err := uuid.Parse(req.Msg.GetBranchId())
+	if err != nil {
+		slog.Error("error parsing branch id", "error", err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	p.manifestCache.Drop(req.Msg.GetUserId(), branchID.String())
 	return connect.NewResponse(&v1.GetCommitResponse{
 		CommitId:    commit.ID.String(),
 		ProjectId:   commit.ProjectID.String(),

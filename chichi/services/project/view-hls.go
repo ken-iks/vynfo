@@ -6,10 +6,9 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"strings"
 	"time"
 
-	"cloud.google.com/go/storage"
+	"vynfo.com/vynfo/video"
 )
 
 // GetManifest handles GET /video?videoId=abc or GET /video?branchId=abc
@@ -20,6 +19,13 @@ func (p *ProjectServiceServer) GetManifest(w http.ResponseWriter, r *http.Reques
 	ctx := context.Background()
 	branchId := r.URL.Query().Get("branchId")
 	videoId := r.URL.Query().Get("videoId")
+	userId := r.URL.Query().Get("userId")
+
+	if userId == "" {
+		slog.Error("cannot view video without a user id")
+		http.Error(w, "missing user id", http.StatusBadRequest)
+		return
+	}
 	manifestId := branchId
 	kind := "branch"
 	if manifestId == "" {
@@ -31,9 +37,16 @@ func (p *ProjectServiceServer) GetManifest(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "missing branchId or videoId", http.StatusBadRequest)
 		return
 	}
-	slog.Info("GetManifest request", "kind", kind, "manifestId", manifestId)
-
 	bucket := p.storageClient.Bucket("vedit-v1")
+	slog.Info("GetManifest request", "kind", kind, "manifestId", manifestId)
+	if kind == "branch" {
+		manifest, okay := p.manifestCache.Find(userId, branchId)
+		if okay {
+			slog.Info("cache hit!", "userId", userId, "branchId", branchId)
+			serveManifest(w, manifest)
+			return
+		}
+	}
 	path := fmt.Sprintf("manifests/%s.m3u8", manifestId)
 	reader, err := bucket.Object(path).NewReader(ctx)
 	if err != nil {
@@ -49,36 +62,22 @@ func (p *ProjectServiceServer) GetManifest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	slog.Debug("GetManifest raw manifest", "path", path, "body", string(raw))
-	signed, err := signManifest(bucket, string(raw))
+	expiry := time.Now().Add(15 * time.Minute)
+	manifest := string(raw)
+	signed, err := video.SignManifest(bucket, manifest, expiry)
 	if err != nil {
 		slog.Error("GetManifest failed to sign manifest", "path", path, "error", err)
 		http.Error(w, "failed to sign manifest", http.StatusInternalServerError)
 		return
 	}
-	slog.Debug("successfully signed manifest")
-	w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
-	io.WriteString(w, signed)
+	if kind == "branch" {
+		p.manifestCache.Add(userId, branchId, signed, time.Until(expiry))
+		slog.Info("added branch to manifest cache", "userId", userId, "branch", branchId)
+	}
+	serveManifest(w, signed)
 }
 
-// Signs all of the URLs within a historical manifest
-func signManifest(bucket *storage.BucketHandle, manifest string) (string, error) {
-	var result strings.Builder
-	for i, line := range strings.Split(manifest, "\n") {
-		trimmed := strings.TrimSpace(line)
-		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
-			result.WriteString(line + "\n")
-			continue
-		}
-		url, err := bucket.SignedURL(trimmed, &storage.SignedURLOptions{
-			Method:  "GET",
-			Expires: time.Now().Add(15 * time.Minute),
-		})
-		if err != nil {
-			slog.Error("signManifest failed", "lineIdx", i, "object", trimmed, "error", err)
-			return "", fmt.Errorf("signing %s: %w", trimmed, err)
-		}
-		slog.Debug("signManifest signed segment", "lineIdx", i, "object", trimmed)
-		result.WriteString(url + "\n")
-	}
-	return result.String(), nil
+func serveManifest(w http.ResponseWriter, signedManifest string) {
+	w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
+	io.WriteString(w, signedManifest)
 }

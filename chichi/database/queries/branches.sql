@@ -7,6 +7,9 @@ UPDATE branches SET tip_commit_id = $1 WHERE id = $2 RETURNING *;
 -- name: ListProjectBranches :many
 SELECT * FROM branches WHERE project_id = $1;
 
+-- name: ListBranchesByTipCommit :many
+SELECT * FROM branches WHERE project_id = $1 AND tip_commit_id = $2;
+
 -- name: CreateMainBranch :one
 INSERT INTO branches (project_id, name) VALUES ($1, 'main') RETURNING *;
 

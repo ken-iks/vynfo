@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSnapshot } from "valtio";
 import { Card, CardContent } from "../../ui/card";
 import { useAuth } from "../../providers/AuthProvider";
 import { client } from "@/lib/client";
@@ -45,12 +46,17 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
   const [selectedBranch, setSelectedBranch] = useState<string>("");
 
   const userId = useAuth();
+  const editorSnap = useSnapshot(editorStore);
 
   const loadBranchIntoEditor = async (branch: BranchMetadata | undefined) => {
     if (branch?.tipCommitId) {
-      const commit = await client.getCommit({ commitId: branch.tipCommitId });
+      const commit = await client.getCommit({
+        commitId: branch.tipCommitId,
+        userId,
+        branchId: branch.id,
+      });
       editorStore.loadSections(commit.commitState);
-      setCurrVideoPlayingSrc(`/video?branchId=${branch.id}`);
+      setCurrVideoPlayingSrc(`/video?branchId=${branch.id}&userId=${userId}`);
     } else {
       editorStore.loadSections([]);
       setCurrVideoPlayingSrc("");
@@ -99,6 +105,32 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
     };
     fetchBranches();
   }, [project]);
+
+  useEffect(() => {
+    if (editorSnap.editRevision === 0 || selectedBranch === "") return;
+
+    const revision = editorSnap.editRevision;
+    const branch = branches.find((b) => b.name === selectedBranch);
+    if (!branch) return;
+    const timeoutId = window.setTimeout(() => {
+      void client
+        .autoSave({
+          userId,
+          projectId: project.id,
+          branchId: branch.id,
+          autoSaveState: [...editorStore.sections],
+        })
+        .then(() => {
+          if (branch) {
+            setCurrVideoPlayingSrc(
+              `/video?branchId=${branch.id}&userId=${userId}&v=autosave-${revision}`,
+            );
+          }
+        });
+    }, 500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [branches, editorSnap.editRevision, project.id, selectedBranch, userId]);
 
   return (
     <div className="flex flex-col items-center">
@@ -165,7 +197,7 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
                 const branch = branches.find((b) => b.name === selectedBranch);
                 if (branch) {
                   setCurrVideoPlayingSrc(
-                    `/video?branchId=${branch.id}&v=${newCommitId}`,
+                    `/video?branchId=${branch.id}&userId=${userId}&v=${newCommitId}`,
                   );
                 }
               }}

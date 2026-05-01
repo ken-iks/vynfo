@@ -130,6 +130,27 @@ Keep this scoped: extract only the repeated logic needed for the current task, a
 ✅ GOOD — add `formatTimestampDate` / `formatTimestampTime` to `eden/src/lib/utils.ts` and reuse them at the call sites.
 ```
 
+### 6. Do the requested implementation, not a "cleaner" variant
+
+When the user asks for a specific implementation shape, make that implementation directly. Do not substitute a more abstract, stricter, "cleaner", or more clever variant unless the user asks for it.
+
+- If the user picks one option from a prior explanation, implement exactly that option.
+- If a cleaner implementation seems worthwhile, mention it briefly as an option and wait for the user to choose it before changing course.
+- Do not iterate on generated code aesthetics after the requested behavior is present.
+- If a generated API is slightly awkward but correct, stop and summarize it instead of changing the source query/schema just to make the generated API prettier.
+- For codegen-backed changes, make the source edit, run the required codegen once, check lints, and stop.
+
+**Example:**
+
+```text
+BAD — user asks for the simple tip-commit query, so the agent rewrites it with
+a join to force a nicer generated parameter type.
+
+GOOD — add `SELECT * FROM branches WHERE project_id = $1 AND tip_commit_id = $2;`,
+run sqlc, and report that sqlc represents `tip_commit_id` as nullable because
+the column is nullable.
+```
+
 <!--
 To add another rule, append:
 

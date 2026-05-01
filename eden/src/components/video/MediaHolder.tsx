@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "../providers/AuthProvider";
 import { EmptyVideoPlayer } from "./EmptyVideoPlayer";
 import { UploadWizard } from "./UploadWizard";
 import { VideoPlayer } from "./VideoPlayer";
@@ -14,12 +15,13 @@ export function MediaHolder({
   onUploadCompleted,
 }: MediaHolderProps) {
   const [videoSrc, setVideoSrc] = useState("");
+  const userId = useAuth();
 
   const handleUploading = (videoId: string) => {
-    setVideoSrc(`/video?videoId=${videoId}`);
+    setVideoSrc(`/video?videoId=${videoId}&userId=${userId}`);
   };
   const handleUploaded = (videoId: string) => {
-    setVideoSrc(`/video?videoId=${videoId}`);
+    setVideoSrc(`/video?videoId=${videoId}&userId=${userId}`);
     onUploadCompleted();
   };
 
