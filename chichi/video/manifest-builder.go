@@ -6,19 +6,16 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"sort"
+	"strconv"
 	"strings"
+	"sync"
 
 	"cloud.google.com/go/storage"
 	"github.com/google/uuid"
 	"vynfo.com/vynfo/internal/db"
 	"vynfo.com/vynfo/shared"
 )
-
-const MANIFEST_LIVE_BASE = `#EXTM3U
-#EXT-X-VERSION:4
-#EXT-X-TARGETDURATION:3
-#EXT-X-MEDIA-SEQUENCE:0
-#EXT-X-PLAYLIST-TYPE:EVENT`
 
 const MANIFEST_PERSISTED_BASE = `#EXTM3U
 #EXT-X-VERSION:4
@@ -35,8 +32,14 @@ type ManifestBuilder struct {
 	VideoID   string
 	VideoUUID uuid.UUID
 	Queries   *db.Queries
-	segIndex  int64
-	lines     strings.Builder
+
+	// maps a segment index to its hls line
+	mu           sync.RWMutex
+	segmentLines map[int]string
+}
+
+type UploadSegmentResult struct {
+	ObjectKey string
 }
 
 // Writes the intital bytes to the manifest files
@@ -47,10 +50,11 @@ func StartManifest(
 	queries *db.Queries,
 ) ManifestBuilder {
 	return ManifestBuilder{
-		Storage:   client,
-		VideoID:   videoID,
-		VideoUUID: videoUUID,
-		Queries:   queries,
+		Storage:      client,
+		VideoID:      videoID,
+		VideoUUID:    videoUUID,
+		Queries:      queries,
+		segmentLines: map[int]string{},
 	}
 }
 
@@ -72,54 +76,82 @@ func uploadFile(
 
 // Uploads the video segment to the Builder's storage client and
 // adds the corresponding line to the mandifest files
-func (builder *ManifestBuilder) UploadSegment(seg VideoSegment, ctx context.Context) error {
+func (builder *ManifestBuilder) UploadSegment(
+	seg VideoSegment,
+	ctx context.Context,
+) (UploadSegmentResult, error) {
 	objectKey := fmt.Sprintf("segments/%s/%s", builder.VideoID, filepath.Base(seg.path))
+	result := UploadSegmentResult{
+		ObjectKey: objectKey,
+	}
 	bucket := builder.Storage.Bucket("vedit-v1")
 	w := bucket.Object(objectKey).NewWriter(ctx)
 	if _, err := uploadFile(w, seg.path, objectKey, nil); err != nil {
-		return err
+		return result, err
 	}
 
-	fmt.Fprintf(&builder.lines, "\n#EXTINF:%s,\n%s", seg.durationString, objectKey)
-
-	manifestPath := fmt.Sprintf("manifests/%s.m3u8", builder.VideoID)
-	mw := bucket.Object(manifestPath).NewWriter(ctx)
-	if _, err := shared.UploadString(mw, MANIFEST_LIVE_BASE+builder.lines.String(), manifestPath, nil); err != nil {
-		slog.Warn("failed to write live manifest to gcs", "videoID", builder.VideoID, "error", err)
+	base := filepath.Base(seg.path)
+	idxStr := strings.TrimSuffix(strings.TrimPrefix(base, "seg_"), ".ts")
+	idx, err := strconv.Atoi(idxStr)
+	if err != nil {
+		slog.Error("could not generate segment index", "path", seg.path)
+		return result, fmt.Errorf("could not generate segment index for %s: %w", seg.path, err)
 	}
+	newline := fmt.Sprintf("\n#EXTINF:%s,\n%s", seg.durationString, objectKey)
+	builder.mu.Lock()
+	builder.segmentLines[idx] = newline
+	builder.mu.Unlock()
 
 	offsets, err := GenerateOffsets(seg.path)
 	if err != nil {
-		return fmt.Errorf("offset generation failed for %s: %w", seg.path, err)
+		return result, fmt.Errorf("offset generation failed for %s: %w", seg.path, err)
 	}
+
 	for ts, kf := range offsets {
 		if _, err := builder.Queries.CreateKeyFrame(ctx, db.CreateKeyFrameParams{
 			VideoID:             builder.VideoUUID,
 			TimestampInVideo:    int64(ts),
-			SegmentIdx:          builder.segIndex,
+			SegmentIdx:          int64(idx),
 			ByteOffsetInSegment: int64(kf.ByteOffset),
 			SizeInBytes:         int64(kf.Size),
 		}); err != nil {
-			return err
+			return result, err
 		}
 	}
-	builder.segIndex++
 
 	if err := os.Remove(seg.path); err != nil {
 		slog.Warn("failed to remove local segment", "path", seg.path, "error", err)
 	}
 	slog.Info("Segment uploaded", "path", objectKey)
-	return nil
+	return result, nil
 }
 
 // Writes the historical manifest to cloud storage appending the final
-// line to it
+// line to it (EXT-X-ENDLIST)
 func (builder *ManifestBuilder) FinishUpload(ctx context.Context) error {
 	bucket := builder.Storage.Bucket("vedit-v1")
 	historicalPath := fmt.Sprintf("manifests/%s.m3u8", builder.VideoID)
 	w := bucket.Object(historicalPath).NewWriter(ctx)
-	final := MANIFEST_PERSISTED_BASE + builder.lines.String() + "\n#EXT-X-ENDLIST"
-	_, err := shared.UploadString(w, final, historicalPath, nil)
+
+	// we generate an ordered set of indexes so that we write out our manifest
+	// file in the correct order
+	builder.mu.RLock()
+	idxs := make([]int, 0, len(builder.segmentLines))
+	for k := range builder.segmentLines {
+		idxs = append(idxs, k)
+	}
+	sort.Ints(idxs)
+	var final strings.Builder
+	final.WriteString(MANIFEST_PERSISTED_BASE)
+
+	for _, k := range idxs {
+		final.WriteString(builder.segmentLines[k])
+	}
+	builder.mu.RUnlock()
+	final.WriteString("\n#EXT-X-ENDLIST")
+
+	// once manifest file is written, we can upload directly to gcs
+	_, err := shared.UploadString(w, final.String(), historicalPath, nil)
 	if err != nil {
 		return err
 	}

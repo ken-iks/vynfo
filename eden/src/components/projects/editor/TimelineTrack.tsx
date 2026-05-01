@@ -269,7 +269,7 @@ export function TimelineTrack({
   );
 
   return (
-    <div className="flex flex-1 flex-col gap-2">
+    <div className="flex min-h-0 flex-1 flex-col gap-2">
       <div className="flex items-center justify-end gap-1">
         <Button
           type="button"
@@ -300,7 +300,7 @@ export function TimelineTrack({
         }}
       >
         <ContextMenuTrigger asChild>
-          <div className="flex flex-1 overflow-x-hidden overflow-y-auto rounded-none border border-border bg-muted/10">
+          <div className="flex min-h-0 flex-1 overflow-x-hidden overflow-y-auto rounded-none border border-border bg-muted/10">
             <div
               className="shrink-0 border-r border-border bg-background/40"
               style={{

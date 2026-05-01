@@ -54,6 +54,8 @@ func GenerateSegments(
 	// -force_key_frames: IDR frame every 0.5s — must cleanly divide into segLength.
 	// -x264-params scenecut=-1: disable scene-cut detection so the ONLY keyframes are the
 	//        forced ones. Without this x264 injects extras at arbitrary timestamps.
+	// Upload profiling showed this segmenter is not the upload bottleneck; GCS write
+	// throughput dominates once the upload worker pool is saturated.
 	cmd := exec.Command("ffmpeg",
 		"-loglevel", "info",
 		"-i", fp,

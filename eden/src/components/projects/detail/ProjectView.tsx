@@ -18,6 +18,7 @@ import { PlaybackControls } from "../../video/PlaybackControls";
 import { editorStore } from "../../stores/editor";
 import { mediaAssetStore } from "../../stores/mediaAssets";
 import { EditorTimeline } from "../editor/EditorTimeline";
+import { CommitDialog } from "../editor/CommitDialog";
 import { SectionTitle } from "../../shared/SectionTitle";
 import {
   Select,
@@ -47,6 +48,7 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
 
   const userId = useAuth();
   const editorSnap = useSnapshot(editorStore);
+  const selectedBranchMetadata = branches.find((b) => b.name === selectedBranch);
 
   const loadBranchIntoEditor = async (branch: BranchMetadata | undefined) => {
     if (branch?.tipCommitId) {
@@ -132,24 +134,47 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
     return () => window.clearTimeout(timeoutId);
   }, [branches, editorSnap.editRevision, project.id, selectedBranch, userId]);
 
+  const handleCommitSuccess = (newCommitId: string) => {
+    setBranches((prev) =>
+      prev.map((b) =>
+        b.name === selectedBranch ? { ...b, tipCommitId: newCommitId } : b,
+      ),
+    );
+    const branch = branches.find((b) => b.name === selectedBranch);
+    if (branch) {
+      setCurrVideoPlayingSrc(
+        `/video?branchId=${branch.id}&userId=${userId}&v=${newCommitId}`,
+      );
+    }
+  };
+
   return (
     <div className="flex flex-col items-center">
       <div className="flex w-2/3 items-center justify-between gap-4">
         <SectionTitle>{project.name}</SectionTitle>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span>Branch</span>
-          <Select value={selectedBranch} onValueChange={handleBranchChange}>
-            <SelectTrigger size="sm">
-              <SelectValue placeholder="Select a branch" />
-            </SelectTrigger>
-            <SelectContent>
-              {branches.map((b) => (
-                <SelectItem key={b.name} value={b.name}>
-                  {b.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span>Branch</span>
+            <Select value={selectedBranch} onValueChange={handleBranchChange}>
+              <SelectTrigger size="sm">
+                <SelectValue placeholder="Select a branch" />
+              </SelectTrigger>
+              <SelectContent>
+                {branches.map((b) => (
+                  <SelectItem key={b.name} value={b.name}>
+                    {b.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <CommitDialog
+            projectId={project.id}
+            branchName={selectedBranch}
+            tipCommitId={selectedBranchMetadata?.tipCommitId}
+            disabled={editorSnap.sections.length === 0}
+            onCommitSuccess={handleCommitSuccess}
+          />
         </div>
       </div>
       <Card className="w-2/3 gap-0 py-0">
@@ -178,29 +203,9 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
           </div>
           <div className="h-96 px-4 py-3">
             <EditorTimeline
-              projectId={project.id}
-              branchName={selectedBranch}
               availableVideos={currProjectVideos}
               availableImages={currProjectImages}
               availableTexts={currProjectTexts}
-              tipCommitId={
-                branches.find((b) => b.name === selectedBranch)?.tipCommitId
-              }
-              onCommitSuccess={(newCommitId) => {
-                setBranches((prev) =>
-                  prev.map((b) =>
-                    b.name === selectedBranch
-                      ? { ...b, tipCommitId: newCommitId }
-                      : b,
-                  ),
-                );
-                const branch = branches.find((b) => b.name === selectedBranch);
-                if (branch) {
-                  setCurrVideoPlayingSrc(
-                    `/video?branchId=${branch.id}&userId=${userId}&v=${newCommitId}`,
-                  );
-                }
-              }}
             />
           </div>
         </CardContent>
