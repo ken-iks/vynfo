@@ -8,6 +8,7 @@ import type {
   MediaImageMetadata,
   MediaTextMetadata,
   MediaVideoMetadata,
+  PlaybackSection,
 } from "@/gen/proto/v1/projects_pb";
 import { editorStore } from "../../stores/editor";
 import { videoRuntime } from "../../stores/videoRuntime";
@@ -47,6 +48,7 @@ const LANE_HEIGHT = 34;
 const LANE_GAP = 3;
 const LABEL_WIDTH = 160;
 const RULER_HEIGHT = 22;
+const HORIZONTAL_SCROLLBAR_GUTTER = 14;
 const MAX_ZOOM_LEVEL = 4;
 
 export function TimelineTrack({
@@ -60,6 +62,7 @@ export function TimelineTrack({
   const viewportRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(0);
+  const [hoverTrackPx, setHoverTrackPx] = useState<number | null>(null);
 
   useEffect(() => {
     const el = viewportRef.current;
@@ -128,6 +131,9 @@ export function TimelineTrack({
     return { lanes, sectionLaneIndices, totalLaneHeight };
   }, [availableVideos, snap.sections]);
   const timelineHeight = timelineLayout.totalLaneHeight;
+  const timelineContentHeight = timelineHeight + RULER_HEIGHT;
+  const timelineScrollHeight =
+    timelineContentHeight + HORIZONTAL_SCROLLBAR_GUTTER;
 
   const clientXToTrackPx = useCallback((clientX: number): number => {
     const viewport = viewportRef.current;
@@ -136,17 +142,24 @@ export function TimelineTrack({
     return clientX - rect.left + viewport.scrollLeft;
   }, []);
 
+  const clampTrackPx = useCallback(
+    (trackPx: number): number => {
+      return Math.min(Math.max(trackPx, 0), naturalTrackWidth);
+    },
+    [naturalTrackWidth],
+  );
+
   const seekToTrackPx = useCallback(
     (trackPx: number) => {
       if (totalDuration <= 0n) return;
 
-      const clampedPx = Math.min(Math.max(trackPx, 0), naturalTrackWidth);
+      const clampedPx = clampTrackPx(trackPx);
       let nextTime = pxToMs(clampedPx, pxPerSecond);
       if (nextTime > totalDuration) nextTime = totalDuration;
       editorStore.setPlaybackTimeMillis(nextTime);
       videoRuntime.seekToMillis(nextTime);
     },
-    [naturalTrackWidth, pxPerSecond, totalDuration],
+    [clampTrackPx, pxPerSecond, totalDuration],
   );
 
   const beginTimelineSeek = useCallback(
@@ -167,6 +180,13 @@ export function TimelineTrack({
       window.addEventListener("pointercancel", onUp);
     },
     [clientXToTrackPx, seekToTrackPx],
+  );
+
+  const updateHoverTrackPx = useCallback(
+    (clientX: number) => {
+      setHoverTrackPx(clampTrackPx(clientXToTrackPx(clientX)));
+    },
+    [clampTrackPx, clientXToTrackPx],
   );
 
   const { reorder, handleBeginReorder, previewLefts } = useTimelineReorder({
@@ -245,27 +265,20 @@ export function TimelineTrack({
     setMenuContext({ trackPx, sectionIndex });
   };
 
-  const computeInsertIndex = useCallback(
-    (trackPx: number): number => {
-      const sections = snap.sections;
-      for (let i = 0; i < sections.length; i++) {
-        const s = sections[i];
-        const left = msToPx(s.startTimeMillis, pxPerSecond);
-        const width = msToPx(s.endTimeMillis - s.startTimeMillis, pxPerSecond);
-        if (trackPx < left + width / 2) return i;
-      }
-      return sections.length;
+  const insertVideoAtTrackPx = useCallback(
+    (trackPx: number, video: MediaVideoMetadata) => {
+      const insertTimeMillis = pxToMs(clampTrackPx(trackPx), pxPerSecond);
+      editorStore.insertVideoAtMillis(insertTimeMillis, video);
     },
-    [snap.sections, pxPerSecond],
+    [clampTrackPx, pxPerSecond],
   );
 
-  const insertVideoFromLane = useCallback(
-    (video: MediaVideoMetadata | undefined, clientX: number) => {
-      if (!video) return;
-      const insertIndex = computeInsertIndex(clientXToTrackPx(clientX));
-      editorStore.insertVideoAt(insertIndex, video);
+  const pasteSectionAtTrackPx = useCallback(
+    (trackPx: number, section: PlaybackSection) => {
+      const insertTimeMillis = pxToMs(clampTrackPx(trackPx), pxPerSecond);
+      editorStore.insertSectionAtMillis(insertTimeMillis, section);
     },
-    [clientXToTrackPx, computeInsertIndex],
+    [clampTrackPx, pxPerSecond],
   );
 
   return (
@@ -305,7 +318,7 @@ export function TimelineTrack({
               className="shrink-0 border-r border-border bg-background/40"
               style={{
                 width: LABEL_WIDTH,
-                minHeight: timelineHeight + RULER_HEIGHT,
+                minHeight: timelineScrollHeight,
               }}
             >
               <div className="h-[22px] border-b border-border/60" />
@@ -325,14 +338,17 @@ export function TimelineTrack({
               </div>
             </div>
             <div
-              className="relative flex-1 overflow-x-auto overflow-y-hidden"
+              className="relative flex-1 self-start overflow-x-auto overflow-y-hidden"
+              style={{ height: timelineScrollHeight }}
               onContextMenu={handleTrackContextMenu}
+              onPointerMove={(e) => updateHoverTrackPx(e.clientX)}
+              onPointerLeave={() => setHoverTrackPx(null)}
               ref={viewportRef}
             >
               <div
-                className="relative h-full w-full"
+                className="relative w-full"
                 style={{
-                  minHeight: timelineHeight + RULER_HEIGHT,
+                  height: timelineContentHeight,
                   width: trackWidth,
                 }}
               >
@@ -367,9 +383,8 @@ export function TimelineTrack({
                   ) : (
                     <>
                       {timelineLayout.lanes.map((lane) => (
-                        <button
+                        <div
                           key={lane.key}
-                          type="button"
                           className="absolute inset-x-0 rounded-sm border border-border/60 bg-background/30 text-left hover:bg-muted/30"
                           style={{
                             top: lane.topPx,
@@ -378,12 +393,12 @@ export function TimelineTrack({
                           onPointerDown={(e) => {
                             if (e.button !== 0) return;
                             e.preventDefault();
-                            e.stopPropagation();
-                            insertVideoFromLane(lane.video, e.clientX);
+                            editorStore.selectSection(null);
+                            beginTimelineSeek(e.clientX);
                           }}
                         >
-                          <span className="sr-only">Add {lane.title}</span>
-                        </button>
+                          <span className="sr-only">{lane.title}</span>
+                        </div>
                       ))}
                       {reorder && (
                         <div
@@ -483,6 +498,14 @@ export function TimelineTrack({
                     </>
                   )}
                 </div>
+                {hoverTrackPx !== null && totalDuration > 0n && (
+                  <div
+                    className="pointer-events-none absolute top-0 bottom-0 z-30 w-px bg-foreground/40"
+                    style={{ left: hoverTrackPx }}
+                  >
+                    <div className="absolute -top-1 left-1/2 size-2 -translate-x-1/2 rotate-45 border border-foreground/50 bg-background" />
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -492,7 +515,8 @@ export function TimelineTrack({
           availableVideos={availableVideos}
           availableImages={availableImages}
           availableTexts={availableTexts}
-          computeInsertIndex={computeInsertIndex}
+          onInsertVideoAtTrackPx={insertVideoAtTrackPx}
+          onPasteSectionAtTrackPx={pasteSectionAtTrackPx}
           onEditEffects={(sectionIndex) => {
             editorStore.selectSection(sectionIndex);
             setEffectsSectionIndex(sectionIndex);

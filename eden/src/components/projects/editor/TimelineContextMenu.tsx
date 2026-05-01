@@ -2,7 +2,10 @@ import type {
   MediaImageMetadata,
   MediaTextMetadata,
   MediaVideoMetadata,
+  PlaybackSection,
 } from "@/gen/proto/v1/projects_pb";
+import { PlaybackSectionSchema } from "@/gen/proto/v1/projects_pb";
+import { fromJsonString, toJsonString } from "@bufbuild/protobuf";
 import { editorStore } from "../../stores/editor";
 import {
   ContextMenuContent,
@@ -23,19 +26,39 @@ interface TimelineContextMenuProps {
   availableVideos: MediaVideoMetadata[];
   availableImages: MediaImageMetadata[];
   availableTexts: MediaTextMetadata[];
-  computeInsertIndex: (trackPx: number) => number;
+  onInsertVideoAtTrackPx: (trackPx: number, video: MediaVideoMetadata) => void;
+  onPasteSectionAtTrackPx: (trackPx: number, section: PlaybackSection) => void;
   onEditEffects: (sectionIndex: number) => void;
 }
+
+const COPIED_SECTION_STORAGE_KEY = "vynfo.timeline.copiedSection";
 
 export function TimelineContextMenu({
   menuContext,
   availableVideos,
   availableImages,
   availableTexts,
-  computeInsertIndex,
+  onInsertVideoAtTrackPx,
+  onPasteSectionAtTrackPx,
   onEditEffects,
 }: TimelineContextMenuProps) {
   const sectionIndex = menuContext?.sectionIndex ?? null;
+  const hasCopiedSection = localStorage.getItem(COPIED_SECTION_STORAGE_KEY) !== null;
+  const copySection = (index: number) => {
+    const section = editorStore.sections[index];
+    if (!section) return;
+    localStorage.setItem(
+      COPIED_SECTION_STORAGE_KEY,
+      toJsonString(PlaybackSectionSchema, section),
+    );
+  };
+  const pasteSection = () => {
+    if (menuContext === null) return;
+    const copiedSectionJson = localStorage.getItem(COPIED_SECTION_STORAGE_KEY);
+    if (copiedSectionJson === null) return;
+    const section = fromJsonString(PlaybackSectionSchema, copiedSectionJson);
+    onPasteSectionAtTrackPx(menuContext.trackPx, section);
+  };
 
   return (
     <ContextMenuContent>
@@ -95,6 +118,13 @@ export function TimelineContextMenu({
           </ContextMenuItem>
           <ContextMenuItem
             onSelect={() => {
+              copySection(sectionIndex);
+            }}
+          >
+            Copy selection
+          </ContextMenuItem>
+          <ContextMenuItem
+            onSelect={() => {
               editorStore.removeSection(sectionIndex);
             }}
             variant="destructive"
@@ -104,6 +134,13 @@ export function TimelineContextMenu({
           <ContextMenuSeparator />
         </>
       )}
+      <ContextMenuItem
+        disabled={!hasCopiedSection || menuContext === null}
+        onSelect={pasteSection}
+      >
+        Paste selection here
+      </ContextMenuItem>
+      <ContextMenuSeparator />
       <ContextMenuSub>
         <ContextMenuSubTrigger disabled={availableVideos.length === 0}>
           Insert video here
@@ -117,8 +154,7 @@ export function TimelineContextMenu({
                 key={video.assetId}
                 onSelect={() => {
                   if (menuContext === null) return;
-                  const insertIndex = computeInsertIndex(menuContext.trackPx);
-                  editorStore.insertVideoAt(insertIndex, video);
+                  onInsertVideoAtTrackPx(menuContext.trackPx, video);
                 }}
               >
                 {video.title || video.assetId}

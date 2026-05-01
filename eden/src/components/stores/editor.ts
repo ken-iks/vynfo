@@ -131,12 +131,26 @@ class EditorStore {
 
   splitSection(index: number, atMillis: bigint) {
     const section = this.sections[index];
-    const left = { ...section, endTimeMillis: atMillis };
+    if (!section) return;
+    if (atMillis <= section.startTimeMillis) return;
+    if (atMillis >= section.endTimeMillis) return;
+    const splitOffset = atMillis - section.startTimeMillis;
+    const left = {
+      ...section,
+      endTimeMillis: atMillis,
+      overlays: [...section.overlays],
+    };
     const right = {
       ...section,
       startTimeMillis: atMillis,
+      overlays: [...section.overlays],
       video: section.video
-        ? { ...section.video, videoStartTimeMillies: atMillis }
+        ? {
+            ...section.video,
+            effects: [...section.video.effects],
+            videoStartTimeMillies:
+              section.video.videoStartTimeMillies + splitOffset,
+          }
         : undefined,
     };
     this.sections.splice(index, 1, left, right);
@@ -336,8 +350,87 @@ class EditorStore {
     const clamped = Math.max(0, Math.min(insertIndex, this.sections.length));
     this.sections.splice(clamped, 0, section);
     this.selectedSectionIndex = clamped;
+    this.selectedOverlay = null;
     this.rippleRecompute();
     this.markEdited();
+  }
+
+  insertVideoAtMillis(insertTimeMillis: bigint, video: MediaVideoMetadata) {
+    const durationMillis = snap(BigInt(Math.floor(video.duration * 1000)));
+    const section = create(PlaybackSectionSchema, {
+      startTimeMillis: 0n,
+      endTimeMillis: durationMillis,
+      video: create(SectionVideoSchema, {
+        meta: video,
+        videoStartTimeMillies: 0n,
+      }),
+    });
+    return this.insertSectionAtMillis(insertTimeMillis, section);
+  }
+
+  insertSectionAtMillis(insertTimeMillis: bigint, section: PlaybackSection) {
+    const durationMillis = section.endTimeMillis - section.startTimeMillis;
+    if (durationMillis < MIN_DURATION_MS) return false;
+
+    const newSection = {
+      ...section,
+      startTimeMillis: 0n,
+      endTimeMillis: durationMillis,
+      overlays: [...section.overlays],
+      video: section.video
+        ? {
+            ...section.video,
+            effects: [...section.video.effects],
+          }
+        : undefined,
+    };
+    const insertTime = snap(insertTimeMillis);
+    let inserted = false;
+
+    for (let i = 0; i < this.sections.length; i++) {
+      const currSection = this.sections[i];
+      if (insertTime <= currSection.startTimeMillis) {
+        this.sections.splice(i, 0, newSection);
+        this.selectedSectionIndex = i;
+        inserted = true;
+        break;
+      }
+
+      if (insertTime < currSection.endTimeMillis) {
+        const splitOffset = insertTime - currSection.startTimeMillis;
+        const left = {
+          ...currSection,
+          endTimeMillis: insertTime,
+          overlays: [...currSection.overlays],
+        };
+        const right = {
+          ...currSection,
+          startTimeMillis: insertTime,
+          overlays: [...currSection.overlays],
+          video: currSection.video
+            ? {
+                ...currSection.video,
+                effects: [...currSection.video.effects],
+                videoStartTimeMillies:
+                  currSection.video.videoStartTimeMillies + splitOffset,
+              }
+            : undefined,
+        };
+        this.sections.splice(i, 1, left, newSection, right);
+        this.selectedSectionIndex = i + 1;
+        inserted = true;
+        break;
+      }
+    }
+
+    if (!inserted) {
+      this.sections.push(newSection);
+      this.selectedSectionIndex = this.sections.length - 1;
+    }
+    this.selectedOverlay = null;
+    this.rippleRecompute();
+    this.markEdited();
+    return true;
   }
 
   loadSections(sections: PlaybackSection[]) {

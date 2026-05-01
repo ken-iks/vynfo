@@ -4,7 +4,7 @@ import {
   SpeakerWaveIcon,
   SpeakerXMarkIcon,
 } from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { formatDuration } from "@/lib/utils";
@@ -20,32 +20,97 @@ export function PlaybackControls({
   const [isPaused, setIsPaused] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1);
+  const videoFrameHandleRef = useRef<number | null>(null);
+  const animationFrameHandleRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!video) return;
 
-    const sync = () => {
+    const syncPlaybackPosition = () => {
       setCurrentTime(video.currentTime);
+      editorStore.setPlaybackTimeSeconds(video.currentTime);
+    };
+
+    const sync = () => {
+      syncPlaybackPosition();
       setDuration(Number.isFinite(video.duration) ? video.duration : 0);
       setIsPaused(video.paused);
       setIsMuted(video.muted);
       setVolume(video.volume);
-      editorStore.setPlaybackTimeSeconds(video.currentTime);
+    };
+
+    const cancelPlaybackLoop = () => {
+      if (videoFrameHandleRef.current !== null) {
+        video.cancelVideoFrameCallback(videoFrameHandleRef.current);
+        videoFrameHandleRef.current = null;
+      }
+      if (animationFrameHandleRef.current !== null) {
+        window.cancelAnimationFrame(animationFrameHandleRef.current);
+        animationFrameHandleRef.current = null;
+      }
+    };
+
+    const scheduleAnimationFrame = () => {
+      animationFrameHandleRef.current = window.requestAnimationFrame(() => {
+        animationFrameHandleRef.current = null;
+        syncPlaybackPosition();
+        if (!video.paused && !video.ended) {
+          scheduleAnimationFrame();
+        }
+      });
+    };
+
+    const scheduleVideoFrame = () => {
+      videoFrameHandleRef.current = video.requestVideoFrameCallback(() => {
+        videoFrameHandleRef.current = null;
+        syncPlaybackPosition();
+        if (!video.paused && !video.ended) {
+          scheduleVideoFrame();
+        }
+      });
+    };
+
+    const startPlaybackLoop = () => {
+      cancelPlaybackLoop();
+      if (video.paused || video.ended) return;
+      if (typeof video.requestVideoFrameCallback === "function") {
+        scheduleVideoFrame();
+        return;
+      }
+      scheduleAnimationFrame();
+    };
+
+    const syncAndStartPlaybackLoop = () => {
+      sync();
+      startPlaybackLoop();
+    };
+
+    const syncAndCancelPlaybackLoop = () => {
+      cancelPlaybackLoop();
+      sync();
     };
 
     sync();
     video.addEventListener("durationchange", sync);
     video.addEventListener("loadedmetadata", sync);
-    video.addEventListener("pause", sync);
-    video.addEventListener("play", sync);
+    video.addEventListener("pause", syncAndCancelPlaybackLoop);
+    video.addEventListener("play", syncAndStartPlaybackLoop);
+    video.addEventListener("ended", syncAndCancelPlaybackLoop);
+    video.addEventListener("seeking", sync);
+    video.addEventListener("seeked", sync);
     video.addEventListener("timeupdate", sync);
     video.addEventListener("volumechange", sync);
+    startPlaybackLoop();
 
     return () => {
+      cancelPlaybackLoop();
       video.removeEventListener("durationchange", sync);
       video.removeEventListener("loadedmetadata", sync);
-      video.removeEventListener("pause", sync);
-      video.removeEventListener("play", sync);
+      video.removeEventListener("pause", syncAndCancelPlaybackLoop);
+      video.removeEventListener("play", syncAndStartPlaybackLoop);
+      video.removeEventListener("ended", syncAndCancelPlaybackLoop);
+      video.removeEventListener("seeking", sync);
+      video.removeEventListener("seeked", sync);
       video.removeEventListener("timeupdate", sync);
       video.removeEventListener("volumechange", sync);
     };

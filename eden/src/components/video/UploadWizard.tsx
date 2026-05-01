@@ -17,13 +17,11 @@ import { useAuth } from "../providers/AuthProvider";
 
 interface UploaderProps {
   projectId: string;
-  onUploadOngoing: (videoId: string) => void;
   onUploadCompleted: (videoId: string) => void;
 }
 
 export function UploadWizard({
   projectId,
-  onUploadOngoing,
   onUploadCompleted,
 }: UploaderProps) {
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -58,7 +56,6 @@ export function UploadWizard({
         setHasFirstResponse(true);
         switch (response.uploadStatus.case) {
           case "ongoing":
-            onUploadOngoing(response.uploadStatus.value.videoId);
             setUploadPercentage(
               response.uploadStatus.value.completionPercentage,
             );
@@ -78,30 +75,37 @@ export function UploadWizard({
 
   return (
     <div>
-      <DragUploadArea onFileSelected={setVideoFile} selectedFile={videoFile} />
-      {videoFile !== null && (
-        <div className="flex justify-center">
-          <Button
-            onClick={handleUpload}
-            disabled={!videoFile || isUploading}
-            size="sm"
-          >
-            Initiate Upload
-          </Button>
-        </div>
+      {isUploading ? (
+        hasFirstResponse ? (
+          <div className="flex items-center gap-2">
+            <ArrowUpTrayIcon className="size-5 animate-pulse" />
+            <ProgressBar value={uploadPercentage} />
+          </div>
+        ) : (
+          <div className="flex items-center justify-center gap-2 py-2">
+            <ArrowPathIcon className="size-5 animate-spin" />
+            <span className="text-sm text-muted-foreground">Uploading…</span>
+          </div>
+        )
+      ) : (
+        <>
+          <DragUploadArea
+            onFileSelected={setVideoFile}
+            selectedFile={videoFile}
+          />
+          {videoFile !== null && (
+            <div className="flex justify-center">
+              <Button
+                onClick={handleUpload}
+                disabled={!videoFile}
+                size="sm"
+              >
+                Initiate Upload
+              </Button>
+            </div>
+          )}
+        </>
       )}
-      {isUploading && !hasFirstResponse ? (
-        <div className="flex items-center justify-center gap-2 py-2">
-          <ArrowPathIcon className="size-5 animate-spin" />
-          <span className="text-sm text-muted-foreground">Uploading…</span>
-        </div>
-      ) : null}
-      {isUploading && hasFirstResponse ? (
-        <div className="flex items-center gap-2">
-          <ArrowUpTrayIcon className="size-5 animate-pulse" />
-          <ProgressBar value={uploadPercentage} />
-        </div>
-      ) : null}
       <Dialog
         open={uploadError !== null}
         onOpenChange={(open) => {
