@@ -1,12 +1,16 @@
 import { Projects } from "./projects/Projects";
 import { AuthProvider, useAuthSwitcher } from "./providers/AuthProvider";
+import { ThemeProvider } from "./providers/ThemeProvider";
+import { ThemeToggle } from "./shared/ThemeToggle";
 import { UserSwitcher } from "@/temp/UserSwitcher";
 
 function App() {
   return (
-    <AuthProvider>
-      <AppShell />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppShell />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
@@ -14,7 +18,8 @@ function AppShell() {
   const { userId, users } = useAuthSwitcher();
   return (
     <>
-      <div className="fixed bottom-2 right-2 z-50">
+      <div className="fixed bottom-2 right-2 z-50 flex items-center gap-2">
+        <ThemeToggle />
         <UserSwitcher />
       </div>
       {userId ? (
