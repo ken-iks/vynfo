@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSnapshot } from "valtio";
 import { Card, CardContent } from "../../ui/card";
 import { useAuth } from "../../providers/AuthProvider";
@@ -14,6 +14,7 @@ import { VideoPlayer } from "../../video/VideoPlayer";
 import { VideoCanvas } from "../../video/VideoCanvas";
 import { MediaOverlayCanvas } from "../../video/MediaOverlayCanvas";
 import { EmptyVideoPlayer } from "../../video/EmptyVideoPlayer";
+import { VideoPlayerPlaceholder } from "../../video/VideoPlayerPlaceholder";
 import { PlaybackControls } from "../../video/PlaybackControls";
 import { editorStore } from "../../stores/editor";
 import { mediaAssetStore } from "../../stores/mediaAssets";
@@ -33,6 +34,7 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
   const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(
     null,
   );
+  const [readyVideoSrc, setReadyVideoSrc] = useState("");
 
   const [currProjectVideos, setCurrProjectVideos] = useState<
     MediaVideoMetadata[]
@@ -51,6 +53,11 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
   const selectedBranchMetadata = branches.find(
     (b) => b.name === selectedBranch,
   );
+  const isVideoReadyToPlay =
+    currVideoPlayingSrc !== "" && readyVideoSrc === currVideoPlayingSrc;
+  const handleVideoReadyToPlay = useCallback(() => {
+    setReadyVideoSrc(currVideoPlayingSrc);
+  }, [currVideoPlayingSrc]);
 
   const loadBranchIntoEditor = async (branch: BranchMetadata | undefined) => {
     if (branch?.tipCommitId) {
@@ -183,16 +190,23 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
         <CardContent className="px-0">
           <div className="flex justify-center px-4 py-4">
             {currVideoPlayingSrc !== "" ? (
-              <div className="relative inline-block">
+              <div className="relative w-full">
+                <VideoPlayerPlaceholder />
                 <div
-                  className="pointer-events-none"
+                  className="pointer-events-none absolute inset-0"
                   style={{ visibility: "hidden" }}
                 >
                   <VideoPlayer
                     src={currVideoPlayingSrc}
+                    onReadyToPlay={handleVideoReadyToPlay}
                     ref={setVideoElement}
                   />
                 </div>
+                {!isVideoReadyToPlay ? (
+                  <div className="absolute inset-0 z-20">
+                    <VideoPlayerPlaceholder />
+                  </div>
+                ) : null}
                 <VideoCanvas video={videoElement} />
                 <MediaOverlayCanvas />
               </div>

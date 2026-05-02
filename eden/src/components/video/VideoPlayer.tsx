@@ -1,8 +1,13 @@
 import Hls from "hls.js";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 
-export const VideoPlayer = forwardRef<HTMLVideoElement, { src: string }>(
-  function VideoPlayer({ src }: { src: string }, ref) {
+type VideoPlayerProps = {
+  src: string;
+  onReadyToPlay?: () => void;
+};
+
+export const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(
+  function VideoPlayer({ src, onReadyToPlay }, ref) {
     const videoRef = useRef<HTMLVideoElement>(null);
     useImperativeHandle(ref, () => videoRef.current!, []);
     // Track currentTime in a ref so we can restore playback position across src
@@ -21,6 +26,20 @@ export const VideoPlayer = forwardRef<HTMLVideoElement, { src: string }>(
 
       return () => video.removeEventListener("timeupdate", onTimeUpdate);
     }, []);
+
+    useEffect(() => {
+      const video = videoRef.current;
+      if (!video || !onReadyToPlay) return;
+
+      if (video.readyState >= video.HAVE_FUTURE_DATA) {
+        onReadyToPlay();
+        return;
+      }
+
+      video.addEventListener("canplay", onReadyToPlay, { once: true });
+
+      return () => video.removeEventListener("canplay", onReadyToPlay);
+    }, [onReadyToPlay, src]);
 
     useEffect(() => {
       const video = videoRef.current;
@@ -45,9 +64,7 @@ export const VideoPlayer = forwardRef<HTMLVideoElement, { src: string }>(
     }, [src]);
 
     return (
-      <div className="p-3">
-        <video ref={videoRef} controls />
-      </div>
+      <video ref={videoRef} controls className="block aspect-video w-full" />
     );
   },
 );
