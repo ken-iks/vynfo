@@ -12,10 +12,9 @@ import "google/protobuf/empty.proto";
 
 // UploadVideoRequest will upload video content to storage
 message UploadVideoRequest {
-    string user_id = 1;
-    string project_id = 2;
-    bytes content = 3;
-    string title = 4;
+    string project_id = 1;
+    bytes content = 2;
+    string title = 3;
 }
 
 // UploadProgressIndicator allows clients to play the video up
@@ -38,10 +37,9 @@ message UploadVideoResponse {
 }
 
 message UploadAudioRequest {
-    string user_id = 1;
-    string project_id = 2;
-    bytes content = 3;
-    string title = 4;
+    string project_id = 1;
+    bytes content = 2;
+    string title = 3;
 }
 
 message UploadAudioProgressIndicator {
@@ -62,11 +60,10 @@ message UploadAudioResponse {
 
 // UploadImageRequest will upload image content to storage
 message UploadImageRequest {
-    string user_id = 1;
-    string project_id = 2;
-    bytes content = 3;
-    string title = 4;
-    MediaImageOverlay meta = 5;
+    string project_id = 1;
+    bytes content = 2;
+    string title = 3;
+    MediaImageOverlay meta = 4;
 }
 
 message UploadImageResponse {
@@ -75,11 +72,10 @@ message UploadImageResponse {
 
 // UploadImageRequest will upload image content to storage
 message UploadTextRequest {
-    string user_id = 1;
-    string project = 2;
-    string content = 3;
-    string title = 4;
-    MediaTextOverlay meta = 6;
+    string project = 1;
+    string content = 2;
+    string title = 3;
+    MediaTextOverlay meta = 4;
 }
 
 message UploadTextResponse {
@@ -187,7 +183,6 @@ message CommitEditRequest {
     string commit_message = 3;
     optional string previous_commit_id = 4;
     PlaybackState commit_state = 5;
-    string user_id = 6;
 }
 
 message CommitEditResponse {
@@ -201,10 +196,9 @@ message CommitEditResponse {
 // 15 mins since the edit. We reserve the right to clear the cache after 15 mins, or
 // if the pod happens to roll - so encourage users to make frequent commits
 message AutoSaveRequest {
-    string user_id = 1;
-    string project_id = 2;
-    string branch_id = 3;
-    PlaybackState auto_save_state = 4;
+    string project_id = 1;
+    string branch_id = 2;
+    PlaybackState auto_save_state = 3;
 }
 
 message CommitEditError {
@@ -250,7 +244,6 @@ message ProjectMetadata {
 
 // ListProjectsRequest fetches all projects belonging to a given user.
 message ListProjectsRequest {
-    string user_id = 1;
 }
 
 // ListProjectsResponse returns the set of projects owned by the requesting user.
@@ -263,7 +256,6 @@ message ListProjectsResponse {
 // that has been uploaded or created within a project.
 message ListProjectAssetsRequest {
     string project_id = 1;
-    string user_id = 2;
 }
 
 // MediaVideoMetadata is the lightweight descriptor returned when listing video
@@ -325,9 +317,8 @@ message ListProjectBranchesResponse {
 }
 
 message CreateProjectRequest {
-    string user_id = 1;
-    string project_name = 2;
-    string project_description = 3;
+    string project_name = 1;
+    string project_description = 2;
 }
 
 message CreateProjectResponse {
@@ -341,7 +332,6 @@ message AddProjectUserRequest {
 
 message DeleteProjectRequest {
     string project_id = 1;
-    string user_id = 2;
 }
 
 // ========================  Commits CRUD  ============================ //
@@ -350,8 +340,7 @@ message GetCommitRequest {
     string commit_id = 1;
     // state is independent of branch, but loading the state also clears
     // the edit cache for this branch which is why the extra fields are needed
-    string user_id = 2;
-    string branch_id = 3;
+    string branch_id = 2;
 }
 
 message GetCommitResponse {

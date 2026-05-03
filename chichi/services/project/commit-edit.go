@@ -8,6 +8,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/encoding/protojson"
+	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
 	"vynfo.com/vynfo/video"
@@ -22,10 +23,9 @@ func (p *ProjectServiceServer) CommitEdit(
 		slog.Error("error parsing project id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
-	userId, err := uuid.Parse(req.Msg.GetUserId())
+	user, err := auth.RequireOnboardedUser(ctx, p.queries)
 	if err != nil {
-		slog.Error("error parsing user id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 	currBranch, err := p.queries.GetBranchByName(ctx, db.GetBranchByNameParams{
 		ProjectID: projectId,
@@ -98,7 +98,7 @@ func (p *ProjectServiceServer) CommitEdit(
 	defer tx.Rollback()
 	q := p.queries.WithTx(tx)
 	commit, err := q.CreateCommit(ctx, db.CreateCommitParams{
-		UserID:    userId,
+		UserID:    user.ID,
 		ProjectID: projectId,
 		State:     stateJson,
 		Message: sql.NullString{
@@ -122,7 +122,7 @@ func (p *ProjectServiceServer) CommitEdit(
 		slog.Error("error commiting db transaction", "error", err)
 	}
 
-	p.manifestCache.DropBranch(req.Msg.GetUserId(), currBranch.ID.String())
+	p.manifestCache.DropBranch(user.ID.String(), currBranch.ID.String())
 	return connect.NewResponse(&v1.CommitEditResponse{
 		Response: &v1.CommitEditResponse_NewCommitId{
 			NewCommitId: updatedBranch.TipCommitID.UUID.String(),

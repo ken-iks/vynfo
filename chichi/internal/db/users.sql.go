@@ -7,34 +7,153 @@ package db
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
 
-const createUser = `-- name: CreateUser :one
-INSERT INTO users (email) VALUES ($1) RETURNING id, email, created_at
+const createUserByFirebaseUID = `-- name: CreateUserByFirebaseUID :one
+INSERT INTO users (firebase_uid, email) VALUES ($1, $2) RETURNING id, firebase_uid, email, display_name, display_photo_object_path, onboarded_at, created_at
 `
 
-func (q *Queries) CreateUser(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, email)
+type CreateUserByFirebaseUIDParams struct {
+	FirebaseUid string
+	Email       string
+}
+
+func (q *Queries) CreateUserByFirebaseUID(ctx context.Context, arg CreateUserByFirebaseUIDParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, createUserByFirebaseUID, arg.FirebaseUid, arg.Email)
 	var i User
-	err := row.Scan(&i.ID, &i.Email, &i.CreatedAt)
+	err := row.Scan(
+		&i.ID,
+		&i.FirebaseUid,
+		&i.Email,
+		&i.DisplayName,
+		&i.DisplayPhotoObjectPath,
+		&i.OnboardedAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const finishUserOnboarding = `-- name: FinishUserOnboarding :one
+UPDATE users
+    SET display_name = $1,
+        display_photo_object_path = $2,
+        onboarded_at = $3
+WHERE id = $4 RETURNING id, firebase_uid, email, display_name, display_photo_object_path, onboarded_at, created_at
+`
+
+type FinishUserOnboardingParams struct {
+	DisplayName            sql.NullString
+	DisplayPhotoObjectPath sql.NullString
+	OnboardedAt            sql.NullTime
+	ID                     uuid.UUID
+}
+
+func (q *Queries) FinishUserOnboarding(ctx context.Context, arg FinishUserOnboardingParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, finishUserOnboarding,
+		arg.DisplayName,
+		arg.DisplayPhotoObjectPath,
+		arg.OnboardedAt,
+		arg.ID,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.FirebaseUid,
+		&i.Email,
+		&i.DisplayName,
+		&i.DisplayPhotoObjectPath,
+		&i.OnboardedAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getOrCreateUserByFirebaseId = `-- name: GetOrCreateUserByFirebaseId :one
+WITH inserted AS (
+    INSERT INTO users (firebase_uid, email)
+    VALUES ($1, $2)
+    ON CONFLICT (firebase_uid) DO NOTHING
+    RETURNING id, firebase_uid, email, display_name, display_photo_object_path, onboarded_at, created_at
+)
+SELECT id, firebase_uid, email, display_name, display_photo_object_path, onboarded_at, created_at FROM inserted
+UNION ALL
+SELECT id, firebase_uid, email, display_name, display_photo_object_path, onboarded_at, created_at FROM users WHERE firebase_uid = $1
+LIMIT 1
+`
+
+type GetOrCreateUserByFirebaseIdParams struct {
+	FirebaseUid string
+	Email       string
+}
+
+type GetOrCreateUserByFirebaseIdRow struct {
+	ID                     uuid.UUID
+	FirebaseUid            string
+	Email                  string
+	DisplayName            sql.NullString
+	DisplayPhotoObjectPath sql.NullString
+	OnboardedAt            sql.NullTime
+	CreatedAt              sql.NullTime
+}
+
+func (q *Queries) GetOrCreateUserByFirebaseId(ctx context.Context, arg GetOrCreateUserByFirebaseIdParams) (GetOrCreateUserByFirebaseIdRow, error) {
+	row := q.db.QueryRowContext(ctx, getOrCreateUserByFirebaseId, arg.FirebaseUid, arg.Email)
+	var i GetOrCreateUserByFirebaseIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.FirebaseUid,
+		&i.Email,
+		&i.DisplayName,
+		&i.DisplayPhotoObjectPath,
+		&i.OnboardedAt,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, email, created_at FROM users WHERE id = $1
+SELECT id, firebase_uid, email, display_name, display_photo_object_path, onboarded_at, created_at FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUser, id)
 	var i User
-	err := row.Scan(&i.ID, &i.Email, &i.CreatedAt)
+	err := row.Scan(
+		&i.ID,
+		&i.FirebaseUid,
+		&i.Email,
+		&i.DisplayName,
+		&i.DisplayPhotoObjectPath,
+		&i.OnboardedAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getUserFromFirebase = `-- name: GetUserFromFirebase :one
+SELECT id, firebase_uid, email, display_name, display_photo_object_path, onboarded_at, created_at FROM users WHERE firebase_uid = $1
+`
+
+func (q *Queries) GetUserFromFirebase(ctx context.Context, firebaseUid string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserFromFirebase, firebaseUid)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.FirebaseUid,
+		&i.Email,
+		&i.DisplayName,
+		&i.DisplayPhotoObjectPath,
+		&i.OnboardedAt,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, email, created_at FROM users ORDER BY email
+SELECT id, firebase_uid, email, display_name, display_photo_object_path, onboarded_at, created_at FROM users ORDER BY email
 `
 
 func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
@@ -46,7 +165,15 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 	var items []User
 	for rows.Next() {
 		var i User
-		if err := rows.Scan(&i.ID, &i.Email, &i.CreatedAt); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.FirebaseUid,
+			&i.Email,
+			&i.DisplayName,
+			&i.DisplayPhotoObjectPath,
+			&i.OnboardedAt,
+			&i.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

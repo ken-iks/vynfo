@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/dialog";
 import { DragUploadArea } from "./DragUploadArea";
 import { ProgressBar } from "./ProgressBar";
-import { useAuth } from "../providers/AuthProvider";
 
 interface UploaderProps {
   projectId: string;
@@ -34,7 +33,6 @@ export function UploadWizard({
   const [hasFirstResponse, setHasFirstResponse] = useState(false);
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const userId = useAuth();
   const isAudio = mediaType === "audio";
   const uploadLabel = isAudio ? "Upload Audio" : "Upload Video";
   const acceptedMime = isAudio ? "audio/*" : "video/mp4";
@@ -57,7 +55,6 @@ export function UploadWizard({
     try {
       if (isAudio) {
         const request = create(UploadAudioRequestSchema, {
-          userId: userId,
           projectId: projectId,
           content: new Uint8Array(await mediaFile.arrayBuffer()),
           title: mediaFile.name,
@@ -78,7 +75,6 @@ export function UploadWizard({
         }
       } else {
         const request = create(UploadVideoRequestSchema, {
-          userId: userId,
           projectId: projectId,
           content: new Uint8Array(await mediaFile.arrayBuffer()),
           title: mediaFile.name,

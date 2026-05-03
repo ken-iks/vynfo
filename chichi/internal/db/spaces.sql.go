@@ -99,7 +99,7 @@ func (q *Queries) AddSpaceMember(ctx context.Context, arg AddSpaceMemberParams) 
 }
 
 const createSpace = `-- name: CreateSpace :one
-INSERT INTO spaces (project_id, admin_id, name) VALUES ($1, $2, $3) RETURNING id, project_id, admin_id, created_at, name
+INSERT INTO spaces (project_id, admin_id, name) VALUES ($1, $2, $3) RETURNING id, project_id, admin_id, name, created_at
 `
 
 type CreateSpaceParams struct {
@@ -115,14 +115,14 @@ func (q *Queries) CreateSpace(ctx context.Context, arg CreateSpaceParams) (Space
 		&i.ID,
 		&i.ProjectID,
 		&i.AdminID,
-		&i.CreatedAt,
 		&i.Name,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getProjectSpaces = `-- name: GetProjectSpaces :many
-SELECT id, project_id, admin_id, created_at, name FROM spaces WHERE project_id = $1 ORDER BY created_at DESC
+SELECT id, project_id, admin_id, name, created_at FROM spaces WHERE project_id = $1 ORDER BY created_at DESC
 `
 
 func (q *Queries) GetProjectSpaces(ctx context.Context, projectID uuid.UUID) ([]Space, error) {
@@ -138,8 +138,8 @@ func (q *Queries) GetProjectSpaces(ctx context.Context, projectID uuid.UUID) ([]
 			&i.ID,
 			&i.ProjectID,
 			&i.AdminID,
-			&i.CreatedAt,
 			&i.Name,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -212,7 +212,7 @@ func (q *Queries) GetProjectSpacesWithMembers(ctx context.Context, projectID uui
 }
 
 const getSpace = `-- name: GetSpace :one
-SELECT id, project_id, admin_id, created_at, name FROM spaces WHERE id = $1
+SELECT id, project_id, admin_id, name, created_at FROM spaces WHERE id = $1
 `
 
 func (q *Queries) GetSpace(ctx context.Context, id uuid.UUID) (Space, error) {
@@ -222,8 +222,8 @@ func (q *Queries) GetSpace(ctx context.Context, id uuid.UUID) (Space, error) {
 		&i.ID,
 		&i.ProjectID,
 		&i.AdminID,
-		&i.CreatedAt,
 		&i.Name,
+		&i.CreatedAt,
 	)
 	return i, err
 }
@@ -256,7 +256,7 @@ func (q *Queries) GetSpaceMembers(ctx context.Context, spaceID uuid.UUID) ([]Spa
 }
 
 const getUserSpaces = `-- name: GetUserSpaces :many
-SELECT id, project_id, admin_id, created_at, name FROM spaces WHERE id IN (
+SELECT id, project_id, admin_id, name, created_at FROM spaces WHERE id IN (
     SELECT space_id FROM space_members WHERE member_id = $1
 )
 `
@@ -274,8 +274,8 @@ func (q *Queries) GetUserSpaces(ctx context.Context, memberID uuid.UUID) ([]Spac
 			&i.ID,
 			&i.ProjectID,
 			&i.AdminID,
-			&i.CreatedAt,
 			&i.Name,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}

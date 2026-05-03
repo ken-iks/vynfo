@@ -73,28 +73,28 @@ func (q *Queries) GetBranchByName(ctx context.Context, arg GetBranchByNameParams
 
 const getBranchCommitHistory = `-- name: GetBranchCommitHistory :many
 WITH RECURSIVE history AS (
-    SELECT c.id, c.project_id, c.state, c.message, c.created_at, c.user_id
+    SELECT c.id, c.user_id, c.project_id, c.state, c.message, c.created_at
     FROM branches b
     JOIN commits c ON c.id = b.tip_commit_id
     WHERE b.id = $1
 
     UNION
 
-    SELECT c.id, c.project_id, c.state, c.message, c.created_at, c.user_id
+    SELECT c.id, c.user_id, c.project_id, c.state, c.message, c.created_at
     FROM commits c
     JOIN commit_parents cp ON cp.parent_id = c.id
     JOIN history h ON h.id = cp.commit_id
 )
-SELECT id, project_id, state, message, created_at, user_id FROM history
+SELECT id, user_id, project_id, state, message, created_at FROM history
 `
 
 type GetBranchCommitHistoryRow struct {
 	ID        uuid.UUID
+	UserID    uuid.UUID
 	ProjectID uuid.UUID
 	State     json.RawMessage
 	Message   sql.NullString
 	CreatedAt sql.NullTime
-	UserID    uuid.UUID
 }
 
 func (q *Queries) GetBranchCommitHistory(ctx context.Context, id uuid.UUID) ([]GetBranchCommitHistoryRow, error) {
@@ -108,11 +108,11 @@ func (q *Queries) GetBranchCommitHistory(ctx context.Context, id uuid.UUID) ([]G
 		var i GetBranchCommitHistoryRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.UserID,
 			&i.ProjectID,
 			&i.State,
 			&i.Message,
 			&i.CreatedAt,
-			&i.UserID,
 		); err != nil {
 			return nil, err
 		}

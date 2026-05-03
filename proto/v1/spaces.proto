@@ -24,9 +24,8 @@ message ProjectSpace {
 // A CreateSpaceRequest creates a new space for the given project.
 // The requesting user_id becomes the admin of the newly created space
 message CreateSpaceRequest {
-    string user_id = 1;
-    string project_id = 2;
-    string name = 3;
+    string project_id = 1;
+    string name = 2;
 }
 
 message CreateSpaceResponse {
@@ -46,7 +45,6 @@ message ListSpacesRequest {
 }
 
 message ListUserSpacesRequest {
-    string user_id = 1;
 }
 
 message ListSpacesResponse {
@@ -121,8 +119,7 @@ message SendSpaceMessageResponse {
 // This opens a server streaming subscription - so the connection is closed when the
 // stream context is cancelled. 
 message OpenSpaceRequest {
-    string user_id = 1;
-    string space_id = 2;
+    string space_id = 1;
 }
 
 // OpenSpaceResponses take the form of SpaceChange's, which the client should use

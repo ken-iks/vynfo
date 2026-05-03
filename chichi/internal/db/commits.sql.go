@@ -14,7 +14,7 @@ import (
 )
 
 const createCommit = `-- name: CreateCommit :one
-INSERT INTO commits (user_id, project_id, state, message) VALUES ($1, $2, $3, $4) RETURNING id, project_id, state, message, created_at, user_id
+INSERT INTO commits (user_id, project_id, state, message) VALUES ($1, $2, $3, $4) RETURNING id, user_id, project_id, state, message, created_at
 `
 
 type CreateCommitParams struct {
@@ -34,17 +34,17 @@ func (q *Queries) CreateCommit(ctx context.Context, arg CreateCommitParams) (Com
 	var i Commit
 	err := row.Scan(
 		&i.ID,
+		&i.UserID,
 		&i.ProjectID,
 		&i.State,
 		&i.Message,
 		&i.CreatedAt,
-		&i.UserID,
 	)
 	return i, err
 }
 
 const getCommitByID = `-- name: GetCommitByID :one
-SELECT id, project_id, state, message, created_at, user_id FROM commits WHERE id = $1
+SELECT id, user_id, project_id, state, message, created_at FROM commits WHERE id = $1
 `
 
 func (q *Queries) GetCommitByID(ctx context.Context, id uuid.UUID) (Commit, error) {
@@ -52,17 +52,17 @@ func (q *Queries) GetCommitByID(ctx context.Context, id uuid.UUID) (Commit, erro
 	var i Commit
 	err := row.Scan(
 		&i.ID,
+		&i.UserID,
 		&i.ProjectID,
 		&i.State,
 		&i.Message,
 		&i.CreatedAt,
-		&i.UserID,
 	)
 	return i, err
 }
 
 const listUserCommits = `-- name: ListUserCommits :many
-SELECT id, project_id, state, message, created_at, user_id FROM commits WHERE user_id = $1
+SELECT id, user_id, project_id, state, message, created_at FROM commits WHERE user_id = $1
 `
 
 func (q *Queries) ListUserCommits(ctx context.Context, userID uuid.UUID) ([]Commit, error) {
@@ -76,11 +76,11 @@ func (q *Queries) ListUserCommits(ctx context.Context, userID uuid.UUID) ([]Comm
 		var i Commit
 		if err := rows.Scan(
 			&i.ID,
+			&i.UserID,
 			&i.ProjectID,
 			&i.State,
 			&i.Message,
 			&i.CreatedAt,
-			&i.UserID,
 		); err != nil {
 			return nil, err
 		}

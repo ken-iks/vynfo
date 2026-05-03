@@ -8,6 +8,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/video"
 )
@@ -17,10 +18,9 @@ func (p *ProjectServiceServer) AutoSave(
 	req *connect.Request[v1.AutoSaveRequest],
 ) (*connect.Response[emptypb.Empty], error) {
 	// TODO assert that branch is part of project
-	_, err := uuid.Parse(req.Msg.GetUserId())
+	user, err := auth.RequireOnboardedUser(ctx, p.queries)
 	if err != nil {
-		slog.Error("error parsing user id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 	_, err = uuid.Parse(req.Msg.GetProjectId())
 	if err != nil {
@@ -47,14 +47,14 @@ func (p *ProjectServiceServer) AutoSave(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	p.manifestCache.Add(
-		req.Msg.GetUserId(),
+		user.ID.String(),
 		branchID.String(),
 		video.ManifestKindVideo,
 		signed,
 		time.Until(expiry),
 	)
 	if len(state.GetAudioSections()) == 0 {
-		p.manifestCache.Drop(req.Msg.GetUserId(), branchID.String(), video.ManifestKindAudio)
+		p.manifestCache.Drop(user.ID.String(), branchID.String(), video.ManifestKindAudio)
 		return connect.NewResponse(&emptypb.Empty{}), nil
 	}
 	audioManifest, err := video.ParseAudioSectionsToHLS(ctx, p.queries, state.GetAudioSections())
@@ -72,7 +72,7 @@ func (p *ProjectServiceServer) AutoSave(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	p.manifestCache.Add(
-		req.Msg.GetUserId(),
+		user.ID.String(),
 		branchID.String(),
 		video.ManifestKindAudio,
 		signedAudio,

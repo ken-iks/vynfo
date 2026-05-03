@@ -12,14 +12,12 @@ import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 import { Textarea } from "../../ui/textarea";
 import { client } from "../../../lib/client";
-import { useAuth } from "../../providers/AuthProvider";
 
 interface CreateProjectDialogProps {
   onCreated: (projectId: string) => void | Promise<void>;
 }
 
 export function CreateProjectDialog({ onCreated }: CreateProjectDialogProps) {
-  const userId = useAuth();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -42,7 +40,6 @@ export function CreateProjectDialog({ onCreated }: CreateProjectDialogProps) {
     setSubmitting(true);
     try {
       const res = await client.createProject({
-        userId,
         projectName: name.trim(),
         projectDescription: description.trim(),
       });

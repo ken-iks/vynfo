@@ -7,6 +7,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
 )
@@ -15,6 +16,10 @@ func (s *SpacesServiceServer) AddSpaceUser(
 	ctx context.Context,
 	req *connect.Request[v1.AddSpaceUserRequest],
 ) (*connect.Response[emptypb.Empty], error) {
+	if _, err := auth.RequireOnboardedUser(ctx, s.queries); err != nil {
+		return nil, err
+	}
+
 	spaceId, err := uuid.Parse(req.Msg.GetSpaceId())
 	if err != nil {
 		slog.Error("error parsing space id", "error", err)

@@ -6,11 +6,33 @@ option go_package = "vynfo.com/vynfo/gen/proto/v1";
 
 import "google/protobuf/timestamp.proto";
 
-// A User is a member of a ProjectSpace, identified by a stable
-// user_id and surfaced with their email for display purposes
+
 message User {
     string user_id = 1;
     string email = 2;
+    string display_name = 3;
+    string signed_display_photo_path = 4;
+}
+
+// GetMe will create or load the minimal app user depending on if
+// the user still needs onboarding. If the user needs onboarding
+// then must make a call to complete sign up in order to fill in
+// app specific user details
+message GetMeRequest {}
+message GetMeResponse {
+    User user = 1;
+    bool needs_onboarding = 2;
+}
+
+// CompleteOnboarding signs up a user with display name and 
+// display photo and is the blocker on the user being able to
+// use the application
+message CompleteOnboardingRequest {
+    string display_name = 1;
+    bytes display_photo = 2;
+}
+message CompleteOnboardingResponse {
+    User user = 1;
 }
 
 message ListUsersRequest {}
@@ -18,15 +40,11 @@ message ListUsersResponse {
     repeated User users = 1;
 }
 
-message CreateUserRequest {
-    string email = 1;
-}
 
-message CreateUserResponse {
-    string created_user_id = 1;
-}
 
 service UsersService {
-    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+    rpc GetMe(GetMeRequest) returns (GetMeResponse);
+    rpc CompleteOnboarding(CompleteOnboardingRequest) returns (CompleteOnboardingResponse);
+
     rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
 }

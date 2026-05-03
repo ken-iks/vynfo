@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { DragUploadArea } from "./DragUploadArea";
-import { useAuth } from "../providers/AuthProvider";
 
 interface UploadImageWizardProps {
   projectId: string;
@@ -28,7 +27,6 @@ export function UploadImageWizard({
   projectId,
   onUploadCompleted,
 }: UploadImageWizardProps) {
-  const userId = useAuth();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [isUploading, setIsUploading] = useState(false);
@@ -42,7 +40,6 @@ export function UploadImageWizard({
     try {
       const response = await client.uploadImage(
         create(UploadImageRequestSchema, {
-          userId,
           projectId,
           content: new Uint8Array(await imageFile.arrayBuffer()),
           title: title.trim() || imageFile.name,

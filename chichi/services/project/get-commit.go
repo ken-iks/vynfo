@@ -7,6 +7,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/encoding/protojson"
+	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 )
 
@@ -14,10 +15,9 @@ func (p *ProjectServiceServer) GetCommit(
 	ctx context.Context,
 	req *connect.Request[v1.GetCommitRequest],
 ) (*connect.Response[v1.GetCommitResponse], error) {
-	_, err := uuid.Parse(req.Msg.GetUserId())
+	user, err := auth.RequireOnboardedUser(ctx, p.queries)
 	if err != nil {
-		slog.Error("error parsing user id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 	commitID, err := uuid.Parse(req.Msg.GetCommitId())
 	if err != nil {
@@ -39,7 +39,7 @@ func (p *ProjectServiceServer) GetCommit(
 		slog.Error("error parsing branch id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
-	p.manifestCache.DropBranch(req.Msg.GetUserId(), branchID.String())
+	p.manifestCache.DropBranch(user.ID.String(), branchID.String())
 	return connect.NewResponse(&v1.GetCommitResponse{
 		CommitId:    commit.ID.String(),
 		ProjectId:   commit.ProjectID.String(),

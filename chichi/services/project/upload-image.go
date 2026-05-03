@@ -11,6 +11,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
 
+	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
 	"vynfo.com/vynfo/shared"
@@ -32,10 +33,8 @@ func (p *ProjectServiceServer) UploadImage(
 	defer tx.Rollback()
 	q := p.queries.WithTx(tx)
 
-	_, err = uuid.Parse(req.Msg.GetUserId())
-	if err != nil {
-		slog.Error("error parsing user id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	if _, err := auth.RequireOnboardedUser(ctx, p.queries); err != nil {
+		return nil, err
 	}
 	projectID, err := uuid.Parse(req.Msg.GetProjectId())
 	if err != nil {

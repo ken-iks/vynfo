@@ -12,7 +12,6 @@ import {
   DialogTrigger,
 } from "../../ui/dialog";
 import { client } from "@/lib/client";
-import { useAuth } from "../../providers/AuthProvider";
 
 interface CommitDialogProps {
   projectId: string;
@@ -29,7 +28,6 @@ export function CommitDialog({
   disabled,
   onCommitSuccess,
 }: CommitDialogProps) {
-  const userId = useAuth();
   const [commitMessage, setCommitMessage] = useState("");
   const [isCommitting, setIsCommitting] = useState(false);
   const [commitError, setCommitError] = useState("");
@@ -46,7 +44,6 @@ export function CommitDialog({
         commitMessage: commitMessage.trim(),
         previousCommitId: tipCommitId,
         commitState: editorStore.currentState(),
-        userId,
       });
       if (res.response.case === "newCommitId") {
         onCommitSuccess(res.response.value);

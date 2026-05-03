@@ -8,6 +8,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
 )
@@ -16,10 +17,9 @@ func (s *SpacesServiceServer) CreateSpace(
 	ctx context.Context,
 	req *connect.Request[v1.CreateSpaceRequest],
 ) (*connect.Response[v1.CreateSpaceResponse], error) {
-	userId, err := uuid.Parse(req.Msg.GetUserId())
+	user, err := auth.RequireOnboardedUser(ctx, s.queries)
 	if err != nil {
-		slog.Error("error parsing user id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 	projectId, err := uuid.Parse(req.Msg.GetProjectId())
 	if err != nil {
@@ -44,7 +44,7 @@ func (s *SpacesServiceServer) CreateSpace(
 
 	space, err := q.CreateSpace(ctx, db.CreateSpaceParams{
 		ProjectID: projectId,
-		AdminID:   userId,
+		AdminID:   user.ID,
 		Name:      name,
 	})
 	if err != nil {
@@ -53,7 +53,7 @@ func (s *SpacesServiceServer) CreateSpace(
 	}
 	if err := q.AddSpaceMember(ctx, db.AddSpaceMemberParams{
 		SpaceID:  space.ID,
-		MemberID: userId,
+		MemberID: user.ID,
 	}); err != nil {
 		slog.Error("error adding admin as space member", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)

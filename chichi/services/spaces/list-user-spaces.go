@@ -6,6 +6,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 )
 
@@ -13,13 +14,12 @@ func (s *SpacesServiceServer) ListUserSpaces(
 	ctx context.Context,
 	req *connect.Request[v1.ListUserSpacesRequest],
 ) (*connect.Response[v1.ListSpacesResponse], error) {
-	userId, err := uuid.Parse(req.Msg.GetUserId())
+	user, err := auth.RequireOnboardedUser(ctx, s.queries)
 	if err != nil {
-		slog.Error("error parsing user id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 
-	rows, err := s.queries.GetUserSpacesWithMembers(ctx, userId)
+	rows, err := s.queries.GetUserSpacesWithMembers(ctx, user.ID)
 	if err != nil {
 		slog.Error("error fetching user spaces", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)

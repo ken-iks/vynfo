@@ -9,9 +9,11 @@ import (
 	"os"
 
 	"cloud.google.com/go/storage"
+	"connectrpc.com/connect"
 	"github.com/joho/godotenv"
 	"github.com/pressly/goose/v3"
 	"github.com/rs/cors"
+	"vynfo.com/vynfo/auth"
 	"vynfo.com/vynfo/gen/proto/v1/v1connect"
 	dbgen "vynfo.com/vynfo/internal/db"
 	"vynfo.com/vynfo/messages"
@@ -51,6 +53,7 @@ func main() {
 	slog.Info("migrations, sucessful - starting up app")
 	//slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})))
 	ctx := context.Background()
+	firebaseAuth := auth.NewFirebaseAuth(ctx)
 
 	// ==================== ProjectService Deps ========================== //
 	storageClient, err := storage.NewClient(ctx)
@@ -74,13 +77,28 @@ func main() {
 	SpacesService := spaces.NewSpacesServiceServer(db, dbgen.New(db), observer)
 
 	// ==================== UsersService Deps ========================== //
-	UsersService := users.NewUsersServiceServer(dbgen.New(db))
+	UsersService := users.NewUsersServiceServer(storageClient, dbgen.New(db))
 
 	mux := http.NewServeMux()
 	// Proto service endpoints
-	mux.Handle(v1connect.NewProjectServiceHandler(ProjectService))
-	mux.Handle(v1connect.NewSpacesServiceHandler(SpacesService))
-	mux.Handle(v1connect.NewUsersServiceHandler(UsersService))
+	mux.Handle(
+		v1connect.NewProjectServiceHandler(
+			ProjectService,
+			connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
+		),
+	)
+	mux.Handle(
+		v1connect.NewSpacesServiceHandler(
+			SpacesService,
+			connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
+		),
+	)
+	mux.Handle(
+		v1connect.NewUsersServiceHandler(
+			UsersService,
+			connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
+		),
+	)
 	// Http service endpoints for HLS video serving
 	mux.HandleFunc("GET /video", ProjectService.GetManifest)
 	mux.Handle(

@@ -1,5 +1,5 @@
 import { OpenSpaceRequestSchema } from "@/gen/proto/v1/spaces_pb";
-import { spacesClient } from "@/lib/client";
+import { createSpacesClient } from "@/lib/client";
 import { create } from "@bufbuild/protobuf";
 
 /**
@@ -10,13 +10,14 @@ import { create } from "@bufbuild/protobuf";
  * message
  */
 export type SpaceWorkerInput = {
-  userId: string;
+  idToken: string;
   spaceId: string;
 };
 
 self.onmessage = async (event: MessageEvent<SpaceWorkerInput>) => {
-  const { userId, spaceId } = event.data;
-  const req = create(OpenSpaceRequestSchema, { userId, spaceId });
+  const { idToken, spaceId } = event.data;
+  const spacesClient = createSpacesClient(idToken);
+  const req = create(OpenSpaceRequestSchema, { spaceId });
   for await (const response of spacesClient.openSpace(req)) {
     if (response.newMessageAlert.valueOf()) {
       self.postMessage({ kind: "reload" });

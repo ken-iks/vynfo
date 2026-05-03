@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuthSwitcher } from "../../providers/AuthProvider";
+import { useAuthContext } from "../../providers/AuthProvider";
 import { client } from "../../../lib/client";
 import type { ProjectMetadata } from "../../../gen/proto/v1/projects_pb";
 import type { User } from "../../../gen/proto/v1/users_pb";
@@ -23,7 +23,7 @@ interface ProjectsListProps {
 }
 
 export function ProjectsList({ onSelect }: ProjectsListProps) {
-  const { userId, users } = useAuthSwitcher();
+  const { userId, users } = useAuthContext();
   const [userCreatedProjects, setUserCreatedProjects] = useState<
     ProjectMetadata[]
   >([]);
@@ -34,7 +34,7 @@ export function ProjectsList({ onSelect }: ProjectsListProps) {
   const [deletingProjectId, setDeletingProjectId] = useState("");
 
   const fetchProjects = async () => {
-    const projects = await client.listProjects({ userId });
+    const projects = await client.listProjects({});
     setUserCreatedProjects(projects.userCreatedProjects);
     setUserMemberProjects(projects.userMemberProjects);
     return projects.userCreatedProjects;
@@ -71,7 +71,6 @@ export function ProjectsList({ onSelect }: ProjectsListProps) {
     try {
       await client.deleteProject({
         projectId: project.id,
-        userId,
       });
       await fetchProjects();
     } catch (err) {

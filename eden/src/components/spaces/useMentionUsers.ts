@@ -1,8 +1,8 @@
-import { useAuthSwitcher } from "../providers/AuthProvider";
+import { useAuthContext } from "../providers/AuthProvider";
 import { usersToMentions, withVynfoAgentMention } from "./MentionCard";
 
 export function useMentionUsers() {
-  const { users } = useAuthSwitcher();
+  const { users } = useAuthContext();
 
   return withVynfoAgentMention(usersToMentions(users));
 }

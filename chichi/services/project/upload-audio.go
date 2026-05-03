@@ -10,6 +10,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
 
+	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
 
@@ -21,10 +22,8 @@ func (p *ProjectServiceServer) UploadAudio(
 	req *connect.Request[v1.UploadAudioRequest],
 	stream *connect.ServerStream[v1.UploadAudioResponse],
 ) error {
-	_, err := uuid.Parse(req.Msg.GetUserId())
-	if err != nil {
-		slog.Error("error parsing user id", "error", err)
-		return connect.NewError(connect.CodeInvalidArgument, err)
+	if _, err := auth.RequireOnboardedUser(ctx, p.queries); err != nil {
+		return err
 	}
 	projectID, err := uuid.Parse(req.Msg.GetProjectId())
 	if err != nil {

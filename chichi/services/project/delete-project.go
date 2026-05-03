@@ -9,6 +9,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
 )
@@ -22,10 +23,9 @@ func (p *ProjectServiceServer) DeleteProject(
 		slog.Error("error parsing project id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
-	userId, err := uuid.Parse(req.Msg.GetUserId())
+	user, err := auth.RequireOnboardedUser(ctx, p.queries)
 	if err != nil {
-		slog.Error("error parsing user id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 
 	project, err := p.queries.GetProject(ctx, projectId)
@@ -36,13 +36,13 @@ func (p *ProjectServiceServer) DeleteProject(
 		slog.Error("error fetching project", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
-	if project.UserID != userId {
+	if project.UserID != user.ID {
 		return nil, connect.NewError(connect.CodePermissionDenied, nil)
 	}
 
 	deletedRows, err := p.queries.DeleteProject(ctx, db.DeleteProjectParams{
 		ID:     projectId,
-		UserID: userId,
+		UserID: user.ID,
 	})
 	if err != nil {
 		slog.Error("error deleting project", "error", err)

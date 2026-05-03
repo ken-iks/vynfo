@@ -6,6 +6,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
 )
@@ -14,10 +15,9 @@ func (p *ProjectServiceServer) CreateProject(
 	ctx context.Context,
 	req *connect.Request[v1.CreateProjectRequest],
 ) (*connect.Response[v1.CreateProjectResponse], error) {
-	userId, err := uuid.Parse(req.Msg.GetUserId())
+	user, err := auth.RequireOnboardedUser(ctx, p.queries)
 	if err != nil {
-		slog.Error("error parsing user id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -28,7 +28,7 @@ func (p *ProjectServiceServer) CreateProject(
 	q := p.queries.WithTx(tx)
 
 	project, err := q.CreateProject(ctx, db.CreateProjectParams{
-		UserID:             userId,
+		UserID:             user.ID,
 		ProjectName:        req.Msg.GetProjectName(),
 		ProjectDescription: req.Msg.GetProjectDescription(),
 	})

@@ -9,6 +9,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
 
+	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 )
 
@@ -16,6 +17,10 @@ func (p *ProjectServiceServer) ListProjectAssets(
 	ctx context.Context,
 	req *connect.Request[v1.ListProjectAssetsRequest],
 ) (*connect.Response[v1.ListProjectAssetsResponse], error) {
+	if _, err := auth.RequireOnboardedUser(ctx, p.queries); err != nil {
+		return nil, err
+	}
+
 	projectID, err := uuid.Parse(req.Msg.GetProjectId())
 	if err != nil {
 		slog.Error("error parsing project id")

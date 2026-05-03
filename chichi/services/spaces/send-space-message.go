@@ -7,6 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
 )
@@ -16,21 +17,21 @@ func (s *SpacesServiceServer) SendSpaceMessage(
 	req *connect.Request[v1.SendSpaceMessageRequest],
 ) (*connect.Response[v1.SendSpaceMessageResponse], error) {
 	spaceMessage := req.Msg.GetSpaceMessage()
-	if spaceMessage == nil || spaceMessage.GetAuthor() == nil {
+	if spaceMessage == nil {
 		return nil, connect.NewError(
 			connect.CodeInvalidArgument,
-			errors.New("space_message and author are required"),
+			errors.New("space_message is required"),
 		)
+	}
+
+	user, err := auth.RequireOnboardedUser(ctx, s.queries)
+	if err != nil {
+		return nil, err
 	}
 
 	spaceId, err := uuid.Parse(req.Msg.GetSpaceId())
 	if err != nil {
 		slog.Error("error parsing space id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
-	}
-	authorId, err := uuid.Parse(spaceMessage.GetAuthor().GetUserId())
-	if err != nil {
-		slog.Error("error parsing author id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
@@ -56,7 +57,7 @@ func (s *SpacesServiceServer) SendSpaceMessage(
 	if parentId.Valid {
 		row, err := q.AddBranchedMessageToSpace(ctx, db.AddBranchedMessageToSpaceParams{
 			SpaceID:  spaceId,
-			AuthorID: authorId,
+			AuthorID: user.ID,
 			Body:     spaceMessage.GetContent(),
 			ParentID: parentId,
 		})
@@ -68,7 +69,7 @@ func (s *SpacesServiceServer) SendSpaceMessage(
 	} else {
 		row, err := q.AddMessageToSpace(ctx, db.AddMessageToSpaceParams{
 			SpaceID:  spaceId,
-			AuthorID: authorId,
+			AuthorID: user.ID,
 			Body:     spaceMessage.GetContent(),
 		})
 		if err != nil {

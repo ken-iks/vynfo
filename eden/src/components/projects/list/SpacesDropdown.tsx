@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { spacesClient } from "../../../lib/client";
 import type { ProjectSpace } from "../../../gen/proto/v1/spaces_pb";
-import { useAuth } from "../../providers/AuthProvider";
 import { Button } from "../../ui/button";
 import {
   DropdownMenu,
@@ -15,21 +14,20 @@ interface SpacesDropdownProps {
 }
 
 export function SpacesDropdown({ onSelectSpace }: SpacesDropdownProps) {
-  const userId = useAuth();
   const [userSpaces, setUserSpaces] = useState<ProjectSpace[]>([]);
   const [loadingSpaces, setLoadingSpaces] = useState(false);
 
   useEffect(() => {
     setLoadingSpaces(true);
     spacesClient
-      .listUserSpaces({ userId })
+      .listUserSpaces({})
       .then((res) => setUserSpaces(res.spaces))
       .catch((err) => {
         console.error("failed to load user spaces", err);
         setUserSpaces([]);
       })
       .finally(() => setLoadingSpaces(false));
-  }, [userId]);
+  }, []);
 
   return (
     <DropdownMenu>

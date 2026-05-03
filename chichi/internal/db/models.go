@@ -46,11 +46,11 @@ type Branch struct {
 
 type Commit struct {
 	ID        uuid.UUID
+	UserID    uuid.UUID
 	ProjectID uuid.UUID
 	State     json.RawMessage
 	Message   sql.NullString
 	CreatedAt sql.NullTime
-	UserID    uuid.UUID
 }
 
 type CommitParent struct {
@@ -102,8 +102,8 @@ type Space struct {
 	ID        uuid.UUID
 	ProjectID uuid.UUID
 	AdminID   uuid.UUID
-	CreatedAt sql.NullTime
 	Name      string
+	CreatedAt sql.NullTime
 }
 
 type SpaceMember struct {
@@ -118,9 +118,13 @@ type Text struct {
 }
 
 type User struct {
-	ID        uuid.UUID
-	Email     string
-	CreatedAt sql.NullTime
+	ID                     uuid.UUID
+	FirebaseUid            string
+	Email                  string
+	DisplayName            sql.NullString
+	DisplayPhotoObjectPath sql.NullString
+	OnboardedAt            sql.NullTime
+	CreatedAt              sql.NullTime
 }
 
 type Video struct {

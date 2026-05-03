@@ -5,9 +5,9 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
 )
@@ -16,19 +16,18 @@ func (p *ProjectServiceServer) ListProjects(
 	ctx context.Context,
 	req *connect.Request[v1.ListProjectsRequest],
 ) (*connect.Response[v1.ListProjectsResponse], error) {
-	userID, err := uuid.Parse(req.Msg.GetUserId())
+	user, err := auth.RequireOnboardedUser(ctx, p.queries)
 	if err != nil {
-		slog.Error("error parsing user id")
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 
-	userCreatedProjects, err := p.queries.GetUserCreatedProjects(ctx, userID)
+	userCreatedProjects, err := p.queries.GetUserCreatedProjects(ctx, user.ID)
 	if err != nil {
 		slog.Error("error fetching user created projects", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	userMemberProjects, err := p.queries.GetUserMemberProjects(ctx, userID)
+	userMemberProjects, err := p.queries.GetUserMemberProjects(ctx, user.ID)
 	if err != nil {
 		slog.Error("error fetching user member projects", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)

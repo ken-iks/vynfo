@@ -151,7 +151,6 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
     if (branch?.tipCommitId) {
       const commit = await client.getCommit({
         commitId: branch.tipCommitId,
-        userId,
         branchId: branch.id,
       });
       editorStore.loadState(commit.commitState);
@@ -177,7 +176,6 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
   useEffect(() => {
     const fetchAssets = async () => {
       const assets = await client.listProjectAssets({
-        userId,
         projectId: project.id,
       });
       setCurrProjectVideos(assets.videos);
@@ -222,7 +220,6 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
     const timeoutId = window.setTimeout(() => {
       void client
         .autoSave({
-          userId,
           projectId: project.id,
           branchId: branch.id,
           autoSaveState: editorStore.currentState(),

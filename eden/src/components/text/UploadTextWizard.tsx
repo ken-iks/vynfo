@@ -17,7 +17,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "../providers/AuthProvider";
 import { MarkdownEditor } from "./MarkdownEditor";
 import { MarkdownViewer } from "./MarkdownViewer";
 
@@ -30,7 +29,6 @@ export function UploadTextWizard({
   projectId,
   onUploadCompleted,
 }: UploadTextWizardProps) {
-  const userId = useAuth();
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
   const [isUploading, setIsUploading] = useState(false);
@@ -44,7 +42,6 @@ export function UploadTextWizard({
     try {
       const response = await client.uploadText(
         create(UploadTextRequestSchema, {
-          userId,
           project: projectId,
           content: markdown,
           title: title.trim() || "Markdown text",

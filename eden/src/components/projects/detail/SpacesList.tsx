@@ -18,7 +18,7 @@ import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import { Table } from "../../shared/Table";
 import { SectionTitle } from "../../shared/SectionTitle";
-import { useAuthSwitcher } from "../../providers/AuthProvider";
+import { useAuthContext } from "../../providers/AuthProvider";
 import { AddUserDropdown } from "../../shared/AddUserDropdown";
 
 interface SpacesListProps {
@@ -27,7 +27,7 @@ interface SpacesListProps {
 }
 
 export function SpacesList({ project, onSelectSpace }: SpacesListProps) {
-  const { userId, users } = useAuthSwitcher();
+  const { users } = useAuthContext();
   const [spaces, setSpaces] = useState<ProjectSpace[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
   const [spaceName, setSpaceName] = useState("");
@@ -60,7 +60,6 @@ export function SpacesList({ project, onSelectSpace }: SpacesListProps) {
     setCreating(true);
     try {
       await spacesClient.createSpace({
-        userId,
         projectId: project.id,
         name,
       });

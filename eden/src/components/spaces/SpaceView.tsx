@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { instantiateSpaceWorker } from "./spaceWorker";
-import { useAuthSwitcher } from "../providers/AuthProvider";
+import { useAuthContext } from "../providers/AuthProvider";
 import { spacesClient } from "@/lib/client";
+import { auth } from "@/firebase";
 import { create } from "@bufbuild/protobuf";
 import {
   ListSpaceMessagesRequestSchema,
@@ -15,20 +16,19 @@ import { NonUserMessage } from "./NonUserMessage";
 import { UserMessage } from "./UserMessage";
 
 export function SpaceView({ spaceId }: { spaceId: string }) {
-  const { userId, users } = useAuthSwitcher();
+  const { userId, appUser } = useAuthContext();
   const [messages, setMessages] = useState<SpaceMessageWithMetadata[]>([]);
   const [sendError, setSendError] = useState("");
-  const currentUser = users.find((user) => user.userId === userId);
-  const handleLoadMessages = async () => {
+  const handleLoadMessages = useCallback(async () => {
     const request = create(ListSpaceMessagesRequestSchema, {
       spaceId,
     });
     const response = await spacesClient.listSpaceMessages(request);
     setMessages(response.messages);
-  };
+  }, [spaceId]);
 
   const handleSubmitMessage = async (value: MessageInputValue) => {
-    if (!currentUser) {
+    if (!appUser) {
       const err = new Error("No user selected");
       console.error("failed to send space message", err);
       setSendError(err.message);
@@ -41,7 +41,6 @@ export function SpaceView({ spaceId }: { spaceId: string }) {
         spaceId,
         spaceMessage: {
           content: value.text,
-          author: currentUser,
         },
       });
 
@@ -57,20 +56,29 @@ export function SpaceView({ spaceId }: { spaceId: string }) {
   };
 
   useEffect(() => {
-    handleLoadMessages();
-    const worker = instantiateSpaceWorker({ userId, spaceId });
-    worker.onmessage = async (event) => {
-      // this function stays registered and runs every time
-      // the worker sends a message
-      if (event.data.kind == "reload") {
-        await handleLoadMessages();
-      }
+    let worker: Worker | undefined;
+    let cancelled = false;
+
+    void handleLoadMessages();
+    const startWorker = async () => {
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken || cancelled) return;
+      worker = instantiateSpaceWorker({ idToken, spaceId });
+      worker.onmessage = async (event) => {
+        // this function stays registered and runs every time
+        // the worker sends a message
+        if (event.data.kind == "reload") {
+          await handleLoadMessages();
+        }
+      };
     };
+    void startWorker();
 
     return () => {
-      worker.terminate();
+      cancelled = true;
+      worker?.terminate();
     };
-  }, []);
+  }, [handleLoadMessages, spaceId]);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
