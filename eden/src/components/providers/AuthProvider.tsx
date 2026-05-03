@@ -13,7 +13,6 @@ import type { User } from "@/gen/proto/v1/users_pb";
 interface AuthContextValue {
   userId: string;
   appUser: User | undefined;
-  users: User[];
   loading: boolean;
   signedIn: boolean;
   needsOnboarding: boolean;
@@ -21,25 +20,17 @@ interface AuthContextValue {
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshMe: () => Promise<void>;
-  refreshUsers: () => Promise<User[]>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [appUser, setAppUser] = useState<User | undefined>();
-  const [users, setUsers] = useState<User[]>([]);
   const [firebaseReady, setFirebaseReady] = useState(false);
   const [loadingMe, setLoadingMe] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [authError, setAuthError] = useState("");
-
-  const refreshUsers = useCallback(async () => {
-    const res = await usersClient.listUsers({});
-    setUsers(res.users);
-    return res.users;
-  }, []);
 
   const refreshMe = useCallback(async () => {
     setLoadingMe(true);
@@ -48,9 +39,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const me = await usersClient.getMe({});
       setAppUser(me.user);
       setNeedsOnboarding(me.needsOnboarding);
-      if (!me.needsOnboarding) {
-        await refreshUsers();
-      }
     } catch (err) {
       setAppUser(undefined);
       setAuthError(
@@ -60,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoadingMe(false);
     }
-  }, [refreshUsers]);
+  }, []);
 
   const signInWithGoogle = useCallback(async () => {
     await signInWithPopup(auth, provider);
@@ -76,7 +64,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSignedIn(false);
         setFirebaseReady(true);
         setAppUser(undefined);
-        setUsers([]);
         setNeedsOnboarding(false);
         setAuthError("");
         return;
@@ -98,7 +85,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         userId: appUser?.userId ?? "",
         appUser,
-        users,
         loading,
         signedIn,
         needsOnboarding,
@@ -106,7 +92,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signInWithGoogle,
         signOut: handleSignOut,
         refreshMe,
-        refreshUsers,
       }}
     >
       {children}

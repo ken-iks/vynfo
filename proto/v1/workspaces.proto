@@ -6,11 +6,13 @@ option go_package = "vynfo.com/vynfo/gen/proto/v1";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
+import "proto/v1/users.proto";
 
 message Workspace {
     string workspace_id = 1;
     string name = 2;
     google.protobuf.Timestamp created_at = 3;
+    repeated User users = 4;
 }
 
 message CreateWorkspaceRequest {

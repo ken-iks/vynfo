@@ -7,7 +7,6 @@ import type { User } from "@/gen/proto/v1/users_pb";
 import { AddUserDropdown } from "../shared/AddUserDropdown";
 import { SectionTitle } from "../shared/SectionTitle";
 import { Table } from "../shared/Table";
-import { useAuthContext } from "../providers/AuthProvider";
 import { useWorkspaceContext } from "../providers/WorkspaceProvider";
 import { Button } from "../ui/button";
 import {
@@ -31,8 +30,7 @@ import { SpaceView } from "./SpaceView";
 
 export function Spaces() {
   const navigate = useNavigate();
-  const { users } = useAuthContext();
-  const { currentWorkspaceId } = useWorkspaceContext();
+  const { currentWorkspace, currentWorkspaceId } = useWorkspaceContext();
   const [spaces, setSpaces] = useState<ProjectSpace[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
   const [spaceName, setSpaceName] = useState("");
@@ -86,10 +84,10 @@ export function Spaces() {
   };
 
   const getAvailableUsers = (space: ProjectSpace) =>
-    users.filter(
+    currentWorkspace?.users.filter(
       (user) =>
         !space.users.some((spaceUser) => spaceUser.userId === user.userId),
-    );
+    ) ?? [];
 
   const handleAddUser = async (space: ProjectSpace, user: User) => {
     setAddingMemberId(`${space.spaceId}:${user.userId}`);

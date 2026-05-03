@@ -35,16 +35,7 @@ message CompleteOnboardingResponse {
     User user = 1;
 }
 
-message ListUsersRequest {}
-message ListUsersResponse {
-    repeated User users = 1;
-}
-
-
-
 service UsersService {
     rpc GetMe(GetMeRequest) returns (GetMeResponse);
     rpc CompleteOnboarding(CompleteOnboardingRequest) returns (CompleteOnboardingResponse);
-
-    rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
 }

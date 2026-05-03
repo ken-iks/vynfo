@@ -24,8 +24,8 @@ interface ProjectsListProps {
 }
 
 export function ProjectsList({ onSelect }: ProjectsListProps) {
-  const { userId, users } = useAuthContext();
-  const { currentWorkspaceId } = useWorkspaceContext();
+  const { userId } = useAuthContext();
+  const { currentWorkspace, currentWorkspaceId } = useWorkspaceContext();
   const [userCreatedProjects, setUserCreatedProjects] = useState<
     ProjectMetadata[]
   >([]);
@@ -61,7 +61,8 @@ export function ProjectsList({ onSelect }: ProjectsListProps) {
     if (created) onSelect(created);
   };
 
-  const availableUsers = users.filter((user) => user.userId !== userId);
+  const availableUsers =
+    currentWorkspace?.users.filter((user) => user.userId !== userId) ?? [];
 
   const handleAddProjectUser = async (project: ProjectMetadata, user: User) => {
     setAddingMemberId(`${project.id}:${user.userId}`);

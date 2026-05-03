@@ -38,15 +38,12 @@ const (
 	// UsersServiceCompleteOnboardingProcedure is the fully-qualified name of the UsersService's
 	// CompleteOnboarding RPC.
 	UsersServiceCompleteOnboardingProcedure = "/v1.UsersService/CompleteOnboarding"
-	// UsersServiceListUsersProcedure is the fully-qualified name of the UsersService's ListUsers RPC.
-	UsersServiceListUsersProcedure = "/v1.UsersService/ListUsers"
 )
 
 // UsersServiceClient is a client for the v1.UsersService service.
 type UsersServiceClient interface {
 	GetMe(context.Context, *connect.Request[v1.GetMeRequest]) (*connect.Response[v1.GetMeResponse], error)
 	CompleteOnboarding(context.Context, *connect.Request[v1.CompleteOnboardingRequest]) (*connect.Response[v1.CompleteOnboardingResponse], error)
-	ListUsers(context.Context, *connect.Request[v1.ListUsersRequest]) (*connect.Response[v1.ListUsersResponse], error)
 }
 
 // NewUsersServiceClient constructs a client for the v1.UsersService service. By default, it uses
@@ -72,12 +69,6 @@ func NewUsersServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(usersServiceMethods.ByName("CompleteOnboarding")),
 			connect.WithClientOptions(opts...),
 		),
-		listUsers: connect.NewClient[v1.ListUsersRequest, v1.ListUsersResponse](
-			httpClient,
-			baseURL+UsersServiceListUsersProcedure,
-			connect.WithSchema(usersServiceMethods.ByName("ListUsers")),
-			connect.WithClientOptions(opts...),
-		),
 	}
 }
 
@@ -85,7 +76,6 @@ func NewUsersServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 type usersServiceClient struct {
 	getMe              *connect.Client[v1.GetMeRequest, v1.GetMeResponse]
 	completeOnboarding *connect.Client[v1.CompleteOnboardingRequest, v1.CompleteOnboardingResponse]
-	listUsers          *connect.Client[v1.ListUsersRequest, v1.ListUsersResponse]
 }
 
 // GetMe calls v1.UsersService.GetMe.
@@ -98,16 +88,10 @@ func (c *usersServiceClient) CompleteOnboarding(ctx context.Context, req *connec
 	return c.completeOnboarding.CallUnary(ctx, req)
 }
 
-// ListUsers calls v1.UsersService.ListUsers.
-func (c *usersServiceClient) ListUsers(ctx context.Context, req *connect.Request[v1.ListUsersRequest]) (*connect.Response[v1.ListUsersResponse], error) {
-	return c.listUsers.CallUnary(ctx, req)
-}
-
 // UsersServiceHandler is an implementation of the v1.UsersService service.
 type UsersServiceHandler interface {
 	GetMe(context.Context, *connect.Request[v1.GetMeRequest]) (*connect.Response[v1.GetMeResponse], error)
 	CompleteOnboarding(context.Context, *connect.Request[v1.CompleteOnboardingRequest]) (*connect.Response[v1.CompleteOnboardingResponse], error)
-	ListUsers(context.Context, *connect.Request[v1.ListUsersRequest]) (*connect.Response[v1.ListUsersResponse], error)
 }
 
 // NewUsersServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -129,20 +113,12 @@ func NewUsersServiceHandler(svc UsersServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(usersServiceMethods.ByName("CompleteOnboarding")),
 		connect.WithHandlerOptions(opts...),
 	)
-	usersServiceListUsersHandler := connect.NewUnaryHandler(
-		UsersServiceListUsersProcedure,
-		svc.ListUsers,
-		connect.WithSchema(usersServiceMethods.ByName("ListUsers")),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/v1.UsersService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case UsersServiceGetMeProcedure:
 			usersServiceGetMeHandler.ServeHTTP(w, r)
 		case UsersServiceCompleteOnboardingProcedure:
 			usersServiceCompleteOnboardingHandler.ServeHTTP(w, r)
-		case UsersServiceListUsersProcedure:
-			usersServiceListUsersHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -158,8 +134,4 @@ func (UnimplementedUsersServiceHandler) GetMe(context.Context, *connect.Request[
 
 func (UnimplementedUsersServiceHandler) CompleteOnboarding(context.Context, *connect.Request[v1.CompleteOnboardingRequest]) (*connect.Response[v1.CompleteOnboardingResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.UsersService.CompleteOnboarding is not implemented"))
-}
-
-func (UnimplementedUsersServiceHandler) ListUsers(context.Context, *connect.Request[v1.ListUsersRequest]) (*connect.Response[v1.ListUsersResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.UsersService.ListUsers is not implemented"))
 }

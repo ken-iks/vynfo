@@ -3,6 +3,9 @@ version: v2
 modules:
   - path: .
     excludes:
+      - .pnpm-store
+      - node_modules
+      - eden/.pnpm-store
       - eden/node_modules
 lint:
   use:

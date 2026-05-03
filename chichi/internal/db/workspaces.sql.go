@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -67,6 +68,61 @@ func (q *Queries) GetUserWorkspaces(ctx context.Context, memberID uuid.UUID) ([]
 	return items, nil
 }
 
+const getUserWorkspacesWithMembers = `-- name: GetUserWorkspacesWithMembers :many
+SELECT
+    w.id workspace_id,
+    w.name workspace_name,
+    w.created_at workspace_created_at,
+    u.id member_id,
+    u.email member_email,
+    u.display_name member_display_name
+FROM workspaces w
+JOIN workspace_members requested_member ON requested_member.workspace_id = w.id
+LEFT JOIN workspace_members wm ON wm.workspace_id = w.id
+LEFT JOIN users u ON u.id = wm.member_id
+WHERE requested_member.member_id = $1
+ORDER BY w.created_at, u.email
+`
+
+type GetUserWorkspacesWithMembersRow struct {
+	WorkspaceID        uuid.UUID
+	WorkspaceName      string
+	WorkspaceCreatedAt sql.NullTime
+	MemberID           uuid.NullUUID
+	MemberEmail        sql.NullString
+	MemberDisplayName  sql.NullString
+}
+
+func (q *Queries) GetUserWorkspacesWithMembers(ctx context.Context, memberID uuid.UUID) ([]GetUserWorkspacesWithMembersRow, error) {
+	rows, err := q.db.QueryContext(ctx, getUserWorkspacesWithMembers, memberID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUserWorkspacesWithMembersRow
+	for rows.Next() {
+		var i GetUserWorkspacesWithMembersRow
+		if err := rows.Scan(
+			&i.WorkspaceID,
+			&i.WorkspaceName,
+			&i.WorkspaceCreatedAt,
+			&i.MemberID,
+			&i.MemberEmail,
+			&i.MemberDisplayName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getWorkspace = `-- name: GetWorkspace :one
 SELECT id, name, created_at FROM workspaces WHERE id = $1
 `
@@ -103,4 +159,77 @@ func (q *Queries) GetWorkspaceMembers(ctx context.Context, workspaceID uuid.UUID
 		return nil, err
 	}
 	return items, nil
+}
+
+const getWorkspaceWithMembers = `-- name: GetWorkspaceWithMembers :many
+SELECT
+    w.id workspace_id,
+    w.name workspace_name,
+    w.created_at workspace_created_at,
+    u.id member_id,
+    u.email member_email,
+    u.display_name member_display_name
+FROM workspaces w
+LEFT JOIN workspace_members wm ON wm.workspace_id = w.id
+LEFT JOIN users u ON u.id = wm.member_id
+WHERE w.id = $1
+ORDER BY u.email
+`
+
+type GetWorkspaceWithMembersRow struct {
+	WorkspaceID        uuid.UUID
+	WorkspaceName      string
+	WorkspaceCreatedAt sql.NullTime
+	MemberID           uuid.NullUUID
+	MemberEmail        sql.NullString
+	MemberDisplayName  sql.NullString
+}
+
+func (q *Queries) GetWorkspaceWithMembers(ctx context.Context, id uuid.UUID) ([]GetWorkspaceWithMembersRow, error) {
+	rows, err := q.db.QueryContext(ctx, getWorkspaceWithMembers, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetWorkspaceWithMembersRow
+	for rows.Next() {
+		var i GetWorkspaceWithMembersRow
+		if err := rows.Scan(
+			&i.WorkspaceID,
+			&i.WorkspaceName,
+			&i.WorkspaceCreatedAt,
+			&i.MemberID,
+			&i.MemberEmail,
+			&i.MemberDisplayName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const isWorkspaceMember = `-- name: IsWorkspaceMember :one
+SELECT EXISTS (
+    SELECT 1 FROM workspace_members
+    WHERE workspace_id = $1 AND member_id = $2
+)
+`
+
+type IsWorkspaceMemberParams struct {
+	WorkspaceID uuid.UUID
+	MemberID    uuid.UUID
+}
+
+func (q *Queries) IsWorkspaceMember(ctx context.Context, arg IsWorkspaceMemberParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, isWorkspaceMember, arg.WorkspaceID, arg.MemberID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
 }

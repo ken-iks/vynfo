@@ -28,6 +28,7 @@ type Workspace struct {
 	WorkspaceId   string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Users         []*User                `protobuf:"bytes,4,rep,name=users,proto3" json:"users,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -79,6 +80,13 @@ func (x *Workspace) GetName() string {
 func (x *Workspace) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *Workspace) GetUsers() []*User {
+	if x != nil {
+		return x.Users
 	}
 	return nil
 }
@@ -395,12 +403,13 @@ var File_proto_v1_workspaces_proto protoreflect.FileDescriptor
 
 const file_proto_v1_workspaces_proto_rawDesc = "" +
 	"\n" +
-	"\x19proto/v1/workspaces.proto\x12\x02v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"}\n" +
+	"\x19proto/v1/workspaces.proto\x12\x02v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14proto/v1/users.proto\"\x9d\x01\n" +
 	"\tWorkspace\x12!\n" +
 	"\fworkspace_id\x18\x01 \x01(\tR\vworkspaceId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x129\n" +
 	"\n" +
-	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\",\n" +
+	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x1e\n" +
+	"\x05users\x18\x04 \x03(\v2\b.v1.UserR\x05users\",\n" +
 	"\x16CreateWorkspaceRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\"<\n" +
 	"\x17CreateWorkspaceResponse\x12!\n" +
@@ -446,25 +455,27 @@ var file_proto_v1_workspaces_proto_goTypes = []any{
 	(*ListWorkspacesResponse)(nil),  // 6: v1.ListWorkspacesResponse
 	(*AddWorkspaceUserRequest)(nil), // 7: v1.AddWorkspaceUserRequest
 	(*timestamppb.Timestamp)(nil),   // 8: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),           // 9: google.protobuf.Empty
+	(*User)(nil),                    // 9: v1.User
+	(*emptypb.Empty)(nil),           // 10: google.protobuf.Empty
 }
 var file_proto_v1_workspaces_proto_depIdxs = []int32{
-	8, // 0: v1.Workspace.created_at:type_name -> google.protobuf.Timestamp
-	0, // 1: v1.GetWorkspaceResponse.workspace:type_name -> v1.Workspace
-	0, // 2: v1.ListWorkspacesResponse.workspaces:type_name -> v1.Workspace
-	1, // 3: v1.WorkspacesService.CreateWorkspace:input_type -> v1.CreateWorkspaceRequest
-	3, // 4: v1.WorkspacesService.GetWorkspace:input_type -> v1.GetWorkspaceRequest
-	5, // 5: v1.WorkspacesService.ListWorkspaces:input_type -> v1.ListWorkspacesRequest
-	7, // 6: v1.WorkspacesService.AddWorkspaceUser:input_type -> v1.AddWorkspaceUserRequest
-	2, // 7: v1.WorkspacesService.CreateWorkspace:output_type -> v1.CreateWorkspaceResponse
-	4, // 8: v1.WorkspacesService.GetWorkspace:output_type -> v1.GetWorkspaceResponse
-	6, // 9: v1.WorkspacesService.ListWorkspaces:output_type -> v1.ListWorkspacesResponse
-	9, // 10: v1.WorkspacesService.AddWorkspaceUser:output_type -> google.protobuf.Empty
-	7, // [7:11] is the sub-list for method output_type
-	3, // [3:7] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	8,  // 0: v1.Workspace.created_at:type_name -> google.protobuf.Timestamp
+	9,  // 1: v1.Workspace.users:type_name -> v1.User
+	0,  // 2: v1.GetWorkspaceResponse.workspace:type_name -> v1.Workspace
+	0,  // 3: v1.ListWorkspacesResponse.workspaces:type_name -> v1.Workspace
+	1,  // 4: v1.WorkspacesService.CreateWorkspace:input_type -> v1.CreateWorkspaceRequest
+	3,  // 5: v1.WorkspacesService.GetWorkspace:input_type -> v1.GetWorkspaceRequest
+	5,  // 6: v1.WorkspacesService.ListWorkspaces:input_type -> v1.ListWorkspacesRequest
+	7,  // 7: v1.WorkspacesService.AddWorkspaceUser:input_type -> v1.AddWorkspaceUserRequest
+	2,  // 8: v1.WorkspacesService.CreateWorkspace:output_type -> v1.CreateWorkspaceResponse
+	4,  // 9: v1.WorkspacesService.GetWorkspace:output_type -> v1.GetWorkspaceResponse
+	6,  // 10: v1.WorkspacesService.ListWorkspaces:output_type -> v1.ListWorkspacesResponse
+	10, // 11: v1.WorkspacesService.AddWorkspaceUser:output_type -> google.protobuf.Empty
+	8,  // [8:12] is the sub-list for method output_type
+	4,  // [4:8] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_proto_v1_workspaces_proto_init() }
@@ -472,6 +483,7 @@ func file_proto_v1_workspaces_proto_init() {
 	if File_proto_v1_workspaces_proto != nil {
 		return
 	}
+	file_proto_v1_users_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

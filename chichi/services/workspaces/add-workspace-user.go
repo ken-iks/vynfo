@@ -17,7 +17,8 @@ func (w *WorkspacesServiceServer) AddWorkspaceUser(
 	ctx context.Context,
 	req *connect.Request[v1.AddWorkspaceUserRequest],
 ) (*connect.Response[emptypb.Empty], error) {
-	if _, err := auth.RequireOnboardedUser(ctx, w.queries); err != nil {
+	user, err := auth.RequireOnboardedUser(ctx, w.queries)
+	if err != nil {
 		return nil, err
 	}
 
@@ -30,6 +31,18 @@ func (w *WorkspacesServiceServer) AddWorkspaceUser(
 	if err != nil {
 		slog.Error("error parsing user id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	isMember, err := w.queries.IsWorkspaceMember(ctx, db.IsWorkspaceMemberParams{
+		WorkspaceID: workspaceID,
+		MemberID:    user.ID,
+	})
+	if err != nil {
+		slog.Error("error checking workspace membership", "error", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	if !isMember {
+		return nil, connect.NewError(connect.CodePermissionDenied, nil)
 	}
 
 	if err := w.queries.AddWorkspaceMember(ctx, db.AddWorkspaceMemberParams{

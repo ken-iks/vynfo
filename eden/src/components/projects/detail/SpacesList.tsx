@@ -18,7 +18,7 @@ import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import { Table } from "../../shared/Table";
 import { SectionTitle } from "../../shared/SectionTitle";
-import { useAuthContext } from "../../providers/AuthProvider";
+import { useWorkspaceContext } from "../../providers/WorkspaceProvider";
 import { AddUserDropdown } from "../../shared/AddUserDropdown";
 
 interface SpacesListProps {
@@ -27,7 +27,7 @@ interface SpacesListProps {
 }
 
 export function SpacesList({ project, onSelectSpace }: SpacesListProps) {
-  const { users } = useAuthContext();
+  const { currentWorkspace } = useWorkspaceContext();
   const [spaces, setSpaces] = useState<ProjectSpace[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
   const [spaceName, setSpaceName] = useState("");
@@ -75,10 +75,10 @@ export function SpacesList({ project, onSelectSpace }: SpacesListProps) {
   };
 
   const getAvailableUsers = (space: ProjectSpace) =>
-    users.filter(
+    currentWorkspace?.users.filter(
       (user) =>
         !space.users.some((spaceUser) => spaceUser.userId === user.userId),
-    );
+    ) ?? [];
 
   const handleAddUser = async (space: ProjectSpace, user: User) => {
     setAddingMemberId(`${space.spaceId}:${user.userId}`);

@@ -18,15 +18,35 @@ func (w *WorkspacesServiceServer) ListWorkspaces(
 		return nil, err
 	}
 
-	workspaces, err := w.queries.GetUserWorkspaces(ctx, user.ID)
+	rows, err := w.queries.GetUserWorkspacesWithMembers(ctx, user.ID)
 	if err != nil {
 		slog.Error("error fetching user workspaces", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	out := make([]*v1.Workspace, 0, len(workspaces))
-	for _, workspace := range workspaces {
-		out = append(out, workspaceProto(workspace))
+	workspacesById := make(map[string]*v1.Workspace)
+	orderedIds := make([]string, 0)
+	for _, row := range rows {
+		workspaceID := row.WorkspaceID.String()
+		workspace, ok := workspacesById[workspaceID]
+		if !ok {
+			workspace = userWorkspaceProto(row)
+			workspacesById[workspaceID] = workspace
+			orderedIds = append(orderedIds, workspaceID)
+		}
+		if row.MemberID.Valid {
+			appendWorkspaceUser(
+				workspace,
+				row.MemberID.UUID.String(),
+				row.MemberEmail.String,
+				row.MemberDisplayName.String,
+			)
+		}
+	}
+
+	out := make([]*v1.Workspace, 0, len(orderedIds))
+	for _, id := range orderedIds {
+		out = append(out, workspacesById[id])
 	}
 
 	return connect.NewResponse(&v1.ListWorkspacesResponse{

@@ -41,9 +41,10 @@ function ProfileImage({
 
 export function Settings() {
   const navigate = useNavigate();
-  const { appUser, userId, users } = useAuthContext();
+  const { appUser, userId } = useAuthContext();
   const {
     workspaces,
+    currentWorkspace,
     currentWorkspaceId,
     loadingWorkspaces,
     selectWorkspace,
@@ -51,7 +52,19 @@ export function Settings() {
   } = useWorkspaceContext();
   const [addingWorkspaceUserId, setAddingWorkspaceUserId] = useState("");
   const displayName = appUser?.displayName || appUser?.email || "User";
-  const availableUsers = users.filter((user) => user.userId !== userId);
+  const workspaceUsersById = new Map<string, User>();
+  for (const workspace of workspaces) {
+    for (const user of workspace.users) {
+      workspaceUsersById.set(user.userId, user);
+    }
+  }
+  const availableUsers = Array.from(workspaceUsersById.values()).filter(
+    (user) =>
+      user.userId !== userId &&
+      !currentWorkspace?.users.some(
+        (workspaceUser) => workspaceUser.userId === user.userId,
+      ),
+  );
 
   const handleSelectWorkspace = (workspaceId: string) => {
     selectWorkspace(workspaceId);
@@ -139,6 +152,16 @@ export function Settings() {
                 {workspace.name}
               </Button>
             ))
+          )}
+          {currentWorkspace && currentWorkspace.users.length > 0 && (
+            <div className="mt-4 flex flex-col gap-1 border-t pt-4">
+              <p className="text-sm font-medium">Members</p>
+              {currentWorkspace.users.map((user) => (
+                <p key={user.userId} className="text-sm text-muted-foreground">
+                  {user.displayName || user.email}
+                </p>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
