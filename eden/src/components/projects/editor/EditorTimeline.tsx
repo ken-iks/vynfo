@@ -1,5 +1,6 @@
 import { useSnapshot } from "valtio";
 import type {
+  MediaAudioMetadata,
   MediaImageMetadata,
   MediaTextMetadata,
   MediaVideoMetadata,
@@ -10,12 +11,14 @@ import { formatDuration } from "@/lib/utils";
 
 interface EditorTimelineProps {
   availableVideos: MediaVideoMetadata[];
+  availableAudios: MediaAudioMetadata[];
   availableImages: MediaImageMetadata[];
   availableTexts: MediaTextMetadata[];
 }
 
 export function EditorTimeline({
   availableVideos,
+  availableAudios,
   availableImages,
   availableTexts,
 }: EditorTimelineProps) {
@@ -26,6 +29,7 @@ export function EditorTimeline({
     <div className="flex h-full min-h-0 flex-col gap-2">
       <TimelineTrack
         availableVideos={availableVideos}
+        availableAudios={availableAudios}
         availableImages={availableImages}
         availableTexts={availableTexts}
       />

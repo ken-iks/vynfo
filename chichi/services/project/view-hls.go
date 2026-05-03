@@ -19,6 +19,8 @@ func (p *ProjectServiceServer) GetManifest(w http.ResponseWriter, r *http.Reques
 	ctx := context.Background()
 	branchId := r.URL.Query().Get("branchId")
 	videoId := r.URL.Query().Get("videoId")
+	audioId := r.URL.Query().Get("audioId")
+	isAudio := r.URL.Query().Get("audio") == "1"
 	userId := r.URL.Query().Get("userId")
 
 	if userId == "" {
@@ -28,19 +30,36 @@ func (p *ProjectServiceServer) GetManifest(w http.ResponseWriter, r *http.Reques
 	}
 	manifestId := branchId
 	kind := "branch"
+	cacheKind := video.ManifestKindVideo
 	if manifestId == "" {
 		manifestId = videoId
 		kind = "video"
 	}
 	if manifestId == "" {
-		slog.Warn("GetManifest missing id", "branchId", branchId, "videoId", videoId)
-		http.Error(w, "missing branchId or videoId", http.StatusBadRequest)
+		manifestId = audioId
+		kind = "audio"
+	}
+	if manifestId == "" {
+		slog.Warn(
+			"GetManifest missing id",
+			"branchId",
+			branchId,
+			"videoId",
+			videoId,
+			"audioId",
+			audioId,
+		)
+		http.Error(w, "missing branchId, videoId, or audioId", http.StatusBadRequest)
 		return
+	}
+	if branchId != "" && isAudio {
+		manifestId = fmt.Sprintf("%s-audio", branchId)
+		cacheKind = video.ManifestKindAudio
 	}
 	bucket := p.storageClient.Bucket("vedit-v1")
 	slog.Info("GetManifest request", "kind", kind, "manifestId", manifestId)
 	if kind == "branch" {
-		manifest, okay := p.manifestCache.Find(userId, branchId)
+		manifest, okay := p.manifestCache.Find(userId, branchId, cacheKind)
 		if okay {
 			slog.Info("cache hit!", "userId", userId, "branchId", branchId)
 			serveManifest(w, manifest)
@@ -71,7 +90,7 @@ func (p *ProjectServiceServer) GetManifest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	if kind == "branch" {
-		p.manifestCache.Add(userId, branchId, signed, time.Until(expiry))
+		p.manifestCache.Add(userId, branchId, cacheKind, signed, time.Until(expiry))
 		slog.Info("added branch to manifest cache", "userId", userId, "branch", branchId)
 	}
 	serveManifest(w, signed)

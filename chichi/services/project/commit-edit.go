@@ -51,7 +51,8 @@ func (p *ProjectServiceServer) CommitEdit(
 		}), nil
 	}
 	// TODO authenticate that branch is part of the project
-	manifest, err := video.ParsePlaybackStateToHLS(ctx, p.queries, req.Msg.GetCommitState())
+	state := req.Msg.GetCommitState()
+	manifest, err := video.ParsePlaybackStateToHLS(ctx, p.queries, state)
 	if err != nil {
 		slog.Error("unable to parse playback state", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -61,8 +62,29 @@ func (p *ProjectServiceServer) CommitEdit(
 		slog.Error("unable to write manifest to cloud", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	if len(state.GetAudioSections()) > 0 {
+		audioManifest, err := video.ParseAudioSectionsToHLS(
+			ctx,
+			p.queries,
+			state.GetAudioSections(),
+		)
+		if err != nil {
+			slog.Error("unable to parse audio playback state", "error", err)
+			return nil, connect.NewError(connect.CodeInternal, err)
+		}
+		err = video.UploadBranchAudioManifestToCloud(
+			ctx,
+			p.storageClient,
+			audioManifest,
+			currBranch.ID.String(),
+		)
+		if err != nil {
+			slog.Error("unable to write audio manifest to cloud", "error", err)
+			return nil, connect.NewError(connect.CodeInternal, err)
+		}
+	}
 	stateJson, err := protojson.Marshal(&v1.CommitEditRequest{
-		CommitState: req.Msg.GetCommitState(),
+		CommitState: state,
 	})
 	if err != nil {
 		slog.Error("error serializing state to json", "error", err)
@@ -100,7 +122,7 @@ func (p *ProjectServiceServer) CommitEdit(
 		slog.Error("error commiting db transaction", "error", err)
 	}
 
-	p.manifestCache.Drop(req.Msg.GetUserId(), currBranch.ID.String())
+	p.manifestCache.DropBranch(req.Msg.GetUserId(), currBranch.ID.String())
 	return connect.NewResponse(&v1.CommitEditResponse{
 		Response: &v1.CommitEditResponse_NewCommitId{
 			NewCommitId: updatedBranch.TipCommitID.UUID.String(),

@@ -39,7 +39,7 @@ func (p *ProjectServiceServer) GetCommit(
 		slog.Error("error parsing branch id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
-	p.manifestCache.Drop(req.Msg.GetUserId(), branchID.String())
+	p.manifestCache.DropBranch(req.Msg.GetUserId(), branchID.String())
 	return connect.NewResponse(&v1.GetCommitResponse{
 		CommitId:    commit.ID.String(),
 		ProjectId:   commit.ProjectID.String(),

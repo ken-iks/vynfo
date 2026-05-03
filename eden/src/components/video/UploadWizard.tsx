@@ -2,7 +2,10 @@ import { ArrowPathIcon, ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { client } from "../../lib/client";
 import { create } from "@bufbuild/protobuf";
-import { UploadVideoRequestSchema } from "../../gen/proto/v1/projects_pb";
+import {
+  UploadAudioRequestSchema,
+  UploadVideoRequestSchema,
+} from "../../gen/proto/v1/projects_pb";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,16 +20,25 @@ import { useAuth } from "../providers/AuthProvider";
 
 interface UploaderProps {
   projectId: string;
-  onUploadCompleted: (videoId: string) => void;
+  mediaType?: "audio" | "video";
+  onUploadCompleted: (assetId: string) => void;
 }
 
-export function UploadWizard({ projectId, onUploadCompleted }: UploaderProps) {
-  const [videoFile, setVideoFile] = useState<File | null>(null);
+export function UploadWizard({
+  projectId,
+  mediaType = "video",
+  onUploadCompleted,
+}: UploaderProps) {
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [hasFirstResponse, setHasFirstResponse] = useState(false);
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const userId = useAuth();
+  const isAudio = mediaType === "audio";
+  const uploadLabel = isAudio ? "Upload Audio" : "Upload Video";
+  const acceptedMime = isAudio ? "audio/*" : "video/mp4";
+  const buttonLabel = isAudio ? "Upload Audio" : "Initiate Upload";
 
   function resetUploadState() {
     setIsUploading(false);
@@ -35,32 +47,55 @@ export function UploadWizard({ projectId, onUploadCompleted }: UploaderProps) {
   }
 
   async function handleUpload() {
-    if (!videoFile) {
-      throw new Error("upload must have a video set");
+    if (!mediaFile) {
+      throw new Error(`upload must have a ${mediaType} set`);
     }
     setIsUploading(true);
     setHasFirstResponse(false);
     setUploadPercentage(0);
     setUploadError(null);
-    const request = create(UploadVideoRequestSchema, {
-      userId: userId,
-      projectId: projectId,
-      content: new Uint8Array(await videoFile.arrayBuffer()),
-      title: videoFile.name,
-    });
     try {
-      for await (const response of client.uploadVideo(request)) {
-        setHasFirstResponse(true);
-        switch (response.uploadStatus.case) {
-          case "ongoing":
-            setUploadPercentage(
-              response.uploadStatus.value.completionPercentage,
-            );
-            break;
-          case "finished":
-            onUploadCompleted(response.uploadStatus.value.videoId);
-            resetUploadState();
-            break;
+      if (isAudio) {
+        const request = create(UploadAudioRequestSchema, {
+          userId: userId,
+          projectId: projectId,
+          content: new Uint8Array(await mediaFile.arrayBuffer()),
+          title: mediaFile.name,
+        });
+        for await (const response of client.uploadAudio(request)) {
+          setHasFirstResponse(true);
+          switch (response.uploadStatus.case) {
+            case "ongoing":
+              setUploadPercentage(
+                response.uploadStatus.value.completionPercentage,
+              );
+              break;
+            case "finished":
+              onUploadCompleted(response.uploadStatus.value.audioId);
+              resetUploadState();
+              break;
+          }
+        }
+      } else {
+        const request = create(UploadVideoRequestSchema, {
+          userId: userId,
+          projectId: projectId,
+          content: new Uint8Array(await mediaFile.arrayBuffer()),
+          title: mediaFile.name,
+        });
+        for await (const response of client.uploadVideo(request)) {
+          setHasFirstResponse(true);
+          switch (response.uploadStatus.case) {
+            case "ongoing":
+              setUploadPercentage(
+                response.uploadStatus.value.completionPercentage,
+              );
+              break;
+            case "finished":
+              onUploadCompleted(response.uploadStatus.value.videoId);
+              resetUploadState();
+              break;
+          }
         }
       }
     } catch (err) {
@@ -87,13 +122,16 @@ export function UploadWizard({ projectId, onUploadCompleted }: UploaderProps) {
       ) : (
         <>
           <DragUploadArea
-            onFileSelected={setVideoFile}
-            selectedFile={videoFile}
+            onFileSelected={setMediaFile}
+            selectedFile={mediaFile}
+            accept={acceptedMime}
+            label={uploadLabel}
+            isAcceptedFile={(file) => file.type.startsWith(`${mediaType}/`)}
           />
-          {videoFile !== null && (
+          {mediaFile !== null && (
             <div className="flex justify-center">
-              <Button onClick={handleUpload} disabled={!videoFile} size="sm">
-                Initiate Upload
+              <Button onClick={handleUpload} disabled={!mediaFile} size="sm">
+                {buttonLabel}
               </Button>
             </div>
           )}

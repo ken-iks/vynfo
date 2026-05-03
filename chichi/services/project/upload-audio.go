@@ -16,17 +16,12 @@ import (
 	vid "vynfo.com/vynfo/video"
 )
 
-const uploadWorkerCount = 5
-const uploadSegmentLength = 3
-
-func (p *ProjectServiceServer) UploadVideo(
+func (p *ProjectServiceServer) UploadAudio(
 	ctx context.Context,
-	req *connect.Request[v1.UploadVideoRequest],
-	stream *connect.ServerStream[v1.UploadVideoResponse],
+	req *connect.Request[v1.UploadAudioRequest],
+	stream *connect.ServerStream[v1.UploadAudioResponse],
 ) error {
-	// TODO: authenticate user
 	_, err := uuid.Parse(req.Msg.GetUserId())
-
 	if err != nil {
 		slog.Error("error parsing user id", "error", err)
 		return connect.NewError(connect.CodeInvalidArgument, err)
@@ -38,7 +33,7 @@ func (p *ProjectServiceServer) UploadVideo(
 	}
 
 	bytes := req.Msg.GetContent()
-	f, err := os.CreateTemp("", "temp-*.mp4")
+	f, err := os.CreateTemp("", "temp-audio-*")
 	if err != nil {
 		slog.Error("error opening up temporary file for writing", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
@@ -47,68 +42,68 @@ func (p *ProjectServiceServer) UploadVideo(
 	defer f.Close()
 	_, err = f.Write(bytes)
 	if err != nil {
-		slog.Error("error writing video to temp file", "error", err)
+		slog.Error("error writing audio to temp file", "error", err)
 		return connect.NewError(connect.CodeInvalidArgument, err)
 	}
-	videoDuration, err := vid.ProbeDuration(f.Name())
+	audioDuration, err := vid.ProbeDuration(f.Name())
 	if err != nil {
-		slog.Error("could not dertermine video length", "error", err)
+		slog.Error("could not determine audio length", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
-	totalSegments := int(math.Ceil(videoDuration / float64(uploadSegmentLength)))
+	totalSegments := int(math.Ceil(audioDuration / float64(uploadSegmentLength)))
 	if totalSegments < 1 {
 		totalSegments = 1
 	}
 
 	asset, err := p.queries.CreateAsset(ctx, db.CreateAssetParams{
 		ProjectID: projectID,
-		AssetType: "video",
+		AssetType: "audio",
 	})
 	if err != nil {
 		slog.Error("error creating asset", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
-	video, err := p.queries.CreateVideo(ctx, db.CreateVideoParams{
+	audio, err := p.queries.CreateAudio(ctx, db.CreateAudioParams{
 		AssetID:     asset.ID,
 		DisplayName: req.Msg.GetTitle(),
-		Duration:    videoDuration,
+		Duration:    audioDuration,
 	})
 	if err != nil {
-		slog.Error("error creating video", "error", err)
-		p.cleanupFailedMediaUpload(ctx, asset.ID, nil, "video")
+		slog.Error("error creating audio", "error", err)
+		p.cleanupFailedMediaUpload(ctx, asset.ID, nil, "audio")
 		return connect.NewError(connect.CodeInternal, err)
 	}
 
-	segements, tmpDir, err := vid.GenerateSegments(
+	segments, tmpDir, err := vid.GenerateAudioSegments(
 		f.Name(),
-		video.AssetID.String(),
+		audio.AssetID.String(),
 		uploadSegmentLength,
-		videoDuration,
+		audioDuration,
 	)
 	if err != nil {
-		slog.Error("error initializing segemnter", "error", err)
-		p.cleanupFailedMediaUpload(ctx, asset.ID, nil, "video")
+		slog.Error("error initializing audio segmenter", "error", err)
+		p.cleanupFailedMediaUpload(ctx, asset.ID, nil, "audio")
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	defer os.RemoveAll(tmpDir)
 	manifest := vid.StartManifest(
-		video.AssetID.String(),
-		video.AssetID,
+		audio.AssetID.String(),
+		audio.AssetID,
 		p.storageClient,
 		p.queries,
-		vid.IndexVideoSegment,
+		vid.IndexAudioSegment,
 	)
 
 	uploadedObjects, err := p.uploadSegments(
 		ctx,
 		totalSegments,
 		&manifest,
-		segements,
+		segments,
 		func(percentComplete float64) error {
-			return stream.Send(&v1.UploadVideoResponse{
-				UploadStatus: &v1.UploadVideoResponse_Ongoing{
-					Ongoing: &v1.UploadProgressIndicator{
-						VideoId:              video.AssetID.String(),
+			return stream.Send(&v1.UploadAudioResponse{
+				UploadStatus: &v1.UploadAudioResponse_Ongoing{
+					Ongoing: &v1.UploadAudioProgressIndicator{
+						AudioId:              audio.AssetID.String(),
 						CompletionPercentage: percentComplete,
 					},
 				},
@@ -116,27 +111,27 @@ func (p *ProjectServiceServer) UploadVideo(
 		},
 	)
 	if err != nil {
-		p.cleanupFailedMediaUpload(ctx, asset.ID, uploadedObjects, "video")
+		p.cleanupFailedMediaUpload(ctx, asset.ID, uploadedObjects, "audio")
 		return err
 	}
 
 	err = manifest.FinishUpload(ctx)
-	manifestPath := fmt.Sprintf("manifests/%s.m3u8", video.AssetID.String())
+	manifestPath := fmt.Sprintf("manifests/%s.m3u8", audio.AssetID.String())
 	if err != nil {
 		slog.Error("error uploading manifest", "error", err)
-		p.cleanupFailedMediaUpload(ctx, asset.ID, append(uploadedObjects, manifestPath), "video")
+		p.cleanupFailedMediaUpload(ctx, asset.ID, append(uploadedObjects, manifestPath), "audio")
 		return connect.NewError(connect.CodeInternal, err)
 	}
 
-	msg := &v1.UploadVideoResponse{
-		UploadStatus: &v1.UploadVideoResponse_Finished{
-			Finished: &v1.UploadFinishedIndicator{
-				VideoId: video.AssetID.String(),
+	msg := &v1.UploadAudioResponse{
+		UploadStatus: &v1.UploadAudioResponse_Finished{
+			Finished: &v1.UploadAudioFinishedIndicator{
+				AudioId: audio.AssetID.String(),
 			},
 		},
 	}
 	if err := stream.Send(msg); err != nil {
-		p.cleanupFailedMediaUpload(ctx, asset.ID, append(uploadedObjects, manifestPath), "video")
+		p.cleanupFailedMediaUpload(ctx, asset.ID, append(uploadedObjects, manifestPath), "audio")
 		return err
 	}
 	return nil

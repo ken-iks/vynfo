@@ -23,6 +23,9 @@ export function ProjectConfigDropDown({
         <DropdownMenuItem onSelect={() => handlePageSelection("uploadVideo")}>
           Upload Video
         </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => handlePageSelection("uploadAudio")}>
+          Upload Audio
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => handlePageSelection("uploadImage")}>
           Upload Image
         </DropdownMenuItem>

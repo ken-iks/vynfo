@@ -7,17 +7,15 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
-	v1 "vynfo.com/vynfo/gen/proto/v1"
 	vid "vynfo.com/vynfo/video"
 )
 
-func (p *ProjectServiceServer) uploadVideoSegments(
+func (p *ProjectServiceServer) uploadSegments(
 	ctx context.Context,
-	videoID string,
 	totalSegments int,
 	manifest *vid.ManifestBuilder,
 	segments iter.Seq2[vid.VideoSegment, error],
-	stream *connect.ServerStream[v1.UploadVideoResponse],
+	sendProgress func(float64) error,
 ) ([]string, error) {
 	worker := vid.UploadWorker{
 		WorkerCount: uploadWorkerCount,
@@ -55,15 +53,7 @@ func (p *ProjectServiceServer) uploadVideoSegments(
 		if percentComplete > 100 {
 			percentComplete = 100
 		}
-		msg := &v1.UploadVideoResponse{
-			UploadStatus: &v1.UploadVideoResponse_Ongoing{
-				Ongoing: &v1.UploadProgressIndicator{
-					VideoId:              videoID,
-					CompletionPercentage: percentComplete,
-				},
-			},
-		}
-		if err := stream.Send(msg); err != nil {
+		if err := sendProgress(percentComplete); err != nil {
 			streamErr = err
 			cancelUpload()
 		}
@@ -77,10 +67,11 @@ func (p *ProjectServiceServer) uploadVideoSegments(
 	return uploadedObjects, nil
 }
 
-func (p *ProjectServiceServer) cleanupFailedVideoUpload(
+func (p *ProjectServiceServer) cleanupFailedMediaUpload(
 	ctx context.Context,
 	assetID uuid.UUID,
 	objectKeys []string,
+	mediaType string,
 ) {
 	cleanupCtx := context.WithoutCancel(ctx)
 	bucket := p.storageClient.Bucket("vedit-v1")
@@ -90,6 +81,14 @@ func (p *ProjectServiceServer) cleanupFailedVideoUpload(
 		}
 	}
 	if err := p.queries.DeleteAsset(cleanupCtx, assetID); err != nil {
-		slog.Warn("failed to cleanup failed video asset", "assetID", assetID, "error", err)
+		slog.Warn(
+			"failed to cleanup failed media asset",
+			"mediaType",
+			mediaType,
+			"assetID",
+			assetID,
+			"error",
+			err,
+		)
 	}
 }

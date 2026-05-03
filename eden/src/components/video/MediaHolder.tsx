@@ -3,11 +3,13 @@ import { UploadWizard } from "./UploadWizard";
 
 interface MediaHolderProps {
   projectId: string;
+  mediaType?: "audio" | "video";
   onUploadCompleted: () => void;
 }
 
 export function MediaHolder({
   projectId,
+  mediaType = "video",
   onUploadCompleted,
 }: MediaHolderProps) {
   return (
@@ -15,6 +17,7 @@ export function MediaHolder({
       <CardContent className="space-y-8">
         <UploadWizard
           projectId={projectId}
+          mediaType={mediaType}
           onUploadCompleted={onUploadCompleted}
         />
       </CardContent>

@@ -31,6 +31,7 @@ func (p *ProjectServiceServer) ListProjectAssets(
 	var videos []*v1.MediaVideoMetadata
 	var images []*v1.MediaImageMetadata
 	var textBoxes []*v1.MediaTextMetadata
+	var audios []*v1.MediaAudioMetadata
 
 	for _, a := range assets {
 		switch a.AssetType {
@@ -79,6 +80,17 @@ func (p *ProjectServiceServer) ListProjectAssets(
 				Content: text.Content,
 				Title:   text.DisplayName,
 			})
+		case "audio":
+			audio, err := p.queries.GetAudioById(ctx, a.ID)
+			if err != nil {
+				slog.Error("error fetching audio metadata", "asset_id", a.ID, "error", err)
+				return nil, connect.NewError(connect.CodeInternal, err)
+			}
+			audios = append(audios, &v1.MediaAudioMetadata{
+				AssetId:  audio.AssetID.String(),
+				Title:    audio.DisplayName,
+				Duration: audio.Duration,
+			})
 		}
 	}
 
@@ -86,5 +98,6 @@ func (p *ProjectServiceServer) ListProjectAssets(
 		Videos:    videos,
 		Images:    images,
 		TextBoxes: textBoxes,
+		Audios:    audios,
 	}), nil
 }

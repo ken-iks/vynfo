@@ -23,6 +23,20 @@ type AssetType struct {
 	Name string
 }
 
+type Audio struct {
+	AssetID     uuid.UUID
+	DisplayName string
+	Duration    float64
+}
+
+type Audioframe struct {
+	AudioID             uuid.UUID
+	TimestampInAudio    int64
+	SegmentIdx          int64
+	ByteOffsetInSegment int64
+	SizeInBytes         int64
+}
+
 type Branch struct {
 	ID          uuid.UUID
 	ProjectID   uuid.UUID

@@ -5,12 +5,13 @@ import { useAuth } from "../../providers/AuthProvider";
 import { client } from "@/lib/client";
 import type {
   BranchMetadata,
+  MediaAudioMetadata,
   MediaImageMetadata,
   MediaTextMetadata,
   MediaVideoMetadata,
   ProjectMetadata,
 } from "@/gen/proto/v1/projects_pb";
-import { VideoPlayer } from "../../video/VideoPlayer";
+import { AudioPlayer, VideoPlayer } from "../../video/VideoPlayer";
 import { VideoCanvas } from "../../video/VideoCanvas";
 import { MediaOverlayCanvas } from "../../video/MediaOverlayCanvas";
 import { EmptyVideoPlayer } from "../../video/EmptyVideoPlayer";
@@ -31,7 +32,11 @@ import {
 
 export function ProjectView({ project }: { project: ProjectMetadata }) {
   const [currVideoPlayingSrc, setCurrVideoPlayingSrc] = useState("");
+  const [currAudioPlayingSrc, setCurrAudioPlayingSrc] = useState("");
   const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(
+    null,
+  );
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(
     null,
   );
   const [readyVideoSrc, setReadyVideoSrc] = useState("");
@@ -44,6 +49,9 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
   );
   const [currProjectImages, setCurrProjectImages] = useState<
     MediaImageMetadata[]
+  >([]);
+  const [currProjectAudios, setCurrProjectAudios] = useState<
+    MediaAudioMetadata[]
   >([]);
   const [branches, setBranches] = useState<BranchMetadata[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<string>("");
@@ -58,6 +66,86 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
   const handleVideoReadyToPlay = useCallback(() => {
     setReadyVideoSrc(currVideoPlayingSrc);
   }, [currVideoPlayingSrc]);
+  const audioTimelineTimeSeconds = useCallback(
+    (timelineSeconds: number) => {
+      const timelineMs = BigInt(Math.floor(timelineSeconds * 1000));
+      let audioProgramMs = 0n;
+
+      for (const section of editorStore.audioSections) {
+        const duration = section.endTimeMillis - section.startTimeMillis;
+        if (
+          section.startTimeMillis <= timelineMs &&
+          timelineMs < section.endTimeMillis
+        ) {
+          return (
+            Number(audioProgramMs + (timelineMs - section.startTimeMillis)) /
+            1000
+          );
+        }
+        if (timelineMs >= section.endTimeMillis) {
+          audioProgramMs += duration;
+        }
+      }
+
+      return null;
+    },
+    [editorSnap.audioSections],
+  );
+
+  useEffect(() => {
+    if (!videoElement || !audioElement || currAudioPlayingSrc === "") return;
+
+    const syncAudioToVideo = (forceSeek: boolean) => {
+      audioElement.muted = videoElement.muted;
+      audioElement.volume = videoElement.volume;
+      audioElement.playbackRate = videoElement.playbackRate;
+      const audioTime = audioTimelineTimeSeconds(videoElement.currentTime);
+      if (audioTime === null) {
+        audioElement.pause();
+        return;
+      }
+      if (forceSeek || Math.abs(audioElement.currentTime - audioTime) > 0.5) {
+        audioElement.currentTime = audioTime;
+      }
+      if (videoElement.paused || videoElement.ended) {
+        audioElement.pause();
+        return;
+      }
+      void audioElement.play();
+    };
+
+    const pauseAudio = () => audioElement.pause();
+    // Tiny corrective seeks are audible, so keep hard sync to lifecycle events
+    // and only correct playback drift once it is large enough to matter.
+    const hardSyncAudio = () => syncAudioToVideo(true);
+    const softSyncAudio = () => syncAudioToVideo(false);
+    const intervalId = window.setInterval(softSyncAudio, 1000);
+
+    hardSyncAudio();
+    videoElement.addEventListener("play", hardSyncAudio);
+    videoElement.addEventListener("pause", pauseAudio);
+    videoElement.addEventListener("ended", pauseAudio);
+    videoElement.addEventListener("seeked", hardSyncAudio);
+    videoElement.addEventListener("timeupdate", softSyncAudio);
+    videoElement.addEventListener("ratechange", hardSyncAudio);
+    videoElement.addEventListener("volumechange", softSyncAudio);
+
+    return () => {
+      window.clearInterval(intervalId);
+      videoElement.removeEventListener("play", hardSyncAudio);
+      videoElement.removeEventListener("pause", pauseAudio);
+      videoElement.removeEventListener("ended", pauseAudio);
+      videoElement.removeEventListener("seeked", hardSyncAudio);
+      videoElement.removeEventListener("timeupdate", softSyncAudio);
+      videoElement.removeEventListener("ratechange", hardSyncAudio);
+      videoElement.removeEventListener("volumechange", softSyncAudio);
+    };
+  }, [
+    audioElement,
+    audioTimelineTimeSeconds,
+    currAudioPlayingSrc,
+    videoElement,
+  ]);
 
   const loadBranchIntoEditor = async (branch: BranchMetadata | undefined) => {
     if (branch?.tipCommitId) {
@@ -66,11 +154,17 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
         userId,
         branchId: branch.id,
       });
-      editorStore.loadSections(commit.commitState);
+      editorStore.loadState(commit.commitState);
       setCurrVideoPlayingSrc(`/video?branchId=${branch.id}&userId=${userId}`);
+      setCurrAudioPlayingSrc(
+        commit.commitState?.audioSections.length
+          ? `/video?branchId=${branch.id}&userId=${userId}&audio=1`
+          : "",
+      );
     } else {
-      editorStore.loadSections([]);
+      editorStore.loadState(undefined);
       setCurrVideoPlayingSrc("");
+      setCurrAudioPlayingSrc("");
     }
   };
 
@@ -88,6 +182,7 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
       });
       setCurrProjectVideos(assets.videos);
       setCurrProjectImages(assets.images);
+      setCurrProjectAudios(assets.audios);
       for (const image of assets.images) {
         mediaAssetStore.setImageUrl(image.assetId, image.signedUrl);
       }
@@ -110,8 +205,9 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
         setSelectedBranch(first.name);
         await loadBranchIntoEditor(first);
       } else {
-        editorStore.loadSections([]);
+        editorStore.loadState(undefined);
         setCurrVideoPlayingSrc("");
+        setCurrAudioPlayingSrc("");
       }
     };
     fetchBranches();
@@ -129,12 +225,17 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
           userId,
           projectId: project.id,
           branchId: branch.id,
-          autoSaveState: [...editorStore.sections],
+          autoSaveState: editorStore.currentState(),
         })
         .then(() => {
           if (branch) {
             setCurrVideoPlayingSrc(
               `/video?branchId=${branch.id}&userId=${userId}&v=autosave-${revision}`,
+            );
+            setCurrAudioPlayingSrc(
+              editorStore.audioSections.length
+                ? `/video?branchId=${branch.id}&userId=${userId}&audio=1&v=autosave-${revision}`
+                : "",
             );
           }
         });
@@ -153,6 +254,11 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
     if (branch) {
       setCurrVideoPlayingSrc(
         `/video?branchId=${branch.id}&userId=${userId}&v=${newCommitId}`,
+      );
+      setCurrAudioPlayingSrc(
+        editorStore.audioSections.length
+          ? `/video?branchId=${branch.id}&userId=${userId}&audio=1&v=${newCommitId}`
+          : "",
       );
     }
   };
@@ -181,7 +287,10 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
             projectId={project.id}
             branchName={selectedBranch}
             tipCommitId={selectedBranchMetadata?.tipCommitId}
-            disabled={editorSnap.sections.length === 0}
+            disabled={
+              editorSnap.sections.length === 0 &&
+              editorSnap.audioSections.length === 0
+            }
             onCommitSuccess={handleCommitSuccess}
           />
         </div>
@@ -209,6 +318,12 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
                 ) : null}
                 <VideoCanvas video={videoElement} />
                 <MediaOverlayCanvas />
+                {currAudioPlayingSrc !== "" ? (
+                  <AudioPlayer
+                    src={currAudioPlayingSrc}
+                    ref={setAudioElement}
+                  />
+                ) : null}
               </div>
             ) : (
               <EmptyVideoPlayer />
@@ -220,6 +335,7 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
           <div className="h-96 px-4 py-3">
             <EditorTimeline
               availableVideos={currProjectVideos}
+              availableAudios={currProjectAudios}
               availableImages={currProjectImages}
               availableTexts={currProjectTexts}
             />

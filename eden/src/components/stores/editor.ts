@@ -1,10 +1,13 @@
 import type {
   MediaOverlay,
+  MediaAudioMetadata,
   MediaImageMetadata,
   MediaTextMetadata,
   MediaVideoEffect,
   MediaVideoMetadata,
+  PlaybackAudio,
   PlaybackSection,
+  PlaybackState,
 } from "@/gen/proto/v1/projects_pb";
 import {
   MediaImageOverlaySchema,
@@ -12,7 +15,10 @@ import {
   MediaPositionSchema,
   MediaTextColor,
   MediaTextOverlaySchema,
+  PlaybackAudioSchema,
   PlaybackSectionSchema,
+  PlaybackStateSchema,
+  SectionAudioSchema,
   SectionVideoSchema,
 } from "@/gen/proto/v1/projects_pb";
 import { create } from "@bufbuild/protobuf";
@@ -37,16 +43,23 @@ interface SelectedOverlay {
 
 class EditorStore {
   sections: PlaybackSection[] = [];
+  audioSections: PlaybackAudio[] = [];
   selectedSectionIndex: number | null = null;
+  selectedAudioSectionIndex: number | null = null;
   selectedOverlay: SelectedOverlay | null = null;
   playbackTimeMillis = 0n;
   editRevision = 0;
 
   get totalDurationMillis(): bigint {
-    return this.sections.reduce(
+    const videoDuration = this.sections.reduce(
       (sum, s) => sum + (s.endTimeMillis - s.startTimeMillis),
       0n,
     );
+    const audioDuration = this.audioSections.reduce(
+      (max, s) => (s.endTimeMillis > max ? s.endTimeMillis : max),
+      0n,
+    );
+    return videoDuration > audioDuration ? videoDuration : audioDuration;
   }
 
   get activeSectionIndex(): number | null {
@@ -72,6 +85,13 @@ class EditorStore {
 
   selectSection(index: number | null) {
     this.selectedSectionIndex = index;
+    this.selectedAudioSectionIndex = null;
+    this.selectedOverlay = null;
+  }
+
+  selectAudioSection(index: number | null) {
+    this.selectedAudioSectionIndex = index;
+    this.selectedSectionIndex = null;
     this.selectedOverlay = null;
   }
 
@@ -103,6 +123,28 @@ class EditorStore {
     this.markEdited();
   }
 
+  addAudioAtMillis(insertTimeMillis: bigint, audio: MediaAudioMetadata) {
+    const durationMillis = snap(BigInt(Math.floor(audio.duration * 1000)));
+    if (durationMillis < MIN_DURATION_MS) return false;
+    const start = snap(insertTimeMillis);
+    const section = create(PlaybackAudioSchema, {
+      startTimeMillis: start,
+      endTimeMillis: start + durationMillis,
+      audio: create(SectionAudioSchema, {
+        meta: audio,
+        audioStartTimeMillies: 0n,
+      }),
+    });
+    if (this.audioOverlaps(section, null)) return false;
+    this.audioSections.push(section);
+    this.sortAudioSections();
+    this.selectedAudioSectionIndex = this.audioSections.indexOf(section);
+    this.selectedSectionIndex = null;
+    this.selectedOverlay = null;
+    this.markEdited();
+    return true;
+  }
+
   removeSection(index: number) {
     this.sections.splice(index, 1);
     if (this.selectedSectionIndex === index) {
@@ -126,6 +168,19 @@ class EditorStore {
       };
     }
     this.rippleRecompute();
+    this.markEdited();
+  }
+
+  removeAudioSection(index: number) {
+    this.audioSections.splice(index, 1);
+    if (this.selectedAudioSectionIndex === index) {
+      this.selectedAudioSectionIndex = null;
+    } else if (
+      this.selectedAudioSectionIndex !== null &&
+      this.selectedAudioSectionIndex > index
+    ) {
+      this.selectedAudioSectionIndex -= 1;
+    }
     this.markEdited();
   }
 
@@ -155,6 +210,31 @@ class EditorStore {
     };
     this.sections.splice(index, 1, left, right);
     this.rippleRecompute();
+    this.markEdited();
+  }
+
+  splitAudioSection(index: number, atMillis: bigint) {
+    const section = this.audioSections[index];
+    if (!section) return;
+    if (!section.audio) return;
+    if (atMillis <= section.startTimeMillis) return;
+    if (atMillis >= section.endTimeMillis) return;
+    const splitOffset = atMillis - section.startTimeMillis;
+    const left = {
+      ...section,
+      endTimeMillis: atMillis,
+    };
+    const right = {
+      ...section,
+      startTimeMillis: atMillis,
+      audio: {
+        ...section.audio,
+        audioStartTimeMillies:
+          section.audio.audioStartTimeMillies + splitOffset,
+      },
+    };
+    this.audioSections.splice(index, 1, left, right);
+    this.selectedAudioSectionIndex = index + 1;
     this.markEdited();
   }
 
@@ -194,6 +274,50 @@ class EditorStore {
       endTimeMillis: section.startTimeMillis + duration,
     };
     this.rippleRecompute();
+    this.markEdited();
+  }
+
+  trimAudioStart(
+    index: number,
+    newDurationMs: bigint,
+    newAudioStartMs: bigint,
+  ) {
+    const section = this.audioSections[index];
+    if (!section.audio) return;
+    const sourceMs = sourceDurationMs(section.audio.meta?.duration);
+
+    const audioStart = snap(newAudioStartMs);
+    const duration = snap(newDurationMs);
+    if (audioStart < 0n) return;
+    if (duration < MIN_DURATION_MS) return;
+    if (audioStart + duration > sourceMs) return;
+
+    const nextSection = {
+      ...section,
+      endTimeMillis: section.startTimeMillis + duration,
+      audio: { ...section.audio, audioStartTimeMillies: audioStart },
+    };
+    if (this.audioOverlaps(nextSection, index)) return;
+    this.audioSections[index] = nextSection;
+    this.markEdited();
+  }
+
+  trimAudioEnd(index: number, newDurationMs: bigint) {
+    const section = this.audioSections[index];
+    if (!section.audio) return;
+    const sourceMs = sourceDurationMs(section.audio.meta?.duration);
+    const audioStart = section.audio.audioStartTimeMillies;
+
+    const duration = snap(newDurationMs);
+    if (duration < MIN_DURATION_MS) return;
+    if (audioStart + duration > sourceMs) return;
+
+    const nextSection = {
+      ...section,
+      endTimeMillis: section.startTimeMillis + duration,
+    };
+    if (this.audioOverlaps(nextSection, index)) return;
+    this.audioSections[index] = nextSection;
     this.markEdited();
   }
 
@@ -435,16 +559,39 @@ class EditorStore {
 
   loadSections(sections: PlaybackSection[]) {
     this.sections = sections;
+    this.audioSections = [];
     this.selectedSectionIndex = null;
+    this.selectedAudioSectionIndex = null;
     this.selectedOverlay = null;
     this.playbackTimeMillis = 0n;
     this.rippleRecompute();
     this.editRevision = 0;
   }
 
+  loadState(state: PlaybackState | undefined) {
+    this.sections = state?.videoSections ? [...state.videoSections] : [];
+    this.audioSections = state?.audioSections ? [...state.audioSections] : [];
+    this.sortAudioSections();
+    this.selectedSectionIndex = null;
+    this.selectedAudioSectionIndex = null;
+    this.selectedOverlay = null;
+    this.playbackTimeMillis = 0n;
+    this.rippleRecompute();
+    this.editRevision = 0;
+  }
+
+  currentState(): PlaybackState {
+    return create(PlaybackStateSchema, {
+      videoSections: [...this.sections],
+      audioSections: [...this.audioSections],
+    });
+  }
+
   reset() {
     this.sections = [];
+    this.audioSections = [];
     this.selectedSectionIndex = null;
+    this.selectedAudioSectionIndex = null;
     this.selectedOverlay = null;
     this.playbackTimeMillis = 0n;
     this.editRevision = 0;
@@ -471,6 +618,24 @@ class EditorStore {
       }
       running += duration;
     }
+  }
+
+  private audioOverlaps(section: PlaybackAudio, ignoreIndex: number | null) {
+    return this.audioSections.some((existing, index) => {
+      if (ignoreIndex !== null && index === ignoreIndex) return false;
+      return (
+        section.startTimeMillis < existing.endTimeMillis &&
+        existing.startTimeMillis < section.endTimeMillis
+      );
+    });
+  }
+
+  private sortAudioSections() {
+    this.audioSections.sort((a, b) => {
+      if (a.startTimeMillis < b.startTimeMillis) return -1;
+      if (a.startTimeMillis > b.startTimeMillis) return 1;
+      return 0;
+    });
   }
 }
 

@@ -23,6 +23,7 @@ export type ProjectPage =
   | "list"
   | "view"
   | "uploadVideo"
+  | "uploadAudio"
   | "uploadImage"
   | "uploadText"
   | "spaces"
@@ -124,6 +125,27 @@ export function Projects() {
               projectId={selectedProject.id}
               onUploadCompleted={() =>
                 showUploadNotice("Video upload finished")
+              }
+            />
+          ) : null}
+        </div>
+      );
+    case "uploadAudio":
+      return (
+        <div className="relative h-full">
+          {uploadNoticeElement}
+          <div className="absolute top-2 left-2 z-10">
+            <Button variant="outline" onClick={() => setProjectPage("view")}>
+              <ArrowLeftIcon className="size-4" />
+              Back to Project
+            </Button>
+          </div>
+          {selectedProject ? (
+            <MediaHolder
+              projectId={selectedProject.id}
+              mediaType="audio"
+              onUploadCompleted={() =>
+                showUploadNotice("Audio upload finished")
               }
             />
           ) : null}

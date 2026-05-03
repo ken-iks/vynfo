@@ -45,7 +45,7 @@ export function CommitDialog({
         branchName,
         commitMessage: commitMessage.trim(),
         previousCommitId: tipCommitId,
-        commitState: [...editorStore.sections],
+        commitState: editorStore.currentState(),
         userId,
       });
       if (res.response.case === "newCommitId") {

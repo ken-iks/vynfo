@@ -37,6 +37,29 @@ message UploadVideoResponse {
     }
 }
 
+message UploadAudioRequest {
+    string user_id = 1;
+    string project_id = 2;
+    bytes content = 3;
+    string title = 4;
+}
+
+message UploadAudioProgressIndicator {
+    string audio_id = 1;
+    double completion_percentage = 2;
+}
+
+message UploadAudioFinishedIndicator {
+    string audio_id = 1;
+}
+
+message UploadAudioResponse {
+    oneof upload_status {
+        UploadAudioProgressIndicator ongoing = 1;
+        UploadAudioFinishedIndicator finished = 2;
+    }
+}
+
 // UploadImageRequest will upload image content to storage
 message UploadImageRequest {
     string user_id = 1;
@@ -145,8 +168,13 @@ message PlaybackSection {
 
 message PlaybackAudio {
     uint64 start_time_millis = 1;
-    uint64 end_time_millies = 2;
+    uint64 end_time_millis = 2;
     SectionAudio audio = 3;
+}
+
+message PlaybackState {
+    repeated PlaybackSection video_sections = 1;
+    repeated PlaybackAudio audio_sections = 2;
 }
 
 // PlaybackEditor holds a list of sections controlling the current edited state of
@@ -158,7 +186,7 @@ message CommitEditRequest {
     string branch_name = 2;
     string commit_message = 3;
     optional string previous_commit_id = 4;
-    repeated PlaybackSection commit_state = 5;
+    PlaybackState commit_state = 5;
     string user_id = 6;
 }
 
@@ -176,7 +204,7 @@ message AutoSaveRequest {
     string user_id = 1;
     string project_id = 2;
     string branch_id = 3;
-    repeated PlaybackSection auto_save_state = 4;
+    PlaybackState auto_save_state = 4;
 }
 
 message CommitEditError {
@@ -276,6 +304,7 @@ message ListProjectAssetsResponse {
     repeated MediaVideoMetadata videos = 1;
     repeated MediaImageMetadata images = 2;
     repeated MediaTextMetadata text_boxes = 3;
+    repeated MediaAudioMetadata audios = 4;
 }
 
 // ListProjectBranchesRequest fetches every branch that belongs to a project.
@@ -329,12 +358,13 @@ message GetCommitResponse {
     string commit_id = 1;
     string project_id = 2;
     string message = 3;
-    repeated PlaybackSection commit_state = 4;
+    PlaybackState commit_state = 4;
 }
 
 // ====================== Service Definition ============================== //
 service ProjectService {
     rpc UploadVideo(UploadVideoRequest) returns (stream UploadVideoResponse);
+    rpc UploadAudio(UploadAudioRequest) returns (stream UploadAudioResponse);
     rpc UploadImage(UploadImageRequest) returns (UploadImageResponse);
     rpc UploadText(UploadTextRequest) returns (UploadTextResponse);
     rpc CommitEdit(CommitEditRequest) returns (CommitEditResponse);

@@ -68,3 +68,31 @@ export const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(
     );
   },
 );
+
+type AudioPlayerProps = {
+  src: string;
+};
+
+export const AudioPlayer = forwardRef<HTMLAudioElement, AudioPlayerProps>(
+  function AudioPlayer({ src }, ref) {
+    const audioRef = useRef<HTMLAudioElement>(null);
+    useImperativeHandle(ref, () => audioRef.current!, []);
+
+    useEffect(() => {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(src);
+        hls.attachMedia(audio);
+
+        return () => hls.destroy();
+      } else if (audio.canPlayType("application/vnd.apple.mpegurl")) {
+        audio.src = src;
+      }
+    }, [src]);
+
+    return <audio ref={audioRef} className="hidden" />;
+  },
+);
