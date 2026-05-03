@@ -1977,6 +1977,7 @@ type ProjectMetadata struct {
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	WorkspaceId   string                 `protobuf:"bytes,5,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2039,9 +2040,17 @@ func (x *ProjectMetadata) GetCreatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *ProjectMetadata) GetWorkspaceId() string {
+	if x != nil {
+		return x.WorkspaceId
+	}
+	return ""
+}
+
 // ListProjectsRequest fetches all projects belonging to a given user.
 type ListProjectsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	WorkspaceId   string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2074,6 +2083,13 @@ func (x *ListProjectsRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ListProjectsRequest.ProtoReflect.Descriptor instead.
 func (*ListProjectsRequest) Descriptor() ([]byte, []int) {
 	return file_proto_v1_projects_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *ListProjectsRequest) GetWorkspaceId() string {
+	if x != nil {
+		return x.WorkspaceId
+	}
+	return ""
 }
 
 // ListProjectsResponse returns the set of projects owned by the requesting user.
@@ -2653,6 +2669,7 @@ type CreateProjectRequest struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	ProjectName        string                 `protobuf:"bytes,1,opt,name=project_name,json=projectName,proto3" json:"project_name,omitempty"`
 	ProjectDescription string                 `protobuf:"bytes,2,opt,name=project_description,json=projectDescription,proto3" json:"project_description,omitempty"`
+	WorkspaceId        string                 `protobuf:"bytes,3,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -2697,6 +2714,13 @@ func (x *CreateProjectRequest) GetProjectName() string {
 func (x *CreateProjectRequest) GetProjectDescription() string {
 	if x != nil {
 		return x.ProjectDescription
+	}
+	return ""
+}
+
+func (x *CreateProjectRequest) GetWorkspaceId() string {
+	if x != nil {
+		return x.WorkspaceId
 	}
 	return ""
 }
@@ -3088,14 +3112,16 @@ const file_proto_v1_projects_proto_rawDesc = "" +
 	"\x10SaturationEffect\x12\x1a\n" +
 	"\bstrength\x18\x01 \x01(\x01R\bstrength\".\n" +
 	"\x10BrightnessEffect\x12\x1a\n" +
-	"\bstrength\x18\x01 \x01(\x01R\bstrength\"\x92\x01\n" +
+	"\bstrength\x18\x01 \x01(\x01R\bstrength\"\xb5\x01\n" +
 	"\x0fProjectMetadata\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x129\n" +
 	"\n" +
-	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\x15\n" +
-	"\x13ListProjectsRequest\"\xa6\x01\n" +
+	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12!\n" +
+	"\fworkspace_id\x18\x05 \x01(\tR\vworkspaceId\"8\n" +
+	"\x13ListProjectsRequest\x12!\n" +
+	"\fworkspace_id\x18\x01 \x01(\tR\vworkspaceId\"\xa6\x01\n" +
 	"\x14ListProjectsResponse\x12G\n" +
 	"\x15user_created_projects\x18\x01 \x03(\v2\x13.v1.ProjectMetadataR\x13userCreatedProjects\x12E\n" +
 	"\x14user_member_projects\x18\x02 \x03(\v2\x13.v1.ProjectMetadataR\x12userMemberProjects\"9\n" +
@@ -3135,10 +3161,11 @@ const file_proto_v1_projects_proto_rawDesc = "" +
 	"\x02id\x18\x03 \x01(\tR\x02idB\x10\n" +
 	"\x0e_tip_commit_id\"M\n" +
 	"\x1bListProjectBranchesResponse\x12.\n" +
-	"\bbranches\x18\x01 \x03(\v2\x12.v1.BranchMetadataR\bbranches\"j\n" +
+	"\bbranches\x18\x01 \x03(\v2\x12.v1.BranchMetadataR\bbranches\"\x8d\x01\n" +
 	"\x14CreateProjectRequest\x12!\n" +
 	"\fproject_name\x18\x01 \x01(\tR\vprojectName\x12/\n" +
-	"\x13project_description\x18\x02 \x01(\tR\x12projectDescription\"E\n" +
+	"\x13project_description\x18\x02 \x01(\tR\x12projectDescription\x12!\n" +
+	"\fworkspace_id\x18\x03 \x01(\tR\vworkspaceId\"E\n" +
 	"\x15CreateProjectResponse\x12,\n" +
 	"\x12created_project_id\x18\x01 \x01(\tR\x10createdProjectId\"O\n" +
 	"\x15AddProjectUserRequest\x12\x1d\n" +

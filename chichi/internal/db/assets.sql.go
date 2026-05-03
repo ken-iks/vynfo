@@ -11,21 +11,36 @@ import (
 	"github.com/google/uuid"
 )
 
+const addProjectAsset = `-- name: AddProjectAsset :exec
+INSERT INTO project_assets (project_id, asset_id) VALUES ($1, $2)
+ON CONFLICT (project_id, asset_id) DO NOTHING
+`
+
+type AddProjectAssetParams struct {
+	ProjectID uuid.UUID
+	AssetID   uuid.UUID
+}
+
+func (q *Queries) AddProjectAsset(ctx context.Context, arg AddProjectAssetParams) error {
+	_, err := q.db.ExecContext(ctx, addProjectAsset, arg.ProjectID, arg.AssetID)
+	return err
+}
+
 const createAsset = `-- name: CreateAsset :one
-INSERT INTO assets (project_id, asset_type) VALUES ($1, $2) RETURNING id, project_id, asset_type, created_at
+INSERT INTO assets (workspace_id, asset_type) VALUES ($1, $2) RETURNING id, workspace_id, asset_type, created_at
 `
 
 type CreateAssetParams struct {
-	ProjectID uuid.UUID
-	AssetType string
+	WorkspaceID uuid.UUID
+	AssetType   string
 }
 
 func (q *Queries) CreateAsset(ctx context.Context, arg CreateAssetParams) (Asset, error) {
-	row := q.db.QueryRowContext(ctx, createAsset, arg.ProjectID, arg.AssetType)
+	row := q.db.QueryRowContext(ctx, createAsset, arg.WorkspaceID, arg.AssetType)
 	var i Asset
 	err := row.Scan(
 		&i.ID,
-		&i.ProjectID,
+		&i.WorkspaceID,
 		&i.AssetType,
 		&i.CreatedAt,
 	)
@@ -42,7 +57,10 @@ func (q *Queries) DeleteAsset(ctx context.Context, id uuid.UUID) error {
 }
 
 const getProjectAssets = `-- name: GetProjectAssets :many
-SELECT id, project_id, asset_type, created_at FROM assets WHERE project_id = $1 ORDER BY created_at
+SELECT assets.id, assets.workspace_id, assets.asset_type, assets.created_at FROM assets
+JOIN project_assets ON project_assets.asset_id = assets.id
+WHERE project_assets.project_id = $1
+ORDER BY assets.created_at
 `
 
 func (q *Queries) GetProjectAssets(ctx context.Context, projectID uuid.UUID) ([]Asset, error) {
@@ -56,7 +74,39 @@ func (q *Queries) GetProjectAssets(ctx context.Context, projectID uuid.UUID) ([]
 		var i Asset
 		if err := rows.Scan(
 			&i.ID,
-			&i.ProjectID,
+			&i.WorkspaceID,
+			&i.AssetType,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getWorkspaceAssets = `-- name: GetWorkspaceAssets :many
+SELECT id, workspace_id, asset_type, created_at FROM assets WHERE workspace_id = $1 ORDER BY created_at
+`
+
+func (q *Queries) GetWorkspaceAssets(ctx context.Context, workspaceID uuid.UUID) ([]Asset, error) {
+	rows, err := q.db.QueryContext(ctx, getWorkspaceAssets, workspaceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Asset
+	for rows.Next() {
+		var i Asset
+		if err := rows.Scan(
+			&i.ID,
+			&i.WorkspaceID,
 			&i.AssetType,
 			&i.CreatedAt,
 		); err != nil {

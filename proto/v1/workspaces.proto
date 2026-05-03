@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = "vynfo.com/vynfo/gen/proto/v1";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+message Workspace {
+    string workspace_id = 1;
+    string name = 2;
+    google.protobuf.Timestamp created_at = 3;
+}
+
+message CreateWorkspaceRequest {
+    string name = 1;
+}
+
+message CreateWorkspaceResponse {
+    string workspace_id = 1;
+}
+
+message GetWorkspaceRequest {
+    string workspace_id = 1;
+}
+
+message GetWorkspaceResponse {
+    Workspace workspace = 1;
+}
+
+message ListWorkspacesRequest {}
+
+message ListWorkspacesResponse {
+    repeated Workspace workspaces = 1;
+}
+
+message AddWorkspaceUserRequest {
+    string workspace_id = 1;
+    string user_id = 2;
+}
+
+service WorkspacesService {
+    rpc CreateWorkspace(CreateWorkspaceRequest) returns (CreateWorkspaceResponse);
+    rpc GetWorkspace(GetWorkspaceRequest) returns (GetWorkspaceResponse);
+    rpc ListWorkspaces(ListWorkspacesRequest) returns (ListWorkspacesResponse);
+    rpc AddWorkspaceUser(AddWorkspaceUserRequest) returns (google.protobuf.Empty);
+}

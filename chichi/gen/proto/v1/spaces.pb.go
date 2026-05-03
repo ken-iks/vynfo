@@ -29,7 +29,7 @@ const (
 type ProjectSpace struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	SpaceId       string                 `protobuf:"bytes,1,opt,name=space_id,json=spaceId,proto3" json:"space_id,omitempty"`
-	ProjectId     string                 `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	WorkspaceId   string                 `protobuf:"bytes,2,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	AdminUserId   string                 `protobuf:"bytes,3,opt,name=admin_user_id,json=adminUserId,proto3" json:"admin_user_id,omitempty"`
 	Users         []*User                `protobuf:"bytes,4,rep,name=users,proto3" json:"users,omitempty"`
 	Name          string                 `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
@@ -74,9 +74,9 @@ func (x *ProjectSpace) GetSpaceId() string {
 	return ""
 }
 
-func (x *ProjectSpace) GetProjectId() string {
+func (x *ProjectSpace) GetWorkspaceId() string {
 	if x != nil {
-		return x.ProjectId
+		return x.WorkspaceId
 	}
 	return ""
 }
@@ -106,7 +106,7 @@ func (x *ProjectSpace) GetName() string {
 // The requesting user_id becomes the admin of the newly created space
 type CreateSpaceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ProjectId     string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	WorkspaceId   string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -142,9 +142,9 @@ func (*CreateSpaceRequest) Descriptor() ([]byte, []int) {
 	return file_proto_v1_spaces_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *CreateSpaceRequest) GetProjectId() string {
+func (x *CreateSpaceRequest) GetWorkspaceId() string {
 	if x != nil {
-		return x.ProjectId
+		return x.WorkspaceId
 	}
 	return ""
 }
@@ -257,7 +257,7 @@ func (x *AddSpaceUserRequest) GetUserId() string {
 // A ListSpacesRequest returns all spaces that exist under a given project
 type ListSpacesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ProjectId     string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	WorkspaceId   string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -292,9 +292,9 @@ func (*ListSpacesRequest) Descriptor() ([]byte, []int) {
 	return file_proto_v1_spaces_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *ListSpacesRequest) GetProjectId() string {
+func (x *ListSpacesRequest) GetWorkspaceId() string {
 	if x != nil {
-		return x.ProjectId
+		return x.WorkspaceId
 	}
 	return ""
 }
@@ -867,26 +867,23 @@ var File_proto_v1_spaces_proto protoreflect.FileDescriptor
 
 const file_proto_v1_spaces_proto_rawDesc = "" +
 	"\n" +
-	"\x15proto/v1/spaces.proto\x12\x02v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x14proto/v1/users.proto\"\xa0\x01\n" +
+	"\x15proto/v1/spaces.proto\x12\x02v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x14proto/v1/users.proto\"\xa4\x01\n" +
 	"\fProjectSpace\x12\x19\n" +
-	"\bspace_id\x18\x01 \x01(\tR\aspaceId\x12\x1d\n" +
-	"\n" +
-	"project_id\x18\x02 \x01(\tR\tprojectId\x12\"\n" +
+	"\bspace_id\x18\x01 \x01(\tR\aspaceId\x12!\n" +
+	"\fworkspace_id\x18\x02 \x01(\tR\vworkspaceId\x12\"\n" +
 	"\radmin_user_id\x18\x03 \x01(\tR\vadminUserId\x12\x1e\n" +
 	"\x05users\x18\x04 \x03(\v2\b.v1.UserR\x05users\x12\x12\n" +
-	"\x04name\x18\x05 \x01(\tR\x04name\"G\n" +
-	"\x12CreateSpaceRequest\x12\x1d\n" +
-	"\n" +
-	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x12\n" +
+	"\x04name\x18\x05 \x01(\tR\x04name\"K\n" +
+	"\x12CreateSpaceRequest\x12!\n" +
+	"\fworkspace_id\x18\x01 \x01(\tR\vworkspaceId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\"?\n" +
 	"\x13CreateSpaceResponse\x12(\n" +
 	"\x10created_space_id\x18\x01 \x01(\tR\x0ecreatedSpaceId\"I\n" +
 	"\x13AddSpaceUserRequest\x12\x19\n" +
 	"\bspace_id\x18\x01 \x01(\tR\aspaceId\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\"2\n" +
-	"\x11ListSpacesRequest\x12\x1d\n" +
-	"\n" +
-	"project_id\x18\x01 \x01(\tR\tprojectId\"\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"6\n" +
+	"\x11ListSpacesRequest\x12!\n" +
+	"\fworkspace_id\x18\x01 \x01(\tR\vworkspaceId\"\x17\n" +
 	"\x15ListUserSpacesRequest\">\n" +
 	"\x12ListSpacesResponse\x12(\n" +
 	"\x06spaces\x18\x01 \x03(\v2\x10.v1.ProjectSpaceR\x06spaces\"J\n" +

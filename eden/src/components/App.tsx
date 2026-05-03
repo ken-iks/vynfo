@@ -1,9 +1,13 @@
 import { Projects } from "./projects/Projects";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import { AppLayout } from "./AppLayout.tsx";
 import { CompleteOnboarding } from "./auth/CompleteOnboarding";
 import { SignIn } from "./auth/SignIn";
 import { AuthProvider, useAuthContext } from "./providers/AuthProvider";
 import { ThemeProvider } from "./providers/ThemeProvider";
-import { ThemeToggle } from "./shared/ThemeToggle";
+import { WorkspaceProvider } from "./providers/WorkspaceProvider.tsx";
+import { Settings } from "./settings/Settings.tsx";
+import { Spaces, SpaceRoute } from "./spaces/Spaces.tsx";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
@@ -66,15 +70,20 @@ function AppShell() {
   if (needsOnboarding) return <CompleteOnboarding />;
 
   return (
-    <>
-      <div className="fixed bottom-2 right-2 z-50 flex items-center gap-2">
-        <ThemeToggle />
-        <Button size="sm" variant="outline" onClick={signOut}>
-          Sign out
-        </Button>
-      </div>
-      <Projects />
-    </>
+    <WorkspaceProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<AppLayout onSignOut={signOut} />}>
+            <Route path="/" element={<Navigate to="/projects" replace />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/spaces" element={<Spaces />} />
+            <Route path="/spaces/:spaceId" element={<SpaceRoute />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="*" element={<Navigate to="/projects" replace />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </WorkspaceProvider>
   );
 }
 

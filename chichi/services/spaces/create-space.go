@@ -21,9 +21,9 @@ func (s *SpacesServiceServer) CreateSpace(
 	if err != nil {
 		return nil, err
 	}
-	projectId, err := uuid.Parse(req.Msg.GetProjectId())
+	workspaceId, err := uuid.Parse(req.Msg.GetWorkspaceId())
 	if err != nil {
-		slog.Error("error parsing project id", "error", err)
+		slog.Error("error parsing workspace id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	name := strings.TrimSpace(req.Msg.GetName())
@@ -43,9 +43,9 @@ func (s *SpacesServiceServer) CreateSpace(
 	q := s.queries.WithTx(tx)
 
 	space, err := q.CreateSpace(ctx, db.CreateSpaceParams{
-		ProjectID: projectId,
-		AdminID:   user.ID,
-		Name:      name,
+		WorkspaceID: workspaceId,
+		AdminID:     user.ID,
+		Name:        name,
 	})
 	if err != nil {
 		slog.Error("error creating space row", "error", err)

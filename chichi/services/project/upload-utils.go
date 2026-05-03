@@ -7,6 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"vynfo.com/vynfo/internal/db"
 	vid "vynfo.com/vynfo/video"
 )
 
@@ -65,6 +66,33 @@ func (p *ProjectServiceServer) uploadSegments(
 		return uploadedObjects, connect.NewError(connect.CodeInternal, uploadErr)
 	}
 	return uploadedObjects, nil
+}
+
+func createProjectAsset(
+	ctx context.Context,
+	q *db.Queries,
+	projectID uuid.UUID,
+	assetType string,
+) (db.Asset, error) {
+	project, err := q.GetProject(ctx, projectID)
+	if err != nil {
+		return db.Asset{}, err
+	}
+	asset, err := q.CreateAsset(ctx, db.CreateAssetParams{
+		WorkspaceID: project.WorkspaceID,
+		AssetType:   assetType,
+	})
+	if err != nil {
+		return db.Asset{}, err
+	}
+	if err := q.AddProjectAsset(ctx, db.AddProjectAssetParams{
+		ProjectID: project.ID,
+		AssetID:   asset.ID,
+	}); err != nil {
+		_ = q.DeleteAsset(ctx, asset.ID)
+		return db.Asset{}, err
+	}
+	return asset, nil
 }
 
 func (p *ProjectServiceServer) cleanupFailedMediaUpload(

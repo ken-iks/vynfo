@@ -13,15 +13,15 @@ func (s *SpacesServiceServer) ListSpaces(
 	ctx context.Context,
 	req *connect.Request[v1.ListSpacesRequest],
 ) (*connect.Response[v1.ListSpacesResponse], error) {
-	projectId, err := uuid.Parse(req.Msg.GetProjectId())
+	workspaceId, err := uuid.Parse(req.Msg.GetWorkspaceId())
 	if err != nil {
-		slog.Error("error parsing project id", "error", err)
+		slog.Error("error parsing workspace id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	rows, err := s.queries.GetProjectSpacesWithMembers(ctx, projectId)
+	rows, err := s.queries.GetWorkspaceSpacesWithMembers(ctx, workspaceId)
 	if err != nil {
-		slog.Error("error fetching project spaces", "error", err)
+		slog.Error("error fetching workspace spaces", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -32,7 +32,7 @@ func (s *SpacesServiceServer) ListSpaces(
 		if !ok {
 			space = &v1.ProjectSpace{
 				SpaceId:     row.SpaceID.String(),
-				ProjectId:   row.ProjectID.String(),
+				WorkspaceId: row.WorkspaceID.String(),
 				AdminUserId: row.AdminID.String(),
 				Name:        row.Name,
 				Users:       make([]*v1.User, 0),

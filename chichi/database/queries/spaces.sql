@@ -1,36 +1,38 @@
--- name: GetProjectSpaces :many
-SELECT * FROM spaces WHERE project_id = $1 ORDER BY created_at DESC;
+-- name: GetWorkspaceSpaces :many
+SELECT * FROM spaces WHERE workspace_id = $1 ORDER BY updated_at DESC;
 
--- name: GetProjectSpacesWithMembers :many
+-- name: GetWorkspaceSpacesWithMembers :many
 SELECT
-    s.id AS space_id,
-    s.project_id,
+    s.id space_id,
+    s.workspace_id,
     s.admin_id,
     s.name,
     s.created_at,
-    u.id AS member_id,
-    u.email AS member_email
+    s.updated_at,
+    u.id member_id,
+    u.email member_email
 FROM spaces s
 LEFT JOIN space_members sm ON sm.space_id = s.id
 LEFT JOIN users u ON u.id = sm.member_id
-WHERE s.project_id = $1
-ORDER BY s.created_at DESC, u.email;
+WHERE s.workspace_id = $1
+ORDER BY s.updated_at DESC, u.email;
 
 -- name: GetUserSpacesWithMembers :many
 SELECT
-    s.id AS space_id,
-    s.project_id,
+    s.id space_id,
+    s.workspace_id,
     s.admin_id,
     s.name,
     s.created_at,
-    u.id AS member_id,
-    u.email AS member_email
+    s.updated_at,
+    u.id member_id,
+    u.email member_email
 FROM spaces s
 JOIN space_members requested_member ON requested_member.space_id = s.id
 LEFT JOIN space_members sm ON sm.space_id = s.id
 LEFT JOIN users u ON u.id = sm.member_id
 WHERE requested_member.member_id = $1
-ORDER BY s.created_at DESC, u.email;
+ORDER BY s.updated_at DESC, u.email;
 
 -- name: GetUserSpaces :many
 SELECT * FROM spaces WHERE id IN (
@@ -60,10 +62,13 @@ ORDER BY m.created_at;
 SELECT pg_notify('space_change', @space_id::TEXT);
 
 -- name: CreateSpace :one
-INSERT INTO spaces (project_id, admin_id, name) VALUES ($1, $2, $3) RETURNING *;
+INSERT INTO spaces (workspace_id, admin_id, name) VALUES ($1, $2, $3) RETURNING *;
 
 -- name: GetSpace :one
 SELECT * FROM spaces WHERE id = $1;
+
+-- name: TouchSpace :exec
+UPDATE spaces SET updated_at = NOW() WHERE id = $1;
 
 -- name: AddSpaceMember :exec
 INSERT INTO space_members (space_id, member_id) VALUES ($1, $2)

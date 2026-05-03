@@ -240,10 +240,12 @@ message ProjectMetadata {
     string name = 2;
     string description = 3;
     google.protobuf.Timestamp created_at = 4;
+    string workspace_id = 5;
 }
 
 // ListProjectsRequest fetches all projects belonging to a given user.
 message ListProjectsRequest {
+    string workspace_id = 1;
 }
 
 // ListProjectsResponse returns the set of projects owned by the requesting user.
@@ -319,6 +321,7 @@ message ListProjectBranchesResponse {
 message CreateProjectRequest {
     string project_name = 1;
     string project_description = 2;
+    string workspace_id = 3;
 }
 
 message CreateProjectResponse {

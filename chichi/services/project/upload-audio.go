@@ -54,10 +54,7 @@ func (p *ProjectServiceServer) UploadAudio(
 		totalSegments = 1
 	}
 
-	asset, err := p.queries.CreateAsset(ctx, db.CreateAssetParams{
-		ProjectID: projectID,
-		AssetType: "audio",
-	})
+	asset, err := createProjectAsset(ctx, p.queries, projectID, "audio")
 	if err != nil {
 		slog.Error("error creating asset", "error", err)
 		return connect.NewError(connect.CodeInternal, err)

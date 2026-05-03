@@ -27,20 +27,27 @@ func (q *Queries) AddProjectMember(ctx context.Context, arg AddProjectMemberPara
 }
 
 const createProject = `-- name: CreateProject :one
-INSERT INTO projects (user_id, project_name, project_description) VALUES ($1, $2, $3) RETURNING id, user_id, project_name, project_description, created_at, main_branch_id
+INSERT INTO projects (workspace_id, user_id, project_name, project_description) VALUES ($1, $2, $3, $4) RETURNING id, workspace_id, user_id, project_name, project_description, created_at, main_branch_id
 `
 
 type CreateProjectParams struct {
+	WorkspaceID        uuid.UUID
 	UserID             uuid.UUID
 	ProjectName        string
 	ProjectDescription string
 }
 
 func (q *Queries) CreateProject(ctx context.Context, arg CreateProjectParams) (Project, error) {
-	row := q.db.QueryRowContext(ctx, createProject, arg.UserID, arg.ProjectName, arg.ProjectDescription)
+	row := q.db.QueryRowContext(ctx, createProject,
+		arg.WorkspaceID,
+		arg.UserID,
+		arg.ProjectName,
+		arg.ProjectDescription,
+	)
 	var i Project
 	err := row.Scan(
 		&i.ID,
+		&i.WorkspaceID,
 		&i.UserID,
 		&i.ProjectName,
 		&i.ProjectDescription,
@@ -68,7 +75,7 @@ func (q *Queries) DeleteProject(ctx context.Context, arg DeleteProjectParams) (i
 }
 
 const getProject = `-- name: GetProject :one
-SELECT id, user_id, project_name, project_description, created_at, main_branch_id FROM projects WHERE id = $1
+SELECT id, workspace_id, user_id, project_name, project_description, created_at, main_branch_id FROM projects WHERE id = $1
 `
 
 func (q *Queries) GetProject(ctx context.Context, id uuid.UUID) (Project, error) {
@@ -76,6 +83,7 @@ func (q *Queries) GetProject(ctx context.Context, id uuid.UUID) (Project, error)
 	var i Project
 	err := row.Scan(
 		&i.ID,
+		&i.WorkspaceID,
 		&i.UserID,
 		&i.ProjectName,
 		&i.ProjectDescription,
@@ -85,12 +93,15 @@ func (q *Queries) GetProject(ctx context.Context, id uuid.UUID) (Project, error)
 	return i, err
 }
 
-const getUserCreatedProjects = `-- name: GetUserCreatedProjects :many
-SELECT id, user_id, project_name, project_description, created_at, main_branch_id FROM projects WHERE user_id = $1 ORDER BY created_at
+const getUserMemberProjects = `-- name: GetUserMemberProjects :many
+SELECT projects.id, projects.workspace_id, projects.user_id, projects.project_name, projects.project_description, projects.created_at, projects.main_branch_id FROM projects
+JOIN project_members ON project_members.project_id = projects.id
+WHERE project_members.member_id = $1 AND projects.user_id <> $1
+ORDER BY projects.created_at
 `
 
-func (q *Queries) GetUserCreatedProjects(ctx context.Context, userID uuid.UUID) ([]Project, error) {
-	rows, err := q.db.QueryContext(ctx, getUserCreatedProjects, userID)
+func (q *Queries) GetUserMemberProjects(ctx context.Context, memberID uuid.UUID) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, getUserMemberProjects, memberID)
 	if err != nil {
 		return nil, err
 	}
@@ -100,6 +111,7 @@ func (q *Queries) GetUserCreatedProjects(ctx context.Context, userID uuid.UUID) 
 		var i Project
 		if err := rows.Scan(
 			&i.ID,
+			&i.WorkspaceID,
 			&i.UserID,
 			&i.ProjectName,
 			&i.ProjectDescription,
@@ -119,15 +131,12 @@ func (q *Queries) GetUserCreatedProjects(ctx context.Context, userID uuid.UUID) 
 	return items, nil
 }
 
-const getUserMemberProjects = `-- name: GetUserMemberProjects :many
-SELECT projects.id, projects.user_id, projects.project_name, projects.project_description, projects.created_at, projects.main_branch_id FROM projects
-JOIN project_members ON project_members.project_id = projects.id
-WHERE project_members.member_id = $1 AND projects.user_id <> $1
-ORDER BY projects.created_at
+const getWorkspaceProjects = `-- name: GetWorkspaceProjects :many
+SELECT id, workspace_id, user_id, project_name, project_description, created_at, main_branch_id FROM projects WHERE workspace_id = $1 ORDER BY created_at
 `
 
-func (q *Queries) GetUserMemberProjects(ctx context.Context, memberID uuid.UUID) ([]Project, error) {
-	rows, err := q.db.QueryContext(ctx, getUserMemberProjects, memberID)
+func (q *Queries) GetWorkspaceProjects(ctx context.Context, workspaceID uuid.UUID) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, getWorkspaceProjects, workspaceID)
 	if err != nil {
 		return nil, err
 	}
@@ -137,6 +146,7 @@ func (q *Queries) GetUserMemberProjects(ctx context.Context, memberID uuid.UUID)
 		var i Project
 		if err := rows.Scan(
 			&i.ID,
+			&i.WorkspaceID,
 			&i.UserID,
 			&i.ProjectName,
 			&i.ProjectDescription,
@@ -157,7 +167,7 @@ func (q *Queries) GetUserMemberProjects(ctx context.Context, memberID uuid.UUID)
 }
 
 const setMainBranch = `-- name: SetMainBranch :one
-UPDATE projects SET main_branch_id = $1 WHERE id = $2 RETURNING id, user_id, project_name, project_description, created_at, main_branch_id
+UPDATE projects SET main_branch_id = $1 WHERE id = $2 RETURNING id, workspace_id, user_id, project_name, project_description, created_at, main_branch_id
 `
 
 type SetMainBranchParams struct {
@@ -170,6 +180,7 @@ func (q *Queries) SetMainBranch(ctx context.Context, arg SetMainBranchParams) (P
 	var i Project
 	err := row.Scan(
 		&i.ID,
+		&i.WorkspaceID,
 		&i.UserID,
 		&i.ProjectName,
 		&i.ProjectDescription,

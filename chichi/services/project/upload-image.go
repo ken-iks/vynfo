@@ -42,10 +42,7 @@ func (p *ProjectServiceServer) UploadImage(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	asset, err := q.CreateAsset(ctx, db.CreateAssetParams{
-		ProjectID: projectID,
-		AssetType: "photo",
-	})
+	asset, err := createProjectAsset(ctx, q, projectID, "photo")
 	if err != nil {
 		slog.Error("error creating asset", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)

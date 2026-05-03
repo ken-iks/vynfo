@@ -79,6 +79,10 @@ func (s *SpacesServiceServer) SendSpaceMessage(
 		sentMessageId = row.ID
 	}
 
+	if err := q.TouchSpace(ctx, spaceId); err != nil {
+		slog.Error("error touching space updated_at", "error", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
 	if err := q.TriggerSpaceNotification(ctx, spaceId.String()); err != nil {
 		slog.Error("error triggering space notification", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)

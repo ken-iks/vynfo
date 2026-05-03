@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuthContext } from "../../providers/AuthProvider";
+import { useWorkspaceContext } from "../../providers/WorkspaceProvider";
 import { client } from "../../../lib/client";
 import type { ProjectMetadata } from "../../../gen/proto/v1/projects_pb";
 import type { User } from "../../../gen/proto/v1/users_pb";
@@ -24,6 +25,7 @@ interface ProjectsListProps {
 
 export function ProjectsList({ onSelect }: ProjectsListProps) {
   const { userId, users } = useAuthContext();
+  const { currentWorkspaceId } = useWorkspaceContext();
   const [userCreatedProjects, setUserCreatedProjects] = useState<
     ProjectMetadata[]
   >([]);
@@ -33,19 +35,28 @@ export function ProjectsList({ onSelect }: ProjectsListProps) {
   const [addingMemberId, setAddingMemberId] = useState("");
   const [deletingProjectId, setDeletingProjectId] = useState("");
 
-  const fetchProjects = async () => {
-    const projects = await client.listProjects({});
+  const fetchProjects = async (workspaceId: string) => {
+    const projects = await client.listProjects({ workspaceId });
     setUserCreatedProjects(projects.userCreatedProjects);
     setUserMemberProjects(projects.userMemberProjects);
     return projects.userCreatedProjects;
   };
 
   useEffect(() => {
-    fetchProjects();
-  }, [userId]);
+    const loadWorkspaceProjects = async () => {
+      if (!currentWorkspaceId) {
+        setUserCreatedProjects([]);
+        setUserMemberProjects([]);
+        return;
+      }
+      await fetchProjects(currentWorkspaceId);
+    };
+    loadWorkspaceProjects();
+  }, [currentWorkspaceId, userId]);
 
   const handleProjectCreated = async (projectId: string) => {
-    const projects = await fetchProjects();
+    if (!currentWorkspaceId) return;
+    const projects = await fetchProjects(currentWorkspaceId);
     const created = projects.find((p) => p.id === projectId);
     if (created) onSelect(created);
   };
@@ -72,7 +83,9 @@ export function ProjectsList({ onSelect }: ProjectsListProps) {
       await client.deleteProject({
         projectId: project.id,
       });
-      await fetchProjects();
+      if (currentWorkspaceId) {
+        await fetchProjects(currentWorkspaceId);
+      }
     } catch (err) {
       console.error("failed to delete project", err);
       throw err;
@@ -86,7 +99,10 @@ export function ProjectsList({ onSelect }: ProjectsListProps) {
       <div className="mb-2 flex items-center justify-between">
         <SectionTitle>Projects</SectionTitle>
         <div className="flex items-center gap-2">
-          <CreateProjectDialog onCreated={handleProjectCreated} />
+          <CreateProjectDialog
+            workspaceId={currentWorkspaceId}
+            onCreated={handleProjectCreated}
+          />
         </div>
       </div>
       <div className="space-y-6">

@@ -151,6 +151,22 @@ run sqlc, and report that sqlc represents `tip_commit_id` as nullable because
 the column is nullable.
 ```
 
+### 7. Explicitly cd before running terminal commands
+
+Do not run any terminal command unless the command itself first changes into the exact directory where it should run.
+
+- Use `cd <directory> && <command>` so the command's working directory is visible in the terminal history.
+- Do not rely on the terminal's current directory, the workspace root, or tool-level working directory settings.
+- Pick the narrowest correct directory for the command, such as `eden` for frontend package commands or `chichi` for backend commands.
+
+### 8. Never run pnpm commands
+
+Do not run `pnpm` commands for any reason.
+
+- If a dependency, shadcn component, package script, install, remove, update, format, lint, dev server, build, codegen, or other `pnpm` command seems necessary, stop and tell the user what command they need to run.
+- Do not substitute `npm`, `yarn`, `npx`, `corepack`, or another package-manager command for `pnpm`.
+- After the user runs the command, continue from the resulting files.
+
 <!--
 To add another rule, append:
 

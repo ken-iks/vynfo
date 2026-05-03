@@ -99,120 +99,31 @@ func (q *Queries) AddSpaceMember(ctx context.Context, arg AddSpaceMemberParams) 
 }
 
 const createSpace = `-- name: CreateSpace :one
-INSERT INTO spaces (project_id, admin_id, name) VALUES ($1, $2, $3) RETURNING id, project_id, admin_id, name, created_at
+INSERT INTO spaces (workspace_id, admin_id, name) VALUES ($1, $2, $3) RETURNING id, admin_id, name, workspace_id, created_at, updated_at
 `
 
 type CreateSpaceParams struct {
-	ProjectID uuid.UUID
-	AdminID   uuid.UUID
-	Name      string
+	WorkspaceID uuid.UUID
+	AdminID     uuid.UUID
+	Name        string
 }
 
 func (q *Queries) CreateSpace(ctx context.Context, arg CreateSpaceParams) (Space, error) {
-	row := q.db.QueryRowContext(ctx, createSpace, arg.ProjectID, arg.AdminID, arg.Name)
+	row := q.db.QueryRowContext(ctx, createSpace, arg.WorkspaceID, arg.AdminID, arg.Name)
 	var i Space
 	err := row.Scan(
 		&i.ID,
-		&i.ProjectID,
 		&i.AdminID,
 		&i.Name,
+		&i.WorkspaceID,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
-const getProjectSpaces = `-- name: GetProjectSpaces :many
-SELECT id, project_id, admin_id, name, created_at FROM spaces WHERE project_id = $1 ORDER BY created_at DESC
-`
-
-func (q *Queries) GetProjectSpaces(ctx context.Context, projectID uuid.UUID) ([]Space, error) {
-	rows, err := q.db.QueryContext(ctx, getProjectSpaces, projectID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Space
-	for rows.Next() {
-		var i Space
-		if err := rows.Scan(
-			&i.ID,
-			&i.ProjectID,
-			&i.AdminID,
-			&i.Name,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getProjectSpacesWithMembers = `-- name: GetProjectSpacesWithMembers :many
-SELECT
-    s.id AS space_id,
-    s.project_id,
-    s.admin_id,
-    s.name,
-    s.created_at,
-    u.id AS member_id,
-    u.email AS member_email
-FROM spaces s
-LEFT JOIN space_members sm ON sm.space_id = s.id
-LEFT JOIN users u ON u.id = sm.member_id
-WHERE s.project_id = $1
-ORDER BY s.created_at DESC, u.email
-`
-
-type GetProjectSpacesWithMembersRow struct {
-	SpaceID     uuid.UUID
-	ProjectID   uuid.UUID
-	AdminID     uuid.UUID
-	Name        string
-	CreatedAt   sql.NullTime
-	MemberID    uuid.NullUUID
-	MemberEmail sql.NullString
-}
-
-func (q *Queries) GetProjectSpacesWithMembers(ctx context.Context, projectID uuid.UUID) ([]GetProjectSpacesWithMembersRow, error) {
-	rows, err := q.db.QueryContext(ctx, getProjectSpacesWithMembers, projectID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetProjectSpacesWithMembersRow
-	for rows.Next() {
-		var i GetProjectSpacesWithMembersRow
-		if err := rows.Scan(
-			&i.SpaceID,
-			&i.ProjectID,
-			&i.AdminID,
-			&i.Name,
-			&i.CreatedAt,
-			&i.MemberID,
-			&i.MemberEmail,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getSpace = `-- name: GetSpace :one
-SELECT id, project_id, admin_id, name, created_at FROM spaces WHERE id = $1
+SELECT id, admin_id, name, workspace_id, created_at, updated_at FROM spaces WHERE id = $1
 `
 
 func (q *Queries) GetSpace(ctx context.Context, id uuid.UUID) (Space, error) {
@@ -220,10 +131,11 @@ func (q *Queries) GetSpace(ctx context.Context, id uuid.UUID) (Space, error) {
 	var i Space
 	err := row.Scan(
 		&i.ID,
-		&i.ProjectID,
 		&i.AdminID,
 		&i.Name,
+		&i.WorkspaceID,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -256,7 +168,7 @@ func (q *Queries) GetSpaceMembers(ctx context.Context, spaceID uuid.UUID) ([]Spa
 }
 
 const getUserSpaces = `-- name: GetUserSpaces :many
-SELECT id, project_id, admin_id, name, created_at FROM spaces WHERE id IN (
+SELECT id, admin_id, name, workspace_id, created_at, updated_at FROM spaces WHERE id IN (
     SELECT space_id FROM space_members WHERE member_id = $1
 )
 `
@@ -272,10 +184,11 @@ func (q *Queries) GetUserSpaces(ctx context.Context, memberID uuid.UUID) ([]Spac
 		var i Space
 		if err := rows.Scan(
 			&i.ID,
-			&i.ProjectID,
 			&i.AdminID,
 			&i.Name,
+			&i.WorkspaceID,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -292,27 +205,29 @@ func (q *Queries) GetUserSpaces(ctx context.Context, memberID uuid.UUID) ([]Spac
 
 const getUserSpacesWithMembers = `-- name: GetUserSpacesWithMembers :many
 SELECT
-    s.id AS space_id,
-    s.project_id,
+    s.id space_id,
+    s.workspace_id,
     s.admin_id,
     s.name,
     s.created_at,
-    u.id AS member_id,
-    u.email AS member_email
+    s.updated_at,
+    u.id member_id,
+    u.email member_email
 FROM spaces s
 JOIN space_members requested_member ON requested_member.space_id = s.id
 LEFT JOIN space_members sm ON sm.space_id = s.id
 LEFT JOIN users u ON u.id = sm.member_id
 WHERE requested_member.member_id = $1
-ORDER BY s.created_at DESC, u.email
+ORDER BY s.updated_at DESC, u.email
 `
 
 type GetUserSpacesWithMembersRow struct {
 	SpaceID     uuid.UUID
-	ProjectID   uuid.UUID
+	WorkspaceID uuid.UUID
 	AdminID     uuid.UUID
 	Name        string
 	CreatedAt   sql.NullTime
+	UpdatedAt   sql.NullTime
 	MemberID    uuid.NullUUID
 	MemberEmail sql.NullString
 }
@@ -328,10 +243,105 @@ func (q *Queries) GetUserSpacesWithMembers(ctx context.Context, memberID uuid.UU
 		var i GetUserSpacesWithMembersRow
 		if err := rows.Scan(
 			&i.SpaceID,
-			&i.ProjectID,
+			&i.WorkspaceID,
 			&i.AdminID,
 			&i.Name,
 			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.MemberID,
+			&i.MemberEmail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getWorkspaceSpaces = `-- name: GetWorkspaceSpaces :many
+SELECT id, admin_id, name, workspace_id, created_at, updated_at FROM spaces WHERE workspace_id = $1 ORDER BY updated_at DESC
+`
+
+func (q *Queries) GetWorkspaceSpaces(ctx context.Context, workspaceID uuid.UUID) ([]Space, error) {
+	rows, err := q.db.QueryContext(ctx, getWorkspaceSpaces, workspaceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Space
+	for rows.Next() {
+		var i Space
+		if err := rows.Scan(
+			&i.ID,
+			&i.AdminID,
+			&i.Name,
+			&i.WorkspaceID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getWorkspaceSpacesWithMembers = `-- name: GetWorkspaceSpacesWithMembers :many
+SELECT
+    s.id space_id,
+    s.workspace_id,
+    s.admin_id,
+    s.name,
+    s.created_at,
+    s.updated_at,
+    u.id member_id,
+    u.email member_email
+FROM spaces s
+LEFT JOIN space_members sm ON sm.space_id = s.id
+LEFT JOIN users u ON u.id = sm.member_id
+WHERE s.workspace_id = $1
+ORDER BY s.updated_at DESC, u.email
+`
+
+type GetWorkspaceSpacesWithMembersRow struct {
+	SpaceID     uuid.UUID
+	WorkspaceID uuid.UUID
+	AdminID     uuid.UUID
+	Name        string
+	CreatedAt   sql.NullTime
+	UpdatedAt   sql.NullTime
+	MemberID    uuid.NullUUID
+	MemberEmail sql.NullString
+}
+
+func (q *Queries) GetWorkspaceSpacesWithMembers(ctx context.Context, workspaceID uuid.UUID) ([]GetWorkspaceSpacesWithMembersRow, error) {
+	rows, err := q.db.QueryContext(ctx, getWorkspaceSpacesWithMembers, workspaceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetWorkspaceSpacesWithMembersRow
+	for rows.Next() {
+		var i GetWorkspaceSpacesWithMembersRow
+		if err := rows.Scan(
+			&i.SpaceID,
+			&i.WorkspaceID,
+			&i.AdminID,
+			&i.Name,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 			&i.MemberID,
 			&i.MemberEmail,
 		); err != nil {
@@ -411,6 +421,15 @@ func (q *Queries) ListSpaceMessages(ctx context.Context, arg ListSpaceMessagesPa
 		return nil, err
 	}
 	return items, nil
+}
+
+const touchSpace = `-- name: TouchSpace :exec
+UPDATE spaces SET updated_at = NOW() WHERE id = $1
+`
+
+func (q *Queries) TouchSpace(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, touchSpace, id)
+	return err
 }
 
 const triggerSpaceNotification = `-- name: TriggerSpaceNotification :exec

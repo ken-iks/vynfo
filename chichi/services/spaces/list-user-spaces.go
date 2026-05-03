@@ -32,7 +32,7 @@ func (s *SpacesServiceServer) ListUserSpaces(
 		if !ok {
 			space = &v1.ProjectSpace{
 				SpaceId:     row.SpaceID.String(),
-				ProjectId:   row.ProjectID.String(),
+				WorkspaceId: row.WorkspaceID.String(),
 				AdminUserId: row.AdminID.String(),
 				Name:        row.Name,
 				Users:       make([]*v1.User, 0),

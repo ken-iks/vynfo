@@ -13,10 +13,10 @@ import (
 )
 
 type Asset struct {
-	ID        uuid.UUID
-	ProjectID uuid.UUID
-	AssetType string
-	CreatedAt sql.NullTime
+	ID          uuid.UUID
+	WorkspaceID uuid.UUID
+	AssetType   string
+	CreatedAt   sql.NullTime
 }
 
 type AssetType struct {
@@ -86,11 +86,17 @@ type Message struct {
 
 type Project struct {
 	ID                 uuid.UUID
+	WorkspaceID        uuid.UUID
 	UserID             uuid.UUID
 	ProjectName        string
 	ProjectDescription string
 	CreatedAt          sql.NullTime
 	MainBranchID       uuid.NullUUID
+}
+
+type ProjectAsset struct {
+	ProjectID uuid.UUID
+	AssetID   uuid.UUID
 }
 
 type ProjectMember struct {
@@ -99,11 +105,12 @@ type ProjectMember struct {
 }
 
 type Space struct {
-	ID        uuid.UUID
-	ProjectID uuid.UUID
-	AdminID   uuid.UUID
-	Name      string
-	CreatedAt sql.NullTime
+	ID          uuid.UUID
+	AdminID     uuid.UUID
+	Name        string
+	WorkspaceID uuid.UUID
+	CreatedAt   sql.NullTime
+	UpdatedAt   sql.NullTime
 }
 
 type SpaceMember struct {
@@ -131,4 +138,15 @@ type Video struct {
 	AssetID     uuid.UUID
 	DisplayName string
 	Duration    float64
+}
+
+type Workspace struct {
+	ID        uuid.UUID
+	Name      string
+	CreatedAt sql.NullTime
+}
+
+type WorkspaceMember struct {
+	WorkspaceID uuid.UUID
+	MemberID    uuid.UUID
 }

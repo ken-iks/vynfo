@@ -15,7 +15,7 @@ import "proto/v1/users.proto";
 // permissions; users contains all members (including the admin)
 message ProjectSpace {
     string space_id = 1;
-    string project_id = 2;
+    string workspace_id = 2;
     string admin_user_id = 3;
     repeated User users = 4;
     string name = 5;
@@ -24,7 +24,7 @@ message ProjectSpace {
 // A CreateSpaceRequest creates a new space for the given project.
 // The requesting user_id becomes the admin of the newly created space
 message CreateSpaceRequest {
-    string project_id = 1;
+    string workspace_id = 1;
     string name = 2;
 }
 
@@ -41,7 +41,7 @@ message AddSpaceUserRequest {
 
 // A ListSpacesRequest returns all spaces that exist under a given project
 message ListSpacesRequest {
-    string project_id = 1;
+    string workspace_id = 1;
 }
 
 message ListUserSpacesRequest {

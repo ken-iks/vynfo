@@ -27,7 +27,14 @@ func (p *ProjectServiceServer) CreateProject(
 	defer tx.Rollback()
 	q := p.queries.WithTx(tx)
 
+	workspaceID, err := uuid.Parse(req.Msg.GetWorkspaceId())
+	if err != nil {
+		slog.Error("error parsing workspace id", "error", err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
 	project, err := q.CreateProject(ctx, db.CreateProjectParams{
+		WorkspaceID:        workspaceID,
 		UserID:             user.ID,
 		ProjectName:        req.Msg.GetProjectName(),
 		ProjectDescription: req.Msg.GetProjectDescription(),

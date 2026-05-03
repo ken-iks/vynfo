@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ProjectMetadata } from "../../gen/proto/v1/projects_pb";
-import type { ProjectSpace } from "../../gen/proto/v1/spaces_pb";
 import { ProjectView } from "./detail/ProjectView";
 import { ProjectConfigDropDown } from "./detail/ProjectConfigDropdown";
-import { SpacesList } from "./detail/SpacesList";
 import { ProjectsList } from "./list/ProjectsList";
 import { MediaHolder } from "../video/MediaHolder";
 import { UploadImageWizard } from "../video/UploadImageWizard";
@@ -17,7 +15,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
-import { SpaceView } from "../spaces/SpaceView";
+import { useWorkspaceContext } from "../providers/WorkspaceProvider";
 
 export type ProjectPage =
   | "list"
@@ -25,11 +23,7 @@ export type ProjectPage =
   | "uploadVideo"
   | "uploadAudio"
   | "uploadImage"
-  | "uploadText"
-  | "spaces"
-  | "space";
-
-type SpaceReturnPage = "list" | "spaces";
+  | "uploadText";
 
 function UploadFinishedNotice({ message }: { message: string }) {
   return (
@@ -45,11 +39,9 @@ function UploadFinishedNotice({ message }: { message: string }) {
 }
 
 export function Projects() {
+  const { currentWorkspaceId } = useWorkspaceContext();
   const [projectPage, setProjectPage] = useState<ProjectPage>("list");
   const [selectedProject, setSelectedProject] = useState<ProjectMetadata>();
-  const [selectedSpace, setSelectedSpace] = useState<ProjectSpace>();
-  const [spaceReturnPage, setSpaceReturnPage] =
-    useState<SpaceReturnPage>("list");
   const [uploadNotice, setUploadNotice] = useState<{
     message: string;
   } | null>(null);
@@ -64,19 +56,14 @@ export function Projects() {
     return () => window.clearTimeout(timeoutId);
   }, [uploadNotice]);
 
+  useEffect(() => {
+    setProjectPage("list");
+    setSelectedProject(undefined);
+  }, [currentWorkspaceId]);
+
   const openProject = (project: ProjectMetadata) => {
     setSelectedProject(project);
     setProjectPage("view");
-  };
-
-  const openSpace = (space: ProjectSpace, returnPage: SpaceReturnPage) => {
-    setSelectedSpace(space);
-    setSpaceReturnPage(returnPage);
-    setProjectPage("space");
-  };
-
-  const handleBackFromSpace = () => {
-    setProjectPage(spaceReturnPage);
   };
 
   const showUploadNotice = (message: string) => {
@@ -103,9 +90,6 @@ export function Projects() {
           </div>
           <div className="absolute top-2 right-8 z-10 flex flex-col items-stretch gap-2">
             <ProjectConfigDropDown handlePageSelection={setProjectPage} />
-            <Button variant="outline" onClick={() => setProjectPage("spaces")}>
-              Project Spaces
-            </Button>
           </div>
           {selectedProject && <ProjectView project={selectedProject} />}
         </div>
@@ -213,53 +197,6 @@ export function Projects() {
                   />
                 ) : null}
               </CardContent>
-            </Card>
-          </div>
-        </div>
-      );
-    case "spaces":
-      return (
-        <div className="relative h-full">
-          <div className="absolute top-2 left-2 z-10">
-            <Button variant="outline" onClick={() => setProjectPage("view")}>
-              <ArrowLeftIcon className="size-4" />
-              Back to Project
-            </Button>
-          </div>
-          {selectedProject && (
-            <SpacesList
-              project={selectedProject}
-              onSelectSpace={(space) => openSpace(space, "spaces")}
-            />
-          )}
-        </div>
-      );
-    case "space":
-      return (
-        <div className="relative h-full">
-          <div className="absolute top-2 left-2 z-10">
-            <Button variant="outline" onClick={handleBackFromSpace}>
-              <ArrowLeftIcon className="size-4" />
-              {spaceReturnPage === "spaces"
-                ? "Back to Project Spaces"
-                : "Back to Projects"}
-            </Button>
-          </div>
-          <div className="flex h-full min-h-0 justify-center px-12 pb-6 pt-14">
-            <Card className="h-full min-h-[82vh] w-full max-w-5xl p-0">
-              {selectedSpace && (
-                <>
-                  <CardHeader className="border-b">
-                    <CardTitle>{selectedSpace.name}</CardTitle>
-                    <CardDescription>
-                      {selectedSpace.users.length} members
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex min-h-0 flex-1 flex-col p-0">
-                    <SpaceView spaceId={selectedSpace.spaceId} />
-                  </CardContent>
-                </>
-              )}
             </Card>
           </div>
         </div>

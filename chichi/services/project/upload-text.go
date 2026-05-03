@@ -33,10 +33,7 @@ func (p *ProjectServiceServer) UploadText(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	asset, err := q.CreateAsset(ctx, db.CreateAssetParams{
-		ProjectID: projectID,
-		AssetType: "text",
-	})
+	asset, err := createProjectAsset(ctx, q, projectID, "text")
 	if err != nil {
 		slog.Error("error creating asset", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)

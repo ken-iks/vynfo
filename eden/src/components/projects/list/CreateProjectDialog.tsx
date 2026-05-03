@@ -14,10 +14,14 @@ import { Textarea } from "../../ui/textarea";
 import { client } from "../../../lib/client";
 
 interface CreateProjectDialogProps {
+  workspaceId: string;
   onCreated: (projectId: string) => void | Promise<void>;
 }
 
-export function CreateProjectDialog({ onCreated }: CreateProjectDialogProps) {
+export function CreateProjectDialog({
+  workspaceId,
+  onCreated,
+}: CreateProjectDialogProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -40,6 +44,7 @@ export function CreateProjectDialog({ onCreated }: CreateProjectDialogProps) {
     setSubmitting(true);
     try {
       const res = await client.createProject({
+        workspaceId,
         projectName: name.trim(),
         projectDescription: description.trim(),
       });
@@ -55,7 +60,7 @@ export function CreateProjectDialog({ onCreated }: CreateProjectDialogProps) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button>Add Project</Button>
+        <Button disabled={workspaceId === ""}>Add Project</Button>
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

@@ -35,13 +35,15 @@ export function SpacesList({ project, onSelectSpace }: SpacesListProps) {
   const [addingMemberId, setAddingMemberId] = useState("");
 
   const fetchSpaces = async () => {
-    const res = await spacesClient.listSpaces({ projectId: project.id });
+    const res = await spacesClient.listSpaces({
+      workspaceId: project.workspaceId,
+    });
     setSpaces(res.spaces);
   };
 
   useEffect(() => {
     fetchSpaces();
-  }, [project.id]);
+  }, [project.workspaceId]);
 
   const resetCreateForm = () => {
     setSpaceName("");
@@ -60,7 +62,7 @@ export function SpacesList({ project, onSelectSpace }: SpacesListProps) {
     setCreating(true);
     try {
       await spacesClient.createSpace({
-        projectId: project.id,
+        workspaceId: project.workspaceId,
         name,
       });
       setCreateOpen(false);

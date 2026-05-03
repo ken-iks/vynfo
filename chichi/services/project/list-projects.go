@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
+	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"vynfo.com/vynfo/auth"
@@ -20,17 +21,26 @@ func (p *ProjectServiceServer) ListProjects(
 	if err != nil {
 		return nil, err
 	}
-
-	userCreatedProjects, err := p.queries.GetUserCreatedProjects(ctx, user.ID)
+	workspaceID, err := uuid.Parse(req.Msg.GetWorkspaceId())
 	if err != nil {
-		slog.Error("error fetching user created projects", "error", err)
+		slog.Error("error parsing workspace id", "error", err)
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	projects, err := p.queries.GetWorkspaceProjects(ctx, workspaceID)
+	if err != nil {
+		slog.Error("error fetching workspace projects", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	userMemberProjects, err := p.queries.GetUserMemberProjects(ctx, user.ID)
-	if err != nil {
-		slog.Error("error fetching user member projects", "error", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+	userCreatedProjects := make([]db.Project, 0)
+	userMemberProjects := make([]db.Project, 0)
+	for _, project := range projects {
+		if project.UserID == user.ID {
+			userCreatedProjects = append(userCreatedProjects, project)
+			continue
+		}
+		userMemberProjects = append(userMemberProjects, project)
 	}
 
 	return connect.NewResponse(&v1.ListProjectsResponse{
@@ -44,6 +54,7 @@ func projectMetadata(projects []db.Project) []*v1.ProjectMetadata {
 	for _, proj := range projects {
 		md := &v1.ProjectMetadata{
 			Id:          proj.ID.String(),
+			WorkspaceId: proj.WorkspaceID.String(),
 			Name:        proj.ProjectName,
 			Description: proj.ProjectDescription,
 		}

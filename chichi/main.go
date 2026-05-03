@@ -20,6 +20,7 @@ import (
 	"vynfo.com/vynfo/services/project"
 	"vynfo.com/vynfo/services/spaces"
 	"vynfo.com/vynfo/services/users"
+	"vynfo.com/vynfo/services/workspaces"
 )
 
 //go:embed database/schema/*.sql
@@ -77,7 +78,8 @@ func main() {
 	SpacesService := spaces.NewSpacesServiceServer(db, dbgen.New(db), observer)
 
 	// ==================== UsersService Deps ========================== //
-	UsersService := users.NewUsersServiceServer(storageClient, dbgen.New(db))
+	UsersService := users.NewUsersServiceServer(storageClient, db, dbgen.New(db))
+	WorkspacesService := workspaces.NewWorkspacesServiceServer(db, dbgen.New(db))
 
 	mux := http.NewServeMux()
 	// Proto service endpoints
@@ -90,6 +92,12 @@ func main() {
 	mux.Handle(
 		v1connect.NewSpacesServiceHandler(
 			SpacesService,
+			connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
+		),
+	)
+	mux.Handle(
+		v1connect.NewWorkspacesServiceHandler(
+			WorkspacesService,
 			connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
 		),
 	)

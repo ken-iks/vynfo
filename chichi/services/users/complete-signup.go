@@ -69,7 +69,15 @@ func (s *UsersServiceServer) CompleteOnboarding(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	updatedUser, err := s.queries.FinishUserOnboarding(ctx, dbgen.FinishUserOnboardingParams{
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		slog.Error("error beginning onboarding transaction", "error", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	defer tx.Rollback()
+	q := s.queries.WithTx(tx)
+
+	updatedUser, err := q.FinishUserOnboarding(ctx, dbgen.FinishUserOnboardingParams{
 		DisplayName: sql.NullString{
 			String: displayName,
 			Valid:  true,
@@ -86,6 +94,30 @@ func (s *UsersServiceServer) CompleteOnboarding(
 	})
 	if err != nil {
 		slog.Error("error finishing user onboarding", "user_id", user.ID, "error", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	workspace, err := q.CreateWorkspace(ctx, fmt.Sprintf("%s's workspace", displayName))
+	if err != nil {
+		slog.Error("error creating default workspace", "user_id", user.ID, "error", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	if err := q.AddWorkspaceMember(ctx, dbgen.AddWorkspaceMemberParams{
+		WorkspaceID: workspace.ID,
+		MemberID:    user.ID,
+	}); err != nil {
+		slog.Error(
+			"error adding user to default workspace",
+			"user_id",
+			user.ID,
+			"workspace_id",
+			workspace.ID,
+			"error",
+			err,
+		)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	if err := tx.Commit(); err != nil {
+		slog.Error("error committing onboarding transaction", "user_id", user.ID, "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
