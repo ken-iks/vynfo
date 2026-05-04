@@ -3,3 +3,4 @@
 .pnpm-store
 chichi/external/
 chichi/segments/
+.DS_Store
