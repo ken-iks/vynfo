@@ -1,4 +1,5 @@
 .env
 .cursor
+.pnpm-store
 chichi/external/
 chichi/segments/
