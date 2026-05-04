@@ -8,7 +8,7 @@ import { FileService } from "../gen/proto/v1/vfs_pb";
 import { WorkspacesService } from "../gen/proto/v1/workspaces_pb";
 import { auth } from "@/firebase";
 
-const baseUrl = "http://localhost:8080";
+const baseUrl = import.meta.env.DEV ? "http://localhost:8080" : "/api";
 
 async function getCurrentIdToken() {
   const user = auth.currentUser;

@@ -45,6 +45,11 @@ func runMigrations() (*sql.DB, error) {
 	return db, nil
 }
 
+func mountConnectHandler(mux *http.ServeMux, path string, handler http.Handler) {
+	mux.Handle(path, handler)
+	mux.Handle("/api"+path, http.StripPrefix("/api", handler))
+}
+
 func main() {
 	godotenv.Load()
 	db, err := runMigrations()
@@ -86,36 +91,31 @@ func main() {
 
 	mux := http.NewServeMux()
 	// Proto service endpoints
-	mux.Handle(
-		v1connect.NewProjectServiceHandler(
-			ProjectService,
-			connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
-		),
+	projectPath, projectHandler := v1connect.NewProjectServiceHandler(
+		ProjectService,
+		connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
 	)
-	mux.Handle(
-		v1connect.NewSpacesServiceHandler(
-			SpacesService,
-			connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
-		),
+	mountConnectHandler(mux, projectPath, projectHandler)
+	spacesPath, spacesHandler := v1connect.NewSpacesServiceHandler(
+		SpacesService,
+		connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
 	)
-	mux.Handle(
-		v1connect.NewWorkspacesServiceHandler(
-			WorkspacesService,
-			connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
-		),
+	mountConnectHandler(mux, spacesPath, spacesHandler)
+	workspacesPath, workspacesHandler := v1connect.NewWorkspacesServiceHandler(
+		WorkspacesService,
+		connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
 	)
-	mux.Handle(
-		v1connect.NewUsersServiceHandler(
-			UsersService,
-			connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
-		),
+	mountConnectHandler(mux, workspacesPath, workspacesHandler)
+	usersPath, usersHandler := v1connect.NewUsersServiceHandler(
+		UsersService,
+		connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
 	)
-	mux.Handle(
-		v1connect.NewFileServiceHandler(
-			FileService,
-			connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
-		),
+	mountConnectHandler(mux, usersPath, usersHandler)
+	filePath, fileHandler := v1connect.NewFileServiceHandler(
+		FileService,
+		connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
 	)
+	mountConnectHandler(mux, filePath, fileHandler)
 	// Http service endpoints for HLS video serving
 	mux.HandleFunc("GET /video", ProjectService.GetManifest)
 	mux.Handle(

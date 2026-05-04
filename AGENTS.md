@@ -167,6 +167,13 @@ Do not run `pnpm` commands for any reason.
 - Do not substitute `npm`, `yarn`, `npx`, `corepack`, or another package-manager command for `pnpm`.
 - After the user runs the command, continue from the resulting files.
 
+### 9. Use current React 19 event types and APIs
+
+This project uses React 19.2.10 or newer. Do not use deprecated React types or APIs.
+
+- Never use `FormEventHandler` or `React.FormEvent` for form submission handlers. Use `SubmitEventHandler` instead.
+- Before adding React types or APIs, prefer the current React 19-compatible form and avoid deprecated aliases, patterns, or imports.
+
 <!--
 To add another rule, append:
 
