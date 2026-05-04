@@ -1,9 +1,9 @@
 import type { PointerEvent as ReactPointerEvent } from "react";
-import Markdown from "react-markdown";
 import { useSnapshot } from "valtio";
 import { cn } from "@/lib/utils";
 import { editorStore } from "../stores/editor";
 import { mediaAssetStore } from "../stores/mediaAssets";
+import { Textarea } from "../ui/textarea";
 
 const DEFAULT_OVERLAY_SIZE = 160n;
 
@@ -94,14 +94,28 @@ export function MediaOverlayCanvas() {
                 draggable={false}
               />
             ) : overlay.kind.case === "text" ? (
-              <div
+              <Textarea
                 className={cn(
-                  "p-2 text-xs font-medium",
+                  "min-h-0 resize-none border-0 bg-transparent p-2 text-xs font-medium",
+                  "shadow-none focus-visible:ring-0",
                   overlay.kind.value.color === 1 ? "text-black" : "text-white",
                 )}
-              >
-                {markdown ? <Markdown>{markdown}</Markdown> : "Markdown text"}
-              </div>
+                value={markdown}
+                placeholder="Text"
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                }}
+                onFocus={() => {
+                  editorStore.selectOverlay(activeSectionIndex, overlayIndex);
+                }}
+                onChange={(e) => {
+                  editorStore.setTextOverlayContent(
+                    activeSectionIndex,
+                    overlayIndex,
+                    e.currentTarget.value,
+                  );
+                }}
+              />
             ) : null}
           </div>
         );

@@ -430,6 +430,18 @@ class EditorStore {
     this.markEdited();
   }
 
+  setTextOverlayContent(
+    sectionIndex: number,
+    overlayIndex: number,
+    content: string,
+  ) {
+    const overlay = this.sections[sectionIndex]?.overlays[overlayIndex];
+    if (overlay?.kind.case !== "text") return;
+
+    overlay.kind.value.content = content;
+    this.markEdited();
+  }
+
   setSectionVideoEffects(sectionIndex: number, effects: MediaVideoEffect[]) {
     const section = this.sections[sectionIndex];
     if (!section?.video) return;

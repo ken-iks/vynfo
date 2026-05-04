@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import type { ProjectMetadata } from "../../gen/proto/v1/projects_pb";
 import { ProjectView } from "./detail/ProjectView";
-import { ProjectConfigDropDown } from "./detail/ProjectConfigDropdown";
 import { ProjectsList } from "./list/ProjectsList";
 import { MediaHolder } from "../video/MediaHolder";
 import { UploadImageWizard } from "../video/UploadImageWizard";
-import { UploadTextWizard } from "../text/UploadTextWizard";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -22,8 +20,7 @@ export type ProjectPage =
   | "view"
   | "uploadVideo"
   | "uploadAudio"
-  | "uploadImage"
-  | "uploadText";
+  | "uploadImage";
 
 function UploadFinishedNotice({ message }: { message: string }) {
   return (
@@ -87,9 +84,6 @@ export function Projects() {
               <ArrowLeftIcon className="size-4" />
               Back to Projects
             </Button>
-          </div>
-          <div className="absolute top-2 right-8 z-10 flex flex-col items-stretch gap-2">
-            <ProjectConfigDropDown handlePageSelection={setProjectPage} />
           </div>
           {selectedProject && <ProjectView project={selectedProject} />}
         </div>
@@ -159,38 +153,6 @@ export function Projects() {
                     workspaceId={currentWorkspaceId}
                     onUploadCompleted={() => {
                       showUploadNotice("Image upload finished");
-                      setProjectPage("view");
-                    }}
-                  />
-                ) : null}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      );
-    case "uploadText":
-      return (
-        <div className="relative h-full">
-          <div className="absolute top-2 left-2 z-10">
-            <Button variant="outline" onClick={() => setProjectPage("view")}>
-              <ArrowLeftIcon className="size-4" />
-              Back to Project
-            </Button>
-          </div>
-          <div className="flex h-full justify-center px-12 pt-20">
-            <Card className="h-fit w-full max-w-4xl">
-              <CardHeader>
-                <CardTitle>Add Text</CardTitle>
-                <CardDescription>
-                  Write markdown text that can be positioned on the editor
-                  canvas.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {selectedProject ? (
-                  <UploadTextWizard
-                    onTextAdded={() => {
-                      showUploadNotice("Text added");
                       setProjectPage("view");
                     }}
                   />

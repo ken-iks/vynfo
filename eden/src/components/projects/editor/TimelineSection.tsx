@@ -7,7 +7,7 @@ import {
   snap,
   sourceDurationMs,
 } from "../../stores/editor";
-import { cn, formatDuration } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { pxToMs, videoColors } from "./geometry";
@@ -21,6 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { formatDuration } from "@/utils/timestamp-conversaions";
 
 interface TimelineSectionProps {
   section: Snapshot<PlaybackSection>;

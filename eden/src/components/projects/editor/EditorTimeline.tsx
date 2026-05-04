@@ -6,7 +6,8 @@ import type {
 } from "@/gen/proto/v1/projects_pb";
 import { editorStore } from "../../stores/editor";
 import { TimelineTrack } from "./TimelineTrack";
-import { formatDuration } from "@/lib/utils";
+import { formatDuration } from "@/utils/timestamp-conversaions";
+import { cn } from "@/lib/utils";
 
 interface EditorTimelineProps {
   availableVideos: MediaVideoMetadata[];
@@ -23,7 +24,12 @@ export function EditorTimeline({
   const totalDuration = snap.totalDurationMillis;
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-2">
+    <div
+      className={cn(
+        "flex h-full min-h-0 min-w-0 flex-col gap-2",
+        "overflow-hidden",
+      )}
+    >
       <TimelineTrack
         availableVideos={availableVideos}
         availableAudios={availableAudios}

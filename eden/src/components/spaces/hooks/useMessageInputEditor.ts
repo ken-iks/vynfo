@@ -1,8 +1,9 @@
 import { type Editor, type JSONContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { cn } from "@/lib/utils";
 import { useEffect, useMemo, useState } from "react";
 import type { KeyboardEvent } from "react";
-import type { MessageMention } from "./MentionCard";
+import type { MessageMention } from "../messages/MentionCard";
 import { useMentionUsers } from "./useMentionUsers";
 
 export interface MessageInputValue {
@@ -118,8 +119,11 @@ export function useMessageInputEditor({
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class:
-          "min-h-20 px-3 py-3 text-sm outline-none [&_p]:my-0 [&_p.is-editor-empty:first-child]:before:text-muted-foreground",
+        class: cn(
+          "min-h-20 px-3 py-3",
+          "text-sm outline-none",
+          "[&_p]:my-0",
+        ),
       },
     },
     onCreate: syncEditorState,

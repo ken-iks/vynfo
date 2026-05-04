@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import type { SpaceMessageWithMetadata } from "@/gen/proto/v1/spaces_pb";
-import { Card, CardContent } from "../ui/card";
-import { cn, formatTimestampTime } from "@/lib/utils";
+import { Card, CardContent } from "../../ui/card";
+import { cn } from "@/lib/utils";
 import { MentionCard, type MessageMention } from "./MentionCard";
-import { useMentionUsers } from "./useMentionUsers";
+import { useMentionUsers } from "../hooks/useMentionUsers";
+import { formatTimestampTime } from "@/utils/timestamp-conversaions";
 
 export type MessageBubbleTone = "user" | "nonUser" | "agent";
 

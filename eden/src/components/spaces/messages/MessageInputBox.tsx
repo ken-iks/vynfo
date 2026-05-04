@@ -1,13 +1,13 @@
 import { ArrowUpIcon } from "@heroicons/react/24/outline";
 import { EditorContent } from "@tiptap/react";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import { cn } from "@/lib/utils";
 import { MentionCard } from "./MentionCard";
 import {
   type MessageInputCommand,
   type MessageInputValue,
   useMessageInputEditor,
-} from "./useMessageInputEditor";
+} from "../hooks/useMessageInputEditor";
 
 interface MessageInputBoxProps {
   className?: string;

@@ -9,11 +9,11 @@ import {
   SendSpaceMessageRequestSchema,
   type SpaceMessageWithMetadata,
 } from "@/gen/proto/v1/spaces_pb";
-import { AgentMessage } from "./AgentMessage";
-import { MessageInputBox } from "./MessageInputBox";
-import type { MessageInputValue } from "./useMessageInputEditor";
-import { NonUserMessage } from "./NonUserMessage";
-import { UserMessage } from "./UserMessage";
+import { AgentMessage } from "./messages/AgentMessage";
+import { MessageInputBox } from "./messages/MessageInputBox";
+import type { MessageInputValue } from "./hooks/useMessageInputEditor";
+import { NonUserMessage } from "./messages/NonUserMessage";
+import { UserMessage } from "./messages/UserMessage";
 
 export function SpaceView({ spaceId }: { spaceId: string }) {
   const { userId, appUser } = useAuthContext();

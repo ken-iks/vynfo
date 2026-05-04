@@ -140,6 +140,13 @@ export function TimelineContextMenu({
           </ContextMenuSub>
           <ContextMenuItem
             onSelect={() => {
+              editorStore.addTextOverlay("", sectionIndex);
+            }}
+          >
+            Add text
+          </ContextMenuItem>
+          <ContextMenuItem
+            onSelect={() => {
               onEditEffects(sectionIndex);
             }}
           >

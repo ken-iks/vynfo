@@ -1,10 +1,10 @@
 import { useLocation, useNavigate } from "react-router";
-import { useAuthContext } from "./providers/AuthProvider";
-import { useWorkspaceContext } from "./providers/WorkspaceProvider";
-import { Button } from "./ui/button";
+import { useAuthContext } from "../providers/AuthProvider";
+import { useWorkspaceContext } from "../providers/WorkspaceProvider";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -12,7 +12,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "./ui/sidebar";
+} from "../ui/sidebar";
+import { UserConfigSheet } from "./UserConfigSheet";
 
 type SidebarRoute = {
   title: string;
@@ -46,6 +47,12 @@ const sidebarRoutes: SidebarRoute[] = [
     path: "/agent",
     disabled: true,
   },
+  {
+    title: "Vynfo Reviews",
+    icon: "/icons/review-icon.svg",
+    path: "/reviews",
+    disabled: true,
+  }
 ];
 
 export function AppSidebar() {
@@ -62,35 +69,11 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <SidebarGroupLabel>Vynfo</SidebarGroupLabel>
-        <div className="flex items-center gap-2 px-2 group-data-[collapsible=icon]:hidden">
-          {appUser?.signedDisplayPhotoPath ? (
-            <img
-              src={appUser.signedDisplayPhotoPath}
-              alt={`${displayName} profile`}
-              className="size-10 rounded-full object-cover"
-            />
-          ) : (
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-medium text-muted-foreground">
-              {displayName.slice(0, 1).toUpperCase()}
-            </div>
-          )}
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium">{displayName}</p>
-            {currentWorkspace && (
-              <p className="truncate text-xs text-muted-foreground">
-                {currentWorkspace.name}
-              </p>
-            )}
-          </div>
-        </div>
-        <Button
-          size="sm"
-          variant={isActive("/settings") ? "default" : "outline"}
-          className="mx-2 justify-start group-data-[collapsible=icon]:hidden"
-          onClick={() => navigate("/settings")}
-        >
-          Settings
-        </Button>
+        <UserConfigSheet 
+          displayPictureUrl={appUser?.signedDisplayPhotoPath}
+          displayName={displayName}
+          workspaceName={currentWorkspace?.name} 
+        />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -120,6 +103,17 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={() => { navigate("/settings") }}>
+              <img src="/icons/settings-icon.svg" alt="" className="size-4 shrink-0" />
+              <span> Settings </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

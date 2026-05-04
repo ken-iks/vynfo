@@ -5,7 +5,7 @@ import { spacesClient } from "@/lib/client";
 import type { ProjectSpace } from "@/gen/proto/v1/spaces_pb";
 import type { ProjectMetadata } from "@/gen/proto/v1/projects_pb";
 import type { User } from "@/gen/proto/v1/users_pb";
-import { Button } from "../../ui/button";
+import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
@@ -14,13 +14,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../ui/dialog";
-import { Input } from "../../ui/input";
-import { Label } from "../../ui/label";
-import { DataTable } from "../../shared/DataTable";
-import { SectionTitle } from "../../shared/SectionTitle";
-import { useWorkspaceContext } from "../../providers/WorkspaceProvider";
-import { AddUserDropdown } from "../../shared/AddUserDropdown";
+} from "../ui/dialog";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { DataTable } from "../shared/DataTable";
+import { SectionTitle } from "../shared/SectionTitle";
+import { useWorkspaceContext } from "../providers/WorkspaceProvider";
+import { AddUserDropdown } from "../shared/AddUserDropdown";
 
 interface SpacesListProps {
   project: ProjectMetadata;

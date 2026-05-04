@@ -27,8 +27,9 @@ import {
   pxToMs,
 } from "./geometry";
 import { ContextMenu, ContextMenuTrigger } from "../../ui/context-menu";
-import { cn, formatDuration } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { formatDuration } from "@/utils/timestamp-conversaions";
 
 interface TimelineTrackProps {
   availableVideos: MediaVideoMetadata[];
@@ -379,7 +380,12 @@ export function TimelineTrack({
   );
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2">
+    <div
+      className={cn(
+        "flex min-h-0 min-w-0 w-full flex-1 flex-col gap-2",
+        "overflow-hidden",
+      )}
+    >
       <div className="flex items-center justify-end gap-1">
         <Button
           type="button"
@@ -410,7 +416,12 @@ export function TimelineTrack({
         }}
       >
         <ContextMenuTrigger asChild>
-          <div className="flex min-h-0 flex-1 overflow-x-hidden overflow-y-auto rounded-none border border-border bg-muted/10">
+          <div
+            className={cn(
+              "flex min-h-0 min-w-0 w-full flex-1 overflow-x-hidden overflow-y-auto",
+              "rounded-none border border-border bg-muted/10",
+            )}
+          >
             <div
               className="shrink-0 border-r border-border bg-background/40"
               style={{
@@ -447,15 +458,19 @@ export function TimelineTrack({
               </div>
             </div>
             <div
-              className="relative flex-1 self-start overflow-x-auto overflow-y-hidden"
+              className={cn(
+                "relative min-w-0 flex-1 self-start",
+                "overflow-x-auto overflow-y-hidden",
+              )}
               style={{ height: timelineScrollHeight }}
               onContextMenu={handleTrackContextMenu}
               onPointerMove={(e) => updateHoverTrackPx(e.clientX)}
               onPointerLeave={() => setHoverTrackPx(null)}
               ref={viewportRef}
             >
+              {/* Keep zoomed track width out of normal layout so it only affects this scroller. */}
               <div
-                className="relative w-full"
+                className="absolute top-0 left-0"
                 style={{
                   height: timelineContentHeight,
                   width: trackWidth,

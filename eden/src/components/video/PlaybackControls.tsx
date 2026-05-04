@@ -7,8 +7,8 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { formatDuration } from "@/lib/utils";
 import { editorStore } from "../stores/editor";
+import { formatDuration } from "@/utils/timestamp-conversaions";
 
 export function PlaybackControls({
   video,

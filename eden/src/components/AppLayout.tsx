@@ -1,5 +1,5 @@
 import { Outlet } from "react-router";
-import { AppSidebar } from "./AppSidebar";
+import { AppSidebar } from "./sidebar/AppSidebar";
 import { ThemeToggle } from "./shared/ThemeToggle";
 import { Button } from "./ui/button";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "./ui/sidebar";

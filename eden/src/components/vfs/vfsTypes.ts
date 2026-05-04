@@ -38,6 +38,13 @@ export type VfsPathSegment = {
   name: string;
 };
 
+export type VfsTreeRow = {
+  entry: VfsEntry;
+  depth: number;
+  expanded: boolean;
+  loading: boolean;
+};
+
 export const rootDirectoryKey = "root";
 
 export function directoryKey(directoryId: string | undefined) {

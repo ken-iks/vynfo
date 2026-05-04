@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../ui/select";
+import { cn } from "@/lib/utils";
 
 export function ProjectView({ project }: { project: ProjectMetadata }) {
   const [currVideoPlayingSrc, setCurrVideoPlayingSrc] = useState("");
@@ -262,8 +263,12 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
   };
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="flex w-2/3 items-center justify-between gap-4">
+    <div className="flex min-w-0 flex-col items-center overflow-x-hidden">
+      <div
+        className={cn(
+          "flex w-2/3 min-w-0 max-w-full items-center justify-between gap-4",
+        )}
+      >
         <SectionTitle>{project.name}</SectionTitle>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -293,8 +298,12 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
           />
         </div>
       </div>
-      <Card className="w-2/3 gap-0 py-0">
-        <CardContent className="px-0">
+      <Card
+        className={cn(
+          "w-2/3 min-w-0 max-w-full gap-0 overflow-hidden py-0",
+        )}
+      >
+        <CardContent className="min-w-0 overflow-hidden px-0">
           <div className="flex justify-center px-4 py-4">
             {currVideoPlayingSrc !== "" ? (
               <div className="relative w-full">
@@ -330,7 +339,7 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
           <div className="border-y bg-muted/20 px-3 py-1">
             <PlaybackControls video={videoElement} />
           </div>
-          <div className="h-96 px-4 py-3">
+          <div className="h-96 min-w-0 overflow-hidden px-4 py-3">
             <EditorTimeline
               availableVideos={currProjectVideos}
               availableAudios={currProjectAudios}

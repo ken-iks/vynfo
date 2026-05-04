@@ -8,7 +8,6 @@ import type { User } from "../../../gen/proto/v1/users_pb";
 import { DataTable } from "../../shared/DataTable";
 import { SectionTitle } from "../../shared/SectionTitle";
 import { CreateProjectDialog } from "./CreateProjectDialog";
-import { formatTimestampDate } from "@/lib/utils";
 import { AddUserDropdown } from "../../shared/AddUserDropdown";
 import { Button } from "../../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
@@ -20,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../ui/dialog";
+import { formatTimestampDate } from "@/utils/timestamp-conversaions";
 
 interface ProjectsListProps {
   onSelect: (project: ProjectMetadata) => void;

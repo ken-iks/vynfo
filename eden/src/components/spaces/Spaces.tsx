@@ -1,10 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-import type { FormEvent } from "react";
+import { useEffect, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Navigate, useNavigate, useParams } from "react-router";
 import { spacesClient } from "@/lib/client";
 import type { ProjectSpace } from "@/gen/proto/v1/spaces_pb";
-import type { User } from "@/gen/proto/v1/users_pb";
 import { AddUserDropdown } from "../shared/AddUserDropdown";
 import { SectionTitle } from "../shared/SectionTitle";
 import { DataTable } from "../shared/DataTable";
@@ -17,93 +15,26 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
 import { SpaceView } from "./SpaceView";
+import { useSpaces } from "./hooks/useSpaces";
+import { CreateSpaceDialogue } from "./CreateSpaceDialogue";
 
 export function Spaces() {
   const navigate = useNavigate();
-  const { currentWorkspace, currentWorkspaceId } = useWorkspaceContext();
-  const [spaces, setSpaces] = useState<ProjectSpace[]>([]);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [spaceName, setSpaceName] = useState("");
-  const [creating, setCreating] = useState(false);
-  const [addingMemberId, setAddingMemberId] = useState("");
+  const {
+    addingMemberId,
+    createOpen,
+    creating,
+    currentWorkspaceId,
+    getAvailableUsers,
+    handleAddUser,
+    handleCreateOpenChange,
+    handleCreateSpace,
+    setSpaceName,
+    spaceName,
+    spaces,
+  } = useSpaces();
 
-  const fetchSpaces = useCallback(async () => {
-    if (!currentWorkspaceId) {
-      setSpaces([]);
-      return;
-    }
-
-    const res = await spacesClient.listSpaces({
-      workspaceId: currentWorkspaceId,
-    });
-    setSpaces(res.spaces);
-  }, [currentWorkspaceId]);
-
-  useEffect(() => {
-    void fetchSpaces();
-  }, [fetchSpaces]);
-
-  const resetCreateForm = () => {
-    setSpaceName("");
-    setCreating(false);
-  };
-
-  const handleCreateOpenChange = (next: boolean) => {
-    if (!next) resetCreateForm();
-    setCreateOpen(next);
-  };
-
-  const handleCreateSpace = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const name = spaceName.trim();
-    if (!name || !currentWorkspaceId) return;
-
-    setCreating(true);
-    try {
-      await spacesClient.createSpace({
-        workspaceId: currentWorkspaceId,
-        name,
-      });
-      setCreateOpen(false);
-      resetCreateForm();
-      await fetchSpaces();
-    } catch (err) {
-      console.error("failed to create space", err);
-      setCreating(false);
-    }
-  };
-
-  const getAvailableUsers = (space: ProjectSpace) =>
-    currentWorkspace?.users.filter(
-      (user) =>
-        !space.users.some((spaceUser) => spaceUser.userId === user.userId),
-    ) ?? [];
-
-  const handleAddUser = async (space: ProjectSpace, user: User) => {
-    setAddingMemberId(`${space.spaceId}:${user.userId}`);
-    try {
-      await spacesClient.addSpaceUser({
-        spaceId: space.spaceId,
-        userId: user.userId,
-      });
-      await fetchSpaces();
-    } catch (err) {
-      console.error("failed to add user to space", err);
-    } finally {
-      setAddingMemberId("");
-    }
-  };
   const columns: ColumnDef<ProjectSpace>[] = [
     {
       accessorKey: "name",
@@ -124,53 +55,15 @@ export function Spaces() {
     <div className="px-12 pt-12">
       <div className="mb-2 flex items-center justify-between">
         <SectionTitle>Spaces</SectionTitle>
-        <Dialog open={createOpen} onOpenChange={handleCreateOpenChange}>
-          <Button
-            disabled={creating || !currentWorkspaceId}
-            onClick={() => setCreateOpen(true)}
-          >
-            Create Space
-          </Button>
-          <DialogContent>
-            <form onSubmit={handleCreateSpace} className="flex flex-col gap-4">
-              <DialogHeader>
-                <DialogTitle>New Space</DialogTitle>
-                <DialogDescription>
-                  Give this collaboration space a name.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="space-name">Name</Label>
-                <Input
-                  id="space-name"
-                  value={spaceName}
-                  onChange={(event) => setSpaceName(event.target.value)}
-                  placeholder="Design review"
-                  autoFocus
-                  required
-                />
-              </div>
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => handleCreateOpenChange(false)}
-                  disabled={creating}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={
-                    creating || !spaceName.trim() || !currentWorkspaceId
-                  }
-                >
-                  {creating ? "Creating..." : "Create"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <CreateSpaceDialogue
+          creating={creating}
+          disabled={!currentWorkspaceId}
+          name={spaceName}
+          onNameChange={setSpaceName}
+          onOpenChange={handleCreateOpenChange}
+          onSubmit={handleCreateSpace}
+          open={createOpen}
+        />
       </div>
       <DataTable<ProjectSpace>
         title=""
