@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSnapshot } from "valtio";
-import { Card, CardContent } from "../../ui/card";
-import { useAuth } from "../../providers/AuthProvider";
+import { Card, CardContent } from "../ui/card";
+import { useAuth } from "../providers/AuthProvider";
 import { client } from "@/lib/client";
 import type {
   BranchMetadata,
@@ -10,24 +10,24 @@ import type {
   MediaVideoMetadata,
   ProjectMetadata,
 } from "@/gen/proto/v1/projects_pb";
-import { AudioPlayer, VideoPlayer } from "../../video/VideoPlayer";
-import { VideoCanvas } from "../../video/VideoCanvas";
-import { MediaOverlayCanvas } from "../../video/MediaOverlayCanvas";
-import { EmptyVideoPlayer } from "../../video/EmptyVideoPlayer";
-import { VideoPlayerPlaceholder } from "../../video/VideoPlayerPlaceholder";
-import { PlaybackControls } from "../../video/PlaybackControls";
-import { editorStore } from "../../stores/editor";
-import { mediaAssetStore } from "../../stores/mediaAssets";
-import { EditorTimeline } from "../editor/EditorTimeline";
-import { CommitDialog } from "../editor/CommitDialog";
-import { SectionTitle } from "../../shared/SectionTitle";
+import { AudioPlayer, VideoPlayer } from "../upload/VideoPlayer";
+import { VideoCanvas } from "../upload/VideoCanvas";
+import { MediaOverlayCanvas } from "../upload/MediaOverlayCanvas";
+import { EmptyVideoPlayer } from "../upload/EmptyVideoPlayer";
+import { VideoPlayerPlaceholder } from "../upload/VideoPlayerPlaceholder";
+import { PlaybackControls } from "../upload/PlaybackControls";
+import { editorStore } from "../stores/editor";
+import { mediaAssetStore } from "../stores/mediaAssets";
+import { EditorTimeline } from "./editor/EditorTimeline";
+import { CommitDialog } from "./editor/CommitDialog";
+import { SectionTitle } from "../shared/SectionTitle";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../ui/select";
+} from "../ui/select";
 import { cn } from "@/lib/utils";
 
 export function ProjectView({ project }: { project: ProjectMetadata }) {
@@ -299,9 +299,7 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
         </div>
       </div>
       <Card
-        className={cn(
-          "w-2/3 min-w-0 max-w-full gap-0 overflow-hidden py-0",
-        )}
+        className={cn("w-2/3 min-w-0 max-w-full gap-0 overflow-hidden py-0")}
       >
         <CardContent className="min-w-0 overflow-hidden px-0">
           <div className="flex justify-center px-4 py-4">

@@ -52,7 +52,7 @@ const sidebarRoutes: SidebarRoute[] = [
     icon: "/icons/review-icon.svg",
     path: "/reviews",
     disabled: true,
-  }
+  },
 ];
 
 export function AppSidebar() {
@@ -69,10 +69,10 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <SidebarGroupLabel>Vynfo</SidebarGroupLabel>
-        <UserConfigSheet 
+        <UserConfigSheet
           displayPictureUrl={appUser?.signedDisplayPhotoPath}
           displayName={displayName}
-          workspaceName={currentWorkspace?.name} 
+          workspaceName={currentWorkspace?.name}
         />
       </SidebarHeader>
       <SidebarContent>
@@ -107,8 +107,16 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => { navigate("/settings") }}>
-              <img src="/icons/settings-icon.svg" alt="" className="size-4 shrink-0" />
+            <SidebarMenuButton
+              onClick={() => {
+                navigate("/settings");
+              }}
+            >
+              <img
+                src="/icons/settings-icon.svg"
+                alt=""
+                className="size-4 shrink-0"
+              />
               <span> Settings </span>
             </SidebarMenuButton>
           </SidebarMenuItem>

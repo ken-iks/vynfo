@@ -18,6 +18,7 @@ import {
 import { SpaceView } from "./SpaceView";
 import { useSpaces } from "./hooks/useSpaces";
 import { CreateSpaceDialogue } from "./CreateSpaceDialogue";
+import { SectionSubtitle } from "../shared/SectionSubtitle";
 
 export function Spaces() {
   const navigate = useNavigate();
@@ -54,7 +55,14 @@ export function Spaces() {
   return (
     <div className="px-12 pt-12">
       <div className="mb-2 flex items-center justify-between">
-        <SectionTitle>Spaces</SectionTitle>
+        <div>
+          <SectionTitle>Vynfo Spaces</SectionTitle>
+          <SectionSubtitle>
+            {" "}
+            Collaborate with workspace members and agents on your hardest
+            workflows{" "}
+          </SectionSubtitle>
+        </div>
         <CreateSpaceDialogue
           creating={creating}
           disabled={!currentWorkspaceId}

@@ -32,7 +32,10 @@ export function CreateSpaceDialogue({
 }: CreateSpaceDialogueProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <Button disabled={creating || disabled} onClick={() => onOpenChange(true)}>
+      <Button
+        disabled={creating || disabled}
+        onClick={() => onOpenChange(true)}
+      >
         Create Space
       </Button>
       <DialogContent>
@@ -63,7 +66,10 @@ export function CreateSpaceDialogue({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={creating || !name.trim() || disabled}>
+            <Button
+              type="submit"
+              disabled={creating || !name.trim() || disabled}
+            >
               {creating ? "Creating..." : "Create"}
             </Button>
           </DialogFooter>

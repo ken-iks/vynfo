@@ -79,7 +79,9 @@ export function VfsEntryRow({
           type="button"
           className="flex w-full items-center gap-3 px-3 py-3 text-left disabled:opacity-50"
           style={{ paddingLeft: `${depth * 1.25 + 0.75}rem` }}
-          onClick={entry.entryType === "directory" ? onToggleDirectory : undefined}
+          onClick={
+            entry.entryType === "directory" ? onToggleDirectory : undefined
+          }
           disabled={rowBusy}
         >
           {entry.entryType === "directory" ? (
@@ -130,7 +132,9 @@ export function VfsEntryRow({
               <DropdownMenuItem onSelect={onCreateFolder}>
                 New Folder Here
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={onUpload}>Upload Here</DropdownMenuItem>
+              <DropdownMenuItem onSelect={onUpload}>
+                Upload Here
+              </DropdownMenuItem>
             </>
           )}
           <DropdownMenuItem onSelect={onRename}>Rename</DropdownMenuItem>

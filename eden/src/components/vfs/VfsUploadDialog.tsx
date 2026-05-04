@@ -12,8 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { UploadImageWizard } from "@/components/video/UploadImageWizard";
-import { UploadWizard } from "@/components/video/UploadWizard";
+import { UploadImageWizard } from "@/components/upload/UploadImageWizard";
+import { UploadWizard } from "@/components/upload/UploadWizard";
 
 type UploadKind = "video" | "audio" | "image";
 

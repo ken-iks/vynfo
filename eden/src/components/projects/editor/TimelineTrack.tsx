@@ -2,7 +2,7 @@ import {
   MagnifyingGlassMinusIcon,
   MagnifyingGlassPlusIcon,
 } from "@heroicons/react/24/outline";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSnapshot } from "valtio";
 import type {
   MediaAudioMetadata,
@@ -11,53 +11,34 @@ import type {
   PlaybackSection,
 } from "@/gen/proto/v1/projects_pb";
 import { editorStore, snap, sourceDurationMs } from "../../stores/editor";
-import { videoRuntime } from "../../stores/videoRuntime";
 import { TimelineSection } from "./TimelineSection";
 import { TimelineRuler } from "./TimelineRuler";
-import {
-  TimelineContextMenu,
-  type TimelineMenuContext,
-} from "./TimelineContextMenu";
+import { TimelineContextMenu } from "./TimelineContextMenu";
 import { EffectsComposer } from "./EffectsComposer";
-import { useTimelineReorder } from "./useTimelineReorder";
-import {
-  DEFAULT_PX_PER_SECOND,
-  MAX_PX_PER_SECOND,
-  msToPx,
-  pxToMs,
-} from "./geometry";
+import { useTimelineReorder } from "./hooks/useTimelineReorder";
+import { msToPx, pxToMs } from "./geometry";
 import { ContextMenu, ContextMenuTrigger } from "../../ui/context-menu";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { formatDuration } from "@/utils/timestamp-conversaions";
+import { useTimelineLayout } from "./hooks/useTimelineLayout";
+import { useTimelineContextMenu } from "./hooks/useTimelineContextMenu";
+import { useTimelineSeeking } from "./hooks/useTimelineSeeking";
+import { useTimelineZoom } from "./hooks/useTimelineZoom";
+import {
+  GROUP_HEADER_HEIGHT,
+  HORIZONTAL_SCROLLBAR_GUTTER,
+  LABEL_WIDTH,
+  LANE_HEIGHT,
+  MAX_ZOOM_LEVEL,
+  RULER_HEIGHT,
+} from "./timelineConstants";
 
 interface TimelineTrackProps {
   availableVideos: MediaVideoMetadata[];
   availableAudios: MediaAudioMetadata[];
   availableImages: MediaImageMetadata[];
 }
-
-interface TimelineLane {
-  key: string;
-  title: string;
-  kind: "audio" | "video";
-  topPx: number;
-}
-
-interface TimelineGroupHeader {
-  key: string;
-  title: string;
-  topPx: number;
-}
-
-const EMPTY_TIMELINE_HEIGHT = 72;
-const LANE_HEIGHT = 34;
-const LANE_GAP = 3;
-const GROUP_HEADER_HEIGHT = 22;
-const LABEL_WIDTH = 160;
-const RULER_HEIGHT = 22;
-const HORIZONTAL_SCROLLBAR_GUTTER = 14;
-const MAX_ZOOM_LEVEL = 4;
 
 export function TimelineTrack({
   availableVideos,
@@ -67,186 +48,41 @@ export function TimelineTrack({
   const editorSnapshot = useSnapshot(editorStore);
   const totalDuration = editorSnapshot.totalDurationMillis;
 
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(0);
-  const [zoomLevel, setZoomLevel] = useState(0);
-  const [hoverTrackPx, setHoverTrackPx] = useState<number | null>(null);
-
-  useEffect(() => {
-    const el = viewportRef.current;
-    if (!el) return;
-    const update = () => setContainerWidth(el.clientWidth);
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  const pxPerSecond = useMemo(() => {
-    const totalMs = Number(totalDuration);
-    if (totalMs <= 0 || containerWidth <= 0) return DEFAULT_PX_PER_SECOND;
-    const fit = (containerWidth * 1000) / totalMs;
-    const fitPxPerSecond = fit > MAX_PX_PER_SECOND ? MAX_PX_PER_SECOND : fit;
-    if (zoomLevel === 0) return fitPxPerSecond;
-    return Math.min(MAX_PX_PER_SECOND, fitPxPerSecond * (zoomLevel + 1));
-  }, [totalDuration, containerWidth, zoomLevel]);
-
-  const naturalTrackWidth = msToPx(totalDuration, pxPerSecond);
-  const trackWidth = Math.max(containerWidth || 0, naturalTrackWidth);
-  const timelineLayout = useMemo(() => {
-    const lanes: TimelineLane[] = [];
-    const groupHeaders: TimelineGroupHeader[] = [];
-    const sectionLaneIndices: number[] = [];
-    const audioSectionLaneIndices: number[] = [];
-    const laneIndicesByKey = new Map<string, number>();
-    let nextTopPx = 0;
-
-    const addGroupHeader = (key: string, title: string) => {
-      groupHeaders.push({
-        key,
-        title,
-        topPx: nextTopPx,
-      });
-      nextTopPx += GROUP_HEADER_HEIGHT;
-    };
-
-    const addLane = (
-      key: string,
-      title: string,
-      kind: "audio" | "video",
-    ): number => {
-      const existingLaneIndex = laneIndicesByKey.get(key);
-      if (existingLaneIndex !== undefined) return existingLaneIndex;
-      const laneIndex = lanes.length;
-      laneIndicesByKey.set(key, laneIndex);
-      lanes.push({
-        key,
-        title,
-        kind,
-        topPx: nextTopPx,
-      });
-      nextTopPx += LANE_HEIGHT + LANE_GAP;
-      return laneIndex;
-    };
-
-    const hasVideoTracks =
-      availableVideos.length > 0 || editorStore.sections.length > 0;
-    if (hasVideoTracks) {
-      addGroupHeader("video", "Video Tracks");
-      for (const video of availableVideos) {
-        if (!video.assetId) continue;
-        addLane(`video-${video.assetId}`, video.title || "Untitled", "video");
-      }
-    }
-
-    for (let i = 0; i < editorStore.sections.length; i++) {
-      const section = editorStore.sections[i];
-      const key = section.video?.meta?.assetId
-        ? `video-${section.video.meta.assetId}`
-        : `section-${i}`;
-      sectionLaneIndices[i] = addLane(
-        key,
-        section.video?.meta?.title ?? "Untitled",
-        "video",
-      );
-    }
-
-    const hasAudioTracks =
-      availableAudios.length > 0 || editorStore.audioSections.length > 0;
-    if (hasAudioTracks) {
-      addGroupHeader("audio", "Audio Tracks");
-      for (const audio of availableAudios) {
-        if (!audio.assetId) continue;
-        addLane(`audio-${audio.assetId}`, audio.title || "Untitled", "audio");
-      }
-    }
-
-    for (let i = 0; i < editorStore.audioSections.length; i++) {
-      const section = editorStore.audioSections[i];
-      const key = section.audio?.meta?.assetId
-        ? `audio-${section.audio.meta.assetId}`
-        : `audio-section-${i}`;
-      audioSectionLaneIndices[i] = addLane(
-        key,
-        section.audio?.meta?.title ?? "Untitled",
-        "audio",
-      );
-    }
-
-    const totalLaneHeight =
-      lanes.length === 0 ? EMPTY_TIMELINE_HEIGHT : nextTopPx - LANE_GAP;
-
-    return {
-      audioSectionLaneIndices,
-      groupHeaders,
-      lanes,
-      sectionLaneIndices,
-      totalLaneHeight,
-    };
-  }, [
+  const {
+    naturalTrackWidth,
+    pxPerSecond,
+    setZoomLevel,
+    trackWidth,
+    viewportRef,
+    zoomLevel,
+  } = useTimelineZoom(totalDuration);
+  const timelineLayout = useTimelineLayout({
     availableAudios,
     availableVideos,
-    editorSnapshot.audioSections,
-    editorSnapshot.sections,
-  ]);
+    audioSections: editorSnapshot.audioSections,
+    sections: editorSnapshot.sections,
+  });
   const timelineHeight = timelineLayout.totalLaneHeight;
   const timelineContentHeight = timelineHeight + RULER_HEIGHT;
   const timelineScrollHeight =
     timelineContentHeight + HORIZONTAL_SCROLLBAR_GUTTER;
-
-  const clientXToTrackPx = useCallback((clientX: number): number => {
-    const viewport = viewportRef.current;
-    if (!viewport) return 0;
-    const rect = viewport.getBoundingClientRect();
-    return clientX - rect.left + viewport.scrollLeft;
-  }, []);
-
-  const clampTrackPx = useCallback(
-    (trackPx: number): number => {
-      return Math.min(Math.max(trackPx, 0), naturalTrackWidth);
-    },
-    [naturalTrackWidth],
-  );
-
-  const seekToTrackPx = useCallback(
-    (trackPx: number) => {
-      if (totalDuration <= 0n) return;
-
-      const clampedPx = clampTrackPx(trackPx);
-      let nextTime = pxToMs(clampedPx, pxPerSecond);
-      if (nextTime > totalDuration) nextTime = totalDuration;
-      editorStore.setPlaybackTimeMillis(nextTime);
-      videoRuntime.seekToMillis(nextTime);
-    },
-    [clampTrackPx, pxPerSecond, totalDuration],
-  );
-
-  const beginTimelineSeek = useCallback(
-    (clientX: number) => {
-      seekToTrackPx(clientXToTrackPx(clientX));
-
-      const onMove = (ev: PointerEvent) => {
-        seekToTrackPx(clientXToTrackPx(ev.clientX));
-      };
-      const onUp = () => {
-        window.removeEventListener("pointermove", onMove);
-        window.removeEventListener("pointerup", onUp);
-        window.removeEventListener("pointercancel", onUp);
-      };
-
-      window.addEventListener("pointermove", onMove);
-      window.addEventListener("pointerup", onUp);
-      window.addEventListener("pointercancel", onUp);
-    },
-    [clientXToTrackPx, seekToTrackPx],
-  );
-
-  const updateHoverTrackPx = useCallback(
-    (clientX: number) => {
-      setHoverTrackPx(clampTrackPx(clientXToTrackPx(clientX)));
-    },
-    [clampTrackPx, clientXToTrackPx],
-  );
+  const {
+    beginTimelineSeek,
+    clampTrackPx,
+    clientXToTrackPx,
+    hoverTrackPx,
+    setHoverTrackPx,
+    updateHoverTrackPx,
+  } = useTimelineSeeking({
+    naturalTrackWidth,
+    pxPerSecond,
+    totalDuration,
+    viewportRef,
+  });
+  const { handleTrackContextMenu, menuContext, setMenuContext } =
+    useTimelineContextMenu({
+      clientXToTrackPx,
+    });
 
   const { reorder, handleBeginReorder, previewLefts } = useTimelineReorder({
     sections: editorSnapshot.sections,
@@ -277,9 +113,6 @@ export function TimelineTrack({
     }
   }, [playheadLeft, totalDuration, trackWidth]);
 
-  const [menuContext, setMenuContext] = useState<TimelineMenuContext | null>(
-    null,
-  );
   const [effectsSectionIndex, setEffectsSectionIndex] = useState<number | null>(
     null,
   );
@@ -315,28 +148,6 @@ export function TimelineTrack({
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
-
-  const handleTrackContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
-    const trackPx = clientXToTrackPx(e.clientX);
-    const target = e.target;
-    let sectionIndex: number | null = null;
-    let audioSectionIndex: number | null = null;
-    if (target instanceof HTMLElement) {
-      const sectionEl = target.closest<HTMLElement>(
-        "[data-slot=editor-timeline-section]",
-      );
-      if (sectionEl && sectionEl.dataset.index !== undefined) {
-        sectionIndex = Number(sectionEl.dataset.index);
-      }
-      const audioSectionEl = target.closest<HTMLElement>(
-        "[data-slot=editor-timeline-audio-section]",
-      );
-      if (audioSectionEl && audioSectionEl.dataset.audioIndex !== undefined) {
-        audioSectionIndex = Number(audioSectionEl.dataset.audioIndex);
-      }
-    }
-    setMenuContext({ audioSectionIndex, trackPx, sectionIndex });
-  };
 
   const insertVideoAtTrackPx = useCallback(
     (trackPx: number, video: MediaVideoMetadata) => {

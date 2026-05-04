@@ -1,5 +1,6 @@
 import { SectionTitle } from "@/components/shared/SectionTitle";
 import { Button } from "@/components/ui/button";
+import { SectionSubtitle } from "../shared/SectionSubtitle";
 
 type VfsToolbarProps = {
   disabled: boolean;
@@ -14,7 +15,13 @@ export function VfsToolbar({
 }: VfsToolbarProps) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <SectionTitle>Filesystem</SectionTitle>
+      <div>
+        <SectionTitle>Vynfo File System </SectionTitle>
+        <SectionSubtitle>
+          {" "}
+          Store files that can be used across all workspace projects{" "}
+        </SectionSubtitle>
+      </div>
       <div className="flex items-center gap-2">
         <Button
           type="button"

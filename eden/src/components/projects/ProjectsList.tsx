@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useAuthContext } from "../../providers/AuthProvider";
-import { useWorkspaceContext } from "../../providers/WorkspaceProvider";
-import { client } from "../../../lib/client";
-import type { ProjectMetadata } from "../../../gen/proto/v1/projects_pb";
-import type { User } from "../../../gen/proto/v1/users_pb";
-import { DataTable } from "../../shared/DataTable";
-import { SectionTitle } from "../../shared/SectionTitle";
+import { useAuthContext } from "../providers/AuthProvider";
+import { useWorkspaceContext } from "../providers/WorkspaceProvider";
+import { client } from "../../lib/client";
+import type { ProjectMetadata } from "../../gen/proto/v1/projects_pb";
+import type { User } from "../../gen/proto/v1/users_pb";
+import { DataTable } from "../shared/DataTable";
+import { SectionTitle } from "../shared/SectionTitle";
 import { CreateProjectDialog } from "./CreateProjectDialog";
-import { AddUserDropdown } from "../../shared/AddUserDropdown";
-import { Button } from "../../ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
+import { AddUserDropdown } from "../shared/AddUserDropdown";
+import { Button } from "../ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../ui/dialog";
+} from "../ui/dialog";
 import { formatTimestampDate } from "@/utils/timestamp-conversaions";
 
 interface ProjectsListProps {

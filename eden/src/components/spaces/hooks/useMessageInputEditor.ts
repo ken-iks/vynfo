@@ -119,11 +119,7 @@ export function useMessageInputEditor({
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: cn(
-          "min-h-20 px-3 py-3",
-          "text-sm outline-none",
-          "[&_p]:my-0",
-        ),
+        class: cn("min-h-20 px-3 py-3", "text-sm outline-none", "[&_p]:my-0"),
       },
     },
     onCreate: syncEditorState,

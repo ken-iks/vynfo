@@ -1,4 +1,4 @@
-import { Projects } from "./projects/Projects";
+import { ProjectRoute, Projects } from "./projects/Projects";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { AppLayout } from "./AppLayout.tsx";
 import { CompleteOnboarding } from "./auth/CompleteOnboarding";
@@ -77,6 +77,7 @@ function AppShell() {
           <Route element={<AppLayout onSignOut={signOut} />}>
             <Route path="/" element={<Navigate to="/projects" replace />} />
             <Route path="/projects" element={<Projects />} />
+            <Route path="/projects/:projectId" element={<ProjectRoute />} />
             <Route path="/spaces" element={<Spaces />} />
             <Route path="/spaces/:spaceId" element={<SpaceRoute />} />
             <Route path="/vfs" element={<Vfs />} />
