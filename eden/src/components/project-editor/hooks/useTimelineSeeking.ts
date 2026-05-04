@@ -1,7 +1,7 @@
 import type { RefObject } from "react";
 import { useCallback, useState } from "react";
-import { editorStore } from "../../../stores/editor";
-import { videoRuntime } from "../../../stores/videoRuntime";
+import { editorStore } from "../../stores/editor";
+import { videoRuntime } from "../../stores/videoRuntime";
 import { pxToMs } from "../geometry";
 
 interface UseTimelineSeekingArgs {

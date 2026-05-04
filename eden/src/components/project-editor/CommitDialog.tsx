@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { editorStore } from "../../stores/editor";
-import { Button } from "../../ui/button";
-import { Textarea } from "../../ui/textarea";
+import { editorStore } from "../stores/editor";
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../ui/dialog";
+} from "../ui/dialog";
 import { client } from "@/lib/client";
 
 interface CommitDialogProps {

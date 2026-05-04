@@ -18,8 +18,8 @@ import { VideoPlayerPlaceholder } from "../upload/VideoPlayerPlaceholder";
 import { PlaybackControls } from "../upload/PlaybackControls";
 import { editorStore } from "../stores/editor";
 import { mediaAssetStore } from "../stores/mediaAssets";
-import { EditorTimeline } from "./editor/EditorTimeline";
-import { CommitDialog } from "./editor/CommitDialog";
+import { EditorTimeline } from "../project-editor/EditorTimeline";
+import { CommitDialog } from "../project-editor/CommitDialog";
 import { SectionTitle } from "../shared/SectionTitle";
 import {
   Select,

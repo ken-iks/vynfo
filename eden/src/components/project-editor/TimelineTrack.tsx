@@ -10,14 +10,14 @@ import type {
   MediaVideoMetadata,
   PlaybackSection,
 } from "@/gen/proto/v1/projects_pb";
-import { editorStore, snap, sourceDurationMs } from "../../stores/editor";
+import { editorStore, snap, sourceDurationMs } from "../stores/editor";
 import { TimelineSection } from "./TimelineSection";
 import { TimelineRuler } from "./TimelineRuler";
 import { TimelineContextMenu } from "./TimelineContextMenu";
 import { EffectsComposer } from "./EffectsComposer";
 import { useTimelineReorder } from "./hooks/useTimelineReorder";
 import { msToPx, pxToMs } from "./geometry";
-import { ContextMenu, ContextMenuTrigger } from "../../ui/context-menu";
+import { ContextMenu, ContextMenuTrigger } from "../ui/context-menu";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { formatDuration } from "@/utils/timestamp-conversaions";

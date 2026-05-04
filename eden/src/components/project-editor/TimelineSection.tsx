@@ -6,7 +6,7 @@ import {
   editorStore,
   snap,
   sourceDurationMs,
-} from "../../stores/editor";
+} from "../stores/editor";
 import { cn } from "@/lib/utils";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";

@@ -4,7 +4,7 @@ import type {
   MediaImageMetadata,
   MediaVideoMetadata,
 } from "@/gen/proto/v1/projects_pb";
-import { editorStore } from "../../stores/editor";
+import { editorStore } from "../stores/editor";
 import { TimelineTrack } from "./TimelineTrack";
 import { formatDuration } from "@/utils/timestamp-conversaions";
 import { cn } from "@/lib/utils";

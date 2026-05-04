@@ -6,7 +6,7 @@ import type {
 } from "@/gen/proto/v1/projects_pb";
 import { PlaybackSectionSchema } from "@/gen/proto/v1/projects_pb";
 import { fromJsonString, toJsonString } from "@bufbuild/protobuf";
-import { editorStore } from "../../stores/editor";
+import { editorStore } from "../stores/editor";
 import {
   ContextMenuContent,
   ContextMenuItem,
@@ -14,7 +14,7 @@ import {
   ContextMenuSub,
   ContextMenuSubContent,
   ContextMenuSubTrigger,
-} from "../../ui/context-menu";
+} from "../ui/context-menu";
 
 export interface TimelineMenuContext {
   trackPx: number;

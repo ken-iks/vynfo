@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
-import { editorStore } from "../../stores/editor";
+import { editorStore } from "../stores/editor";
 import { useEffect, useRef, useState } from "react";
 
 type DraftEffect =
