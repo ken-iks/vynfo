@@ -11,13 +11,11 @@ import { editorStore } from "../../stores/editor";
 import type {
   MediaVideoMetadata,
   MediaImageMetadata,
-  MediaTextMetadata,
 } from "@/gen/proto/v1/projects_pb";
 
 type AssetActionProps =
   | { type: "video"; metadata: MediaVideoMetadata }
-  | { type: "image"; metadata: MediaImageMetadata }
-  | { type: "text"; metadata: MediaTextMetadata };
+  | { type: "image"; metadata: MediaImageMetadata };
 
 export function AssetActions(props: AssetActionProps) {
   const snap = useSnapshot(editorStore);
@@ -45,16 +43,6 @@ export function AssetActions(props: AssetActionProps) {
             disabled={!canAddOverlay}
             onSelect={() => {
               editorStore.addImageOverlay(props.metadata);
-            }}
-          >
-            Add to Current Section
-          </DropdownMenuItem>
-        )}
-        {props.type === "text" && (
-          <DropdownMenuItem
-            disabled={!canAddOverlay}
-            onSelect={() => {
-              editorStore.addTextOverlay(props.metadata);
             }}
           >
             Add to Current Section

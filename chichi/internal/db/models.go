@@ -16,7 +16,9 @@ type Asset struct {
 	ID          uuid.UUID
 	WorkspaceID uuid.UUID
 	AssetType   string
+	DisplayName string
 	CreatedAt   sql.NullTime
+	DirectoryID uuid.NullUUID
 }
 
 type AssetType struct {
@@ -24,9 +26,8 @@ type AssetType struct {
 }
 
 type Audio struct {
-	AssetID     uuid.UUID
-	DisplayName string
-	Duration    float64
+	AssetID  uuid.UUID
+	Duration float64
 }
 
 type Audioframe struct {
@@ -59,9 +60,17 @@ type CommitParent struct {
 	Position int32
 }
 
+type Directory struct {
+	ID          uuid.UUID
+	WorkspaceID uuid.UUID
+	DisplayName string
+	ParentID    uuid.NullUUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
 type Image struct {
 	AssetID     uuid.UUID
-	DisplayName string
 	ObjectPath  string
 	ContentType string
 }
@@ -118,12 +127,6 @@ type SpaceMember struct {
 	MemberID uuid.UUID
 }
 
-type Text struct {
-	AssetID     uuid.UUID
-	DisplayName string
-	Content     string
-}
-
 type User struct {
 	ID                     uuid.UUID
 	FirebaseUid            string
@@ -135,9 +138,8 @@ type User struct {
 }
 
 type Video struct {
-	AssetID     uuid.UUID
-	DisplayName string
-	Duration    float64
+	AssetID  uuid.UUID
+	Duration float64
 }
 
 type Workspace struct {

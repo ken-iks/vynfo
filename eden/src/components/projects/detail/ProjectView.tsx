@@ -7,7 +7,6 @@ import type {
   BranchMetadata,
   MediaAudioMetadata,
   MediaImageMetadata,
-  MediaTextMetadata,
   MediaVideoMetadata,
   ProjectMetadata,
 } from "@/gen/proto/v1/projects_pb";
@@ -44,9 +43,6 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
   const [currProjectVideos, setCurrProjectVideos] = useState<
     MediaVideoMetadata[]
   >([]);
-  const [currProjectTexts, setCurrProjectTexts] = useState<MediaTextMetadata[]>(
-    [],
-  );
   const [currProjectImages, setCurrProjectImages] = useState<
     MediaImageMetadata[]
   >([]);
@@ -184,10 +180,6 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
       for (const image of assets.images) {
         mediaAssetStore.setImageUrl(image.assetId, image.signedUrl);
       }
-      for (const text of assets.textBoxes) {
-        mediaAssetStore.setTextMarkdown(text.assetId, text.content);
-      }
-      setCurrProjectTexts(assets.textBoxes);
     };
     fetchAssets();
   }, [userId, project]);
@@ -334,7 +326,6 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
               availableVideos={currProjectVideos}
               availableAudios={currProjectAudios}
               availableImages={currProjectImages}
-              availableTexts={currProjectTexts}
             />
           </div>
         </CardContent>

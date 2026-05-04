@@ -13,35 +13,34 @@ import (
 )
 
 const createVideo = `-- name: CreateVideo :one
-INSERT INTO videos (asset_id, display_name, duration) VALUES ($1, $2, $3) RETURNING asset_id, display_name, duration
+INSERT INTO videos (asset_id, duration) VALUES ($1, $2) RETURNING asset_id, duration
 `
 
 type CreateVideoParams struct {
-	AssetID     uuid.UUID
-	DisplayName string
-	Duration    float64
+	AssetID  uuid.UUID
+	Duration float64
 }
 
 func (q *Queries) CreateVideo(ctx context.Context, arg CreateVideoParams) (Video, error) {
-	row := q.db.QueryRowContext(ctx, createVideo, arg.AssetID, arg.DisplayName, arg.Duration)
+	row := q.db.QueryRowContext(ctx, createVideo, arg.AssetID, arg.Duration)
 	var i Video
-	err := row.Scan(&i.AssetID, &i.DisplayName, &i.Duration)
+	err := row.Scan(&i.AssetID, &i.Duration)
 	return i, err
 }
 
 const getVideoById = `-- name: GetVideoById :one
-SELECT asset_id, display_name, duration FROM videos WHERE asset_id = $1
+SELECT asset_id, duration FROM videos WHERE asset_id = $1
 `
 
 func (q *Queries) GetVideoById(ctx context.Context, assetID uuid.UUID) (Video, error) {
 	row := q.db.QueryRowContext(ctx, getVideoById, assetID)
 	var i Video
-	err := row.Scan(&i.AssetID, &i.DisplayName, &i.Duration)
+	err := row.Scan(&i.AssetID, &i.Duration)
 	return i, err
 }
 
 const getVideos = `-- name: GetVideos :many
-SELECT asset_id, display_name, duration FROM videos WHERE asset_id = ANY($1::uuid[])
+SELECT asset_id, duration FROM videos WHERE asset_id = ANY($1::uuid[])
 `
 
 func (q *Queries) GetVideos(ctx context.Context, assetIds []uuid.UUID) ([]Video, error) {
@@ -53,7 +52,7 @@ func (q *Queries) GetVideos(ctx context.Context, assetIds []uuid.UUID) ([]Video,
 	var items []Video
 	for rows.Next() {
 		var i Video
-		if err := rows.Scan(&i.AssetID, &i.DisplayName, &i.Duration); err != nil {
+		if err := rows.Scan(&i.AssetID, &i.Duration); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -93,44 +94,6 @@ func (q *Queries) GetProject(ctx context.Context, id uuid.UUID) (Project, error)
 	return i, err
 }
 
-const getUserMemberProjects = `-- name: GetUserMemberProjects :many
-SELECT projects.id, projects.workspace_id, projects.user_id, projects.project_name, projects.project_description, projects.created_at, projects.main_branch_id FROM projects
-JOIN project_members ON project_members.project_id = projects.id
-WHERE project_members.member_id = $1 AND projects.user_id <> $1
-ORDER BY projects.created_at
-`
-
-func (q *Queries) GetUserMemberProjects(ctx context.Context, memberID uuid.UUID) ([]Project, error) {
-	rows, err := q.db.QueryContext(ctx, getUserMemberProjects, memberID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Project
-	for rows.Next() {
-		var i Project
-		if err := rows.Scan(
-			&i.ID,
-			&i.WorkspaceID,
-			&i.UserID,
-			&i.ProjectName,
-			&i.ProjectDescription,
-			&i.CreatedAt,
-			&i.MainBranchID,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getWorkspaceProjects = `-- name: GetWorkspaceProjects :many
 SELECT id, workspace_id, user_id, project_name, project_description, created_at, main_branch_id FROM projects WHERE workspace_id = $1 ORDER BY created_at
 `
@@ -164,6 +127,79 @@ func (q *Queries) GetWorkspaceProjects(ctx context.Context, workspaceID uuid.UUI
 		return nil, err
 	}
 	return items, nil
+}
+
+const getWorkspaceProjectsWithCreators = `-- name: GetWorkspaceProjectsWithCreators :many
+SELECT
+    projects.id, projects.workspace_id, projects.user_id, projects.project_name, projects.project_description, projects.created_at, projects.main_branch_id,
+    users.email creator_email,
+    users.display_name creator_display_name,
+    users.display_photo_object_path creator_display_photo_object_path
+FROM projects
+JOIN users ON users.id = projects.user_id
+WHERE projects.workspace_id = $1
+ORDER BY projects.created_at
+`
+
+type GetWorkspaceProjectsWithCreatorsRow struct {
+	ID                            uuid.UUID
+	WorkspaceID                   uuid.UUID
+	UserID                        uuid.UUID
+	ProjectName                   string
+	ProjectDescription            string
+	CreatedAt                     sql.NullTime
+	MainBranchID                  uuid.NullUUID
+	CreatorEmail                  string
+	CreatorDisplayName            sql.NullString
+	CreatorDisplayPhotoObjectPath sql.NullString
+}
+
+func (q *Queries) GetWorkspaceProjectsWithCreators(ctx context.Context, workspaceID uuid.UUID) ([]GetWorkspaceProjectsWithCreatorsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getWorkspaceProjectsWithCreators, workspaceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetWorkspaceProjectsWithCreatorsRow
+	for rows.Next() {
+		var i GetWorkspaceProjectsWithCreatorsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.WorkspaceID,
+			&i.UserID,
+			&i.ProjectName,
+			&i.ProjectDescription,
+			&i.CreatedAt,
+			&i.MainBranchID,
+			&i.CreatorEmail,
+			&i.CreatorDisplayName,
+			&i.CreatorDisplayPhotoObjectPath,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const removeAssetFromProject = `-- name: RemoveAssetFromProject :exec
+DELETE FROM project_assets WHERE project_id = $1 AND asset_id = $2
+`
+
+type RemoveAssetFromProjectParams struct {
+	ProjectID uuid.UUID
+	AssetID   uuid.UUID
+}
+
+func (q *Queries) RemoveAssetFromProject(ctx context.Context, arg RemoveAssetFromProjectParams) error {
+	_, err := q.db.ExecContext(ctx, removeAssetFromProject, arg.ProjectID, arg.AssetID)
+	return err
 }
 
 const setMainBranch = `-- name: SetMainBranch :one

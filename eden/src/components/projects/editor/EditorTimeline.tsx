@@ -2,7 +2,6 @@ import { useSnapshot } from "valtio";
 import type {
   MediaAudioMetadata,
   MediaImageMetadata,
-  MediaTextMetadata,
   MediaVideoMetadata,
 } from "@/gen/proto/v1/projects_pb";
 import { editorStore } from "../../stores/editor";
@@ -13,14 +12,12 @@ interface EditorTimelineProps {
   availableVideos: MediaVideoMetadata[];
   availableAudios: MediaAudioMetadata[];
   availableImages: MediaImageMetadata[];
-  availableTexts: MediaTextMetadata[];
 }
 
 export function EditorTimeline({
   availableVideos,
   availableAudios,
   availableImages,
-  availableTexts,
 }: EditorTimelineProps) {
   const snap = useSnapshot(editorStore);
   const totalDuration = snap.totalDurationMillis;
@@ -31,7 +28,6 @@ export function EditorTimeline({
         availableVideos={availableVideos}
         availableAudios={availableAudios}
         availableImages={availableImages}
-        availableTexts={availableTexts}
       />
       <div className="flex items-center justify-end px-2 py-1">
         <span className="text-[10px] tabular-nums text-muted-foreground">

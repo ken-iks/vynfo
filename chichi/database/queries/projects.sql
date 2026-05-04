@@ -4,10 +4,15 @@ SELECT * FROM projects WHERE id = $1;
 -- name: GetWorkspaceProjects :many
 SELECT * FROM projects WHERE workspace_id = $1 ORDER BY created_at;
 
--- name: GetUserMemberProjects :many
-SELECT projects.* FROM projects
-JOIN project_members ON project_members.project_id = projects.id
-WHERE project_members.member_id = $1 AND projects.user_id <> $1
+-- name: GetWorkspaceProjectsWithCreators :many
+SELECT
+    projects.*,
+    users.email creator_email,
+    users.display_name creator_display_name,
+    users.display_photo_object_path creator_display_photo_object_path
+FROM projects
+JOIN users ON users.id = projects.user_id
+WHERE projects.workspace_id = $1
 ORDER BY projects.created_at;
 
 -- name: CreateProject :one
@@ -22,4 +27,7 @@ DELETE FROM projects WHERE id = $1 AND user_id = $2;
 
 -- name: SetMainBranch :one
 UPDATE projects SET main_branch_id = $1 WHERE id = $2 RETURNING *; 
+
+-- name: RemoveAssetFromProject :exec
+DELETE FROM project_assets WHERE project_id = $1 AND asset_id = $2;
 

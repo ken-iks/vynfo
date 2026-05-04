@@ -12,45 +12,29 @@ import (
 )
 
 const createImage = `-- name: CreateImage :one
-INSERT INTO images (asset_id, display_name, object_path, content_type) VALUES ($1, $2, $3, $4) RETURNING asset_id, display_name, object_path, content_type
+INSERT INTO images (asset_id, object_path, content_type) VALUES ($1, $2, $3) RETURNING asset_id, object_path, content_type
 `
 
 type CreateImageParams struct {
 	AssetID     uuid.UUID
-	DisplayName string
 	ObjectPath  string
 	ContentType string
 }
 
 func (q *Queries) CreateImage(ctx context.Context, arg CreateImageParams) (Image, error) {
-	row := q.db.QueryRowContext(ctx, createImage,
-		arg.AssetID,
-		arg.DisplayName,
-		arg.ObjectPath,
-		arg.ContentType,
-	)
+	row := q.db.QueryRowContext(ctx, createImage, arg.AssetID, arg.ObjectPath, arg.ContentType)
 	var i Image
-	err := row.Scan(
-		&i.AssetID,
-		&i.DisplayName,
-		&i.ObjectPath,
-		&i.ContentType,
-	)
+	err := row.Scan(&i.AssetID, &i.ObjectPath, &i.ContentType)
 	return i, err
 }
 
 const getImageById = `-- name: GetImageById :one
-SELECT asset_id, display_name, object_path, content_type FROM images WHERE asset_id = $1
+SELECT asset_id, object_path, content_type FROM images WHERE asset_id = $1
 `
 
 func (q *Queries) GetImageById(ctx context.Context, assetID uuid.UUID) (Image, error) {
 	row := q.db.QueryRowContext(ctx, getImageById, assetID)
 	var i Image
-	err := row.Scan(
-		&i.AssetID,
-		&i.DisplayName,
-		&i.ObjectPath,
-		&i.ContentType,
-	)
+	err := row.Scan(&i.AssetID, &i.ObjectPath, &i.ContentType)
 	return i, err
 }

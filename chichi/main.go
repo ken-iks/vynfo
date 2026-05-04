@@ -20,6 +20,7 @@ import (
 	"vynfo.com/vynfo/services/project"
 	"vynfo.com/vynfo/services/spaces"
 	"vynfo.com/vynfo/services/users"
+	"vynfo.com/vynfo/services/vfs"
 	"vynfo.com/vynfo/services/workspaces"
 )
 
@@ -64,6 +65,8 @@ func main() {
 	defer storageClient.Close()
 	ProjectService := project.NewProjectServiceServer(storageClient, db, dbgen.New(db))
 
+	FileService := vfs.NewFileServiceServer(storageClient, db, dbgen.New(db))
+
 	// ==================== SpacesService Deps ========================== //
 	listener, err := messages.NewMessageListener(os.Getenv("DATABASE_URL"))
 	if err != nil {
@@ -104,6 +107,12 @@ func main() {
 	mux.Handle(
 		v1connect.NewUsersServiceHandler(
 			UsersService,
+			connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
+		),
+	)
+	mux.Handle(
+		v1connect.NewFileServiceHandler(
+			FileService,
 			connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
 		),
 	)

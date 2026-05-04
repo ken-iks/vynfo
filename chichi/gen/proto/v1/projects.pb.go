@@ -75,726 +75,21 @@ func (MediaTextColor) EnumDescriptor() ([]byte, []int) {
 	return file_proto_v1_projects_proto_rawDescGZIP(), []int{0}
 }
 
-// UploadVideoRequest will upload video content to storage
-type UploadVideoRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ProjectId     string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
-	Content       []byte                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UploadVideoRequest) Reset() {
-	*x = UploadVideoRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadVideoRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadVideoRequest) ProtoMessage() {}
-
-func (x *UploadVideoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadVideoRequest.ProtoReflect.Descriptor instead.
-func (*UploadVideoRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *UploadVideoRequest) GetProjectId() string {
-	if x != nil {
-		return x.ProjectId
-	}
-	return ""
-}
-
-func (x *UploadVideoRequest) GetContent() []byte {
-	if x != nil {
-		return x.Content
-	}
-	return nil
-}
-
-func (x *UploadVideoRequest) GetTitle() string {
-	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
-// UploadProgressIndicator allows clients to play the video up
-// until the uploaded point whilst a large video is still uploaded
-type UploadProgressIndicator struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	VideoId              string                 `protobuf:"bytes,1,opt,name=video_id,json=videoId,proto3" json:"video_id,omitempty"`
-	CompletionPercentage float64                `protobuf:"fixed64,2,opt,name=completion_percentage,json=completionPercentage,proto3" json:"completion_percentage,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
-}
-
-func (x *UploadProgressIndicator) Reset() {
-	*x = UploadProgressIndicator{}
-	mi := &file_proto_v1_projects_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadProgressIndicator) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadProgressIndicator) ProtoMessage() {}
-
-func (x *UploadProgressIndicator) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadProgressIndicator.ProtoReflect.Descriptor instead.
-func (*UploadProgressIndicator) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *UploadProgressIndicator) GetVideoId() string {
-	if x != nil {
-		return x.VideoId
-	}
-	return ""
-}
-
-func (x *UploadProgressIndicator) GetCompletionPercentage() float64 {
-	if x != nil {
-		return x.CompletionPercentage
-	}
-	return 0
-}
-
-// UploadFinishedIndicator does as advertised...
-type UploadFinishedIndicator struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	VideoId       string                 `protobuf:"bytes,1,opt,name=video_id,json=videoId,proto3" json:"video_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UploadFinishedIndicator) Reset() {
-	*x = UploadFinishedIndicator{}
-	mi := &file_proto_v1_projects_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadFinishedIndicator) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadFinishedIndicator) ProtoMessage() {}
-
-func (x *UploadFinishedIndicator) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadFinishedIndicator.ProtoReflect.Descriptor instead.
-func (*UploadFinishedIndicator) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *UploadFinishedIndicator) GetVideoId() string {
-	if x != nil {
-		return x.VideoId
-	}
-	return ""
-}
-
-type UploadVideoResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to UploadStatus:
-	//
-	//	*UploadVideoResponse_Ongoing
-	//	*UploadVideoResponse_Finished
-	UploadStatus  isUploadVideoResponse_UploadStatus `protobuf_oneof:"upload_status"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UploadVideoResponse) Reset() {
-	*x = UploadVideoResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadVideoResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadVideoResponse) ProtoMessage() {}
-
-func (x *UploadVideoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadVideoResponse.ProtoReflect.Descriptor instead.
-func (*UploadVideoResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *UploadVideoResponse) GetUploadStatus() isUploadVideoResponse_UploadStatus {
-	if x != nil {
-		return x.UploadStatus
-	}
-	return nil
-}
-
-func (x *UploadVideoResponse) GetOngoing() *UploadProgressIndicator {
-	if x != nil {
-		if x, ok := x.UploadStatus.(*UploadVideoResponse_Ongoing); ok {
-			return x.Ongoing
-		}
-	}
-	return nil
-}
-
-func (x *UploadVideoResponse) GetFinished() *UploadFinishedIndicator {
-	if x != nil {
-		if x, ok := x.UploadStatus.(*UploadVideoResponse_Finished); ok {
-			return x.Finished
-		}
-	}
-	return nil
-}
-
-type isUploadVideoResponse_UploadStatus interface {
-	isUploadVideoResponse_UploadStatus()
-}
-
-type UploadVideoResponse_Ongoing struct {
-	Ongoing *UploadProgressIndicator `protobuf:"bytes,1,opt,name=ongoing,proto3,oneof"`
-}
-
-type UploadVideoResponse_Finished struct {
-	Finished *UploadFinishedIndicator `protobuf:"bytes,2,opt,name=finished,proto3,oneof"`
-}
-
-func (*UploadVideoResponse_Ongoing) isUploadVideoResponse_UploadStatus() {}
-
-func (*UploadVideoResponse_Finished) isUploadVideoResponse_UploadStatus() {}
-
-type UploadAudioRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ProjectId     string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
-	Content       []byte                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UploadAudioRequest) Reset() {
-	*x = UploadAudioRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadAudioRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadAudioRequest) ProtoMessage() {}
-
-func (x *UploadAudioRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadAudioRequest.ProtoReflect.Descriptor instead.
-func (*UploadAudioRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *UploadAudioRequest) GetProjectId() string {
-	if x != nil {
-		return x.ProjectId
-	}
-	return ""
-}
-
-func (x *UploadAudioRequest) GetContent() []byte {
-	if x != nil {
-		return x.Content
-	}
-	return nil
-}
-
-func (x *UploadAudioRequest) GetTitle() string {
-	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
-type UploadAudioProgressIndicator struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	AudioId              string                 `protobuf:"bytes,1,opt,name=audio_id,json=audioId,proto3" json:"audio_id,omitempty"`
-	CompletionPercentage float64                `protobuf:"fixed64,2,opt,name=completion_percentage,json=completionPercentage,proto3" json:"completion_percentage,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
-}
-
-func (x *UploadAudioProgressIndicator) Reset() {
-	*x = UploadAudioProgressIndicator{}
-	mi := &file_proto_v1_projects_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadAudioProgressIndicator) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadAudioProgressIndicator) ProtoMessage() {}
-
-func (x *UploadAudioProgressIndicator) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadAudioProgressIndicator.ProtoReflect.Descriptor instead.
-func (*UploadAudioProgressIndicator) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *UploadAudioProgressIndicator) GetAudioId() string {
-	if x != nil {
-		return x.AudioId
-	}
-	return ""
-}
-
-func (x *UploadAudioProgressIndicator) GetCompletionPercentage() float64 {
-	if x != nil {
-		return x.CompletionPercentage
-	}
-	return 0
-}
-
-type UploadAudioFinishedIndicator struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AudioId       string                 `protobuf:"bytes,1,opt,name=audio_id,json=audioId,proto3" json:"audio_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UploadAudioFinishedIndicator) Reset() {
-	*x = UploadAudioFinishedIndicator{}
-	mi := &file_proto_v1_projects_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadAudioFinishedIndicator) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadAudioFinishedIndicator) ProtoMessage() {}
-
-func (x *UploadAudioFinishedIndicator) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadAudioFinishedIndicator.ProtoReflect.Descriptor instead.
-func (*UploadAudioFinishedIndicator) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *UploadAudioFinishedIndicator) GetAudioId() string {
-	if x != nil {
-		return x.AudioId
-	}
-	return ""
-}
-
-type UploadAudioResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to UploadStatus:
-	//
-	//	*UploadAudioResponse_Ongoing
-	//	*UploadAudioResponse_Finished
-	UploadStatus  isUploadAudioResponse_UploadStatus `protobuf_oneof:"upload_status"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UploadAudioResponse) Reset() {
-	*x = UploadAudioResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadAudioResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadAudioResponse) ProtoMessage() {}
-
-func (x *UploadAudioResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadAudioResponse.ProtoReflect.Descriptor instead.
-func (*UploadAudioResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *UploadAudioResponse) GetUploadStatus() isUploadAudioResponse_UploadStatus {
-	if x != nil {
-		return x.UploadStatus
-	}
-	return nil
-}
-
-func (x *UploadAudioResponse) GetOngoing() *UploadAudioProgressIndicator {
-	if x != nil {
-		if x, ok := x.UploadStatus.(*UploadAudioResponse_Ongoing); ok {
-			return x.Ongoing
-		}
-	}
-	return nil
-}
-
-func (x *UploadAudioResponse) GetFinished() *UploadAudioFinishedIndicator {
-	if x != nil {
-		if x, ok := x.UploadStatus.(*UploadAudioResponse_Finished); ok {
-			return x.Finished
-		}
-	}
-	return nil
-}
-
-type isUploadAudioResponse_UploadStatus interface {
-	isUploadAudioResponse_UploadStatus()
-}
-
-type UploadAudioResponse_Ongoing struct {
-	Ongoing *UploadAudioProgressIndicator `protobuf:"bytes,1,opt,name=ongoing,proto3,oneof"`
-}
-
-type UploadAudioResponse_Finished struct {
-	Finished *UploadAudioFinishedIndicator `protobuf:"bytes,2,opt,name=finished,proto3,oneof"`
-}
-
-func (*UploadAudioResponse_Ongoing) isUploadAudioResponse_UploadStatus() {}
-
-func (*UploadAudioResponse_Finished) isUploadAudioResponse_UploadStatus() {}
-
-// UploadImageRequest will upload image content to storage
-type UploadImageRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ProjectId     string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
-	Content       []byte                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
-	Meta          *MediaImageOverlay     `protobuf:"bytes,4,opt,name=meta,proto3" json:"meta,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UploadImageRequest) Reset() {
-	*x = UploadImageRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadImageRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadImageRequest) ProtoMessage() {}
-
-func (x *UploadImageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadImageRequest.ProtoReflect.Descriptor instead.
-func (*UploadImageRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *UploadImageRequest) GetProjectId() string {
-	if x != nil {
-		return x.ProjectId
-	}
-	return ""
-}
-
-func (x *UploadImageRequest) GetContent() []byte {
-	if x != nil {
-		return x.Content
-	}
-	return nil
-}
-
-func (x *UploadImageRequest) GetTitle() string {
-	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
-func (x *UploadImageRequest) GetMeta() *MediaImageOverlay {
-	if x != nil {
-		return x.Meta
-	}
-	return nil
-}
-
-type UploadImageResponse struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	UploadedAssetId string                 `protobuf:"bytes,1,opt,name=uploaded_asset_id,json=uploadedAssetId,proto3" json:"uploaded_asset_id,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
-}
-
-func (x *UploadImageResponse) Reset() {
-	*x = UploadImageResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadImageResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadImageResponse) ProtoMessage() {}
-
-func (x *UploadImageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadImageResponse.ProtoReflect.Descriptor instead.
-func (*UploadImageResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *UploadImageResponse) GetUploadedAssetId() string {
-	if x != nil {
-		return x.UploadedAssetId
-	}
-	return ""
-}
-
-// UploadImageRequest will upload image content to storage
-type UploadTextRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Project       string                 `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
-	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
-	Meta          *MediaTextOverlay      `protobuf:"bytes,4,opt,name=meta,proto3" json:"meta,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UploadTextRequest) Reset() {
-	*x = UploadTextRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadTextRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadTextRequest) ProtoMessage() {}
-
-func (x *UploadTextRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadTextRequest.ProtoReflect.Descriptor instead.
-func (*UploadTextRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *UploadTextRequest) GetProject() string {
-	if x != nil {
-		return x.Project
-	}
-	return ""
-}
-
-func (x *UploadTextRequest) GetContent() string {
-	if x != nil {
-		return x.Content
-	}
-	return ""
-}
-
-func (x *UploadTextRequest) GetTitle() string {
-	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
-func (x *UploadTextRequest) GetMeta() *MediaTextOverlay {
-	if x != nil {
-		return x.Meta
-	}
-	return nil
-}
-
-type UploadTextResponse struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	UploadedAssetId string                 `protobuf:"bytes,1,opt,name=uploaded_asset_id,json=uploadedAssetId,proto3" json:"uploaded_asset_id,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
-}
-
-func (x *UploadTextResponse) Reset() {
-	*x = UploadTextResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadTextResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadTextResponse) ProtoMessage() {}
-
-func (x *UploadTextResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadTextResponse.ProtoReflect.Descriptor instead.
-func (*UploadTextResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *UploadTextResponse) GetUploadedAssetId() string {
-	if x != nil {
-		return x.UploadedAssetId
-	}
-	return ""
-}
-
 // MediaImage is a reference to an image asset that can either take up the full video frame,
 // or be displayed at a specific pixel value depending on whether or not pos is included.
 // Size clamping to the size of the video display should be handled on the client in both the
 // size case and the corner position case.
 type MediaImageOverlay struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Pos           *MediaPosition         `protobuf:"bytes,1,opt,name=pos,proto3" json:"pos,omitempty"`
+	AssetId       string                 `protobuf:"bytes,1,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
+	Pos           *MediaPosition         `protobuf:"bytes,2,opt,name=pos,proto3" json:"pos,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MediaImageOverlay) Reset() {
 	*x = MediaImageOverlay{}
-	mi := &file_proto_v1_projects_proto_msgTypes[12]
+	mi := &file_proto_v1_projects_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -806,7 +101,7 @@ func (x *MediaImageOverlay) String() string {
 func (*MediaImageOverlay) ProtoMessage() {}
 
 func (x *MediaImageOverlay) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[12]
+	mi := &file_proto_v1_projects_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -819,7 +114,14 @@ func (x *MediaImageOverlay) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaImageOverlay.ProtoReflect.Descriptor instead.
 func (*MediaImageOverlay) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{12}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *MediaImageOverlay) GetAssetId() string {
+	if x != nil {
+		return x.AssetId
+	}
+	return ""
 }
 
 func (x *MediaImageOverlay) GetPos() *MediaPosition {
@@ -829,20 +131,21 @@ func (x *MediaImageOverlay) GetPos() *MediaPosition {
 	return nil
 }
 
-// MediaText is a reference to a text asset that is positioned at some place in the video frame,
+// MediaText is a reference to a inline text that is positioned at some place in the video frame,
 // Size clamping to the size of the video display should be handled on the client in both the
 // size case and the corner position case.
 type MediaTextOverlay struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Pos           *MediaPosition         `protobuf:"bytes,1,opt,name=pos,proto3" json:"pos,omitempty"`
 	Color         MediaTextColor         `protobuf:"varint,2,opt,name=color,proto3,enum=v1.MediaTextColor" json:"color,omitempty"`
+	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MediaTextOverlay) Reset() {
 	*x = MediaTextOverlay{}
-	mi := &file_proto_v1_projects_proto_msgTypes[13]
+	mi := &file_proto_v1_projects_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -854,7 +157,7 @@ func (x *MediaTextOverlay) String() string {
 func (*MediaTextOverlay) ProtoMessage() {}
 
 func (x *MediaTextOverlay) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[13]
+	mi := &file_proto_v1_projects_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -867,7 +170,7 @@ func (x *MediaTextOverlay) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaTextOverlay.ProtoReflect.Descriptor instead.
 func (*MediaTextOverlay) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{13}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *MediaTextOverlay) GetPos() *MediaPosition {
@@ -884,6 +187,13 @@ func (x *MediaTextOverlay) GetColor() MediaTextColor {
 	return MediaTextColor_MEDIA_TEXT_COLOR_UNSPECIFIED
 }
 
+func (x *MediaTextOverlay) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
 type MediaPosition struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	LeftCornerPx  uint64                 `protobuf:"varint,1,opt,name=left_corner_px,json=leftCornerPx,proto3" json:"left_corner_px,omitempty"`
@@ -895,7 +205,7 @@ type MediaPosition struct {
 
 func (x *MediaPosition) Reset() {
 	*x = MediaPosition{}
-	mi := &file_proto_v1_projects_proto_msgTypes[14]
+	mi := &file_proto_v1_projects_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -907,7 +217,7 @@ func (x *MediaPosition) String() string {
 func (*MediaPosition) ProtoMessage() {}
 
 func (x *MediaPosition) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[14]
+	mi := &file_proto_v1_projects_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -920,7 +230,7 @@ func (x *MediaPosition) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaPosition.ProtoReflect.Descriptor instead.
 func (*MediaPosition) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{14}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *MediaPosition) GetLeftCornerPx() uint64 {
@@ -947,20 +257,19 @@ func (x *MediaPosition) GetSize() uint64 {
 // MediaOverlays are the types of media that can be rendered on the playback editor for an
 // editing session on top of a video.
 type MediaOverlay struct {
-	state   protoimpl.MessageState `protogen:"open.v1"`
-	AssetId string                 `protobuf:"bytes,1,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
-	// Types that are valid to be assigned to AssetType:
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Kind:
 	//
 	//	*MediaOverlay_Image
 	//	*MediaOverlay_Text
-	AssetType     isMediaOverlay_AssetType `protobuf_oneof:"asset_type"`
+	Kind          isMediaOverlay_Kind `protobuf_oneof:"kind"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MediaOverlay) Reset() {
 	*x = MediaOverlay{}
-	mi := &file_proto_v1_projects_proto_msgTypes[15]
+	mi := &file_proto_v1_projects_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -972,7 +281,7 @@ func (x *MediaOverlay) String() string {
 func (*MediaOverlay) ProtoMessage() {}
 
 func (x *MediaOverlay) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[15]
+	mi := &file_proto_v1_projects_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -985,26 +294,19 @@ func (x *MediaOverlay) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaOverlay.ProtoReflect.Descriptor instead.
 func (*MediaOverlay) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{15}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *MediaOverlay) GetAssetId() string {
+func (x *MediaOverlay) GetKind() isMediaOverlay_Kind {
 	if x != nil {
-		return x.AssetId
-	}
-	return ""
-}
-
-func (x *MediaOverlay) GetAssetType() isMediaOverlay_AssetType {
-	if x != nil {
-		return x.AssetType
+		return x.Kind
 	}
 	return nil
 }
 
 func (x *MediaOverlay) GetImage() *MediaImageOverlay {
 	if x != nil {
-		if x, ok := x.AssetType.(*MediaOverlay_Image); ok {
+		if x, ok := x.Kind.(*MediaOverlay_Image); ok {
 			return x.Image
 		}
 	}
@@ -1013,28 +315,28 @@ func (x *MediaOverlay) GetImage() *MediaImageOverlay {
 
 func (x *MediaOverlay) GetText() *MediaTextOverlay {
 	if x != nil {
-		if x, ok := x.AssetType.(*MediaOverlay_Text); ok {
+		if x, ok := x.Kind.(*MediaOverlay_Text); ok {
 			return x.Text
 		}
 	}
 	return nil
 }
 
-type isMediaOverlay_AssetType interface {
-	isMediaOverlay_AssetType()
+type isMediaOverlay_Kind interface {
+	isMediaOverlay_Kind()
 }
 
 type MediaOverlay_Image struct {
-	Image *MediaImageOverlay `protobuf:"bytes,2,opt,name=image,proto3,oneof"`
+	Image *MediaImageOverlay `protobuf:"bytes,1,opt,name=image,proto3,oneof"`
 }
 
 type MediaOverlay_Text struct {
-	Text *MediaTextOverlay `protobuf:"bytes,3,opt,name=text,proto3,oneof"`
+	Text *MediaTextOverlay `protobuf:"bytes,2,opt,name=text,proto3,oneof"`
 }
 
-func (*MediaOverlay_Image) isMediaOverlay_AssetType() {}
+func (*MediaOverlay_Image) isMediaOverlay_Kind() {}
 
-func (*MediaOverlay_Text) isMediaOverlay_AssetType() {}
+func (*MediaOverlay_Text) isMediaOverlay_Kind() {}
 
 // MediaVideoEffects are effects that can be layed on top of video sections
 type MediaVideoEffect struct {
@@ -1052,7 +354,7 @@ type MediaVideoEffect struct {
 
 func (x *MediaVideoEffect) Reset() {
 	*x = MediaVideoEffect{}
-	mi := &file_proto_v1_projects_proto_msgTypes[16]
+	mi := &file_proto_v1_projects_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1064,7 +366,7 @@ func (x *MediaVideoEffect) String() string {
 func (*MediaVideoEffect) ProtoMessage() {}
 
 func (x *MediaVideoEffect) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[16]
+	mi := &file_proto_v1_projects_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1077,7 +379,7 @@ func (x *MediaVideoEffect) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaVideoEffect.ProtoReflect.Descriptor instead.
 func (*MediaVideoEffect) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{16}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *MediaVideoEffect) GetEffect() isMediaVideoEffect_Effect {
@@ -1168,7 +470,7 @@ type SectionVideo struct {
 
 func (x *SectionVideo) Reset() {
 	*x = SectionVideo{}
-	mi := &file_proto_v1_projects_proto_msgTypes[17]
+	mi := &file_proto_v1_projects_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1180,7 +482,7 @@ func (x *SectionVideo) String() string {
 func (*SectionVideo) ProtoMessage() {}
 
 func (x *SectionVideo) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[17]
+	mi := &file_proto_v1_projects_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1193,7 +495,7 @@ func (x *SectionVideo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SectionVideo.ProtoReflect.Descriptor instead.
 func (*SectionVideo) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{17}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SectionVideo) GetMeta() *MediaVideoMetadata {
@@ -1231,7 +533,7 @@ type SectionAudio struct {
 
 func (x *SectionAudio) Reset() {
 	*x = SectionAudio{}
-	mi := &file_proto_v1_projects_proto_msgTypes[18]
+	mi := &file_proto_v1_projects_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1243,7 +545,7 @@ func (x *SectionAudio) String() string {
 func (*SectionAudio) ProtoMessage() {}
 
 func (x *SectionAudio) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[18]
+	mi := &file_proto_v1_projects_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1256,7 +558,7 @@ func (x *SectionAudio) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SectionAudio.ProtoReflect.Descriptor instead.
 func (*SectionAudio) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{18}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *SectionAudio) GetMeta() *MediaAudioMetadata {
@@ -1287,7 +589,7 @@ type PlaybackSection struct {
 
 func (x *PlaybackSection) Reset() {
 	*x = PlaybackSection{}
-	mi := &file_proto_v1_projects_proto_msgTypes[19]
+	mi := &file_proto_v1_projects_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1299,7 +601,7 @@ func (x *PlaybackSection) String() string {
 func (*PlaybackSection) ProtoMessage() {}
 
 func (x *PlaybackSection) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[19]
+	mi := &file_proto_v1_projects_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1312,7 +614,7 @@ func (x *PlaybackSection) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PlaybackSection.ProtoReflect.Descriptor instead.
 func (*PlaybackSection) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{19}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *PlaybackSection) GetStartTimeMillis() uint64 {
@@ -1354,7 +656,7 @@ type PlaybackAudio struct {
 
 func (x *PlaybackAudio) Reset() {
 	*x = PlaybackAudio{}
-	mi := &file_proto_v1_projects_proto_msgTypes[20]
+	mi := &file_proto_v1_projects_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1366,7 +668,7 @@ func (x *PlaybackAudio) String() string {
 func (*PlaybackAudio) ProtoMessage() {}
 
 func (x *PlaybackAudio) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[20]
+	mi := &file_proto_v1_projects_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1379,7 +681,7 @@ func (x *PlaybackAudio) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PlaybackAudio.ProtoReflect.Descriptor instead.
 func (*PlaybackAudio) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{20}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *PlaybackAudio) GetStartTimeMillis() uint64 {
@@ -1413,7 +715,7 @@ type PlaybackState struct {
 
 func (x *PlaybackState) Reset() {
 	*x = PlaybackState{}
-	mi := &file_proto_v1_projects_proto_msgTypes[21]
+	mi := &file_proto_v1_projects_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1425,7 +727,7 @@ func (x *PlaybackState) String() string {
 func (*PlaybackState) ProtoMessage() {}
 
 func (x *PlaybackState) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[21]
+	mi := &file_proto_v1_projects_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1438,7 +740,7 @@ func (x *PlaybackState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PlaybackState.ProtoReflect.Descriptor instead.
 func (*PlaybackState) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{21}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *PlaybackState) GetVideoSections() []*PlaybackSection {
@@ -1472,7 +774,7 @@ type CommitEditRequest struct {
 
 func (x *CommitEditRequest) Reset() {
 	*x = CommitEditRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[22]
+	mi := &file_proto_v1_projects_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1484,7 +786,7 @@ func (x *CommitEditRequest) String() string {
 func (*CommitEditRequest) ProtoMessage() {}
 
 func (x *CommitEditRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[22]
+	mi := &file_proto_v1_projects_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1497,7 +799,7 @@ func (x *CommitEditRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommitEditRequest.ProtoReflect.Descriptor instead.
 func (*CommitEditRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{22}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *CommitEditRequest) GetProjectId() string {
@@ -1548,7 +850,7 @@ type CommitEditResponse struct {
 
 func (x *CommitEditResponse) Reset() {
 	*x = CommitEditResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[23]
+	mi := &file_proto_v1_projects_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1560,7 +862,7 @@ func (x *CommitEditResponse) String() string {
 func (*CommitEditResponse) ProtoMessage() {}
 
 func (x *CommitEditResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[23]
+	mi := &file_proto_v1_projects_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1573,7 +875,7 @@ func (x *CommitEditResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommitEditResponse.ProtoReflect.Descriptor instead.
 func (*CommitEditResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{23}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *CommitEditResponse) GetResponse() isCommitEditResponse_Response {
@@ -1631,7 +933,7 @@ type AutoSaveRequest struct {
 
 func (x *AutoSaveRequest) Reset() {
 	*x = AutoSaveRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[24]
+	mi := &file_proto_v1_projects_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1643,7 +945,7 @@ func (x *AutoSaveRequest) String() string {
 func (*AutoSaveRequest) ProtoMessage() {}
 
 func (x *AutoSaveRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[24]
+	mi := &file_proto_v1_projects_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1656,7 +958,7 @@ func (x *AutoSaveRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AutoSaveRequest.ProtoReflect.Descriptor instead.
 func (*AutoSaveRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{24}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *AutoSaveRequest) GetProjectId() string {
@@ -1692,7 +994,7 @@ type CommitEditError struct {
 
 func (x *CommitEditError) Reset() {
 	*x = CommitEditError{}
-	mi := &file_proto_v1_projects_proto_msgTypes[25]
+	mi := &file_proto_v1_projects_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1704,7 +1006,7 @@ func (x *CommitEditError) String() string {
 func (*CommitEditError) ProtoMessage() {}
 
 func (x *CommitEditError) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[25]
+	mi := &file_proto_v1_projects_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1717,7 +1019,7 @@ func (x *CommitEditError) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommitEditError.ProtoReflect.Descriptor instead.
 func (*CommitEditError) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{25}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *CommitEditError) GetErrorType() isCommitEditError_ErrorType {
@@ -1756,7 +1058,7 @@ type StaleBranchError struct {
 
 func (x *StaleBranchError) Reset() {
 	*x = StaleBranchError{}
-	mi := &file_proto_v1_projects_proto_msgTypes[26]
+	mi := &file_proto_v1_projects_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1768,7 +1070,7 @@ func (x *StaleBranchError) String() string {
 func (*StaleBranchError) ProtoMessage() {}
 
 func (x *StaleBranchError) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[26]
+	mi := &file_proto_v1_projects_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1781,7 +1083,7 @@ func (x *StaleBranchError) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StaleBranchError.ProtoReflect.Descriptor instead.
 func (*StaleBranchError) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{26}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *StaleBranchError) GetAssumedBranchTipUuid() string {
@@ -1808,7 +1110,7 @@ type BlurEffect struct {
 
 func (x *BlurEffect) Reset() {
 	*x = BlurEffect{}
-	mi := &file_proto_v1_projects_proto_msgTypes[27]
+	mi := &file_proto_v1_projects_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1820,7 +1122,7 @@ func (x *BlurEffect) String() string {
 func (*BlurEffect) ProtoMessage() {}
 
 func (x *BlurEffect) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[27]
+	mi := &file_proto_v1_projects_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1833,7 +1135,7 @@ func (x *BlurEffect) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlurEffect.ProtoReflect.Descriptor instead.
 func (*BlurEffect) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{27}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *BlurEffect) GetIntensity() float64 {
@@ -1853,7 +1155,7 @@ type SepiaEffect struct {
 
 func (x *SepiaEffect) Reset() {
 	*x = SepiaEffect{}
-	mi := &file_proto_v1_projects_proto_msgTypes[28]
+	mi := &file_proto_v1_projects_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1865,7 +1167,7 @@ func (x *SepiaEffect) String() string {
 func (*SepiaEffect) ProtoMessage() {}
 
 func (x *SepiaEffect) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[28]
+	mi := &file_proto_v1_projects_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1878,7 +1180,7 @@ func (x *SepiaEffect) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SepiaEffect.ProtoReflect.Descriptor instead.
 func (*SepiaEffect) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{28}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{16}
 }
 
 type SaturationEffect struct {
@@ -1890,7 +1192,7 @@ type SaturationEffect struct {
 
 func (x *SaturationEffect) Reset() {
 	*x = SaturationEffect{}
-	mi := &file_proto_v1_projects_proto_msgTypes[29]
+	mi := &file_proto_v1_projects_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1902,7 +1204,7 @@ func (x *SaturationEffect) String() string {
 func (*SaturationEffect) ProtoMessage() {}
 
 func (x *SaturationEffect) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[29]
+	mi := &file_proto_v1_projects_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1915,7 +1217,7 @@ func (x *SaturationEffect) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SaturationEffect.ProtoReflect.Descriptor instead.
 func (*SaturationEffect) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{29}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *SaturationEffect) GetStrength() float64 {
@@ -1934,7 +1236,7 @@ type BrightnessEffect struct {
 
 func (x *BrightnessEffect) Reset() {
 	*x = BrightnessEffect{}
-	mi := &file_proto_v1_projects_proto_msgTypes[30]
+	mi := &file_proto_v1_projects_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1946,7 +1248,7 @@ func (x *BrightnessEffect) String() string {
 func (*BrightnessEffect) ProtoMessage() {}
 
 func (x *BrightnessEffect) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[30]
+	mi := &file_proto_v1_projects_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1959,7 +1261,7 @@ func (x *BrightnessEffect) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BrightnessEffect.ProtoReflect.Descriptor instead.
 func (*BrightnessEffect) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{30}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *BrightnessEffect) GetStrength() float64 {
@@ -1978,13 +1280,14 @@ type ProjectMetadata struct {
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	WorkspaceId   string                 `protobuf:"bytes,5,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	CreatedBy     *User                  `protobuf:"bytes,6,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ProjectMetadata) Reset() {
 	*x = ProjectMetadata{}
-	mi := &file_proto_v1_projects_proto_msgTypes[31]
+	mi := &file_proto_v1_projects_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1996,7 +1299,7 @@ func (x *ProjectMetadata) String() string {
 func (*ProjectMetadata) ProtoMessage() {}
 
 func (x *ProjectMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[31]
+	mi := &file_proto_v1_projects_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2009,7 +1312,7 @@ func (x *ProjectMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProjectMetadata.ProtoReflect.Descriptor instead.
 func (*ProjectMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{31}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ProjectMetadata) GetId() string {
@@ -2047,6 +1350,13 @@ func (x *ProjectMetadata) GetWorkspaceId() string {
 	return ""
 }
 
+func (x *ProjectMetadata) GetCreatedBy() *User {
+	if x != nil {
+		return x.CreatedBy
+	}
+	return nil
+}
+
 // ListProjectsRequest fetches all projects belonging to a given user.
 type ListProjectsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -2057,7 +1367,7 @@ type ListProjectsRequest struct {
 
 func (x *ListProjectsRequest) Reset() {
 	*x = ListProjectsRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[32]
+	mi := &file_proto_v1_projects_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2069,7 +1379,7 @@ func (x *ListProjectsRequest) String() string {
 func (*ListProjectsRequest) ProtoMessage() {}
 
 func (x *ListProjectsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[32]
+	mi := &file_proto_v1_projects_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2082,7 +1392,7 @@ func (x *ListProjectsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProjectsRequest.ProtoReflect.Descriptor instead.
 func (*ListProjectsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{32}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ListProjectsRequest) GetWorkspaceId() string {
@@ -2092,18 +1402,17 @@ func (x *ListProjectsRequest) GetWorkspaceId() string {
 	return ""
 }
 
-// ListProjectsResponse returns the set of projects owned by the requesting user.
+// ListProjectsResponse returns the projects in a workspace.
 type ListProjectsResponse struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	UserCreatedProjects []*ProjectMetadata     `protobuf:"bytes,1,rep,name=user_created_projects,json=userCreatedProjects,proto3" json:"user_created_projects,omitempty"`
-	UserMemberProjects  []*ProjectMetadata     `protobuf:"bytes,2,rep,name=user_member_projects,json=userMemberProjects,proto3" json:"user_member_projects,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Projects      []*ProjectMetadata     `protobuf:"bytes,1,rep,name=projects,proto3" json:"projects,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListProjectsResponse) Reset() {
 	*x = ListProjectsResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[33]
+	mi := &file_proto_v1_projects_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2115,7 +1424,7 @@ func (x *ListProjectsResponse) String() string {
 func (*ListProjectsResponse) ProtoMessage() {}
 
 func (x *ListProjectsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[33]
+	mi := &file_proto_v1_projects_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2128,24 +1437,17 @@ func (x *ListProjectsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProjectsResponse.ProtoReflect.Descriptor instead.
 func (*ListProjectsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{33}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{21}
 }
 
-func (x *ListProjectsResponse) GetUserCreatedProjects() []*ProjectMetadata {
+func (x *ListProjectsResponse) GetProjects() []*ProjectMetadata {
 	if x != nil {
-		return x.UserCreatedProjects
+		return x.Projects
 	}
 	return nil
 }
 
-func (x *ListProjectsResponse) GetUserMemberProjects() []*ProjectMetadata {
-	if x != nil {
-		return x.UserMemberProjects
-	}
-	return nil
-}
-
-// ListProjectAssetsRequest fetches every media asset (videos, images, text boxes)
+// ListProjectAssetsRequest fetches every media asset (videos, images, audio)
 // that has been uploaded or created within a project.
 type ListProjectAssetsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -2156,7 +1458,7 @@ type ListProjectAssetsRequest struct {
 
 func (x *ListProjectAssetsRequest) Reset() {
 	*x = ListProjectAssetsRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[34]
+	mi := &file_proto_v1_projects_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2168,7 +1470,7 @@ func (x *ListProjectAssetsRequest) String() string {
 func (*ListProjectAssetsRequest) ProtoMessage() {}
 
 func (x *ListProjectAssetsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[34]
+	mi := &file_proto_v1_projects_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2181,12 +1483,64 @@ func (x *ListProjectAssetsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProjectAssetsRequest.ProtoReflect.Descriptor instead.
 func (*ListProjectAssetsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{34}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ListProjectAssetsRequest) GetProjectId() string {
 	if x != nil {
 		return x.ProjectId
+	}
+	return ""
+}
+
+type RemoveProjectAssetRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId     string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	AssetId       string                 `protobuf:"bytes,2,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemoveProjectAssetRequest) Reset() {
+	*x = RemoveProjectAssetRequest{}
+	mi := &file_proto_v1_projects_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemoveProjectAssetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemoveProjectAssetRequest) ProtoMessage() {}
+
+func (x *RemoveProjectAssetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_projects_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemoveProjectAssetRequest.ProtoReflect.Descriptor instead.
+func (*RemoveProjectAssetRequest) Descriptor() ([]byte, []int) {
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *RemoveProjectAssetRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *RemoveProjectAssetRequest) GetAssetId() string {
+	if x != nil {
+		return x.AssetId
 	}
 	return ""
 }
@@ -2204,7 +1558,7 @@ type MediaVideoMetadata struct {
 
 func (x *MediaVideoMetadata) Reset() {
 	*x = MediaVideoMetadata{}
-	mi := &file_proto_v1_projects_proto_msgTypes[35]
+	mi := &file_proto_v1_projects_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2216,7 +1570,7 @@ func (x *MediaVideoMetadata) String() string {
 func (*MediaVideoMetadata) ProtoMessage() {}
 
 func (x *MediaVideoMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[35]
+	mi := &file_proto_v1_projects_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2229,7 +1583,7 @@ func (x *MediaVideoMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaVideoMetadata.ProtoReflect.Descriptor instead.
 func (*MediaVideoMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{35}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *MediaVideoMetadata) GetAssetId() string {
@@ -2264,7 +1618,7 @@ type MediaAudioMetadata struct {
 
 func (x *MediaAudioMetadata) Reset() {
 	*x = MediaAudioMetadata{}
-	mi := &file_proto_v1_projects_proto_msgTypes[36]
+	mi := &file_proto_v1_projects_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2276,7 +1630,7 @@ func (x *MediaAudioMetadata) String() string {
 func (*MediaAudioMetadata) ProtoMessage() {}
 
 func (x *MediaAudioMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[36]
+	mi := &file_proto_v1_projects_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2289,7 +1643,7 @@ func (x *MediaAudioMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaAudioMetadata.ProtoReflect.Descriptor instead.
 func (*MediaAudioMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{36}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *MediaAudioMetadata) GetAssetId() string {
@@ -2319,14 +1673,14 @@ type MediaImageMetadata struct {
 	AssetId       string                 `protobuf:"bytes,1,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
 	SignedUrl     string                 `protobuf:"bytes,2,opt,name=signed_url,json=signedUrl,proto3" json:"signed_url,omitempty"`
 	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
-	ContentType   string                 `protobuf:"bytes,4,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"` // TODO
+	ContentType   string                 `protobuf:"bytes,4,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MediaImageMetadata) Reset() {
 	*x = MediaImageMetadata{}
-	mi := &file_proto_v1_projects_proto_msgTypes[37]
+	mi := &file_proto_v1_projects_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2338,7 +1692,7 @@ func (x *MediaImageMetadata) String() string {
 func (*MediaImageMetadata) ProtoMessage() {}
 
 func (x *MediaImageMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[37]
+	mi := &file_proto_v1_projects_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2351,7 +1705,7 @@ func (x *MediaImageMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaImageMetadata.ProtoReflect.Descriptor instead.
 func (*MediaImageMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{37}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *MediaImageMetadata) GetAssetId() string {
@@ -2382,83 +1736,20 @@ func (x *MediaImageMetadata) GetContentType() string {
 	return ""
 }
 
-// MediaTextMetadata is the lightweight descriptor returned when listing text box assets.
-type MediaTextMetadata struct {
-	state   protoimpl.MessageState `protogen:"open.v1"`
-	AssetId string                 `protobuf:"bytes,1,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
-	// TODO
-	Content       string `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	Title         string `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *MediaTextMetadata) Reset() {
-	*x = MediaTextMetadata{}
-	mi := &file_proto_v1_projects_proto_msgTypes[38]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *MediaTextMetadata) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*MediaTextMetadata) ProtoMessage() {}
-
-func (x *MediaTextMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[38]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use MediaTextMetadata.ProtoReflect.Descriptor instead.
-func (*MediaTextMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{38}
-}
-
-func (x *MediaTextMetadata) GetAssetId() string {
-	if x != nil {
-		return x.AssetId
-	}
-	return ""
-}
-
-func (x *MediaTextMetadata) GetContent() string {
-	if x != nil {
-		return x.Content
-	}
-	return ""
-}
-
-func (x *MediaTextMetadata) GetTitle() string {
-	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
 // ListProjectAssetsResponse groups all asset types belonging to a project so the
 // client can populate the asset panel in a single round-trip.
 type ListProjectAssetsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Videos        []*MediaVideoMetadata  `protobuf:"bytes,1,rep,name=videos,proto3" json:"videos,omitempty"`
 	Images        []*MediaImageMetadata  `protobuf:"bytes,2,rep,name=images,proto3" json:"images,omitempty"`
-	TextBoxes     []*MediaTextMetadata   `protobuf:"bytes,3,rep,name=text_boxes,json=textBoxes,proto3" json:"text_boxes,omitempty"`
-	Audios        []*MediaAudioMetadata  `protobuf:"bytes,4,rep,name=audios,proto3" json:"audios,omitempty"`
+	Audios        []*MediaAudioMetadata  `protobuf:"bytes,3,rep,name=audios,proto3" json:"audios,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListProjectAssetsResponse) Reset() {
 	*x = ListProjectAssetsResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[39]
+	mi := &file_proto_v1_projects_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2470,7 +1761,7 @@ func (x *ListProjectAssetsResponse) String() string {
 func (*ListProjectAssetsResponse) ProtoMessage() {}
 
 func (x *ListProjectAssetsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[39]
+	mi := &file_proto_v1_projects_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2483,7 +1774,7 @@ func (x *ListProjectAssetsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProjectAssetsResponse.ProtoReflect.Descriptor instead.
 func (*ListProjectAssetsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{39}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ListProjectAssetsResponse) GetVideos() []*MediaVideoMetadata {
@@ -2496,13 +1787,6 @@ func (x *ListProjectAssetsResponse) GetVideos() []*MediaVideoMetadata {
 func (x *ListProjectAssetsResponse) GetImages() []*MediaImageMetadata {
 	if x != nil {
 		return x.Images
-	}
-	return nil
-}
-
-func (x *ListProjectAssetsResponse) GetTextBoxes() []*MediaTextMetadata {
-	if x != nil {
-		return x.TextBoxes
 	}
 	return nil
 }
@@ -2524,7 +1808,7 @@ type ListProjectBranchesRequest struct {
 
 func (x *ListProjectBranchesRequest) Reset() {
 	*x = ListProjectBranchesRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[40]
+	mi := &file_proto_v1_projects_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2536,7 +1820,7 @@ func (x *ListProjectBranchesRequest) String() string {
 func (*ListProjectBranchesRequest) ProtoMessage() {}
 
 func (x *ListProjectBranchesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[40]
+	mi := &file_proto_v1_projects_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2549,7 +1833,7 @@ func (x *ListProjectBranchesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProjectBranchesRequest.ProtoReflect.Descriptor instead.
 func (*ListProjectBranchesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{40}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ListProjectBranchesRequest) GetProjectId() string {
@@ -2571,7 +1855,7 @@ type BranchMetadata struct {
 
 func (x *BranchMetadata) Reset() {
 	*x = BranchMetadata{}
-	mi := &file_proto_v1_projects_proto_msgTypes[41]
+	mi := &file_proto_v1_projects_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2583,7 +1867,7 @@ func (x *BranchMetadata) String() string {
 func (*BranchMetadata) ProtoMessage() {}
 
 func (x *BranchMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[41]
+	mi := &file_proto_v1_projects_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2596,7 +1880,7 @@ func (x *BranchMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BranchMetadata.ProtoReflect.Descriptor instead.
 func (*BranchMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{41}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *BranchMetadata) GetName() string {
@@ -2630,7 +1914,7 @@ type ListProjectBranchesResponse struct {
 
 func (x *ListProjectBranchesResponse) Reset() {
 	*x = ListProjectBranchesResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[42]
+	mi := &file_proto_v1_projects_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2642,7 +1926,7 @@ func (x *ListProjectBranchesResponse) String() string {
 func (*ListProjectBranchesResponse) ProtoMessage() {}
 
 func (x *ListProjectBranchesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[42]
+	mi := &file_proto_v1_projects_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2655,7 +1939,7 @@ func (x *ListProjectBranchesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProjectBranchesResponse.ProtoReflect.Descriptor instead.
 func (*ListProjectBranchesResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{42}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *ListProjectBranchesResponse) GetBranches() []*BranchMetadata {
@@ -2676,7 +1960,7 @@ type CreateProjectRequest struct {
 
 func (x *CreateProjectRequest) Reset() {
 	*x = CreateProjectRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[43]
+	mi := &file_proto_v1_projects_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2688,7 +1972,7 @@ func (x *CreateProjectRequest) String() string {
 func (*CreateProjectRequest) ProtoMessage() {}
 
 func (x *CreateProjectRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[43]
+	mi := &file_proto_v1_projects_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2701,7 +1985,7 @@ func (x *CreateProjectRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateProjectRequest.ProtoReflect.Descriptor instead.
 func (*CreateProjectRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{43}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *CreateProjectRequest) GetProjectName() string {
@@ -2734,7 +2018,7 @@ type CreateProjectResponse struct {
 
 func (x *CreateProjectResponse) Reset() {
 	*x = CreateProjectResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[44]
+	mi := &file_proto_v1_projects_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2746,7 +2030,7 @@ func (x *CreateProjectResponse) String() string {
 func (*CreateProjectResponse) ProtoMessage() {}
 
 func (x *CreateProjectResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[44]
+	mi := &file_proto_v1_projects_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2759,7 +2043,7 @@ func (x *CreateProjectResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateProjectResponse.ProtoReflect.Descriptor instead.
 func (*CreateProjectResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{44}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *CreateProjectResponse) GetCreatedProjectId() string {
@@ -2779,7 +2063,7 @@ type AddProjectUserRequest struct {
 
 func (x *AddProjectUserRequest) Reset() {
 	*x = AddProjectUserRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[45]
+	mi := &file_proto_v1_projects_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2791,7 +2075,7 @@ func (x *AddProjectUserRequest) String() string {
 func (*AddProjectUserRequest) ProtoMessage() {}
 
 func (x *AddProjectUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[45]
+	mi := &file_proto_v1_projects_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2804,7 +2088,7 @@ func (x *AddProjectUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddProjectUserRequest.ProtoReflect.Descriptor instead.
 func (*AddProjectUserRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{45}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *AddProjectUserRequest) GetProjectId() string {
@@ -2830,7 +2114,7 @@ type DeleteProjectRequest struct {
 
 func (x *DeleteProjectRequest) Reset() {
 	*x = DeleteProjectRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[46]
+	mi := &file_proto_v1_projects_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2842,7 +2126,7 @@ func (x *DeleteProjectRequest) String() string {
 func (*DeleteProjectRequest) ProtoMessage() {}
 
 func (x *DeleteProjectRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[46]
+	mi := &file_proto_v1_projects_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2855,7 +2139,7 @@ func (x *DeleteProjectRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteProjectRequest.ProtoReflect.Descriptor instead.
 func (*DeleteProjectRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{46}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *DeleteProjectRequest) GetProjectId() string {
@@ -2877,7 +2161,7 @@ type GetCommitRequest struct {
 
 func (x *GetCommitRequest) Reset() {
 	*x = GetCommitRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[47]
+	mi := &file_proto_v1_projects_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2889,7 +2173,7 @@ func (x *GetCommitRequest) String() string {
 func (*GetCommitRequest) ProtoMessage() {}
 
 func (x *GetCommitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[47]
+	mi := &file_proto_v1_projects_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2902,7 +2186,7 @@ func (x *GetCommitRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCommitRequest.ProtoReflect.Descriptor instead.
 func (*GetCommitRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{47}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *GetCommitRequest) GetCommitId() string {
@@ -2931,7 +2215,7 @@ type GetCommitResponse struct {
 
 func (x *GetCommitResponse) Reset() {
 	*x = GetCommitResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[48]
+	mi := &file_proto_v1_projects_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2943,7 +2227,7 @@ func (x *GetCommitResponse) String() string {
 func (*GetCommitResponse) ProtoMessage() {}
 
 func (x *GetCommitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[48]
+	mi := &file_proto_v1_projects_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2956,7 +2240,7 @@ func (x *GetCommitResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCommitResponse.ProtoReflect.Descriptor instead.
 func (*GetCommitResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{48}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *GetCommitResponse) GetCommitId() string {
@@ -2991,65 +2275,22 @@ var File_proto_v1_projects_proto protoreflect.FileDescriptor
 
 const file_proto_v1_projects_proto_rawDesc = "" +
 	"\n" +
-	"\x17proto/v1/projects.proto\x12\x02v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\"c\n" +
-	"\x12UploadVideoRequest\x12\x1d\n" +
-	"\n" +
-	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\fR\acontent\x12\x14\n" +
-	"\x05title\x18\x03 \x01(\tR\x05title\"i\n" +
-	"\x17UploadProgressIndicator\x12\x19\n" +
-	"\bvideo_id\x18\x01 \x01(\tR\avideoId\x123\n" +
-	"\x15completion_percentage\x18\x02 \x01(\x01R\x14completionPercentage\"4\n" +
-	"\x17UploadFinishedIndicator\x12\x19\n" +
-	"\bvideo_id\x18\x01 \x01(\tR\avideoId\"\x9a\x01\n" +
-	"\x13UploadVideoResponse\x127\n" +
-	"\aongoing\x18\x01 \x01(\v2\x1b.v1.UploadProgressIndicatorH\x00R\aongoing\x129\n" +
-	"\bfinished\x18\x02 \x01(\v2\x1b.v1.UploadFinishedIndicatorH\x00R\bfinishedB\x0f\n" +
-	"\rupload_status\"c\n" +
-	"\x12UploadAudioRequest\x12\x1d\n" +
-	"\n" +
-	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\fR\acontent\x12\x14\n" +
-	"\x05title\x18\x03 \x01(\tR\x05title\"n\n" +
-	"\x1cUploadAudioProgressIndicator\x12\x19\n" +
-	"\baudio_id\x18\x01 \x01(\tR\aaudioId\x123\n" +
-	"\x15completion_percentage\x18\x02 \x01(\x01R\x14completionPercentage\"9\n" +
-	"\x1cUploadAudioFinishedIndicator\x12\x19\n" +
-	"\baudio_id\x18\x01 \x01(\tR\aaudioId\"\xa4\x01\n" +
-	"\x13UploadAudioResponse\x12<\n" +
-	"\aongoing\x18\x01 \x01(\v2 .v1.UploadAudioProgressIndicatorH\x00R\aongoing\x12>\n" +
-	"\bfinished\x18\x02 \x01(\v2 .v1.UploadAudioFinishedIndicatorH\x00R\bfinishedB\x0f\n" +
-	"\rupload_status\"\x8e\x01\n" +
-	"\x12UploadImageRequest\x12\x1d\n" +
-	"\n" +
-	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\fR\acontent\x12\x14\n" +
-	"\x05title\x18\x03 \x01(\tR\x05title\x12)\n" +
-	"\x04meta\x18\x04 \x01(\v2\x15.v1.MediaImageOverlayR\x04meta\"A\n" +
-	"\x13UploadImageResponse\x12*\n" +
-	"\x11uploaded_asset_id\x18\x01 \x01(\tR\x0fuploadedAssetId\"\x87\x01\n" +
-	"\x11UploadTextRequest\x12\x18\n" +
-	"\aproject\x18\x01 \x01(\tR\aproject\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\x12\x14\n" +
-	"\x05title\x18\x03 \x01(\tR\x05title\x12(\n" +
-	"\x04meta\x18\x04 \x01(\v2\x14.v1.MediaTextOverlayR\x04meta\"@\n" +
-	"\x12UploadTextResponse\x12*\n" +
-	"\x11uploaded_asset_id\x18\x01 \x01(\tR\x0fuploadedAssetId\"8\n" +
-	"\x11MediaImageOverlay\x12#\n" +
-	"\x03pos\x18\x01 \x01(\v2\x11.v1.MediaPositionR\x03pos\"a\n" +
+	"\x17proto/v1/projects.proto\x12\x02v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x14proto/v1/users.proto\"S\n" +
+	"\x11MediaImageOverlay\x12\x19\n" +
+	"\basset_id\x18\x01 \x01(\tR\aassetId\x12#\n" +
+	"\x03pos\x18\x02 \x01(\v2\x11.v1.MediaPositionR\x03pos\"{\n" +
 	"\x10MediaTextOverlay\x12#\n" +
 	"\x03pos\x18\x01 \x01(\v2\x11.v1.MediaPositionR\x03pos\x12(\n" +
-	"\x05color\x18\x02 \x01(\x0e2\x12.v1.MediaTextColorR\x05color\"o\n" +
+	"\x05color\x18\x02 \x01(\x0e2\x12.v1.MediaTextColorR\x05color\x12\x18\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\"o\n" +
 	"\rMediaPosition\x12$\n" +
 	"\x0eleft_corner_px\x18\x01 \x01(\x04R\fleftCornerPx\x12$\n" +
 	"\x0eleft_corner_py\x18\x02 \x01(\x04R\fleftCornerPy\x12\x12\n" +
-	"\x04size\x18\x03 \x01(\x04R\x04size\"\x92\x01\n" +
-	"\fMediaOverlay\x12\x19\n" +
-	"\basset_id\x18\x01 \x01(\tR\aassetId\x12-\n" +
-	"\x05image\x18\x02 \x01(\v2\x15.v1.MediaImageOverlayH\x00R\x05image\x12*\n" +
-	"\x04text\x18\x03 \x01(\v2\x14.v1.MediaTextOverlayH\x00R\x04textB\f\n" +
-	"\n" +
-	"asset_type\"\xdb\x01\n" +
+	"\x04size\x18\x03 \x01(\x04R\x04size\"q\n" +
+	"\fMediaOverlay\x12-\n" +
+	"\x05image\x18\x01 \x01(\v2\x15.v1.MediaImageOverlayH\x00R\x05image\x12*\n" +
+	"\x04text\x18\x02 \x01(\v2\x14.v1.MediaTextOverlayH\x00R\x04textB\x06\n" +
+	"\x04kind\"\xdb\x01\n" +
 	"\x10MediaVideoEffect\x12$\n" +
 	"\x04blur\x18\x01 \x01(\v2\x0e.v1.BlurEffectH\x00R\x04blur\x12'\n" +
 	"\x05sepia\x18\x02 \x01(\v2\x0f.v1.SepiaEffectH\x00R\x05sepia\x126\n" +
@@ -3112,22 +2353,27 @@ const file_proto_v1_projects_proto_rawDesc = "" +
 	"\x10SaturationEffect\x12\x1a\n" +
 	"\bstrength\x18\x01 \x01(\x01R\bstrength\".\n" +
 	"\x10BrightnessEffect\x12\x1a\n" +
-	"\bstrength\x18\x01 \x01(\x01R\bstrength\"\xb5\x01\n" +
+	"\bstrength\x18\x01 \x01(\x01R\bstrength\"\xde\x01\n" +
 	"\x0fProjectMetadata\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x129\n" +
 	"\n" +
 	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12!\n" +
-	"\fworkspace_id\x18\x05 \x01(\tR\vworkspaceId\"8\n" +
+	"\fworkspace_id\x18\x05 \x01(\tR\vworkspaceId\x12'\n" +
+	"\n" +
+	"created_by\x18\x06 \x01(\v2\b.v1.UserR\tcreatedBy\"8\n" +
 	"\x13ListProjectsRequest\x12!\n" +
-	"\fworkspace_id\x18\x01 \x01(\tR\vworkspaceId\"\xa6\x01\n" +
-	"\x14ListProjectsResponse\x12G\n" +
-	"\x15user_created_projects\x18\x01 \x03(\v2\x13.v1.ProjectMetadataR\x13userCreatedProjects\x12E\n" +
-	"\x14user_member_projects\x18\x02 \x03(\v2\x13.v1.ProjectMetadataR\x12userMemberProjects\"9\n" +
+	"\fworkspace_id\x18\x01 \x01(\tR\vworkspaceId\"G\n" +
+	"\x14ListProjectsResponse\x12/\n" +
+	"\bprojects\x18\x01 \x03(\v2\x13.v1.ProjectMetadataR\bprojects\"9\n" +
 	"\x18ListProjectAssetsRequest\x12\x1d\n" +
 	"\n" +
-	"project_id\x18\x01 \x01(\tR\tprojectId\"a\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\"U\n" +
+	"\x19RemoveProjectAssetRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x19\n" +
+	"\basset_id\x18\x02 \x01(\tR\aassetId\"a\n" +
 	"\x12MediaVideoMetadata\x12\x19\n" +
 	"\basset_id\x18\x01 \x01(\tR\aassetId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1a\n" +
@@ -3141,17 +2387,11 @@ const file_proto_v1_projects_proto_rawDesc = "" +
 	"\n" +
 	"signed_url\x18\x02 \x01(\tR\tsignedUrl\x12\x14\n" +
 	"\x05title\x18\x03 \x01(\tR\x05title\x12!\n" +
-	"\fcontent_type\x18\x04 \x01(\tR\vcontentType\"^\n" +
-	"\x11MediaTextMetadata\x12\x19\n" +
-	"\basset_id\x18\x01 \x01(\tR\aassetId\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\x12\x14\n" +
-	"\x05title\x18\x03 \x01(\tR\x05title\"\xe1\x01\n" +
+	"\fcontent_type\x18\x04 \x01(\tR\vcontentType\"\xab\x01\n" +
 	"\x19ListProjectAssetsResponse\x12.\n" +
 	"\x06videos\x18\x01 \x03(\v2\x16.v1.MediaVideoMetadataR\x06videos\x12.\n" +
-	"\x06images\x18\x02 \x03(\v2\x16.v1.MediaImageMetadataR\x06images\x124\n" +
-	"\n" +
-	"text_boxes\x18\x03 \x03(\v2\x15.v1.MediaTextMetadataR\ttextBoxes\x12.\n" +
-	"\x06audios\x18\x04 \x03(\v2\x16.v1.MediaAudioMetadataR\x06audios\";\n" +
+	"\x06images\x18\x02 \x03(\v2\x16.v1.MediaImageMetadataR\x06images\x12.\n" +
+	"\x06audios\x18\x03 \x03(\v2\x16.v1.MediaAudioMetadataR\x06audios\";\n" +
 	"\x1aListProjectBranchesRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\"o\n" +
@@ -3188,18 +2428,14 @@ const file_proto_v1_projects_proto_rawDesc = "" +
 	"\x1cMEDIA_TEXT_COLOR_UNSPECIFIED\x10\x00\x12\x1a\n" +
 	"\x16MEDIA_TEXT_COLOR_BLACK\x10\x01\x12\x1a\n" +
 	"\x16MEDIA_TEXT_COLOR_WHITE\x10\x02\x12\x1a\n" +
-	"\x16MEDIA_TEXT_COLOR_CLEAR\x10\x032\xfc\x06\n" +
-	"\x0eProjectService\x12@\n" +
-	"\vUploadVideo\x12\x16.v1.UploadVideoRequest\x1a\x17.v1.UploadVideoResponse0\x01\x12@\n" +
-	"\vUploadAudio\x12\x16.v1.UploadAudioRequest\x1a\x17.v1.UploadAudioResponse0\x01\x12>\n" +
-	"\vUploadImage\x12\x16.v1.UploadImageRequest\x1a\x17.v1.UploadImageResponse\x12;\n" +
-	"\n" +
-	"UploadText\x12\x15.v1.UploadTextRequest\x1a\x16.v1.UploadTextResponse\x12;\n" +
+	"\x16MEDIA_TEXT_COLOR_CLEAR\x10\x032\xc8\x05\n" +
+	"\x0eProjectService\x12;\n" +
 	"\n" +
 	"CommitEdit\x12\x15.v1.CommitEditRequest\x1a\x16.v1.CommitEditResponse\x128\n" +
 	"\tGetCommit\x12\x14.v1.GetCommitRequest\x1a\x15.v1.GetCommitResponse\x12A\n" +
 	"\fListProjects\x12\x17.v1.ListProjectsRequest\x1a\x18.v1.ListProjectsResponse\x12P\n" +
-	"\x11ListProjectAssets\x12\x1c.v1.ListProjectAssetsRequest\x1a\x1d.v1.ListProjectAssetsResponse\x12V\n" +
+	"\x11ListProjectAssets\x12\x1c.v1.ListProjectAssetsRequest\x1a\x1d.v1.ListProjectAssetsResponse\x12K\n" +
+	"\x12RemoveProjectAsset\x12\x1d.v1.RemoveProjectAssetRequest\x1a\x16.google.protobuf.Empty\x12V\n" +
 	"\x13ListProjectBranches\x12\x1e.v1.ListProjectBranchesRequest\x1a\x1f.v1.ListProjectBranchesResponse\x12D\n" +
 	"\rCreateProject\x12\x18.v1.CreateProjectRequest\x1a\x19.v1.CreateProjectResponse\x12C\n" +
 	"\x0eAddProjectUser\x12\x19.v1.AddProjectUserRequest\x1a\x16.google.protobuf.Empty\x12A\n" +
@@ -3219,129 +2455,105 @@ func file_proto_v1_projects_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_v1_projects_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_v1_projects_proto_msgTypes = make([]protoimpl.MessageInfo, 49)
+var file_proto_v1_projects_proto_msgTypes = make([]protoimpl.MessageInfo, 37)
 var file_proto_v1_projects_proto_goTypes = []any{
-	(MediaTextColor)(0),                  // 0: v1.MediaTextColor
-	(*UploadVideoRequest)(nil),           // 1: v1.UploadVideoRequest
-	(*UploadProgressIndicator)(nil),      // 2: v1.UploadProgressIndicator
-	(*UploadFinishedIndicator)(nil),      // 3: v1.UploadFinishedIndicator
-	(*UploadVideoResponse)(nil),          // 4: v1.UploadVideoResponse
-	(*UploadAudioRequest)(nil),           // 5: v1.UploadAudioRequest
-	(*UploadAudioProgressIndicator)(nil), // 6: v1.UploadAudioProgressIndicator
-	(*UploadAudioFinishedIndicator)(nil), // 7: v1.UploadAudioFinishedIndicator
-	(*UploadAudioResponse)(nil),          // 8: v1.UploadAudioResponse
-	(*UploadImageRequest)(nil),           // 9: v1.UploadImageRequest
-	(*UploadImageResponse)(nil),          // 10: v1.UploadImageResponse
-	(*UploadTextRequest)(nil),            // 11: v1.UploadTextRequest
-	(*UploadTextResponse)(nil),           // 12: v1.UploadTextResponse
-	(*MediaImageOverlay)(nil),            // 13: v1.MediaImageOverlay
-	(*MediaTextOverlay)(nil),             // 14: v1.MediaTextOverlay
-	(*MediaPosition)(nil),                // 15: v1.MediaPosition
-	(*MediaOverlay)(nil),                 // 16: v1.MediaOverlay
-	(*MediaVideoEffect)(nil),             // 17: v1.MediaVideoEffect
-	(*SectionVideo)(nil),                 // 18: v1.SectionVideo
-	(*SectionAudio)(nil),                 // 19: v1.SectionAudio
-	(*PlaybackSection)(nil),              // 20: v1.PlaybackSection
-	(*PlaybackAudio)(nil),                // 21: v1.PlaybackAudio
-	(*PlaybackState)(nil),                // 22: v1.PlaybackState
-	(*CommitEditRequest)(nil),            // 23: v1.CommitEditRequest
-	(*CommitEditResponse)(nil),           // 24: v1.CommitEditResponse
-	(*AutoSaveRequest)(nil),              // 25: v1.AutoSaveRequest
-	(*CommitEditError)(nil),              // 26: v1.CommitEditError
-	(*StaleBranchError)(nil),             // 27: v1.StaleBranchError
-	(*BlurEffect)(nil),                   // 28: v1.BlurEffect
-	(*SepiaEffect)(nil),                  // 29: v1.SepiaEffect
-	(*SaturationEffect)(nil),             // 30: v1.SaturationEffect
-	(*BrightnessEffect)(nil),             // 31: v1.BrightnessEffect
-	(*ProjectMetadata)(nil),              // 32: v1.ProjectMetadata
-	(*ListProjectsRequest)(nil),          // 33: v1.ListProjectsRequest
-	(*ListProjectsResponse)(nil),         // 34: v1.ListProjectsResponse
-	(*ListProjectAssetsRequest)(nil),     // 35: v1.ListProjectAssetsRequest
-	(*MediaVideoMetadata)(nil),           // 36: v1.MediaVideoMetadata
-	(*MediaAudioMetadata)(nil),           // 37: v1.MediaAudioMetadata
-	(*MediaImageMetadata)(nil),           // 38: v1.MediaImageMetadata
-	(*MediaTextMetadata)(nil),            // 39: v1.MediaTextMetadata
-	(*ListProjectAssetsResponse)(nil),    // 40: v1.ListProjectAssetsResponse
-	(*ListProjectBranchesRequest)(nil),   // 41: v1.ListProjectBranchesRequest
-	(*BranchMetadata)(nil),               // 42: v1.BranchMetadata
-	(*ListProjectBranchesResponse)(nil),  // 43: v1.ListProjectBranchesResponse
-	(*CreateProjectRequest)(nil),         // 44: v1.CreateProjectRequest
-	(*CreateProjectResponse)(nil),        // 45: v1.CreateProjectResponse
-	(*AddProjectUserRequest)(nil),        // 46: v1.AddProjectUserRequest
-	(*DeleteProjectRequest)(nil),         // 47: v1.DeleteProjectRequest
-	(*GetCommitRequest)(nil),             // 48: v1.GetCommitRequest
-	(*GetCommitResponse)(nil),            // 49: v1.GetCommitResponse
-	(*timestamppb.Timestamp)(nil),        // 50: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),                // 51: google.protobuf.Empty
+	(MediaTextColor)(0),                 // 0: v1.MediaTextColor
+	(*MediaImageOverlay)(nil),           // 1: v1.MediaImageOverlay
+	(*MediaTextOverlay)(nil),            // 2: v1.MediaTextOverlay
+	(*MediaPosition)(nil),               // 3: v1.MediaPosition
+	(*MediaOverlay)(nil),                // 4: v1.MediaOverlay
+	(*MediaVideoEffect)(nil),            // 5: v1.MediaVideoEffect
+	(*SectionVideo)(nil),                // 6: v1.SectionVideo
+	(*SectionAudio)(nil),                // 7: v1.SectionAudio
+	(*PlaybackSection)(nil),             // 8: v1.PlaybackSection
+	(*PlaybackAudio)(nil),               // 9: v1.PlaybackAudio
+	(*PlaybackState)(nil),               // 10: v1.PlaybackState
+	(*CommitEditRequest)(nil),           // 11: v1.CommitEditRequest
+	(*CommitEditResponse)(nil),          // 12: v1.CommitEditResponse
+	(*AutoSaveRequest)(nil),             // 13: v1.AutoSaveRequest
+	(*CommitEditError)(nil),             // 14: v1.CommitEditError
+	(*StaleBranchError)(nil),            // 15: v1.StaleBranchError
+	(*BlurEffect)(nil),                  // 16: v1.BlurEffect
+	(*SepiaEffect)(nil),                 // 17: v1.SepiaEffect
+	(*SaturationEffect)(nil),            // 18: v1.SaturationEffect
+	(*BrightnessEffect)(nil),            // 19: v1.BrightnessEffect
+	(*ProjectMetadata)(nil),             // 20: v1.ProjectMetadata
+	(*ListProjectsRequest)(nil),         // 21: v1.ListProjectsRequest
+	(*ListProjectsResponse)(nil),        // 22: v1.ListProjectsResponse
+	(*ListProjectAssetsRequest)(nil),    // 23: v1.ListProjectAssetsRequest
+	(*RemoveProjectAssetRequest)(nil),   // 24: v1.RemoveProjectAssetRequest
+	(*MediaVideoMetadata)(nil),          // 25: v1.MediaVideoMetadata
+	(*MediaAudioMetadata)(nil),          // 26: v1.MediaAudioMetadata
+	(*MediaImageMetadata)(nil),          // 27: v1.MediaImageMetadata
+	(*ListProjectAssetsResponse)(nil),   // 28: v1.ListProjectAssetsResponse
+	(*ListProjectBranchesRequest)(nil),  // 29: v1.ListProjectBranchesRequest
+	(*BranchMetadata)(nil),              // 30: v1.BranchMetadata
+	(*ListProjectBranchesResponse)(nil), // 31: v1.ListProjectBranchesResponse
+	(*CreateProjectRequest)(nil),        // 32: v1.CreateProjectRequest
+	(*CreateProjectResponse)(nil),       // 33: v1.CreateProjectResponse
+	(*AddProjectUserRequest)(nil),       // 34: v1.AddProjectUserRequest
+	(*DeleteProjectRequest)(nil),        // 35: v1.DeleteProjectRequest
+	(*GetCommitRequest)(nil),            // 36: v1.GetCommitRequest
+	(*GetCommitResponse)(nil),           // 37: v1.GetCommitResponse
+	(*timestamppb.Timestamp)(nil),       // 38: google.protobuf.Timestamp
+	(*User)(nil),                        // 39: v1.User
+	(*emptypb.Empty)(nil),               // 40: google.protobuf.Empty
 }
 var file_proto_v1_projects_proto_depIdxs = []int32{
-	2,  // 0: v1.UploadVideoResponse.ongoing:type_name -> v1.UploadProgressIndicator
-	3,  // 1: v1.UploadVideoResponse.finished:type_name -> v1.UploadFinishedIndicator
-	6,  // 2: v1.UploadAudioResponse.ongoing:type_name -> v1.UploadAudioProgressIndicator
-	7,  // 3: v1.UploadAudioResponse.finished:type_name -> v1.UploadAudioFinishedIndicator
-	13, // 4: v1.UploadImageRequest.meta:type_name -> v1.MediaImageOverlay
-	14, // 5: v1.UploadTextRequest.meta:type_name -> v1.MediaTextOverlay
-	15, // 6: v1.MediaImageOverlay.pos:type_name -> v1.MediaPosition
-	15, // 7: v1.MediaTextOverlay.pos:type_name -> v1.MediaPosition
-	0,  // 8: v1.MediaTextOverlay.color:type_name -> v1.MediaTextColor
-	13, // 9: v1.MediaOverlay.image:type_name -> v1.MediaImageOverlay
-	14, // 10: v1.MediaOverlay.text:type_name -> v1.MediaTextOverlay
-	28, // 11: v1.MediaVideoEffect.blur:type_name -> v1.BlurEffect
-	29, // 12: v1.MediaVideoEffect.sepia:type_name -> v1.SepiaEffect
-	30, // 13: v1.MediaVideoEffect.saturation:type_name -> v1.SaturationEffect
-	31, // 14: v1.MediaVideoEffect.brightness:type_name -> v1.BrightnessEffect
-	36, // 15: v1.SectionVideo.meta:type_name -> v1.MediaVideoMetadata
-	17, // 16: v1.SectionVideo.effects:type_name -> v1.MediaVideoEffect
-	37, // 17: v1.SectionAudio.meta:type_name -> v1.MediaAudioMetadata
-	18, // 18: v1.PlaybackSection.video:type_name -> v1.SectionVideo
-	16, // 19: v1.PlaybackSection.overlays:type_name -> v1.MediaOverlay
-	19, // 20: v1.PlaybackAudio.audio:type_name -> v1.SectionAudio
-	20, // 21: v1.PlaybackState.video_sections:type_name -> v1.PlaybackSection
-	21, // 22: v1.PlaybackState.audio_sections:type_name -> v1.PlaybackAudio
-	22, // 23: v1.CommitEditRequest.commit_state:type_name -> v1.PlaybackState
-	26, // 24: v1.CommitEditResponse.err:type_name -> v1.CommitEditError
-	22, // 25: v1.AutoSaveRequest.auto_save_state:type_name -> v1.PlaybackState
-	27, // 26: v1.CommitEditError.stale_branch:type_name -> v1.StaleBranchError
-	50, // 27: v1.ProjectMetadata.created_at:type_name -> google.protobuf.Timestamp
-	32, // 28: v1.ListProjectsResponse.user_created_projects:type_name -> v1.ProjectMetadata
-	32, // 29: v1.ListProjectsResponse.user_member_projects:type_name -> v1.ProjectMetadata
-	36, // 30: v1.ListProjectAssetsResponse.videos:type_name -> v1.MediaVideoMetadata
-	38, // 31: v1.ListProjectAssetsResponse.images:type_name -> v1.MediaImageMetadata
-	39, // 32: v1.ListProjectAssetsResponse.text_boxes:type_name -> v1.MediaTextMetadata
-	37, // 33: v1.ListProjectAssetsResponse.audios:type_name -> v1.MediaAudioMetadata
-	42, // 34: v1.ListProjectBranchesResponse.branches:type_name -> v1.BranchMetadata
-	22, // 35: v1.GetCommitResponse.commit_state:type_name -> v1.PlaybackState
-	1,  // 36: v1.ProjectService.UploadVideo:input_type -> v1.UploadVideoRequest
-	5,  // 37: v1.ProjectService.UploadAudio:input_type -> v1.UploadAudioRequest
-	9,  // 38: v1.ProjectService.UploadImage:input_type -> v1.UploadImageRequest
-	11, // 39: v1.ProjectService.UploadText:input_type -> v1.UploadTextRequest
-	23, // 40: v1.ProjectService.CommitEdit:input_type -> v1.CommitEditRequest
-	48, // 41: v1.ProjectService.GetCommit:input_type -> v1.GetCommitRequest
-	33, // 42: v1.ProjectService.ListProjects:input_type -> v1.ListProjectsRequest
-	35, // 43: v1.ProjectService.ListProjectAssets:input_type -> v1.ListProjectAssetsRequest
-	41, // 44: v1.ProjectService.ListProjectBranches:input_type -> v1.ListProjectBranchesRequest
-	44, // 45: v1.ProjectService.CreateProject:input_type -> v1.CreateProjectRequest
-	46, // 46: v1.ProjectService.AddProjectUser:input_type -> v1.AddProjectUserRequest
-	47, // 47: v1.ProjectService.DeleteProject:input_type -> v1.DeleteProjectRequest
-	25, // 48: v1.ProjectService.AutoSave:input_type -> v1.AutoSaveRequest
-	4,  // 49: v1.ProjectService.UploadVideo:output_type -> v1.UploadVideoResponse
-	8,  // 50: v1.ProjectService.UploadAudio:output_type -> v1.UploadAudioResponse
-	10, // 51: v1.ProjectService.UploadImage:output_type -> v1.UploadImageResponse
-	12, // 52: v1.ProjectService.UploadText:output_type -> v1.UploadTextResponse
-	24, // 53: v1.ProjectService.CommitEdit:output_type -> v1.CommitEditResponse
-	49, // 54: v1.ProjectService.GetCommit:output_type -> v1.GetCommitResponse
-	34, // 55: v1.ProjectService.ListProjects:output_type -> v1.ListProjectsResponse
-	40, // 56: v1.ProjectService.ListProjectAssets:output_type -> v1.ListProjectAssetsResponse
-	43, // 57: v1.ProjectService.ListProjectBranches:output_type -> v1.ListProjectBranchesResponse
-	45, // 58: v1.ProjectService.CreateProject:output_type -> v1.CreateProjectResponse
-	51, // 59: v1.ProjectService.AddProjectUser:output_type -> google.protobuf.Empty
-	51, // 60: v1.ProjectService.DeleteProject:output_type -> google.protobuf.Empty
-	51, // 61: v1.ProjectService.AutoSave:output_type -> google.protobuf.Empty
-	49, // [49:62] is the sub-list for method output_type
-	36, // [36:49] is the sub-list for method input_type
-	36, // [36:36] is the sub-list for extension type_name
-	36, // [36:36] is the sub-list for extension extendee
-	0,  // [0:36] is the sub-list for field type_name
+	3,  // 0: v1.MediaImageOverlay.pos:type_name -> v1.MediaPosition
+	3,  // 1: v1.MediaTextOverlay.pos:type_name -> v1.MediaPosition
+	0,  // 2: v1.MediaTextOverlay.color:type_name -> v1.MediaTextColor
+	1,  // 3: v1.MediaOverlay.image:type_name -> v1.MediaImageOverlay
+	2,  // 4: v1.MediaOverlay.text:type_name -> v1.MediaTextOverlay
+	16, // 5: v1.MediaVideoEffect.blur:type_name -> v1.BlurEffect
+	17, // 6: v1.MediaVideoEffect.sepia:type_name -> v1.SepiaEffect
+	18, // 7: v1.MediaVideoEffect.saturation:type_name -> v1.SaturationEffect
+	19, // 8: v1.MediaVideoEffect.brightness:type_name -> v1.BrightnessEffect
+	25, // 9: v1.SectionVideo.meta:type_name -> v1.MediaVideoMetadata
+	5,  // 10: v1.SectionVideo.effects:type_name -> v1.MediaVideoEffect
+	26, // 11: v1.SectionAudio.meta:type_name -> v1.MediaAudioMetadata
+	6,  // 12: v1.PlaybackSection.video:type_name -> v1.SectionVideo
+	4,  // 13: v1.PlaybackSection.overlays:type_name -> v1.MediaOverlay
+	7,  // 14: v1.PlaybackAudio.audio:type_name -> v1.SectionAudio
+	8,  // 15: v1.PlaybackState.video_sections:type_name -> v1.PlaybackSection
+	9,  // 16: v1.PlaybackState.audio_sections:type_name -> v1.PlaybackAudio
+	10, // 17: v1.CommitEditRequest.commit_state:type_name -> v1.PlaybackState
+	14, // 18: v1.CommitEditResponse.err:type_name -> v1.CommitEditError
+	10, // 19: v1.AutoSaveRequest.auto_save_state:type_name -> v1.PlaybackState
+	15, // 20: v1.CommitEditError.stale_branch:type_name -> v1.StaleBranchError
+	38, // 21: v1.ProjectMetadata.created_at:type_name -> google.protobuf.Timestamp
+	39, // 22: v1.ProjectMetadata.created_by:type_name -> v1.User
+	20, // 23: v1.ListProjectsResponse.projects:type_name -> v1.ProjectMetadata
+	25, // 24: v1.ListProjectAssetsResponse.videos:type_name -> v1.MediaVideoMetadata
+	27, // 25: v1.ListProjectAssetsResponse.images:type_name -> v1.MediaImageMetadata
+	26, // 26: v1.ListProjectAssetsResponse.audios:type_name -> v1.MediaAudioMetadata
+	30, // 27: v1.ListProjectBranchesResponse.branches:type_name -> v1.BranchMetadata
+	10, // 28: v1.GetCommitResponse.commit_state:type_name -> v1.PlaybackState
+	11, // 29: v1.ProjectService.CommitEdit:input_type -> v1.CommitEditRequest
+	36, // 30: v1.ProjectService.GetCommit:input_type -> v1.GetCommitRequest
+	21, // 31: v1.ProjectService.ListProjects:input_type -> v1.ListProjectsRequest
+	23, // 32: v1.ProjectService.ListProjectAssets:input_type -> v1.ListProjectAssetsRequest
+	24, // 33: v1.ProjectService.RemoveProjectAsset:input_type -> v1.RemoveProjectAssetRequest
+	29, // 34: v1.ProjectService.ListProjectBranches:input_type -> v1.ListProjectBranchesRequest
+	32, // 35: v1.ProjectService.CreateProject:input_type -> v1.CreateProjectRequest
+	34, // 36: v1.ProjectService.AddProjectUser:input_type -> v1.AddProjectUserRequest
+	35, // 37: v1.ProjectService.DeleteProject:input_type -> v1.DeleteProjectRequest
+	13, // 38: v1.ProjectService.AutoSave:input_type -> v1.AutoSaveRequest
+	12, // 39: v1.ProjectService.CommitEdit:output_type -> v1.CommitEditResponse
+	37, // 40: v1.ProjectService.GetCommit:output_type -> v1.GetCommitResponse
+	22, // 41: v1.ProjectService.ListProjects:output_type -> v1.ListProjectsResponse
+	28, // 42: v1.ProjectService.ListProjectAssets:output_type -> v1.ListProjectAssetsResponse
+	40, // 43: v1.ProjectService.RemoveProjectAsset:output_type -> google.protobuf.Empty
+	31, // 44: v1.ProjectService.ListProjectBranches:output_type -> v1.ListProjectBranchesResponse
+	33, // 45: v1.ProjectService.CreateProject:output_type -> v1.CreateProjectResponse
+	40, // 46: v1.ProjectService.AddProjectUser:output_type -> google.protobuf.Empty
+	40, // 47: v1.ProjectService.DeleteProject:output_type -> google.protobuf.Empty
+	40, // 48: v1.ProjectService.AutoSave:output_type -> google.protobuf.Empty
+	39, // [39:49] is the sub-list for method output_type
+	29, // [29:39] is the sub-list for method input_type
+	29, // [29:29] is the sub-list for extension type_name
+	29, // [29:29] is the sub-list for extension extendee
+	0,  // [0:29] is the sub-list for field type_name
 }
 
 func init() { file_proto_v1_projects_proto_init() }
@@ -3349,40 +2561,33 @@ func file_proto_v1_projects_proto_init() {
 	if File_proto_v1_projects_proto != nil {
 		return
 	}
+	file_proto_v1_users_proto_init()
 	file_proto_v1_projects_proto_msgTypes[3].OneofWrappers = []any{
-		(*UploadVideoResponse_Ongoing)(nil),
-		(*UploadVideoResponse_Finished)(nil),
-	}
-	file_proto_v1_projects_proto_msgTypes[7].OneofWrappers = []any{
-		(*UploadAudioResponse_Ongoing)(nil),
-		(*UploadAudioResponse_Finished)(nil),
-	}
-	file_proto_v1_projects_proto_msgTypes[15].OneofWrappers = []any{
 		(*MediaOverlay_Image)(nil),
 		(*MediaOverlay_Text)(nil),
 	}
-	file_proto_v1_projects_proto_msgTypes[16].OneofWrappers = []any{
+	file_proto_v1_projects_proto_msgTypes[4].OneofWrappers = []any{
 		(*MediaVideoEffect_Blur)(nil),
 		(*MediaVideoEffect_Sepia)(nil),
 		(*MediaVideoEffect_Saturation)(nil),
 		(*MediaVideoEffect_Brightness)(nil),
 	}
-	file_proto_v1_projects_proto_msgTypes[22].OneofWrappers = []any{}
-	file_proto_v1_projects_proto_msgTypes[23].OneofWrappers = []any{
+	file_proto_v1_projects_proto_msgTypes[10].OneofWrappers = []any{}
+	file_proto_v1_projects_proto_msgTypes[11].OneofWrappers = []any{
 		(*CommitEditResponse_NewCommitId)(nil),
 		(*CommitEditResponse_Err)(nil),
 	}
-	file_proto_v1_projects_proto_msgTypes[25].OneofWrappers = []any{
+	file_proto_v1_projects_proto_msgTypes[13].OneofWrappers = []any{
 		(*CommitEditError_StaleBranch)(nil),
 	}
-	file_proto_v1_projects_proto_msgTypes[41].OneofWrappers = []any{}
+	file_proto_v1_projects_proto_msgTypes[29].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_v1_projects_proto_rawDesc), len(file_proto_v1_projects_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   49,
+			NumMessages:   37,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

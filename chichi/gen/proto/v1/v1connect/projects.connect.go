@@ -34,18 +34,6 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// ProjectServiceUploadVideoProcedure is the fully-qualified name of the ProjectService's
-	// UploadVideo RPC.
-	ProjectServiceUploadVideoProcedure = "/v1.ProjectService/UploadVideo"
-	// ProjectServiceUploadAudioProcedure is the fully-qualified name of the ProjectService's
-	// UploadAudio RPC.
-	ProjectServiceUploadAudioProcedure = "/v1.ProjectService/UploadAudio"
-	// ProjectServiceUploadImageProcedure is the fully-qualified name of the ProjectService's
-	// UploadImage RPC.
-	ProjectServiceUploadImageProcedure = "/v1.ProjectService/UploadImage"
-	// ProjectServiceUploadTextProcedure is the fully-qualified name of the ProjectService's UploadText
-	// RPC.
-	ProjectServiceUploadTextProcedure = "/v1.ProjectService/UploadText"
 	// ProjectServiceCommitEditProcedure is the fully-qualified name of the ProjectService's CommitEdit
 	// RPC.
 	ProjectServiceCommitEditProcedure = "/v1.ProjectService/CommitEdit"
@@ -58,6 +46,9 @@ const (
 	// ProjectServiceListProjectAssetsProcedure is the fully-qualified name of the ProjectService's
 	// ListProjectAssets RPC.
 	ProjectServiceListProjectAssetsProcedure = "/v1.ProjectService/ListProjectAssets"
+	// ProjectServiceRemoveProjectAssetProcedure is the fully-qualified name of the ProjectService's
+	// RemoveProjectAsset RPC.
+	ProjectServiceRemoveProjectAssetProcedure = "/v1.ProjectService/RemoveProjectAsset"
 	// ProjectServiceListProjectBranchesProcedure is the fully-qualified name of the ProjectService's
 	// ListProjectBranches RPC.
 	ProjectServiceListProjectBranchesProcedure = "/v1.ProjectService/ListProjectBranches"
@@ -76,14 +67,11 @@ const (
 
 // ProjectServiceClient is a client for the v1.ProjectService service.
 type ProjectServiceClient interface {
-	UploadVideo(context.Context, *connect.Request[v1.UploadVideoRequest]) (*connect.ServerStreamForClient[v1.UploadVideoResponse], error)
-	UploadAudio(context.Context, *connect.Request[v1.UploadAudioRequest]) (*connect.ServerStreamForClient[v1.UploadAudioResponse], error)
-	UploadImage(context.Context, *connect.Request[v1.UploadImageRequest]) (*connect.Response[v1.UploadImageResponse], error)
-	UploadText(context.Context, *connect.Request[v1.UploadTextRequest]) (*connect.Response[v1.UploadTextResponse], error)
 	CommitEdit(context.Context, *connect.Request[v1.CommitEditRequest]) (*connect.Response[v1.CommitEditResponse], error)
 	GetCommit(context.Context, *connect.Request[v1.GetCommitRequest]) (*connect.Response[v1.GetCommitResponse], error)
 	ListProjects(context.Context, *connect.Request[v1.ListProjectsRequest]) (*connect.Response[v1.ListProjectsResponse], error)
 	ListProjectAssets(context.Context, *connect.Request[v1.ListProjectAssetsRequest]) (*connect.Response[v1.ListProjectAssetsResponse], error)
+	RemoveProjectAsset(context.Context, *connect.Request[v1.RemoveProjectAssetRequest]) (*connect.Response[emptypb.Empty], error)
 	ListProjectBranches(context.Context, *connect.Request[v1.ListProjectBranchesRequest]) (*connect.Response[v1.ListProjectBranchesResponse], error)
 	CreateProject(context.Context, *connect.Request[v1.CreateProjectRequest]) (*connect.Response[v1.CreateProjectResponse], error)
 	AddProjectUser(context.Context, *connect.Request[v1.AddProjectUserRequest]) (*connect.Response[emptypb.Empty], error)
@@ -102,30 +90,6 @@ func NewProjectServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 	baseURL = strings.TrimRight(baseURL, "/")
 	projectServiceMethods := v1.File_proto_v1_projects_proto.Services().ByName("ProjectService").Methods()
 	return &projectServiceClient{
-		uploadVideo: connect.NewClient[v1.UploadVideoRequest, v1.UploadVideoResponse](
-			httpClient,
-			baseURL+ProjectServiceUploadVideoProcedure,
-			connect.WithSchema(projectServiceMethods.ByName("UploadVideo")),
-			connect.WithClientOptions(opts...),
-		),
-		uploadAudio: connect.NewClient[v1.UploadAudioRequest, v1.UploadAudioResponse](
-			httpClient,
-			baseURL+ProjectServiceUploadAudioProcedure,
-			connect.WithSchema(projectServiceMethods.ByName("UploadAudio")),
-			connect.WithClientOptions(opts...),
-		),
-		uploadImage: connect.NewClient[v1.UploadImageRequest, v1.UploadImageResponse](
-			httpClient,
-			baseURL+ProjectServiceUploadImageProcedure,
-			connect.WithSchema(projectServiceMethods.ByName("UploadImage")),
-			connect.WithClientOptions(opts...),
-		),
-		uploadText: connect.NewClient[v1.UploadTextRequest, v1.UploadTextResponse](
-			httpClient,
-			baseURL+ProjectServiceUploadTextProcedure,
-			connect.WithSchema(projectServiceMethods.ByName("UploadText")),
-			connect.WithClientOptions(opts...),
-		),
 		commitEdit: connect.NewClient[v1.CommitEditRequest, v1.CommitEditResponse](
 			httpClient,
 			baseURL+ProjectServiceCommitEditProcedure,
@@ -148,6 +112,12 @@ func NewProjectServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			httpClient,
 			baseURL+ProjectServiceListProjectAssetsProcedure,
 			connect.WithSchema(projectServiceMethods.ByName("ListProjectAssets")),
+			connect.WithClientOptions(opts...),
+		),
+		removeProjectAsset: connect.NewClient[v1.RemoveProjectAssetRequest, emptypb.Empty](
+			httpClient,
+			baseURL+ProjectServiceRemoveProjectAssetProcedure,
+			connect.WithSchema(projectServiceMethods.ByName("RemoveProjectAsset")),
 			connect.WithClientOptions(opts...),
 		),
 		listProjectBranches: connect.NewClient[v1.ListProjectBranchesRequest, v1.ListProjectBranchesResponse](
@@ -185,39 +155,16 @@ func NewProjectServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 
 // projectServiceClient implements ProjectServiceClient.
 type projectServiceClient struct {
-	uploadVideo         *connect.Client[v1.UploadVideoRequest, v1.UploadVideoResponse]
-	uploadAudio         *connect.Client[v1.UploadAudioRequest, v1.UploadAudioResponse]
-	uploadImage         *connect.Client[v1.UploadImageRequest, v1.UploadImageResponse]
-	uploadText          *connect.Client[v1.UploadTextRequest, v1.UploadTextResponse]
 	commitEdit          *connect.Client[v1.CommitEditRequest, v1.CommitEditResponse]
 	getCommit           *connect.Client[v1.GetCommitRequest, v1.GetCommitResponse]
 	listProjects        *connect.Client[v1.ListProjectsRequest, v1.ListProjectsResponse]
 	listProjectAssets   *connect.Client[v1.ListProjectAssetsRequest, v1.ListProjectAssetsResponse]
+	removeProjectAsset  *connect.Client[v1.RemoveProjectAssetRequest, emptypb.Empty]
 	listProjectBranches *connect.Client[v1.ListProjectBranchesRequest, v1.ListProjectBranchesResponse]
 	createProject       *connect.Client[v1.CreateProjectRequest, v1.CreateProjectResponse]
 	addProjectUser      *connect.Client[v1.AddProjectUserRequest, emptypb.Empty]
 	deleteProject       *connect.Client[v1.DeleteProjectRequest, emptypb.Empty]
 	autoSave            *connect.Client[v1.AutoSaveRequest, emptypb.Empty]
-}
-
-// UploadVideo calls v1.ProjectService.UploadVideo.
-func (c *projectServiceClient) UploadVideo(ctx context.Context, req *connect.Request[v1.UploadVideoRequest]) (*connect.ServerStreamForClient[v1.UploadVideoResponse], error) {
-	return c.uploadVideo.CallServerStream(ctx, req)
-}
-
-// UploadAudio calls v1.ProjectService.UploadAudio.
-func (c *projectServiceClient) UploadAudio(ctx context.Context, req *connect.Request[v1.UploadAudioRequest]) (*connect.ServerStreamForClient[v1.UploadAudioResponse], error) {
-	return c.uploadAudio.CallServerStream(ctx, req)
-}
-
-// UploadImage calls v1.ProjectService.UploadImage.
-func (c *projectServiceClient) UploadImage(ctx context.Context, req *connect.Request[v1.UploadImageRequest]) (*connect.Response[v1.UploadImageResponse], error) {
-	return c.uploadImage.CallUnary(ctx, req)
-}
-
-// UploadText calls v1.ProjectService.UploadText.
-func (c *projectServiceClient) UploadText(ctx context.Context, req *connect.Request[v1.UploadTextRequest]) (*connect.Response[v1.UploadTextResponse], error) {
-	return c.uploadText.CallUnary(ctx, req)
 }
 
 // CommitEdit calls v1.ProjectService.CommitEdit.
@@ -238,6 +185,11 @@ func (c *projectServiceClient) ListProjects(ctx context.Context, req *connect.Re
 // ListProjectAssets calls v1.ProjectService.ListProjectAssets.
 func (c *projectServiceClient) ListProjectAssets(ctx context.Context, req *connect.Request[v1.ListProjectAssetsRequest]) (*connect.Response[v1.ListProjectAssetsResponse], error) {
 	return c.listProjectAssets.CallUnary(ctx, req)
+}
+
+// RemoveProjectAsset calls v1.ProjectService.RemoveProjectAsset.
+func (c *projectServiceClient) RemoveProjectAsset(ctx context.Context, req *connect.Request[v1.RemoveProjectAssetRequest]) (*connect.Response[emptypb.Empty], error) {
+	return c.removeProjectAsset.CallUnary(ctx, req)
 }
 
 // ListProjectBranches calls v1.ProjectService.ListProjectBranches.
@@ -267,14 +219,11 @@ func (c *projectServiceClient) AutoSave(ctx context.Context, req *connect.Reques
 
 // ProjectServiceHandler is an implementation of the v1.ProjectService service.
 type ProjectServiceHandler interface {
-	UploadVideo(context.Context, *connect.Request[v1.UploadVideoRequest], *connect.ServerStream[v1.UploadVideoResponse]) error
-	UploadAudio(context.Context, *connect.Request[v1.UploadAudioRequest], *connect.ServerStream[v1.UploadAudioResponse]) error
-	UploadImage(context.Context, *connect.Request[v1.UploadImageRequest]) (*connect.Response[v1.UploadImageResponse], error)
-	UploadText(context.Context, *connect.Request[v1.UploadTextRequest]) (*connect.Response[v1.UploadTextResponse], error)
 	CommitEdit(context.Context, *connect.Request[v1.CommitEditRequest]) (*connect.Response[v1.CommitEditResponse], error)
 	GetCommit(context.Context, *connect.Request[v1.GetCommitRequest]) (*connect.Response[v1.GetCommitResponse], error)
 	ListProjects(context.Context, *connect.Request[v1.ListProjectsRequest]) (*connect.Response[v1.ListProjectsResponse], error)
 	ListProjectAssets(context.Context, *connect.Request[v1.ListProjectAssetsRequest]) (*connect.Response[v1.ListProjectAssetsResponse], error)
+	RemoveProjectAsset(context.Context, *connect.Request[v1.RemoveProjectAssetRequest]) (*connect.Response[emptypb.Empty], error)
 	ListProjectBranches(context.Context, *connect.Request[v1.ListProjectBranchesRequest]) (*connect.Response[v1.ListProjectBranchesResponse], error)
 	CreateProject(context.Context, *connect.Request[v1.CreateProjectRequest]) (*connect.Response[v1.CreateProjectResponse], error)
 	AddProjectUser(context.Context, *connect.Request[v1.AddProjectUserRequest]) (*connect.Response[emptypb.Empty], error)
@@ -289,30 +238,6 @@ type ProjectServiceHandler interface {
 // and JSON codecs. They also support gzip compression.
 func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
 	projectServiceMethods := v1.File_proto_v1_projects_proto.Services().ByName("ProjectService").Methods()
-	projectServiceUploadVideoHandler := connect.NewServerStreamHandler(
-		ProjectServiceUploadVideoProcedure,
-		svc.UploadVideo,
-		connect.WithSchema(projectServiceMethods.ByName("UploadVideo")),
-		connect.WithHandlerOptions(opts...),
-	)
-	projectServiceUploadAudioHandler := connect.NewServerStreamHandler(
-		ProjectServiceUploadAudioProcedure,
-		svc.UploadAudio,
-		connect.WithSchema(projectServiceMethods.ByName("UploadAudio")),
-		connect.WithHandlerOptions(opts...),
-	)
-	projectServiceUploadImageHandler := connect.NewUnaryHandler(
-		ProjectServiceUploadImageProcedure,
-		svc.UploadImage,
-		connect.WithSchema(projectServiceMethods.ByName("UploadImage")),
-		connect.WithHandlerOptions(opts...),
-	)
-	projectServiceUploadTextHandler := connect.NewUnaryHandler(
-		ProjectServiceUploadTextProcedure,
-		svc.UploadText,
-		connect.WithSchema(projectServiceMethods.ByName("UploadText")),
-		connect.WithHandlerOptions(opts...),
-	)
 	projectServiceCommitEditHandler := connect.NewUnaryHandler(
 		ProjectServiceCommitEditProcedure,
 		svc.CommitEdit,
@@ -335,6 +260,12 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 		ProjectServiceListProjectAssetsProcedure,
 		svc.ListProjectAssets,
 		connect.WithSchema(projectServiceMethods.ByName("ListProjectAssets")),
+		connect.WithHandlerOptions(opts...),
+	)
+	projectServiceRemoveProjectAssetHandler := connect.NewUnaryHandler(
+		ProjectServiceRemoveProjectAssetProcedure,
+		svc.RemoveProjectAsset,
+		connect.WithSchema(projectServiceMethods.ByName("RemoveProjectAsset")),
 		connect.WithHandlerOptions(opts...),
 	)
 	projectServiceListProjectBranchesHandler := connect.NewUnaryHandler(
@@ -369,14 +300,6 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 	)
 	return "/v1.ProjectService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case ProjectServiceUploadVideoProcedure:
-			projectServiceUploadVideoHandler.ServeHTTP(w, r)
-		case ProjectServiceUploadAudioProcedure:
-			projectServiceUploadAudioHandler.ServeHTTP(w, r)
-		case ProjectServiceUploadImageProcedure:
-			projectServiceUploadImageHandler.ServeHTTP(w, r)
-		case ProjectServiceUploadTextProcedure:
-			projectServiceUploadTextHandler.ServeHTTP(w, r)
 		case ProjectServiceCommitEditProcedure:
 			projectServiceCommitEditHandler.ServeHTTP(w, r)
 		case ProjectServiceGetCommitProcedure:
@@ -385,6 +308,8 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 			projectServiceListProjectsHandler.ServeHTTP(w, r)
 		case ProjectServiceListProjectAssetsProcedure:
 			projectServiceListProjectAssetsHandler.ServeHTTP(w, r)
+		case ProjectServiceRemoveProjectAssetProcedure:
+			projectServiceRemoveProjectAssetHandler.ServeHTTP(w, r)
 		case ProjectServiceListProjectBranchesProcedure:
 			projectServiceListProjectBranchesHandler.ServeHTTP(w, r)
 		case ProjectServiceCreateProjectProcedure:
@@ -404,22 +329,6 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 // UnimplementedProjectServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedProjectServiceHandler struct{}
 
-func (UnimplementedProjectServiceHandler) UploadVideo(context.Context, *connect.Request[v1.UploadVideoRequest], *connect.ServerStream[v1.UploadVideoResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.UploadVideo is not implemented"))
-}
-
-func (UnimplementedProjectServiceHandler) UploadAudio(context.Context, *connect.Request[v1.UploadAudioRequest], *connect.ServerStream[v1.UploadAudioResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.UploadAudio is not implemented"))
-}
-
-func (UnimplementedProjectServiceHandler) UploadImage(context.Context, *connect.Request[v1.UploadImageRequest]) (*connect.Response[v1.UploadImageResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.UploadImage is not implemented"))
-}
-
-func (UnimplementedProjectServiceHandler) UploadText(context.Context, *connect.Request[v1.UploadTextRequest]) (*connect.Response[v1.UploadTextResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.UploadText is not implemented"))
-}
-
 func (UnimplementedProjectServiceHandler) CommitEdit(context.Context, *connect.Request[v1.CommitEditRequest]) (*connect.Response[v1.CommitEditResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.CommitEdit is not implemented"))
 }
@@ -434,6 +343,10 @@ func (UnimplementedProjectServiceHandler) ListProjects(context.Context, *connect
 
 func (UnimplementedProjectServiceHandler) ListProjectAssets(context.Context, *connect.Request[v1.ListProjectAssetsRequest]) (*connect.Response[v1.ListProjectAssetsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.ListProjectAssets is not implemented"))
+}
+
+func (UnimplementedProjectServiceHandler) RemoveProjectAsset(context.Context, *connect.Request[v1.RemoveProjectAssetRequest]) (*connect.Response[emptypb.Empty], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.RemoveProjectAsset is not implemented"))
 }
 
 func (UnimplementedProjectServiceHandler) ListProjectBranches(context.Context, *connect.Request[v1.ListProjectBranchesRequest]) (*connect.Response[v1.ListProjectBranchesResponse], error) {

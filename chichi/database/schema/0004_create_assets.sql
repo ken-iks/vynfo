@@ -3,12 +3,13 @@ CREATE TABLE assets (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
     asset_type TEXT NOT NULL REFERENCES asset_types(name),
+    display_name TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE project_assets (
     project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-    asset_id UUID NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
+    asset_id UUID NOT NULL REFERENCES assets(id) ON DELETE RESTRICT,
     PRIMARY KEY (project_id, asset_id)
 );
 

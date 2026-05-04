@@ -24,16 +24,19 @@ export function MediaOverlayCanvas() {
     <div className="absolute inset-0 z-10 overflow-hidden">
       {activeSection.overlays.map((overlay, overlayIndex) => {
         const position =
-          overlay.assetType.case === "image" ||
-          overlay.assetType.case === "text"
-            ? overlay.assetType.value.pos
+          overlay.kind.case === "image" || overlay.kind.case === "text"
+            ? overlay.kind.value.pos
             : undefined;
         const size = position?.size ?? DEFAULT_OVERLAY_SIZE;
         const leftPx = Number(position?.leftCornerPx ?? 32n);
         const topPx = Number(position?.leftCornerPy ?? 32n);
         const sizePx = Number(size);
-        const imageUrl = assetSnap.imageUrls[overlay.assetId] ?? "";
-        const markdown = assetSnap.textMarkdown[overlay.assetId];
+        const imageUrl =
+          overlay.kind.case === "image"
+            ? (assetSnap.imageUrls[overlay.kind.value.assetId] ?? "")
+            : "";
+        const markdown =
+          overlay.kind.case === "text" ? overlay.kind.value.content : "";
         const isSelected =
           snap.selectedOverlay?.sectionIndex === activeSectionIndex &&
           snap.selectedOverlay.overlayIndex === overlayIndex;
@@ -69,7 +72,7 @@ export function MediaOverlayCanvas() {
 
         return (
           <div
-            key={`${overlay.assetId}-${overlayIndex}`}
+            key={`${overlay.kind.case}-${overlayIndex}`}
             className={cn(
               "absolute cursor-move select-none overflow-hidden rounded-sm",
               "border border-white/40 bg-black/35 shadow-sm backdrop-blur-[1px]",
@@ -79,24 +82,22 @@ export function MediaOverlayCanvas() {
               left: leftPx,
               top: topPx,
               width: sizePx,
-              height: overlay.assetType.case === "text" ? undefined : sizePx,
+              height: overlay.kind.case === "text" ? undefined : sizePx,
             }}
             onPointerDown={handlePointerDown}
           >
-            {overlay.assetType.case === "image" ? (
+            {overlay.kind.case === "image" ? (
               <img
                 src={imageUrl}
                 alt=""
                 className="block size-full object-contain"
                 draggable={false}
               />
-            ) : overlay.assetType.case === "text" ? (
+            ) : overlay.kind.case === "text" ? (
               <div
                 className={cn(
                   "p-2 text-xs font-medium",
-                  overlay.assetType.value.color === 1
-                    ? "text-black"
-                    : "text-white",
+                  overlay.kind.value.color === 1 ? "text-black" : "text-white",
                 )}
               >
                 {markdown ? <Markdown>{markdown}</Markdown> : "Markdown text"}

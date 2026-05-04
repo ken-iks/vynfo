@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { SyntheticEvent } from "react";
+import type { ColumnDef } from "@tanstack/react-table";
 import { spacesClient } from "@/lib/client";
 import type { ProjectSpace } from "@/gen/proto/v1/spaces_pb";
 import type { ProjectMetadata } from "@/gen/proto/v1/projects_pb";
@@ -16,7 +17,7 @@ import {
 } from "../../ui/dialog";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
-import { Table } from "../../shared/Table";
+import { DataTable } from "../../shared/DataTable";
 import { SectionTitle } from "../../shared/SectionTitle";
 import { useWorkspaceContext } from "../../providers/WorkspaceProvider";
 import { AddUserDropdown } from "../../shared/AddUserDropdown";
@@ -94,6 +95,21 @@ export function SpacesList({ project, onSelectSpace }: SpacesListProps) {
       setAddingMemberId("");
     }
   };
+  const columns: ColumnDef<ProjectSpace>[] = [
+    {
+      accessorKey: "name",
+      header: "Name",
+      enableSorting: true,
+    },
+    {
+      id: "users",
+      accessorFn: (space) => space.users.map((user) => user.email).join(", "),
+      header: "Members",
+      cell: ({ row }) =>
+        row.original.users.map((user) => user.email).join(", "),
+      enableSorting: true,
+    },
+  ];
 
   return (
     <div className="px-12 pt-12">
@@ -139,18 +155,10 @@ export function SpacesList({ project, onSelectSpace }: SpacesListProps) {
           </DialogContent>
         </Dialog>
       </div>
-      <Table<ProjectSpace>
+      <DataTable<ProjectSpace>
         title=""
         data={spaces}
-        columns={[
-          { key: "name", header: "Name" },
-          {
-            key: "users",
-            header: "Members",
-            render: (_value, row) =>
-              row.users.map((user) => user.email).join(", "),
-          },
-        ]}
+        columns={columns}
         rowActions={(space) => {
           const availableUsers = getAvailableUsers(space);
           return (

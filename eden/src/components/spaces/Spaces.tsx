@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Navigate, useNavigate, useParams } from "react-router";
 import { spacesClient } from "@/lib/client";
 import type { ProjectSpace } from "@/gen/proto/v1/spaces_pb";
 import type { User } from "@/gen/proto/v1/users_pb";
 import { AddUserDropdown } from "../shared/AddUserDropdown";
 import { SectionTitle } from "../shared/SectionTitle";
-import { Table } from "../shared/Table";
+import { DataTable } from "../shared/DataTable";
 import { useWorkspaceContext } from "../providers/WorkspaceProvider";
 import { Button } from "../ui/button";
 import {
@@ -103,6 +104,21 @@ export function Spaces() {
       setAddingMemberId("");
     }
   };
+  const columns: ColumnDef<ProjectSpace>[] = [
+    {
+      accessorKey: "name",
+      header: "Name",
+      enableSorting: true,
+    },
+    {
+      id: "users",
+      accessorFn: (space) => space.users.map((user) => user.email).join(", "),
+      header: "Members",
+      cell: ({ row }) =>
+        row.original.users.map((user) => user.email).join(", "),
+      enableSorting: true,
+    },
+  ];
 
   return (
     <div className="px-12 pt-12">
@@ -156,18 +172,10 @@ export function Spaces() {
           </DialogContent>
         </Dialog>
       </div>
-      <Table<ProjectSpace>
+      <DataTable<ProjectSpace>
         title=""
         data={spaces}
-        columns={[
-          { key: "name", header: "Name" },
-          {
-            key: "users",
-            header: "Members",
-            render: (_value, row) =>
-              row.users.map((user) => user.email).join(", "),
-          },
-        ]}
+        columns={columns}
         rowActions={(space) => {
           const availableUsers = getAvailableUsers(space);
           return (

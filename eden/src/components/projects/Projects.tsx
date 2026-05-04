@@ -180,7 +180,7 @@ export function Projects() {
           <div className="flex h-full justify-center px-12 pt-20">
             <Card className="h-fit w-full max-w-4xl">
               <CardHeader>
-                <CardTitle>Upload Text</CardTitle>
+                <CardTitle>Add Text</CardTitle>
                 <CardDescription>
                   Write markdown text that can be positioned on the editor
                   canvas.
@@ -189,9 +189,8 @@ export function Projects() {
               <CardContent>
                 {selectedProject ? (
                   <UploadTextWizard
-                    projectId={selectedProject.id}
-                    onUploadCompleted={() => {
-                      showUploadNotice("Text upload finished");
+                    onTextAdded={() => {
+                      showUploadNotice("Text added");
                       setProjectPage("view");
                     }}
                   />

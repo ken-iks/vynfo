@@ -13,35 +13,34 @@ import (
 )
 
 const createAudio = `-- name: CreateAudio :one
-INSERT INTO audios (asset_id, display_name, duration) VALUES ($1, $2, $3) RETURNING asset_id, display_name, duration
+INSERT INTO audios (asset_id, duration) VALUES ($1, $2) RETURNING asset_id, duration
 `
 
 type CreateAudioParams struct {
-	AssetID     uuid.UUID
-	DisplayName string
-	Duration    float64
+	AssetID  uuid.UUID
+	Duration float64
 }
 
 func (q *Queries) CreateAudio(ctx context.Context, arg CreateAudioParams) (Audio, error) {
-	row := q.db.QueryRowContext(ctx, createAudio, arg.AssetID, arg.DisplayName, arg.Duration)
+	row := q.db.QueryRowContext(ctx, createAudio, arg.AssetID, arg.Duration)
 	var i Audio
-	err := row.Scan(&i.AssetID, &i.DisplayName, &i.Duration)
+	err := row.Scan(&i.AssetID, &i.Duration)
 	return i, err
 }
 
 const getAudioById = `-- name: GetAudioById :one
-SELECT asset_id, display_name, duration FROM audios WHERE asset_id = $1
+SELECT asset_id, duration FROM audios WHERE asset_id = $1
 `
 
 func (q *Queries) GetAudioById(ctx context.Context, assetID uuid.UUID) (Audio, error) {
 	row := q.db.QueryRowContext(ctx, getAudioById, assetID)
 	var i Audio
-	err := row.Scan(&i.AssetID, &i.DisplayName, &i.Duration)
+	err := row.Scan(&i.AssetID, &i.Duration)
 	return i, err
 }
 
 const getAudios = `-- name: GetAudios :many
-SELECT asset_id, display_name, duration FROM audios WHERE asset_id = ANY($1::uuid[])
+SELECT asset_id, duration FROM audios WHERE asset_id = ANY($1::uuid[])
 `
 
 func (q *Queries) GetAudios(ctx context.Context, assetIds []uuid.UUID) ([]Audio, error) {
@@ -53,7 +52,7 @@ func (q *Queries) GetAudios(ctx context.Context, assetIds []uuid.UUID) ([]Audio,
 	var items []Audio
 	for rows.Next() {
 		var i Audio
-		if err := rows.Scan(&i.AssetID, &i.DisplayName, &i.Duration); err != nil {
+		if err := rows.Scan(&i.AssetID, &i.Duration); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

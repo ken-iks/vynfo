@@ -3,9 +3,9 @@ import { create } from "@bufbuild/protobuf";
 import {
   MediaImageOverlaySchema,
   MediaPositionSchema,
-  UploadImageRequestSchema,
 } from "../../gen/proto/v1/projects_pb";
-import { client } from "../../lib/client";
+import { UploadImageRequestSchema } from "../../gen/proto/v1/vfs_pb";
+import { filesClient } from "../../lib/client";
 import { mediaAssetStore } from "../stores/mediaAssets";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,7 +38,7 @@ export function UploadImageWizard({
     setIsUploading(true);
     setUploadError(null);
     try {
-      const response = await client.uploadImage(
+      const response = await filesClient.uploadImage(
         create(UploadImageRequestSchema, {
           projectId,
           content: new Uint8Array(await imageFile.arrayBuffer()),

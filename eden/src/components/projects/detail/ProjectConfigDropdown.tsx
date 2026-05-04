@@ -30,7 +30,7 @@ export function ProjectConfigDropDown({
           Upload Image
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => handlePageSelection("uploadText")}>
-          Upload Text
+          Add Text
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

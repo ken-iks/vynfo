@@ -2,7 +2,6 @@ import type {
   MediaOverlay,
   MediaAudioMetadata,
   MediaImageMetadata,
-  MediaTextMetadata,
   MediaVideoEffect,
   MediaVideoMetadata,
   PlaybackAudio,
@@ -347,10 +346,10 @@ class EditorStore {
     if (sectionIndex === null) return false;
 
     const overlay = create(MediaOverlaySchema, {
-      assetId: image.assetId,
-      assetType: {
+      kind: {
         case: "image",
         value: create(MediaImageOverlaySchema, {
+          assetId: image.assetId,
           pos: create(MediaPositionSchema, {
             leftCornerPx: 32n,
             leftCornerPy: 32n,
@@ -368,17 +367,17 @@ class EditorStore {
   }
 
   addTextOverlay(
-    text: MediaTextMetadata,
+    content: string,
     sectionIndex = this.targetSectionIndex,
   ): boolean {
     if (sectionIndex === null) return false;
 
     const overlay = create(MediaOverlaySchema, {
-      assetId: text.assetId,
-      assetType: {
+      kind: {
         case: "text",
         value: create(MediaTextOverlaySchema, {
           color: MediaTextColor.WHITE,
+          content,
           pos: create(MediaPositionSchema, {
             leftCornerPx: 32n,
             leftCornerPy: 32n,
@@ -411,10 +410,10 @@ class EditorStore {
       size,
     });
 
-    if (overlay.assetType.case === "image") {
-      overlay.assetType.value.pos = pos;
-    } else if (overlay.assetType.case === "text") {
-      overlay.assetType.value.pos = pos;
+    if (overlay.kind.case === "image") {
+      overlay.kind.value.pos = pos;
+    } else if (overlay.kind.case === "text") {
+      overlay.kind.value.pos = pos;
     }
     this.markEdited();
   }
@@ -425,9 +424,9 @@ class EditorStore {
     color: MediaTextColor,
   ) {
     const overlay = this.sections[sectionIndex]?.overlays[overlayIndex];
-    if (overlay?.assetType.case !== "text") return;
+    if (overlay?.kind.case !== "text") return;
 
-    overlay.assetType.value.color = color;
+    overlay.kind.value.color = color;
     this.markEdited();
   }
 

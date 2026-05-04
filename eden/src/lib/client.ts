@@ -4,6 +4,7 @@ import { createConnectTransport } from "@connectrpc/connect-web";
 import { ProjectService } from "../gen/proto/v1/projects_pb";
 import { SpacesService } from "../gen/proto/v1/spaces_pb";
 import { UsersService } from "../gen/proto/v1/users_pb";
+import { FileService } from "../gen/proto/v1/vfs_pb";
 import { WorkspacesService } from "../gen/proto/v1/workspaces_pb";
 import { auth } from "@/firebase";
 
@@ -33,6 +34,7 @@ const transport = createConnectTransport({
 export const client = createClient(ProjectService, transport);
 export const spacesClient = createClient(SpacesService, transport);
 export const usersClient = createClient(UsersService, transport);
+export const filesClient = createClient(FileService, transport);
 export const workspacesClient = createClient(WorkspacesService, transport);
 
 export function createSpacesClient(idToken: string) {

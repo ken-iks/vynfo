@@ -1,11 +1,11 @@
 import { ArrowPathIcon, ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import { client } from "../../lib/client";
+import { filesClient } from "../../lib/client";
 import { create } from "@bufbuild/protobuf";
 import {
   UploadAudioRequestSchema,
   UploadVideoRequestSchema,
-} from "../../gen/proto/v1/projects_pb";
+} from "../../gen/proto/v1/vfs_pb";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -59,7 +59,7 @@ export function UploadWizard({
           content: new Uint8Array(await mediaFile.arrayBuffer()),
           title: mediaFile.name,
         });
-        for await (const response of client.uploadAudio(request)) {
+        for await (const response of filesClient.uploadAudio(request)) {
           setHasFirstResponse(true);
           switch (response.uploadStatus.case) {
             case "ongoing":
@@ -79,7 +79,7 @@ export function UploadWizard({
           content: new Uint8Array(await mediaFile.arrayBuffer()),
           title: mediaFile.name,
         });
-        for await (const response of client.uploadVideo(request)) {
+        for await (const response of filesClient.uploadVideo(request)) {
           setHasFirstResponse(true);
           switch (response.uploadStatus.case) {
             case "ongoing":

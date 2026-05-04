@@ -1,0 +1,227 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = "vynfo.com/vynfo/gen/proto/v1";
+
+import "proto/v1/projects.proto";
+import "google/protobuf/empty.proto";
+
+// ======================  Directory CRUD  ========================== //
+
+
+// Directories can contain either assets (files) or subdirectories themselves
+message Directory {
+    string id = 1;
+    string workspace_id = 2;
+    string name = 3;
+    repeated DirectoryEntry entries = 4;
+}
+
+message DirectoryEntry {
+    oneof kind {
+        DirectoryMetadata directory = 1;
+        AssetMetadata asset = 2;
+    }
+}
+
+message DirectoryMetadata {
+    string id = 1;
+    string name = 2;
+}
+
+message AssetMetadata {
+    oneof kind {
+        MediaVideoMetadata video = 1;
+        MediaAudioMetadata audio = 2;
+        MediaImageMetadata image = 3;
+    }
+}
+
+
+// CreateDirectory will create a new directory that can itself contain files
+// or sub directories. No parent id provided will have this directory be
+// part of the root directory
+message CreateDirectoryRequest {
+    string name = 1;
+    string workspace_id = 2;
+    optional string parent_directory_id = 3;
+}
+
+message CreateDirectoryResponse {
+    string created_directory_id = 1;
+}
+
+// GetRootDirectory will give the entries in the outermost directory of
+// the workspace's file system. These files/folders do not have a parent
+message GetRootDirectoryRequest {
+    string workspace_id = 1;
+}
+
+message GetRootDirectoryResponse {
+    repeated DirectoryMetadata directories = 1;
+    repeated MediaVideoMetadata videos = 2;
+    repeated MediaImageMetadata images = 3;
+    repeated MediaAudioMetadata audios = 4;
+}
+
+// GetDirectoryChildren will give all entries whos parent id is `directory_id`
+message GetDirectoryChildrenRequest {
+    string workspace_id = 1;
+    string directory_id = 2;
+}
+
+message GetDirectoryChildrenResponse {
+    repeated DirectoryMetadata directories = 1;
+    repeated MediaVideoMetadata videos = 2;
+    repeated MediaImageMetadata images = 3;
+    repeated MediaAudioMetadata audios = 4;
+}
+
+// RenameDirectory will update a directory with the new provided name
+message RenameDirectoryRequest {
+    string workspace_id = 1;
+    string directory_id = 2;
+    string name = 3;
+}
+
+// MoveDirectory will move a directory (and thus any children) to the new directory,
+// with an nil parent directory moving the directory to the root 
+message MoveDirectoryRequest {
+    string workspace_id = 1;
+    string directory_id = 2;
+    optional string new_parent_directory = 3;
+}
+
+// RenameAsset will update an asset with the new provided name
+message RenameAssetRequest {
+    string workspace_id = 1;
+    string asset_id = 2;
+    string name = 3;
+}
+
+// MoveAsset will move a directory (and thus any children) to the new directory,
+// with an nil parent directory moving the directory to the root 
+message MoveAssetRequest {
+    string workspace_id = 1;
+    string asset_id = 2;
+    optional string new_parent_directory = 3;
+}
+
+// DeleteDirectory will PERMANENTLY DELETE a directory AND RECURSIVELY DELETE all
+// of its children (including all subdirectory children)... This will throw if there
+// are any active projects in the workspace containing any assets in the directory
+// children to be deleted
+message DeleteDirectoryRequest {
+    string workspace_id = 1;
+    string directory_id = 2;
+}
+
+// DeleteAsset will PERMANENTLY DELETE a workspace asset. This will throw if there
+// are any active projects in the workspace containing this asset.
+message DeleteAssetRequest {
+    string workspace_id = 1;
+    string asset_id = 2;
+}
+
+// this error is detailed when you attempt to rename or move a directory/file or create
+// a directory/file in a place where it shares a name with any of its sibling directories
+message DuplicateFileOrDirectoryEntryNameError {
+    string workspace_id = 1;
+    optional string parent_directory_id = 2;
+    string name = 3;
+}
+
+// this error is detailed when you attempt to make a delete request that would
+// delete assets that are currently in use in projects
+message DeleteInUseAssetsError {
+    string workspace_id = 1;
+    repeated DeleteInUseAssetUsage usages = 2;
+}
+
+message DeleteInUseAssetUsage {
+    string asset_id = 1;
+    string asset_name = 2;
+    string project_id = 3;
+    string project_name = 4;
+}
+
+// ========================  Uploader  ============================ //
+
+// UploadVideoRequest will upload video content to storage
+message UploadVideoRequest {
+    string workspace_id = 1;
+    optional string parent_directory_id = 2;
+    bytes content = 3;
+    string title = 4;
+}
+
+// UploadProgressIndicator allows clients to play the video up
+// until the uploaded point whilst a large video is still uploaded
+message UploadProgressIndicator {
+    string video_id = 1;
+    double completion_percentage = 2;
+}
+
+// UploadFinishedIndicator does as advertised...
+message UploadFinishedIndicator {
+    string video_id = 1;
+}
+
+message UploadVideoResponse {
+    oneof upload_status {
+        UploadProgressIndicator ongoing = 1;
+        UploadFinishedIndicator finished = 2;
+    }
+}
+
+message UploadAudioRequest {
+    string workspace_id = 1;
+    optional string parent_directory_id = 2;
+    bytes content = 3;
+    string title = 4;
+}
+
+message UploadAudioProgressIndicator {
+    string audio_id = 1;
+    double completion_percentage = 2;
+}
+
+message UploadAudioFinishedIndicator {
+    string audio_id = 1;
+}
+
+message UploadAudioResponse {
+    oneof upload_status {
+        UploadAudioProgressIndicator ongoing = 1;
+        UploadAudioFinishedIndicator finished = 2;
+    }
+}
+
+// UploadImageRequest will upload image content to storage
+message UploadImageRequest {
+    string workspace_id = 1;
+    optional string parent_directory_id = 2;
+    bytes content = 3;
+    string title = 4;
+}
+
+message UploadImageResponse {
+    string uploaded_asset_id = 1;
+}
+
+
+service FileService {
+    rpc UploadVideo(UploadVideoRequest) returns (stream UploadVideoResponse);
+    rpc UploadAudio(UploadAudioRequest) returns (stream UploadAudioResponse);
+    rpc UploadImage(UploadImageRequest) returns (UploadImageResponse);
+    rpc GetRootDirectory(GetRootDirectoryRequest) returns (GetRootDirectoryResponse);
+    rpc GetDirectoryChildren(GetDirectoryChildrenRequest) returns (GetDirectoryChildrenResponse);
+    rpc CreateDirectory(CreateDirectoryRequest) returns (CreateDirectoryResponse);
+    rpc RenameDirectory(RenameDirectoryRequest) returns (google.protobuf.Empty);
+    rpc MoveDirectory(MoveDirectoryRequest) returns (google.protobuf.Empty);
+    rpc DeleteDirectory(DeleteDirectoryRequest) returns (google.protobuf.Empty);
+    rpc RenameAsset(RenameAssetRequest) returns (google.protobuf.Empty);
+    rpc MoveAsset(MoveAssetRequest) returns (google.protobuf.Empty);
+    rpc DeleteAsset(DeleteAssetRequest) returns (google.protobuf.Empty);
+}

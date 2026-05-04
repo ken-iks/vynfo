@@ -19,6 +19,8 @@ import {
   file_google_protobuf_empty,
   file_google_protobuf_timestamp,
 } from "@bufbuild/protobuf/wkt";
+import type { User } from "./users_pb";
+import { file_proto_v1_users } from "./users_pb";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
@@ -27,328 +29,13 @@ import type { Message } from "@bufbuild/protobuf";
 export const file_proto_v1_projects: GenFile =
   /*@__PURE__*/
   fileDesc(
-    "Chdwcm90by92MS9wcm9qZWN0cy5wcm90bxICdjEiSAoSVXBsb2FkVmlkZW9SZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkSDwoHY29udGVudBgCIAEoDBINCgV0aXRsZRgDIAEoCSJKChdVcGxvYWRQcm9ncmVzc0luZGljYXRvchIQCgh2aWRlb19pZBgBIAEoCRIdChVjb21wbGV0aW9uX3BlcmNlbnRhZ2UYAiABKAEiKwoXVXBsb2FkRmluaXNoZWRJbmRpY2F0b3ISEAoIdmlkZW9faWQYASABKAkihwEKE1VwbG9hZFZpZGVvUmVzcG9uc2USLgoHb25nb2luZxgBIAEoCzIbLnYxLlVwbG9hZFByb2dyZXNzSW5kaWNhdG9ySAASLwoIZmluaXNoZWQYAiABKAsyGy52MS5VcGxvYWRGaW5pc2hlZEluZGljYXRvckgAQg8KDXVwbG9hZF9zdGF0dXMiSAoSVXBsb2FkQXVkaW9SZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkSDwoHY29udGVudBgCIAEoDBINCgV0aXRsZRgDIAEoCSJPChxVcGxvYWRBdWRpb1Byb2dyZXNzSW5kaWNhdG9yEhAKCGF1ZGlvX2lkGAEgASgJEh0KFWNvbXBsZXRpb25fcGVyY2VudGFnZRgCIAEoASIwChxVcGxvYWRBdWRpb0ZpbmlzaGVkSW5kaWNhdG9yEhAKCGF1ZGlvX2lkGAEgASgJIpEBChNVcGxvYWRBdWRpb1Jlc3BvbnNlEjMKB29uZ29pbmcYASABKAsyIC52MS5VcGxvYWRBdWRpb1Byb2dyZXNzSW5kaWNhdG9ySAASNAoIZmluaXNoZWQYAiABKAsyIC52MS5VcGxvYWRBdWRpb0ZpbmlzaGVkSW5kaWNhdG9ySABCDwoNdXBsb2FkX3N0YXR1cyJtChJVcGxvYWRJbWFnZVJlcXVlc3QSEgoKcHJvamVjdF9pZBgBIAEoCRIPCgdjb250ZW50GAIgASgMEg0KBXRpdGxlGAMgASgJEiMKBG1ldGEYBCABKAsyFS52MS5NZWRpYUltYWdlT3ZlcmxheSIwChNVcGxvYWRJbWFnZVJlc3BvbnNlEhkKEXVwbG9hZGVkX2Fzc2V0X2lkGAEgASgJImgKEVVwbG9hZFRleHRSZXF1ZXN0Eg8KB3Byb2plY3QYASABKAkSDwoHY29udGVudBgCIAEoCRINCgV0aXRsZRgDIAEoCRIiCgRtZXRhGAQgASgLMhQudjEuTWVkaWFUZXh0T3ZlcmxheSIvChJVcGxvYWRUZXh0UmVzcG9uc2USGQoRdXBsb2FkZWRfYXNzZXRfaWQYASABKAkiMwoRTWVkaWFJbWFnZU92ZXJsYXkSHgoDcG9zGAEgASgLMhEudjEuTWVkaWFQb3NpdGlvbiJVChBNZWRpYVRleHRPdmVybGF5Eh4KA3BvcxgBIAEoCzIRLnYxLk1lZGlhUG9zaXRpb24SIQoFY29sb3IYAiABKA4yEi52MS5NZWRpYVRleHRDb2xvciJNCg1NZWRpYVBvc2l0aW9uEhYKDmxlZnRfY29ybmVyX3B4GAEgASgEEhYKDmxlZnRfY29ybmVyX3B5GAIgASgEEgwKBHNpemUYAyABKAQifAoMTWVkaWFPdmVybGF5EhAKCGFzc2V0X2lkGAEgASgJEiYKBWltYWdlGAIgASgLMhUudjEuTWVkaWFJbWFnZU92ZXJsYXlIABIkCgR0ZXh0GAMgASgLMhQudjEuTWVkaWFUZXh0T3ZlcmxheUgAQgwKCmFzc2V0X3R5cGUitgEKEE1lZGlhVmlkZW9FZmZlY3QSHgoEYmx1chgBIAEoCzIOLnYxLkJsdXJFZmZlY3RIABIgCgVzZXBpYRgCIAEoCzIPLnYxLlNlcGlhRWZmZWN0SAASKgoKc2F0dXJhdGlvbhgDIAEoCzIULnYxLlNhdHVyYXRpb25FZmZlY3RIABIqCgpicmlnaHRuZXNzGAQgASgLMhQudjEuQnJpZ2h0bmVzc0VmZmVjdEgAQggKBmVmZmVjdCJ9CgxTZWN0aW9uVmlkZW8SJAoEbWV0YRgBIAEoCzIWLnYxLk1lZGlhVmlkZW9NZXRhZGF0YRIgChh2aWRlb19zdGFydF90aW1lX21pbGxpZXMYAiABKAQSJQoHZWZmZWN0cxgDIAMoCzIULnYxLk1lZGlhVmlkZW9FZmZlY3QiVgoMU2VjdGlvbkF1ZGlvEiQKBG1ldGEYASABKAsyFi52MS5NZWRpYUF1ZGlvTWV0YWRhdGESIAoYYXVkaW9fc3RhcnRfdGltZV9taWxsaWVzGAIgASgEIooBCg9QbGF5YmFja1NlY3Rpb24SGQoRc3RhcnRfdGltZV9taWxsaXMYASABKAQSFwoPZW5kX3RpbWVfbWlsbGlzGAIgASgEEh8KBXZpZGVvGAMgASgLMhAudjEuU2VjdGlvblZpZGVvEiIKCG92ZXJsYXlzGAUgAygLMhAudjEuTWVkaWFPdmVybGF5ImQKDVBsYXliYWNrQXVkaW8SGQoRc3RhcnRfdGltZV9taWxsaXMYASABKAQSFwoPZW5kX3RpbWVfbWlsbGlzGAIgASgEEh8KBWF1ZGlvGAMgASgLMhAudjEuU2VjdGlvbkF1ZGlvImcKDVBsYXliYWNrU3RhdGUSKwoOdmlkZW9fc2VjdGlvbnMYASADKAsyEy52MS5QbGF5YmFja1NlY3Rpb24SKQoOYXVkaW9fc2VjdGlvbnMYAiADKAsyES52MS5QbGF5YmFja0F1ZGlvIrUBChFDb21taXRFZGl0UmVxdWVzdBISCgpwcm9qZWN0X2lkGAEgASgJEhMKC2JyYW5jaF9uYW1lGAIgASgJEhYKDmNvbW1pdF9tZXNzYWdlGAMgASgJEh8KEnByZXZpb3VzX2NvbW1pdF9pZBgEIAEoCUgAiAEBEicKDGNvbW1pdF9zdGF0ZRgFIAEoCzIRLnYxLlBsYXliYWNrU3RhdGVCFQoTX3ByZXZpb3VzX2NvbW1pdF9pZCJdChJDb21taXRFZGl0UmVzcG9uc2USFwoNbmV3X2NvbW1pdF9pZBgBIAEoCUgAEiIKA2VychgCIAEoCzITLnYxLkNvbW1pdEVkaXRFcnJvckgAQgoKCHJlc3BvbnNlImQKD0F1dG9TYXZlUmVxdWVzdBISCgpwcm9qZWN0X2lkGAEgASgJEhEKCWJyYW5jaF9pZBgCIAEoCRIqCg9hdXRvX3NhdmVfc3RhdGUYAyABKAsyES52MS5QbGF5YmFja1N0YXRlIk0KD0NvbW1pdEVkaXRFcnJvchIsCgxzdGFsZV9icmFuY2gYAiABKAsyFC52MS5TdGFsZUJyYW5jaEVycm9ySABCDAoKZXJyb3JfdHlwZSJUChBTdGFsZUJyYW5jaEVycm9yEh8KF2Fzc3VtZWRfYnJhbmNoX3RpcF91dWlkGAEgASgJEh8KF2N1cnJlbnRfYnJhbmNoX3RpcF91dWlkGAIgASgJIh8KCkJsdXJFZmZlY3QSEQoJaW50ZW5zaXR5GAEgASgBIg0KC1NlcGlhRWZmZWN0IiQKEFNhdHVyYXRpb25FZmZlY3QSEAoIc3RyZW5ndGgYASABKAEiJAoQQnJpZ2h0bmVzc0VmZmVjdBIQCghzdHJlbmd0aBgBIAEoASKGAQoPUHJvamVjdE1ldGFkYXRhEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSLgoKY3JlYXRlZF9hdBgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASFAoMd29ya3NwYWNlX2lkGAUgASgJIisKE0xpc3RQcm9qZWN0c1JlcXVlc3QSFAoMd29ya3NwYWNlX2lkGAEgASgJIn0KFExpc3RQcm9qZWN0c1Jlc3BvbnNlEjIKFXVzZXJfY3JlYXRlZF9wcm9qZWN0cxgBIAMoCzITLnYxLlByb2plY3RNZXRhZGF0YRIxChR1c2VyX21lbWJlcl9wcm9qZWN0cxgCIAMoCzITLnYxLlByb2plY3RNZXRhZGF0YSIuChhMaXN0UHJvamVjdEFzc2V0c1JlcXVlc3QSEgoKcHJvamVjdF9pZBgBIAEoCSJHChJNZWRpYVZpZGVvTWV0YWRhdGESEAoIYXNzZXRfaWQYASABKAkSDQoFdGl0bGUYAiABKAkSEAoIZHVyYXRpb24YAyABKAEiRwoSTWVkaWFBdWRpb01ldGFkYXRhEhAKCGFzc2V0X2lkGAEgASgJEg0KBXRpdGxlGAIgASgJEhAKCGR1cmF0aW9uGAMgASgBIl8KEk1lZGlhSW1hZ2VNZXRhZGF0YRIQCghhc3NldF9pZBgBIAEoCRISCgpzaWduZWRfdXJsGAIgASgJEg0KBXRpdGxlGAMgASgJEhQKDGNvbnRlbnRfdHlwZRgEIAEoCSJFChFNZWRpYVRleHRNZXRhZGF0YRIQCghhc3NldF9pZBgBIAEoCRIPCgdjb250ZW50GAIgASgJEg0KBXRpdGxlGAMgASgJIr4BChlMaXN0UHJvamVjdEFzc2V0c1Jlc3BvbnNlEiYKBnZpZGVvcxgBIAMoCzIWLnYxLk1lZGlhVmlkZW9NZXRhZGF0YRImCgZpbWFnZXMYAiADKAsyFi52MS5NZWRpYUltYWdlTWV0YWRhdGESKQoKdGV4dF9ib3hlcxgDIAMoCzIVLnYxLk1lZGlhVGV4dE1ldGFkYXRhEiYKBmF1ZGlvcxgEIAMoCzIWLnYxLk1lZGlhQXVkaW9NZXRhZGF0YSIwChpMaXN0UHJvamVjdEJyYW5jaGVzUmVxdWVzdBISCgpwcm9qZWN0X2lkGAEgASgJIlgKDkJyYW5jaE1ldGFkYXRhEgwKBG5hbWUYASABKAkSGgoNdGlwX2NvbW1pdF9pZBgCIAEoCUgAiAEBEgoKAmlkGAMgASgJQhAKDl90aXBfY29tbWl0X2lkIkMKG0xpc3RQcm9qZWN0QnJhbmNoZXNSZXNwb25zZRIkCghicmFuY2hlcxgBIAMoCzISLnYxLkJyYW5jaE1ldGFkYXRhIl8KFENyZWF0ZVByb2plY3RSZXF1ZXN0EhQKDHByb2plY3RfbmFtZRgBIAEoCRIbChNwcm9qZWN0X2Rlc2NyaXB0aW9uGAIgASgJEhQKDHdvcmtzcGFjZV9pZBgDIAEoCSIzChVDcmVhdGVQcm9qZWN0UmVzcG9uc2USGgoSY3JlYXRlZF9wcm9qZWN0X2lkGAEgASgJIjwKFUFkZFByb2plY3RVc2VyUmVxdWVzdBISCgpwcm9qZWN0X2lkGAEgASgJEg8KB3VzZXJfaWQYAiABKAkiKgoURGVsZXRlUHJvamVjdFJlcXVlc3QSEgoKcHJvamVjdF9pZBgBIAEoCSI4ChBHZXRDb21taXRSZXF1ZXN0EhEKCWNvbW1pdF9pZBgBIAEoCRIRCglicmFuY2hfaWQYAiABKAkidAoRR2V0Q29tbWl0UmVzcG9uc2USEQoJY29tbWl0X2lkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSDwoHbWVzc2FnZRgDIAEoCRInCgxjb21taXRfc3RhdGUYBCABKAsyES52MS5QbGF5YmFja1N0YXRlKoYBCg5NZWRpYVRleHRDb2xvchIgChxNRURJQV9URVhUX0NPTE9SX1VOU1BFQ0lGSUVEEAASGgoWTUVESUFfVEVYVF9DT0xPUl9CTEFDSxABEhoKFk1FRElBX1RFWFRfQ09MT1JfV0hJVEUQAhIaChZNRURJQV9URVhUX0NPTE9SX0NMRUFSEAMy/AYKDlByb2plY3RTZXJ2aWNlEkAKC1VwbG9hZFZpZGVvEhYudjEuVXBsb2FkVmlkZW9SZXF1ZXN0GhcudjEuVXBsb2FkVmlkZW9SZXNwb25zZTABEkAKC1VwbG9hZEF1ZGlvEhYudjEuVXBsb2FkQXVkaW9SZXF1ZXN0GhcudjEuVXBsb2FkQXVkaW9SZXNwb25zZTABEj4KC1VwbG9hZEltYWdlEhYudjEuVXBsb2FkSW1hZ2VSZXF1ZXN0GhcudjEuVXBsb2FkSW1hZ2VSZXNwb25zZRI7CgpVcGxvYWRUZXh0EhUudjEuVXBsb2FkVGV4dFJlcXVlc3QaFi52MS5VcGxvYWRUZXh0UmVzcG9uc2USOwoKQ29tbWl0RWRpdBIVLnYxLkNvbW1pdEVkaXRSZXF1ZXN0GhYudjEuQ29tbWl0RWRpdFJlc3BvbnNlEjgKCUdldENvbW1pdBIULnYxLkdldENvbW1pdFJlcXVlc3QaFS52MS5HZXRDb21taXRSZXNwb25zZRJBCgxMaXN0UHJvamVjdHMSFy52MS5MaXN0UHJvamVjdHNSZXF1ZXN0GhgudjEuTGlzdFByb2plY3RzUmVzcG9uc2USUAoRTGlzdFByb2plY3RBc3NldHMSHC52MS5MaXN0UHJvamVjdEFzc2V0c1JlcXVlc3QaHS52MS5MaXN0UHJvamVjdEFzc2V0c1Jlc3BvbnNlElYKE0xpc3RQcm9qZWN0QnJhbmNoZXMSHi52MS5MaXN0UHJvamVjdEJyYW5jaGVzUmVxdWVzdBofLnYxLkxpc3RQcm9qZWN0QnJhbmNoZXNSZXNwb25zZRJECg1DcmVhdGVQcm9qZWN0EhgudjEuQ3JlYXRlUHJvamVjdFJlcXVlc3QaGS52MS5DcmVhdGVQcm9qZWN0UmVzcG9uc2USQwoOQWRkUHJvamVjdFVzZXISGS52MS5BZGRQcm9qZWN0VXNlclJlcXVlc3QaFi5nb29nbGUucHJvdG9idWYuRW1wdHkSQQoNRGVsZXRlUHJvamVjdBIYLnYxLkRlbGV0ZVByb2plY3RSZXF1ZXN0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5EjcKCEF1dG9TYXZlEhMudjEuQXV0b1NhdmVSZXF1ZXN0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5Qh5aHHZ5bmZvLmNvbS92eW5mby9nZW4vcHJvdG8vdjFiBnByb3RvMw",
-    [file_google_protobuf_timestamp, file_google_protobuf_empty],
+    "Chdwcm90by92MS9wcm9qZWN0cy5wcm90bxICdjEiRQoRTWVkaWFJbWFnZU92ZXJsYXkSEAoIYXNzZXRfaWQYASABKAkSHgoDcG9zGAIgASgLMhEudjEuTWVkaWFQb3NpdGlvbiJmChBNZWRpYVRleHRPdmVybGF5Eh4KA3BvcxgBIAEoCzIRLnYxLk1lZGlhUG9zaXRpb24SIQoFY29sb3IYAiABKA4yEi52MS5NZWRpYVRleHRDb2xvchIPCgdjb250ZW50GAMgASgJIk0KDU1lZGlhUG9zaXRpb24SFgoObGVmdF9jb3JuZXJfcHgYASABKAQSFgoObGVmdF9jb3JuZXJfcHkYAiABKAQSDAoEc2l6ZRgDIAEoBCJkCgxNZWRpYU92ZXJsYXkSJgoFaW1hZ2UYASABKAsyFS52MS5NZWRpYUltYWdlT3ZlcmxheUgAEiQKBHRleHQYAiABKAsyFC52MS5NZWRpYVRleHRPdmVybGF5SABCBgoEa2luZCK2AQoQTWVkaWFWaWRlb0VmZmVjdBIeCgRibHVyGAEgASgLMg4udjEuQmx1ckVmZmVjdEgAEiAKBXNlcGlhGAIgASgLMg8udjEuU2VwaWFFZmZlY3RIABIqCgpzYXR1cmF0aW9uGAMgASgLMhQudjEuU2F0dXJhdGlvbkVmZmVjdEgAEioKCmJyaWdodG5lc3MYBCABKAsyFC52MS5CcmlnaHRuZXNzRWZmZWN0SABCCAoGZWZmZWN0In0KDFNlY3Rpb25WaWRlbxIkCgRtZXRhGAEgASgLMhYudjEuTWVkaWFWaWRlb01ldGFkYXRhEiAKGHZpZGVvX3N0YXJ0X3RpbWVfbWlsbGllcxgCIAEoBBIlCgdlZmZlY3RzGAMgAygLMhQudjEuTWVkaWFWaWRlb0VmZmVjdCJWCgxTZWN0aW9uQXVkaW8SJAoEbWV0YRgBIAEoCzIWLnYxLk1lZGlhQXVkaW9NZXRhZGF0YRIgChhhdWRpb19zdGFydF90aW1lX21pbGxpZXMYAiABKAQiigEKD1BsYXliYWNrU2VjdGlvbhIZChFzdGFydF90aW1lX21pbGxpcxgBIAEoBBIXCg9lbmRfdGltZV9taWxsaXMYAiABKAQSHwoFdmlkZW8YAyABKAsyEC52MS5TZWN0aW9uVmlkZW8SIgoIb3ZlcmxheXMYBSADKAsyEC52MS5NZWRpYU92ZXJsYXkiZAoNUGxheWJhY2tBdWRpbxIZChFzdGFydF90aW1lX21pbGxpcxgBIAEoBBIXCg9lbmRfdGltZV9taWxsaXMYAiABKAQSHwoFYXVkaW8YAyABKAsyEC52MS5TZWN0aW9uQXVkaW8iZwoNUGxheWJhY2tTdGF0ZRIrCg52aWRlb19zZWN0aW9ucxgBIAMoCzITLnYxLlBsYXliYWNrU2VjdGlvbhIpCg5hdWRpb19zZWN0aW9ucxgCIAMoCzIRLnYxLlBsYXliYWNrQXVkaW8itQEKEUNvbW1pdEVkaXRSZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkSEwoLYnJhbmNoX25hbWUYAiABKAkSFgoOY29tbWl0X21lc3NhZ2UYAyABKAkSHwoScHJldmlvdXNfY29tbWl0X2lkGAQgASgJSACIAQESJwoMY29tbWl0X3N0YXRlGAUgASgLMhEudjEuUGxheWJhY2tTdGF0ZUIVChNfcHJldmlvdXNfY29tbWl0X2lkIl0KEkNvbW1pdEVkaXRSZXNwb25zZRIXCg1uZXdfY29tbWl0X2lkGAEgASgJSAASIgoDZXJyGAIgASgLMhMudjEuQ29tbWl0RWRpdEVycm9ySABCCgoIcmVzcG9uc2UiZAoPQXV0b1NhdmVSZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkSEQoJYnJhbmNoX2lkGAIgASgJEioKD2F1dG9fc2F2ZV9zdGF0ZRgDIAEoCzIRLnYxLlBsYXliYWNrU3RhdGUiTQoPQ29tbWl0RWRpdEVycm9yEiwKDHN0YWxlX2JyYW5jaBgCIAEoCzIULnYxLlN0YWxlQnJhbmNoRXJyb3JIAEIMCgplcnJvcl90eXBlIlQKEFN0YWxlQnJhbmNoRXJyb3ISHwoXYXNzdW1lZF9icmFuY2hfdGlwX3V1aWQYASABKAkSHwoXY3VycmVudF9icmFuY2hfdGlwX3V1aWQYAiABKAkiHwoKQmx1ckVmZmVjdBIRCglpbnRlbnNpdHkYASABKAEiDQoLU2VwaWFFZmZlY3QiJAoQU2F0dXJhdGlvbkVmZmVjdBIQCghzdHJlbmd0aBgBIAEoASIkChBCcmlnaHRuZXNzRWZmZWN0EhAKCHN0cmVuZ3RoGAEgASgBIqQBCg9Qcm9qZWN0TWV0YWRhdGESCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIuCgpjcmVhdGVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIUCgx3b3Jrc3BhY2VfaWQYBSABKAkSHAoKY3JlYXRlZF9ieRgGIAEoCzIILnYxLlVzZXIiKwoTTGlzdFByb2plY3RzUmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkiPQoUTGlzdFByb2plY3RzUmVzcG9uc2USJQoIcHJvamVjdHMYASADKAsyEy52MS5Qcm9qZWN0TWV0YWRhdGEiLgoYTGlzdFByb2plY3RBc3NldHNSZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkiQQoZUmVtb3ZlUHJvamVjdEFzc2V0UmVxdWVzdBISCgpwcm9qZWN0X2lkGAEgASgJEhAKCGFzc2V0X2lkGAIgASgJIkcKEk1lZGlhVmlkZW9NZXRhZGF0YRIQCghhc3NldF9pZBgBIAEoCRINCgV0aXRsZRgCIAEoCRIQCghkdXJhdGlvbhgDIAEoASJHChJNZWRpYUF1ZGlvTWV0YWRhdGESEAoIYXNzZXRfaWQYASABKAkSDQoFdGl0bGUYAiABKAkSEAoIZHVyYXRpb24YAyABKAEiXwoSTWVkaWFJbWFnZU1ldGFkYXRhEhAKCGFzc2V0X2lkGAEgASgJEhIKCnNpZ25lZF91cmwYAiABKAkSDQoFdGl0bGUYAyABKAkSFAoMY29udGVudF90eXBlGAQgASgJIpMBChlMaXN0UHJvamVjdEFzc2V0c1Jlc3BvbnNlEiYKBnZpZGVvcxgBIAMoCzIWLnYxLk1lZGlhVmlkZW9NZXRhZGF0YRImCgZpbWFnZXMYAiADKAsyFi52MS5NZWRpYUltYWdlTWV0YWRhdGESJgoGYXVkaW9zGAMgAygLMhYudjEuTWVkaWFBdWRpb01ldGFkYXRhIjAKGkxpc3RQcm9qZWN0QnJhbmNoZXNSZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkiWAoOQnJhbmNoTWV0YWRhdGESDAoEbmFtZRgBIAEoCRIaCg10aXBfY29tbWl0X2lkGAIgASgJSACIAQESCgoCaWQYAyABKAlCEAoOX3RpcF9jb21taXRfaWQiQwobTGlzdFByb2plY3RCcmFuY2hlc1Jlc3BvbnNlEiQKCGJyYW5jaGVzGAEgAygLMhIudjEuQnJhbmNoTWV0YWRhdGEiXwoUQ3JlYXRlUHJvamVjdFJlcXVlc3QSFAoMcHJvamVjdF9uYW1lGAEgASgJEhsKE3Byb2plY3RfZGVzY3JpcHRpb24YAiABKAkSFAoMd29ya3NwYWNlX2lkGAMgASgJIjMKFUNyZWF0ZVByb2plY3RSZXNwb25zZRIaChJjcmVhdGVkX3Byb2plY3RfaWQYASABKAkiPAoVQWRkUHJvamVjdFVzZXJSZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkSDwoHdXNlcl9pZBgCIAEoCSIqChREZWxldGVQcm9qZWN0UmVxdWVzdBISCgpwcm9qZWN0X2lkGAEgASgJIjgKEEdldENvbW1pdFJlcXVlc3QSEQoJY29tbWl0X2lkGAEgASgJEhEKCWJyYW5jaF9pZBgCIAEoCSJ0ChFHZXRDb21taXRSZXNwb25zZRIRCgljb21taXRfaWQYASABKAkSEgoKcHJvamVjdF9pZBgCIAEoCRIPCgdtZXNzYWdlGAMgASgJEicKDGNvbW1pdF9zdGF0ZRgEIAEoCzIRLnYxLlBsYXliYWNrU3RhdGUqhgEKDk1lZGlhVGV4dENvbG9yEiAKHE1FRElBX1RFWFRfQ09MT1JfVU5TUEVDSUZJRUQQABIaChZNRURJQV9URVhUX0NPTE9SX0JMQUNLEAESGgoWTUVESUFfVEVYVF9DT0xPUl9XSElURRACEhoKFk1FRElBX1RFWFRfQ09MT1JfQ0xFQVIQAzLIBQoOUHJvamVjdFNlcnZpY2USOwoKQ29tbWl0RWRpdBIVLnYxLkNvbW1pdEVkaXRSZXF1ZXN0GhYudjEuQ29tbWl0RWRpdFJlc3BvbnNlEjgKCUdldENvbW1pdBIULnYxLkdldENvbW1pdFJlcXVlc3QaFS52MS5HZXRDb21taXRSZXNwb25zZRJBCgxMaXN0UHJvamVjdHMSFy52MS5MaXN0UHJvamVjdHNSZXF1ZXN0GhgudjEuTGlzdFByb2plY3RzUmVzcG9uc2USUAoRTGlzdFByb2plY3RBc3NldHMSHC52MS5MaXN0UHJvamVjdEFzc2V0c1JlcXVlc3QaHS52MS5MaXN0UHJvamVjdEFzc2V0c1Jlc3BvbnNlEksKElJlbW92ZVByb2plY3RBc3NldBIdLnYxLlJlbW92ZVByb2plY3RBc3NldFJlcXVlc3QaFi5nb29nbGUucHJvdG9idWYuRW1wdHkSVgoTTGlzdFByb2plY3RCcmFuY2hlcxIeLnYxLkxpc3RQcm9qZWN0QnJhbmNoZXNSZXF1ZXN0Gh8udjEuTGlzdFByb2plY3RCcmFuY2hlc1Jlc3BvbnNlEkQKDUNyZWF0ZVByb2plY3QSGC52MS5DcmVhdGVQcm9qZWN0UmVxdWVzdBoZLnYxLkNyZWF0ZVByb2plY3RSZXNwb25zZRJDCg5BZGRQcm9qZWN0VXNlchIZLnYxLkFkZFByb2plY3RVc2VyUmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRJBCg1EZWxldGVQcm9qZWN0EhgudjEuRGVsZXRlUHJvamVjdFJlcXVlc3QaFi5nb29nbGUucHJvdG9idWYuRW1wdHkSNwoIQXV0b1NhdmUSEy52MS5BdXRvU2F2ZVJlcXVlc3QaFi5nb29nbGUucHJvdG9idWYuRW1wdHlCHlocdnluZm8uY29tL3Z5bmZvL2dlbi9wcm90by92MWIGcHJvdG8z",
+    [
+      file_google_protobuf_timestamp,
+      file_google_protobuf_empty,
+      file_proto_v1_users,
+    ],
   );
-
-/**
- * UploadVideoRequest will upload video content to storage
- *
- * @generated from message v1.UploadVideoRequest
- */
-export type UploadVideoRequest = Message<"v1.UploadVideoRequest"> & {
-  /**
-   * @generated from field: string project_id = 1;
-   */
-  projectId: string;
-
-  /**
-   * @generated from field: bytes content = 2;
-   */
-  content: Uint8Array;
-
-  /**
-   * @generated from field: string title = 3;
-   */
-  title: string;
-};
-
-/**
- * Describes the message v1.UploadVideoRequest.
- * Use `create(UploadVideoRequestSchema)` to create a new message.
- */
-export const UploadVideoRequestSchema: GenMessage<UploadVideoRequest> =
-  /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 0);
-
-/**
- * UploadProgressIndicator allows clients to play the video up
- * until the uploaded point whilst a large video is still uploaded
- *
- * @generated from message v1.UploadProgressIndicator
- */
-export type UploadProgressIndicator = Message<"v1.UploadProgressIndicator"> & {
-  /**
-   * @generated from field: string video_id = 1;
-   */
-  videoId: string;
-
-  /**
-   * @generated from field: double completion_percentage = 2;
-   */
-  completionPercentage: number;
-};
-
-/**
- * Describes the message v1.UploadProgressIndicator.
- * Use `create(UploadProgressIndicatorSchema)` to create a new message.
- */
-export const UploadProgressIndicatorSchema: GenMessage<UploadProgressIndicator> =
-  /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 1);
-
-/**
- * UploadFinishedIndicator does as advertised...
- *
- * @generated from message v1.UploadFinishedIndicator
- */
-export type UploadFinishedIndicator = Message<"v1.UploadFinishedIndicator"> & {
-  /**
-   * @generated from field: string video_id = 1;
-   */
-  videoId: string;
-};
-
-/**
- * Describes the message v1.UploadFinishedIndicator.
- * Use `create(UploadFinishedIndicatorSchema)` to create a new message.
- */
-export const UploadFinishedIndicatorSchema: GenMessage<UploadFinishedIndicator> =
-  /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 2);
-
-/**
- * @generated from message v1.UploadVideoResponse
- */
-export type UploadVideoResponse = Message<"v1.UploadVideoResponse"> & {
-  /**
-   * @generated from oneof v1.UploadVideoResponse.upload_status
-   */
-  uploadStatus:
-    | {
-        /**
-         * @generated from field: v1.UploadProgressIndicator ongoing = 1;
-         */
-        value: UploadProgressIndicator;
-        case: "ongoing";
-      }
-    | {
-        /**
-         * @generated from field: v1.UploadFinishedIndicator finished = 2;
-         */
-        value: UploadFinishedIndicator;
-        case: "finished";
-      }
-    | { case: undefined; value?: undefined };
-};
-
-/**
- * Describes the message v1.UploadVideoResponse.
- * Use `create(UploadVideoResponseSchema)` to create a new message.
- */
-export const UploadVideoResponseSchema: GenMessage<UploadVideoResponse> =
-  /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 3);
-
-/**
- * @generated from message v1.UploadAudioRequest
- */
-export type UploadAudioRequest = Message<"v1.UploadAudioRequest"> & {
-  /**
-   * @generated from field: string project_id = 1;
-   */
-  projectId: string;
-
-  /**
-   * @generated from field: bytes content = 2;
-   */
-  content: Uint8Array;
-
-  /**
-   * @generated from field: string title = 3;
-   */
-  title: string;
-};
-
-/**
- * Describes the message v1.UploadAudioRequest.
- * Use `create(UploadAudioRequestSchema)` to create a new message.
- */
-export const UploadAudioRequestSchema: GenMessage<UploadAudioRequest> =
-  /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 4);
-
-/**
- * @generated from message v1.UploadAudioProgressIndicator
- */
-export type UploadAudioProgressIndicator =
-  Message<"v1.UploadAudioProgressIndicator"> & {
-    /**
-     * @generated from field: string audio_id = 1;
-     */
-    audioId: string;
-
-    /**
-     * @generated from field: double completion_percentage = 2;
-     */
-    completionPercentage: number;
-  };
-
-/**
- * Describes the message v1.UploadAudioProgressIndicator.
- * Use `create(UploadAudioProgressIndicatorSchema)` to create a new message.
- */
-export const UploadAudioProgressIndicatorSchema: GenMessage<UploadAudioProgressIndicator> =
-  /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 5);
-
-/**
- * @generated from message v1.UploadAudioFinishedIndicator
- */
-export type UploadAudioFinishedIndicator =
-  Message<"v1.UploadAudioFinishedIndicator"> & {
-    /**
-     * @generated from field: string audio_id = 1;
-     */
-    audioId: string;
-  };
-
-/**
- * Describes the message v1.UploadAudioFinishedIndicator.
- * Use `create(UploadAudioFinishedIndicatorSchema)` to create a new message.
- */
-export const UploadAudioFinishedIndicatorSchema: GenMessage<UploadAudioFinishedIndicator> =
-  /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 6);
-
-/**
- * @generated from message v1.UploadAudioResponse
- */
-export type UploadAudioResponse = Message<"v1.UploadAudioResponse"> & {
-  /**
-   * @generated from oneof v1.UploadAudioResponse.upload_status
-   */
-  uploadStatus:
-    | {
-        /**
-         * @generated from field: v1.UploadAudioProgressIndicator ongoing = 1;
-         */
-        value: UploadAudioProgressIndicator;
-        case: "ongoing";
-      }
-    | {
-        /**
-         * @generated from field: v1.UploadAudioFinishedIndicator finished = 2;
-         */
-        value: UploadAudioFinishedIndicator;
-        case: "finished";
-      }
-    | { case: undefined; value?: undefined };
-};
-
-/**
- * Describes the message v1.UploadAudioResponse.
- * Use `create(UploadAudioResponseSchema)` to create a new message.
- */
-export const UploadAudioResponseSchema: GenMessage<UploadAudioResponse> =
-  /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 7);
-
-/**
- * UploadImageRequest will upload image content to storage
- *
- * @generated from message v1.UploadImageRequest
- */
-export type UploadImageRequest = Message<"v1.UploadImageRequest"> & {
-  /**
-   * @generated from field: string project_id = 1;
-   */
-  projectId: string;
-
-  /**
-   * @generated from field: bytes content = 2;
-   */
-  content: Uint8Array;
-
-  /**
-   * @generated from field: string title = 3;
-   */
-  title: string;
-
-  /**
-   * @generated from field: v1.MediaImageOverlay meta = 4;
-   */
-  meta?: MediaImageOverlay;
-};
-
-/**
- * Describes the message v1.UploadImageRequest.
- * Use `create(UploadImageRequestSchema)` to create a new message.
- */
-export const UploadImageRequestSchema: GenMessage<UploadImageRequest> =
-  /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 8);
-
-/**
- * @generated from message v1.UploadImageResponse
- */
-export type UploadImageResponse = Message<"v1.UploadImageResponse"> & {
-  /**
-   * @generated from field: string uploaded_asset_id = 1;
-   */
-  uploadedAssetId: string;
-};
-
-/**
- * Describes the message v1.UploadImageResponse.
- * Use `create(UploadImageResponseSchema)` to create a new message.
- */
-export const UploadImageResponseSchema: GenMessage<UploadImageResponse> =
-  /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 9);
-
-/**
- * UploadImageRequest will upload image content to storage
- *
- * @generated from message v1.UploadTextRequest
- */
-export type UploadTextRequest = Message<"v1.UploadTextRequest"> & {
-  /**
-   * @generated from field: string project = 1;
-   */
-  project: string;
-
-  /**
-   * @generated from field: string content = 2;
-   */
-  content: string;
-
-  /**
-   * @generated from field: string title = 3;
-   */
-  title: string;
-
-  /**
-   * @generated from field: v1.MediaTextOverlay meta = 4;
-   */
-  meta?: MediaTextOverlay;
-};
-
-/**
- * Describes the message v1.UploadTextRequest.
- * Use `create(UploadTextRequestSchema)` to create a new message.
- */
-export const UploadTextRequestSchema: GenMessage<UploadTextRequest> =
-  /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 10);
-
-/**
- * @generated from message v1.UploadTextResponse
- */
-export type UploadTextResponse = Message<"v1.UploadTextResponse"> & {
-  /**
-   * @generated from field: string uploaded_asset_id = 1;
-   */
-  uploadedAssetId: string;
-};
-
-/**
- * Describes the message v1.UploadTextResponse.
- * Use `create(UploadTextResponseSchema)` to create a new message.
- */
-export const UploadTextResponseSchema: GenMessage<UploadTextResponse> =
-  /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 11);
 
 /**
  * MediaImage is a reference to an image asset that can either take up the full video frame,
@@ -360,7 +47,12 @@ export const UploadTextResponseSchema: GenMessage<UploadTextResponse> =
  */
 export type MediaImageOverlay = Message<"v1.MediaImageOverlay"> & {
   /**
-   * @generated from field: v1.MediaPosition pos = 1;
+   * @generated from field: string asset_id = 1;
+   */
+  assetId: string;
+
+  /**
+   * @generated from field: v1.MediaPosition pos = 2;
    */
   pos?: MediaPosition;
 };
@@ -371,10 +63,10 @@ export type MediaImageOverlay = Message<"v1.MediaImageOverlay"> & {
  */
 export const MediaImageOverlaySchema: GenMessage<MediaImageOverlay> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 12);
+  messageDesc(file_proto_v1_projects, 0);
 
 /**
- * MediaText is a reference to a text asset that is positioned at some place in the video frame,
+ * MediaText is a reference to a inline text that is positioned at some place in the video frame,
  * Size clamping to the size of the video display should be handled on the client in both the
  * size case and the corner position case.
  *
@@ -390,6 +82,11 @@ export type MediaTextOverlay = Message<"v1.MediaTextOverlay"> & {
    * @generated from field: v1.MediaTextColor color = 2;
    */
   color: MediaTextColor;
+
+  /**
+   * @generated from field: string content = 3;
+   */
+  content: string;
 };
 
 /**
@@ -398,7 +95,7 @@ export type MediaTextOverlay = Message<"v1.MediaTextOverlay"> & {
  */
 export const MediaTextOverlaySchema: GenMessage<MediaTextOverlay> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 13);
+  messageDesc(file_proto_v1_projects, 1);
 
 /**
  * @generated from message v1.MediaPosition
@@ -426,7 +123,7 @@ export type MediaPosition = Message<"v1.MediaPosition"> & {
  */
 export const MediaPositionSchema: GenMessage<MediaPosition> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 14);
+  messageDesc(file_proto_v1_projects, 2);
 
 /**
  * MediaOverlays are the types of media that can be rendered on the playback editor for an
@@ -436,24 +133,19 @@ export const MediaPositionSchema: GenMessage<MediaPosition> =
  */
 export type MediaOverlay = Message<"v1.MediaOverlay"> & {
   /**
-   * @generated from field: string asset_id = 1;
+   * @generated from oneof v1.MediaOverlay.kind
    */
-  assetId: string;
-
-  /**
-   * @generated from oneof v1.MediaOverlay.asset_type
-   */
-  assetType:
+  kind:
     | {
         /**
-         * @generated from field: v1.MediaImageOverlay image = 2;
+         * @generated from field: v1.MediaImageOverlay image = 1;
          */
         value: MediaImageOverlay;
         case: "image";
       }
     | {
         /**
-         * @generated from field: v1.MediaTextOverlay text = 3;
+         * @generated from field: v1.MediaTextOverlay text = 2;
          */
         value: MediaTextOverlay;
         case: "text";
@@ -467,7 +159,7 @@ export type MediaOverlay = Message<"v1.MediaOverlay"> & {
  */
 export const MediaOverlaySchema: GenMessage<MediaOverlay> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 15);
+  messageDesc(file_proto_v1_projects, 3);
 
 /**
  * MediaVideoEffects are effects that can be layed on top of video sections
@@ -516,7 +208,7 @@ export type MediaVideoEffect = Message<"v1.MediaVideoEffect"> & {
  */
 export const MediaVideoEffectSchema: GenMessage<MediaVideoEffect> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 16);
+  messageDesc(file_proto_v1_projects, 4);
 
 /**
  * The section video is the video that is used for this section, and start time
@@ -552,7 +244,7 @@ export type SectionVideo = Message<"v1.SectionVideo"> & {
  */
 export const SectionVideoSchema: GenMessage<SectionVideo> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 17);
+  messageDesc(file_proto_v1_projects, 5);
 
 /**
  * TODO: audio sections will be a separate editing experience from the video editing
@@ -579,7 +271,7 @@ export type SectionAudio = Message<"v1.SectionAudio"> & {
  */
 export const SectionAudioSchema: GenMessage<SectionAudio> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 18);
+  messageDesc(file_proto_v1_projects, 6);
 
 /**
  * PlaybackSection represents a particular cut of playback that is displayed between
@@ -615,7 +307,7 @@ export type PlaybackSection = Message<"v1.PlaybackSection"> & {
  */
 export const PlaybackSectionSchema: GenMessage<PlaybackSection> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 19);
+  messageDesc(file_proto_v1_projects, 7);
 
 /**
  * @generated from message v1.PlaybackAudio
@@ -643,7 +335,7 @@ export type PlaybackAudio = Message<"v1.PlaybackAudio"> & {
  */
 export const PlaybackAudioSchema: GenMessage<PlaybackAudio> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 20);
+  messageDesc(file_proto_v1_projects, 8);
 
 /**
  * @generated from message v1.PlaybackState
@@ -666,7 +358,7 @@ export type PlaybackState = Message<"v1.PlaybackState"> & {
  */
 export const PlaybackStateSchema: GenMessage<PlaybackState> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 21);
+  messageDesc(file_proto_v1_projects, 9);
 
 /**
  * PlaybackEditor holds a list of sections controlling the current edited state of
@@ -709,7 +401,7 @@ export type CommitEditRequest = Message<"v1.CommitEditRequest"> & {
  */
 export const CommitEditRequestSchema: GenMessage<CommitEditRequest> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 22);
+  messageDesc(file_proto_v1_projects, 10);
 
 /**
  * @generated from message v1.CommitEditResponse
@@ -742,7 +434,7 @@ export type CommitEditResponse = Message<"v1.CommitEditResponse"> & {
  */
 export const CommitEditResponseSchema: GenMessage<CommitEditResponse> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 23);
+  messageDesc(file_proto_v1_projects, 11);
 
 /**
  * AutoSave's will store the branches edited playback state in an in memory cache for
@@ -774,7 +466,7 @@ export type AutoSaveRequest = Message<"v1.AutoSaveRequest"> & {
  */
 export const AutoSaveRequestSchema: GenMessage<AutoSaveRequest> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 24);
+  messageDesc(file_proto_v1_projects, 12);
 
 /**
  * @generated from message v1.CommitEditError
@@ -800,7 +492,7 @@ export type CommitEditError = Message<"v1.CommitEditError"> & {
  */
 export const CommitEditErrorSchema: GenMessage<CommitEditError> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 25);
+  messageDesc(file_proto_v1_projects, 13);
 
 /**
  * @generated from message v1.StaleBranchError
@@ -823,7 +515,7 @@ export type StaleBranchError = Message<"v1.StaleBranchError"> & {
  */
 export const StaleBranchErrorSchema: GenMessage<StaleBranchError> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 26);
+  messageDesc(file_proto_v1_projects, 14);
 
 /**
  * Blur will apply a blur to the video section at a growing intensity scale
@@ -845,7 +537,7 @@ export type BlurEffect = Message<"v1.BlurEffect"> & {
  */
 export const BlurEffectSchema: GenMessage<BlurEffect> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 27);
+  messageDesc(file_proto_v1_projects, 15);
 
 /**
  * Sepia will apply a default sepria effect to the full video segment
@@ -861,7 +553,7 @@ export type SepiaEffect = Message<"v1.SepiaEffect"> & {};
  */
 export const SepiaEffectSchema: GenMessage<SepiaEffect> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 28);
+  messageDesc(file_proto_v1_projects, 16);
 
 /**
  * @generated from message v1.SaturationEffect
@@ -881,7 +573,7 @@ export type SaturationEffect = Message<"v1.SaturationEffect"> & {
  */
 export const SaturationEffectSchema: GenMessage<SaturationEffect> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 29);
+  messageDesc(file_proto_v1_projects, 17);
 
 /**
  * @generated from message v1.BrightnessEffect
@@ -901,7 +593,7 @@ export type BrightnessEffect = Message<"v1.BrightnessEffect"> & {
  */
 export const BrightnessEffectSchema: GenMessage<BrightnessEffect> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 30);
+  messageDesc(file_proto_v1_projects, 18);
 
 /**
  * ProjectMetadata contains the core identifying information for a project
@@ -934,6 +626,11 @@ export type ProjectMetadata = Message<"v1.ProjectMetadata"> & {
    * @generated from field: string workspace_id = 5;
    */
   workspaceId: string;
+
+  /**
+   * @generated from field: v1.User created_by = 6;
+   */
+  createdBy?: User;
 };
 
 /**
@@ -942,7 +639,7 @@ export type ProjectMetadata = Message<"v1.ProjectMetadata"> & {
  */
 export const ProjectMetadataSchema: GenMessage<ProjectMetadata> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 31);
+  messageDesc(file_proto_v1_projects, 19);
 
 /**
  * ListProjectsRequest fetches all projects belonging to a given user.
@@ -962,23 +659,18 @@ export type ListProjectsRequest = Message<"v1.ListProjectsRequest"> & {
  */
 export const ListProjectsRequestSchema: GenMessage<ListProjectsRequest> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 32);
+  messageDesc(file_proto_v1_projects, 20);
 
 /**
- * ListProjectsResponse returns the set of projects owned by the requesting user.
+ * ListProjectsResponse returns the projects in a workspace.
  *
  * @generated from message v1.ListProjectsResponse
  */
 export type ListProjectsResponse = Message<"v1.ListProjectsResponse"> & {
   /**
-   * @generated from field: repeated v1.ProjectMetadata user_created_projects = 1;
+   * @generated from field: repeated v1.ProjectMetadata projects = 1;
    */
-  userCreatedProjects: ProjectMetadata[];
-
-  /**
-   * @generated from field: repeated v1.ProjectMetadata user_member_projects = 2;
-   */
-  userMemberProjects: ProjectMetadata[];
+  projects: ProjectMetadata[];
 };
 
 /**
@@ -987,10 +679,10 @@ export type ListProjectsResponse = Message<"v1.ListProjectsResponse"> & {
  */
 export const ListProjectsResponseSchema: GenMessage<ListProjectsResponse> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 33);
+  messageDesc(file_proto_v1_projects, 21);
 
 /**
- * ListProjectAssetsRequest fetches every media asset (videos, images, text boxes)
+ * ListProjectAssetsRequest fetches every media asset (videos, images, audio)
  * that has been uploaded or created within a project.
  *
  * @generated from message v1.ListProjectAssetsRequest
@@ -1009,7 +701,31 @@ export type ListProjectAssetsRequest =
  */
 export const ListProjectAssetsRequestSchema: GenMessage<ListProjectAssetsRequest> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 34);
+  messageDesc(file_proto_v1_projects, 22);
+
+/**
+ * @generated from message v1.RemoveProjectAssetRequest
+ */
+export type RemoveProjectAssetRequest =
+  Message<"v1.RemoveProjectAssetRequest"> & {
+    /**
+     * @generated from field: string project_id = 1;
+     */
+    projectId: string;
+
+    /**
+     * @generated from field: string asset_id = 2;
+     */
+    assetId: string;
+  };
+
+/**
+ * Describes the message v1.RemoveProjectAssetRequest.
+ * Use `create(RemoveProjectAssetRequestSchema)` to create a new message.
+ */
+export const RemoveProjectAssetRequestSchema: GenMessage<RemoveProjectAssetRequest> =
+  /*@__PURE__*/
+  messageDesc(file_proto_v1_projects, 23);
 
 /**
  * MediaVideoMetadata is the lightweight descriptor returned when listing video
@@ -1040,7 +756,7 @@ export type MediaVideoMetadata = Message<"v1.MediaVideoMetadata"> & {
  */
 export const MediaVideoMetadataSchema: GenMessage<MediaVideoMetadata> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 35);
+  messageDesc(file_proto_v1_projects, 24);
 
 /**
  * @generated from message v1.MediaAudioMetadata
@@ -1070,7 +786,7 @@ export type MediaAudioMetadata = Message<"v1.MediaAudioMetadata"> & {
  */
 export const MediaAudioMetadataSchema: GenMessage<MediaAudioMetadata> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 36);
+  messageDesc(file_proto_v1_projects, 25);
 
 /**
  * MediaImageMetadata is the lightweight descriptor returned when listing image assets.
@@ -1094,8 +810,6 @@ export type MediaImageMetadata = Message<"v1.MediaImageMetadata"> & {
   title: string;
 
   /**
-   * TODO
-   *
    * @generated from field: string content_type = 4;
    */
   contentType: string;
@@ -1107,39 +821,7 @@ export type MediaImageMetadata = Message<"v1.MediaImageMetadata"> & {
  */
 export const MediaImageMetadataSchema: GenMessage<MediaImageMetadata> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 37);
-
-/**
- * MediaTextMetadata is the lightweight descriptor returned when listing text box assets.
- *
- * @generated from message v1.MediaTextMetadata
- */
-export type MediaTextMetadata = Message<"v1.MediaTextMetadata"> & {
-  /**
-   * @generated from field: string asset_id = 1;
-   */
-  assetId: string;
-
-  /**
-   * TODO
-   *
-   * @generated from field: string content = 2;
-   */
-  content: string;
-
-  /**
-   * @generated from field: string title = 3;
-   */
-  title: string;
-};
-
-/**
- * Describes the message v1.MediaTextMetadata.
- * Use `create(MediaTextMetadataSchema)` to create a new message.
- */
-export const MediaTextMetadataSchema: GenMessage<MediaTextMetadata> =
-  /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 38);
+  messageDesc(file_proto_v1_projects, 26);
 
 /**
  * ListProjectAssetsResponse groups all asset types belonging to a project so the
@@ -1160,12 +842,7 @@ export type ListProjectAssetsResponse =
     images: MediaImageMetadata[];
 
     /**
-     * @generated from field: repeated v1.MediaTextMetadata text_boxes = 3;
-     */
-    textBoxes: MediaTextMetadata[];
-
-    /**
-     * @generated from field: repeated v1.MediaAudioMetadata audios = 4;
+     * @generated from field: repeated v1.MediaAudioMetadata audios = 3;
      */
     audios: MediaAudioMetadata[];
   };
@@ -1176,7 +853,7 @@ export type ListProjectAssetsResponse =
  */
 export const ListProjectAssetsResponseSchema: GenMessage<ListProjectAssetsResponse> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 39);
+  messageDesc(file_proto_v1_projects, 27);
 
 /**
  * ListProjectBranchesRequest fetches every branch that belongs to a project.
@@ -1197,7 +874,7 @@ export type ListProjectBranchesRequest =
  */
 export const ListProjectBranchesRequestSchema: GenMessage<ListProjectBranchesRequest> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 40);
+  messageDesc(file_proto_v1_projects, 28);
 
 /**
  * BranchMetadata is the lightweight descriptor for a single branch.
@@ -1227,7 +904,7 @@ export type BranchMetadata = Message<"v1.BranchMetadata"> & {
  */
 export const BranchMetadataSchema: GenMessage<BranchMetadata> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 41);
+  messageDesc(file_proto_v1_projects, 29);
 
 /**
  * ListProjectBranchesResponse returns the branches for the requested project.
@@ -1248,7 +925,7 @@ export type ListProjectBranchesResponse =
  */
 export const ListProjectBranchesResponseSchema: GenMessage<ListProjectBranchesResponse> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 42);
+  messageDesc(file_proto_v1_projects, 30);
 
 /**
  * @generated from message v1.CreateProjectRequest
@@ -1276,7 +953,7 @@ export type CreateProjectRequest = Message<"v1.CreateProjectRequest"> & {
  */
 export const CreateProjectRequestSchema: GenMessage<CreateProjectRequest> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 43);
+  messageDesc(file_proto_v1_projects, 31);
 
 /**
  * @generated from message v1.CreateProjectResponse
@@ -1294,7 +971,7 @@ export type CreateProjectResponse = Message<"v1.CreateProjectResponse"> & {
  */
 export const CreateProjectResponseSchema: GenMessage<CreateProjectResponse> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 44);
+  messageDesc(file_proto_v1_projects, 32);
 
 /**
  * @generated from message v1.AddProjectUserRequest
@@ -1317,7 +994,7 @@ export type AddProjectUserRequest = Message<"v1.AddProjectUserRequest"> & {
  */
 export const AddProjectUserRequestSchema: GenMessage<AddProjectUserRequest> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 45);
+  messageDesc(file_proto_v1_projects, 33);
 
 /**
  * @generated from message v1.DeleteProjectRequest
@@ -1335,7 +1012,7 @@ export type DeleteProjectRequest = Message<"v1.DeleteProjectRequest"> & {
  */
 export const DeleteProjectRequestSchema: GenMessage<DeleteProjectRequest> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 46);
+  messageDesc(file_proto_v1_projects, 34);
 
 /**
  * @generated from message v1.GetCommitRequest
@@ -1361,7 +1038,7 @@ export type GetCommitRequest = Message<"v1.GetCommitRequest"> & {
  */
 export const GetCommitRequestSchema: GenMessage<GetCommitRequest> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 47);
+  messageDesc(file_proto_v1_projects, 35);
 
 /**
  * @generated from message v1.GetCommitResponse
@@ -1394,7 +1071,7 @@ export type GetCommitResponse = Message<"v1.GetCommitResponse"> & {
  */
 export const GetCommitResponseSchema: GenMessage<GetCommitResponse> =
   /*@__PURE__*/
-  messageDesc(file_proto_v1_projects, 48);
+  messageDesc(file_proto_v1_projects, 36);
 
 /**
  * @generated from enum v1.MediaTextColor
@@ -1435,38 +1112,6 @@ export const MediaTextColorSchema: GenEnum<MediaTextColor> =
  */
 export const ProjectService: GenService<{
   /**
-   * @generated from rpc v1.ProjectService.UploadVideo
-   */
-  uploadVideo: {
-    methodKind: "server_streaming";
-    input: typeof UploadVideoRequestSchema;
-    output: typeof UploadVideoResponseSchema;
-  };
-  /**
-   * @generated from rpc v1.ProjectService.UploadAudio
-   */
-  uploadAudio: {
-    methodKind: "server_streaming";
-    input: typeof UploadAudioRequestSchema;
-    output: typeof UploadAudioResponseSchema;
-  };
-  /**
-   * @generated from rpc v1.ProjectService.UploadImage
-   */
-  uploadImage: {
-    methodKind: "unary";
-    input: typeof UploadImageRequestSchema;
-    output: typeof UploadImageResponseSchema;
-  };
-  /**
-   * @generated from rpc v1.ProjectService.UploadText
-   */
-  uploadText: {
-    methodKind: "unary";
-    input: typeof UploadTextRequestSchema;
-    output: typeof UploadTextResponseSchema;
-  };
-  /**
    * @generated from rpc v1.ProjectService.CommitEdit
    */
   commitEdit: {
@@ -1497,6 +1142,14 @@ export const ProjectService: GenService<{
     methodKind: "unary";
     input: typeof ListProjectAssetsRequestSchema;
     output: typeof ListProjectAssetsResponseSchema;
+  };
+  /**
+   * @generated from rpc v1.ProjectService.RemoveProjectAsset
+   */
+  removeProjectAsset: {
+    methodKind: "unary";
+    input: typeof RemoveProjectAssetRequestSchema;
+    output: typeof EmptySchema;
   };
   /**
    * @generated from rpc v1.ProjectService.ListProjectBranches

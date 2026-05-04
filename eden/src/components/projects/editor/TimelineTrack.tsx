@@ -7,7 +7,6 @@ import { useSnapshot } from "valtio";
 import type {
   MediaAudioMetadata,
   MediaImageMetadata,
-  MediaTextMetadata,
   MediaVideoMetadata,
   PlaybackSection,
 } from "@/gen/proto/v1/projects_pb";
@@ -35,7 +34,6 @@ interface TimelineTrackProps {
   availableVideos: MediaVideoMetadata[];
   availableAudios: MediaAudioMetadata[];
   availableImages: MediaImageMetadata[];
-  availableTexts: MediaTextMetadata[];
 }
 
 interface TimelineLane {
@@ -64,7 +62,6 @@ export function TimelineTrack({
   availableVideos,
   availableAudios,
   availableImages,
-  availableTexts,
 }: TimelineTrackProps) {
   const editorSnapshot = useSnapshot(editorStore);
   const totalDuration = editorSnapshot.totalDurationMillis;
@@ -803,7 +800,6 @@ export function TimelineTrack({
           availableVideos={availableVideos}
           availableAudios={availableAudios}
           availableImages={availableImages}
-          availableTexts={availableTexts}
           onInsertVideoAtTrackPx={insertVideoAtTrackPx}
           onInsertAudioAtTrackPx={insertAudioAtTrackPx}
           onCutAtTrackPx={cutAtTrackPx}

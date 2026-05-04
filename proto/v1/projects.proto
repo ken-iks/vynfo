@@ -6,81 +6,9 @@ option go_package = "vynfo.com/vynfo/gen/proto/v1";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
+import "proto/v1/users.proto";
 
 
-// ========================  Uploader  ============================ //
-
-// UploadVideoRequest will upload video content to storage
-message UploadVideoRequest {
-    string project_id = 1;
-    bytes content = 2;
-    string title = 3;
-}
-
-// UploadProgressIndicator allows clients to play the video up
-// until the uploaded point whilst a large video is still uploaded
-message UploadProgressIndicator {
-    string video_id = 1;
-    double completion_percentage = 2;
-}
-
-// UploadFinishedIndicator does as advertised...
-message UploadFinishedIndicator {
-    string video_id = 1;
-}
-
-message UploadVideoResponse {
-    oneof upload_status {
-        UploadProgressIndicator ongoing = 1;
-        UploadFinishedIndicator finished = 2;
-    }
-}
-
-message UploadAudioRequest {
-    string project_id = 1;
-    bytes content = 2;
-    string title = 3;
-}
-
-message UploadAudioProgressIndicator {
-    string audio_id = 1;
-    double completion_percentage = 2;
-}
-
-message UploadAudioFinishedIndicator {
-    string audio_id = 1;
-}
-
-message UploadAudioResponse {
-    oneof upload_status {
-        UploadAudioProgressIndicator ongoing = 1;
-        UploadAudioFinishedIndicator finished = 2;
-    }
-}
-
-// UploadImageRequest will upload image content to storage
-message UploadImageRequest {
-    string project_id = 1;
-    bytes content = 2;
-    string title = 3;
-    MediaImageOverlay meta = 4;
-}
-
-message UploadImageResponse {
-    string uploaded_asset_id = 1;
-}
-
-// UploadImageRequest will upload image content to storage
-message UploadTextRequest {
-    string project = 1;
-    string content = 2;
-    string title = 3;
-    MediaTextOverlay meta = 4;
-}
-
-message UploadTextResponse {
-    string uploaded_asset_id = 1;
-}
 
 // =======================  PlayBack Editor ============================= //
 
@@ -89,15 +17,17 @@ message UploadTextResponse {
 // Size clamping to the size of the video display should be handled on the client in both the
 // size case and the corner position case.
 message MediaImageOverlay {
-    MediaPosition pos = 1;
+    string asset_id = 1;
+    MediaPosition pos = 2;
 }
 
-// MediaText is a reference to a text asset that is positioned at some place in the video frame,
+// MediaText is a reference to a inline text that is positioned at some place in the video frame,
 // Size clamping to the size of the video display should be handled on the client in both the
 // size case and the corner position case.
 message MediaTextOverlay {
     MediaPosition pos = 1;
     MediaTextColor color = 2;
+    string content = 3;
 }
 
 enum MediaTextColor {
@@ -116,10 +46,9 @@ message MediaPosition {
 // MediaOverlays are the types of media that can be rendered on the playback editor for an
 // editing session on top of a video.
 message MediaOverlay {
-    string asset_id = 1;
-    oneof asset_type {
-        MediaImageOverlay image = 2;
-        MediaTextOverlay text = 3;
+    oneof kind {
+        MediaImageOverlay image = 1;
+        MediaTextOverlay text = 2;
     }
 }
 
@@ -241,6 +170,7 @@ message ProjectMetadata {
     string description = 3;
     google.protobuf.Timestamp created_at = 4;
     string workspace_id = 5;
+    User created_by = 6;
 }
 
 // ListProjectsRequest fetches all projects belonging to a given user.
@@ -248,16 +178,20 @@ message ListProjectsRequest {
     string workspace_id = 1;
 }
 
-// ListProjectsResponse returns the set of projects owned by the requesting user.
+// ListProjectsResponse returns the projects in a workspace.
 message ListProjectsResponse {
-    repeated ProjectMetadata user_created_projects = 1;
-    repeated ProjectMetadata user_member_projects = 2;
+    repeated ProjectMetadata projects = 1;
 }
 
-// ListProjectAssetsRequest fetches every media asset (videos, images, text boxes)
+// ListProjectAssetsRequest fetches every media asset (videos, images, audio)
 // that has been uploaded or created within a project.
 message ListProjectAssetsRequest {
     string project_id = 1;
+}
+
+message RemoveProjectAssetRequest {
+    string project_id = 1;
+    string asset_id = 2;
 }
 
 // MediaVideoMetadata is the lightweight descriptor returned when listing video
@@ -281,15 +215,6 @@ message MediaImageMetadata {
     string signed_url = 2;
     string title = 3;
     string content_type = 4;
-    // TODO
-}
-
-// MediaTextMetadata is the lightweight descriptor returned when listing text box assets.
-message MediaTextMetadata {
-    string asset_id = 1;
-    // TODO
-    string content = 2;
-    string title = 3;
 }
 
 // ListProjectAssetsResponse groups all asset types belonging to a project so the
@@ -297,8 +222,7 @@ message MediaTextMetadata {
 message ListProjectAssetsResponse {
     repeated MediaVideoMetadata videos = 1;
     repeated MediaImageMetadata images = 2;
-    repeated MediaTextMetadata text_boxes = 3;
-    repeated MediaAudioMetadata audios = 4;
+    repeated MediaAudioMetadata audios = 3;
 }
 
 // ListProjectBranchesRequest fetches every branch that belongs to a project.
@@ -355,14 +279,11 @@ message GetCommitResponse {
 
 // ====================== Service Definition ============================== //
 service ProjectService {
-    rpc UploadVideo(UploadVideoRequest) returns (stream UploadVideoResponse);
-    rpc UploadAudio(UploadAudioRequest) returns (stream UploadAudioResponse);
-    rpc UploadImage(UploadImageRequest) returns (UploadImageResponse);
-    rpc UploadText(UploadTextRequest) returns (UploadTextResponse);
     rpc CommitEdit(CommitEditRequest) returns (CommitEditResponse);
     rpc GetCommit(GetCommitRequest) returns (GetCommitResponse);
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
     rpc ListProjectAssets(ListProjectAssetsRequest) returns (ListProjectAssetsResponse);
+    rpc RemoveProjectAsset(RemoveProjectAssetRequest) returns (google.protobuf.Empty);
     rpc ListProjectBranches(ListProjectBranchesRequest) returns (ListProjectBranchesResponse);
     rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
     rpc AddProjectUser(AddProjectUserRequest) returns (google.protobuf.Empty);

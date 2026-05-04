@@ -26,23 +26,46 @@ func (q *Queries) AddProjectAsset(ctx context.Context, arg AddProjectAssetParams
 	return err
 }
 
+const changeAssetDirectory = `-- name: ChangeAssetDirectory :exec
+UPDATE assets SET directory_id = $1 WHERE id = $2
+`
+
+type ChangeAssetDirectoryParams struct {
+	DirectoryID uuid.NullUUID
+	ID          uuid.UUID
+}
+
+func (q *Queries) ChangeAssetDirectory(ctx context.Context, arg ChangeAssetDirectoryParams) error {
+	_, err := q.db.ExecContext(ctx, changeAssetDirectory, arg.DirectoryID, arg.ID)
+	return err
+}
+
 const createAsset = `-- name: CreateAsset :one
-INSERT INTO assets (workspace_id, asset_type) VALUES ($1, $2) RETURNING id, workspace_id, asset_type, created_at
+INSERT INTO assets (workspace_id, asset_type, display_name, directory_id) VALUES ($1, $2, $3, $4) RETURNING id, workspace_id, asset_type, display_name, created_at, directory_id
 `
 
 type CreateAssetParams struct {
 	WorkspaceID uuid.UUID
 	AssetType   string
+	DisplayName string
+	DirectoryID uuid.NullUUID
 }
 
 func (q *Queries) CreateAsset(ctx context.Context, arg CreateAssetParams) (Asset, error) {
-	row := q.db.QueryRowContext(ctx, createAsset, arg.WorkspaceID, arg.AssetType)
+	row := q.db.QueryRowContext(ctx, createAsset,
+		arg.WorkspaceID,
+		arg.AssetType,
+		arg.DisplayName,
+		arg.DirectoryID,
+	)
 	var i Asset
 	err := row.Scan(
 		&i.ID,
 		&i.WorkspaceID,
 		&i.AssetType,
+		&i.DisplayName,
 		&i.CreatedAt,
+		&i.DirectoryID,
 	)
 	return i, err
 }
@@ -56,8 +79,108 @@ func (q *Queries) DeleteAsset(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getAssetById = `-- name: GetAssetById :one
+SELECT id, workspace_id, asset_type, display_name, created_at, directory_id FROM assets WHERE id = $1
+`
+
+func (q *Queries) GetAssetById(ctx context.Context, id uuid.UUID) (Asset, error) {
+	row := q.db.QueryRowContext(ctx, getAssetById, id)
+	var i Asset
+	err := row.Scan(
+		&i.ID,
+		&i.WorkspaceID,
+		&i.AssetType,
+		&i.DisplayName,
+		&i.CreatedAt,
+		&i.DirectoryID,
+	)
+	return i, err
+}
+
+const getAssetsByDirectory = `-- name: GetAssetsByDirectory :many
+SELECT id, workspace_id, asset_type, display_name, created_at, directory_id FROM assets WHERE directory_id = $1
+`
+
+func (q *Queries) GetAssetsByDirectory(ctx context.Context, directoryID uuid.NullUUID) ([]Asset, error) {
+	rows, err := q.db.QueryContext(ctx, getAssetsByDirectory, directoryID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Asset
+	for rows.Next() {
+		var i Asset
+		if err := rows.Scan(
+			&i.ID,
+			&i.WorkspaceID,
+			&i.AssetType,
+			&i.DisplayName,
+			&i.CreatedAt,
+			&i.DirectoryID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getInUseAssetProjects = `-- name: GetInUseAssetProjects :many
+SELECT
+    project_assets.asset_id,
+    assets.display_name asset_display_name,
+    projects.id project_id,
+    projects.project_name
+FROM project_assets
+JOIN assets ON assets.id = project_assets.asset_id
+JOIN projects ON projects.id = project_assets.project_id
+WHERE project_assets.asset_id = $1
+ORDER BY projects.project_name
+`
+
+type GetInUseAssetProjectsRow struct {
+	AssetID          uuid.UUID
+	AssetDisplayName string
+	ProjectID        uuid.UUID
+	ProjectName      string
+}
+
+func (q *Queries) GetInUseAssetProjects(ctx context.Context, assetID uuid.UUID) ([]GetInUseAssetProjectsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getInUseAssetProjects, assetID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetInUseAssetProjectsRow
+	for rows.Next() {
+		var i GetInUseAssetProjectsRow
+		if err := rows.Scan(
+			&i.AssetID,
+			&i.AssetDisplayName,
+			&i.ProjectID,
+			&i.ProjectName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProjectAssets = `-- name: GetProjectAssets :many
-SELECT assets.id, assets.workspace_id, assets.asset_type, assets.created_at FROM assets
+SELECT assets.id, assets.workspace_id, assets.asset_type, assets.display_name, assets.created_at, assets.directory_id FROM assets
 JOIN project_assets ON project_assets.asset_id = assets.id
 WHERE project_assets.project_id = $1
 ORDER BY assets.created_at
@@ -76,7 +199,43 @@ func (q *Queries) GetProjectAssets(ctx context.Context, projectID uuid.UUID) ([]
 			&i.ID,
 			&i.WorkspaceID,
 			&i.AssetType,
+			&i.DisplayName,
 			&i.CreatedAt,
+			&i.DirectoryID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getRootDirectoryAssets = `-- name: GetRootDirectoryAssets :many
+SELECT id, workspace_id, asset_type, display_name, created_at, directory_id FROM assets WHERE directory_id IS NULL and workspace_id = $1 ORDER BY created_at
+`
+
+func (q *Queries) GetRootDirectoryAssets(ctx context.Context, workspaceID uuid.UUID) ([]Asset, error) {
+	rows, err := q.db.QueryContext(ctx, getRootDirectoryAssets, workspaceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Asset
+	for rows.Next() {
+		var i Asset
+		if err := rows.Scan(
+			&i.ID,
+			&i.WorkspaceID,
+			&i.AssetType,
+			&i.DisplayName,
+			&i.CreatedAt,
+			&i.DirectoryID,
 		); err != nil {
 			return nil, err
 		}
@@ -92,7 +251,7 @@ func (q *Queries) GetProjectAssets(ctx context.Context, projectID uuid.UUID) ([]
 }
 
 const getWorkspaceAssets = `-- name: GetWorkspaceAssets :many
-SELECT id, workspace_id, asset_type, created_at FROM assets WHERE workspace_id = $1 ORDER BY created_at
+SELECT id, workspace_id, asset_type, display_name, created_at, directory_id FROM assets WHERE workspace_id = $1 ORDER BY created_at
 `
 
 func (q *Queries) GetWorkspaceAssets(ctx context.Context, workspaceID uuid.UUID) ([]Asset, error) {
@@ -108,7 +267,9 @@ func (q *Queries) GetWorkspaceAssets(ctx context.Context, workspaceID uuid.UUID)
 			&i.ID,
 			&i.WorkspaceID,
 			&i.AssetType,
+			&i.DisplayName,
 			&i.CreatedAt,
+			&i.DirectoryID,
 		); err != nil {
 			return nil, err
 		}
@@ -121,4 +282,18 @@ func (q *Queries) GetWorkspaceAssets(ctx context.Context, workspaceID uuid.UUID)
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateAssetName = `-- name: UpdateAssetName :exec
+UPDATE assets SET display_name = $1 WHERE id = $2
+`
+
+type UpdateAssetNameParams struct {
+	DisplayName string
+	ID          uuid.UUID
+}
+
+func (q *Queries) UpdateAssetName(ctx context.Context, arg UpdateAssetNameParams) error {
+	_, err := q.db.ExecContext(ctx, updateAssetName, arg.DisplayName, arg.ID)
+	return err
 }

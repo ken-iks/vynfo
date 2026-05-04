@@ -1,7 +1,6 @@
 import type {
   MediaAudioMetadata,
   MediaImageMetadata,
-  MediaTextMetadata,
   MediaVideoMetadata,
   PlaybackSection,
 } from "@/gen/proto/v1/projects_pb";
@@ -28,7 +27,6 @@ interface TimelineContextMenuProps {
   availableVideos: MediaVideoMetadata[];
   availableAudios: MediaAudioMetadata[];
   availableImages: MediaImageMetadata[];
-  availableTexts: MediaTextMetadata[];
   onInsertVideoAtTrackPx: (trackPx: number, video: MediaVideoMetadata) => void;
   onInsertAudioAtTrackPx: (trackPx: number, audio: MediaAudioMetadata) => void;
   onCutAtTrackPx: (
@@ -47,7 +45,6 @@ export function TimelineContextMenu({
   availableVideos,
   availableAudios,
   availableImages,
-  availableTexts,
   onInsertVideoAtTrackPx,
   onInsertAudioAtTrackPx,
   onCutAtTrackPx,
@@ -117,30 +114,6 @@ export function TimelineContextMenu({
               )}
             </ContextMenuSubContent>
           </ContextMenuSub>
-          <ContextMenuSub>
-            <ContextMenuSubTrigger disabled={availableTexts.length === 0}>
-              Add text box
-            </ContextMenuSubTrigger>
-            <ContextMenuSubContent className="max-h-64 overflow-y-auto">
-              {availableTexts.length === 0 ? (
-                <ContextMenuItem disabled>
-                  No text boxes uploaded
-                </ContextMenuItem>
-              ) : (
-                availableTexts.map((text) => (
-                  <ContextMenuItem
-                    key={text.assetId}
-                    onSelect={() => {
-                      editorStore.addTextOverlay(text, sectionIndex);
-                    }}
-                  >
-                    {text.title || text.assetId}
-                  </ContextMenuItem>
-                ))
-              )}
-            </ContextMenuSubContent>
-          </ContextMenuSub>
-          <ContextMenuSeparator />
           <ContextMenuItem
             onSelect={() => {
               onEditEffects(sectionIndex);
