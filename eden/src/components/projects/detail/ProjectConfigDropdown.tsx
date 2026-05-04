@@ -17,18 +17,9 @@ export function ProjectConfigDropDown({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button> Upload Assets </Button>
+        <Button>Project Actions</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onSelect={() => handlePageSelection("uploadVideo")}>
-          Upload Video
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => handlePageSelection("uploadAudio")}>
-          Upload Audio
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => handlePageSelection("uploadImage")}>
-          Upload Image
-        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => handlePageSelection("uploadText")}>
           Add Text
         </DropdownMenuItem>

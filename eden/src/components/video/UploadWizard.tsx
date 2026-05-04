@@ -18,13 +18,15 @@ import { DragUploadArea } from "./DragUploadArea";
 import { ProgressBar } from "./ProgressBar";
 
 interface UploaderProps {
-  projectId: string;
+  workspaceId: string;
+  parentDirectoryId?: string;
   mediaType?: "audio" | "video";
   onUploadCompleted: (assetId: string) => void;
 }
 
 export function UploadWizard({
-  projectId,
+  workspaceId,
+  parentDirectoryId,
   mediaType = "video",
   onUploadCompleted,
 }: UploaderProps) {
@@ -55,7 +57,8 @@ export function UploadWizard({
     try {
       if (isAudio) {
         const request = create(UploadAudioRequestSchema, {
-          projectId: projectId,
+          workspaceId,
+          parentDirectoryId,
           content: new Uint8Array(await mediaFile.arrayBuffer()),
           title: mediaFile.name,
         });
@@ -75,7 +78,8 @@ export function UploadWizard({
         }
       } else {
         const request = create(UploadVideoRequestSchema, {
-          projectId: projectId,
+          workspaceId,
+          parentDirectoryId,
           content: new Uint8Array(await mediaFile.arrayBuffer()),
           title: mediaFile.name,
         });

@@ -1,9 +1,5 @@
 import { useState } from "react";
 import { create } from "@bufbuild/protobuf";
-import {
-  MediaImageOverlaySchema,
-  MediaPositionSchema,
-} from "../../gen/proto/v1/projects_pb";
 import { UploadImageRequestSchema } from "../../gen/proto/v1/vfs_pb";
 import { filesClient } from "../../lib/client";
 import { mediaAssetStore } from "../stores/mediaAssets";
@@ -19,12 +15,14 @@ import { Input } from "@/components/ui/input";
 import { DragUploadArea } from "./DragUploadArea";
 
 interface UploadImageWizardProps {
-  projectId: string;
+  workspaceId: string;
+  parentDirectoryId?: string;
   onUploadCompleted: () => void;
 }
 
 export function UploadImageWizard({
-  projectId,
+  workspaceId,
+  parentDirectoryId,
   onUploadCompleted,
 }: UploadImageWizardProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -40,16 +38,10 @@ export function UploadImageWizard({
     try {
       const response = await filesClient.uploadImage(
         create(UploadImageRequestSchema, {
-          projectId,
+          workspaceId,
+          parentDirectoryId,
           content: new Uint8Array(await imageFile.arrayBuffer()),
           title: title.trim() || imageFile.name,
-          meta: create(MediaImageOverlaySchema, {
-            pos: create(MediaPositionSchema, {
-              leftCornerPx: 32n,
-              leftCornerPy: 32n,
-              size: 160n,
-            }),
-          }),
         }),
       );
       mediaAssetStore.setImageUrl(

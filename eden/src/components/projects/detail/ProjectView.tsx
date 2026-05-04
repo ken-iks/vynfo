@@ -170,10 +170,16 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
   };
 
   useEffect(() => {
+    let ignore = false;
+    setCurrProjectVideos([]);
+    setCurrProjectImages([]);
+    setCurrProjectAudios([]);
+
     const fetchAssets = async () => {
       const assets = await client.listProjectAssets({
         projectId: project.id,
       });
+      if (ignore) return;
       setCurrProjectVideos(assets.videos);
       setCurrProjectImages(assets.images);
       setCurrProjectAudios(assets.audios);
@@ -182,7 +188,10 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
       }
     };
     fetchAssets();
-  }, [userId, project]);
+    return () => {
+      ignore = true;
+    };
+  }, [project.id]);
 
   useEffect(() => {
     const fetchBranches = async () => {

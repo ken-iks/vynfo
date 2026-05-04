@@ -38,7 +38,7 @@ const sidebarRoutes: SidebarRoute[] = [
     title: "VFS",
     icon: "/icons/vfs-icon.svg",
     path: "/vfs",
-    disabled: true,
+    disabled: false,
   },
   {
     title: "Vynfo Agent",

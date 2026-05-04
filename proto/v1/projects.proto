@@ -194,6 +194,11 @@ message RemoveProjectAssetRequest {
     string asset_id = 2;
 }
 
+message AddProjectAssetRequest {
+    string project_id = 1;
+    string asset_id = 2;
+}
+
 // MediaVideoMetadata is the lightweight descriptor returned when listing video
 // assets — enough for thumbnails and duration display without streaming bytes.
 message MediaVideoMetadata {
@@ -283,6 +288,7 @@ service ProjectService {
     rpc GetCommit(GetCommitRequest) returns (GetCommitResponse);
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
     rpc ListProjectAssets(ListProjectAssetsRequest) returns (ListProjectAssetsResponse);
+    rpc AddProjectAsset(AddProjectAssetRequest) returns (google.protobuf.Empty);
     rpc RemoveProjectAsset(RemoveProjectAssetRequest) returns (google.protobuf.Empty);
     rpc ListProjectBranches(ListProjectBranchesRequest) returns (ListProjectBranchesResponse);
     rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);

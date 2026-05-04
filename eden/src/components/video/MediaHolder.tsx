@@ -2,13 +2,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { UploadWizard } from "./UploadWizard";
 
 interface MediaHolderProps {
-  projectId: string;
+  workspaceId: string;
+  parentDirectoryId?: string;
   mediaType?: "audio" | "video";
   onUploadCompleted: () => void;
 }
 
 export function MediaHolder({
-  projectId,
+  workspaceId,
+  parentDirectoryId,
   mediaType = "video",
   onUploadCompleted,
 }: MediaHolderProps) {
@@ -16,7 +18,8 @@ export function MediaHolder({
     <Card className="mx-auto w-1/2">
       <CardContent className="space-y-8">
         <UploadWizard
-          projectId={projectId}
+          workspaceId={workspaceId}
+          parentDirectoryId={parentDirectoryId}
           mediaType={mediaType}
           onUploadCompleted={onUploadCompleted}
         />

@@ -1545,6 +1545,58 @@ func (x *RemoveProjectAssetRequest) GetAssetId() string {
 	return ""
 }
 
+type AddProjectAssetRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId     string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	AssetId       string                 `protobuf:"bytes,2,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddProjectAssetRequest) Reset() {
+	*x = AddProjectAssetRequest{}
+	mi := &file_proto_v1_projects_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddProjectAssetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddProjectAssetRequest) ProtoMessage() {}
+
+func (x *AddProjectAssetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_projects_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddProjectAssetRequest.ProtoReflect.Descriptor instead.
+func (*AddProjectAssetRequest) Descriptor() ([]byte, []int) {
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *AddProjectAssetRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *AddProjectAssetRequest) GetAssetId() string {
+	if x != nil {
+		return x.AssetId
+	}
+	return ""
+}
+
 // MediaVideoMetadata is the lightweight descriptor returned when listing video
 // assets — enough for thumbnails and duration display without streaming bytes.
 type MediaVideoMetadata struct {
@@ -1558,7 +1610,7 @@ type MediaVideoMetadata struct {
 
 func (x *MediaVideoMetadata) Reset() {
 	*x = MediaVideoMetadata{}
-	mi := &file_proto_v1_projects_proto_msgTypes[24]
+	mi := &file_proto_v1_projects_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1570,7 +1622,7 @@ func (x *MediaVideoMetadata) String() string {
 func (*MediaVideoMetadata) ProtoMessage() {}
 
 func (x *MediaVideoMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[24]
+	mi := &file_proto_v1_projects_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1583,7 +1635,7 @@ func (x *MediaVideoMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaVideoMetadata.ProtoReflect.Descriptor instead.
 func (*MediaVideoMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{24}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *MediaVideoMetadata) GetAssetId() string {
@@ -1618,7 +1670,7 @@ type MediaAudioMetadata struct {
 
 func (x *MediaAudioMetadata) Reset() {
 	*x = MediaAudioMetadata{}
-	mi := &file_proto_v1_projects_proto_msgTypes[25]
+	mi := &file_proto_v1_projects_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1630,7 +1682,7 @@ func (x *MediaAudioMetadata) String() string {
 func (*MediaAudioMetadata) ProtoMessage() {}
 
 func (x *MediaAudioMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[25]
+	mi := &file_proto_v1_projects_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1643,7 +1695,7 @@ func (x *MediaAudioMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaAudioMetadata.ProtoReflect.Descriptor instead.
 func (*MediaAudioMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{25}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *MediaAudioMetadata) GetAssetId() string {
@@ -1680,7 +1732,7 @@ type MediaImageMetadata struct {
 
 func (x *MediaImageMetadata) Reset() {
 	*x = MediaImageMetadata{}
-	mi := &file_proto_v1_projects_proto_msgTypes[26]
+	mi := &file_proto_v1_projects_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1692,7 +1744,7 @@ func (x *MediaImageMetadata) String() string {
 func (*MediaImageMetadata) ProtoMessage() {}
 
 func (x *MediaImageMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[26]
+	mi := &file_proto_v1_projects_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1705,7 +1757,7 @@ func (x *MediaImageMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaImageMetadata.ProtoReflect.Descriptor instead.
 func (*MediaImageMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{26}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *MediaImageMetadata) GetAssetId() string {
@@ -1749,7 +1801,7 @@ type ListProjectAssetsResponse struct {
 
 func (x *ListProjectAssetsResponse) Reset() {
 	*x = ListProjectAssetsResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[27]
+	mi := &file_proto_v1_projects_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1761,7 +1813,7 @@ func (x *ListProjectAssetsResponse) String() string {
 func (*ListProjectAssetsResponse) ProtoMessage() {}
 
 func (x *ListProjectAssetsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[27]
+	mi := &file_proto_v1_projects_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1774,7 +1826,7 @@ func (x *ListProjectAssetsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProjectAssetsResponse.ProtoReflect.Descriptor instead.
 func (*ListProjectAssetsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{27}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ListProjectAssetsResponse) GetVideos() []*MediaVideoMetadata {
@@ -1808,7 +1860,7 @@ type ListProjectBranchesRequest struct {
 
 func (x *ListProjectBranchesRequest) Reset() {
 	*x = ListProjectBranchesRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[28]
+	mi := &file_proto_v1_projects_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1820,7 +1872,7 @@ func (x *ListProjectBranchesRequest) String() string {
 func (*ListProjectBranchesRequest) ProtoMessage() {}
 
 func (x *ListProjectBranchesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[28]
+	mi := &file_proto_v1_projects_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1833,7 +1885,7 @@ func (x *ListProjectBranchesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProjectBranchesRequest.ProtoReflect.Descriptor instead.
 func (*ListProjectBranchesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{28}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *ListProjectBranchesRequest) GetProjectId() string {
@@ -1855,7 +1907,7 @@ type BranchMetadata struct {
 
 func (x *BranchMetadata) Reset() {
 	*x = BranchMetadata{}
-	mi := &file_proto_v1_projects_proto_msgTypes[29]
+	mi := &file_proto_v1_projects_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1867,7 +1919,7 @@ func (x *BranchMetadata) String() string {
 func (*BranchMetadata) ProtoMessage() {}
 
 func (x *BranchMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[29]
+	mi := &file_proto_v1_projects_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1880,7 +1932,7 @@ func (x *BranchMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BranchMetadata.ProtoReflect.Descriptor instead.
 func (*BranchMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{29}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *BranchMetadata) GetName() string {
@@ -1914,7 +1966,7 @@ type ListProjectBranchesResponse struct {
 
 func (x *ListProjectBranchesResponse) Reset() {
 	*x = ListProjectBranchesResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[30]
+	mi := &file_proto_v1_projects_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1926,7 +1978,7 @@ func (x *ListProjectBranchesResponse) String() string {
 func (*ListProjectBranchesResponse) ProtoMessage() {}
 
 func (x *ListProjectBranchesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[30]
+	mi := &file_proto_v1_projects_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1939,7 +1991,7 @@ func (x *ListProjectBranchesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProjectBranchesResponse.ProtoReflect.Descriptor instead.
 func (*ListProjectBranchesResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{30}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *ListProjectBranchesResponse) GetBranches() []*BranchMetadata {
@@ -1960,7 +2012,7 @@ type CreateProjectRequest struct {
 
 func (x *CreateProjectRequest) Reset() {
 	*x = CreateProjectRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[31]
+	mi := &file_proto_v1_projects_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1972,7 +2024,7 @@ func (x *CreateProjectRequest) String() string {
 func (*CreateProjectRequest) ProtoMessage() {}
 
 func (x *CreateProjectRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[31]
+	mi := &file_proto_v1_projects_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1985,7 +2037,7 @@ func (x *CreateProjectRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateProjectRequest.ProtoReflect.Descriptor instead.
 func (*CreateProjectRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{31}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *CreateProjectRequest) GetProjectName() string {
@@ -2018,7 +2070,7 @@ type CreateProjectResponse struct {
 
 func (x *CreateProjectResponse) Reset() {
 	*x = CreateProjectResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[32]
+	mi := &file_proto_v1_projects_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2030,7 +2082,7 @@ func (x *CreateProjectResponse) String() string {
 func (*CreateProjectResponse) ProtoMessage() {}
 
 func (x *CreateProjectResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[32]
+	mi := &file_proto_v1_projects_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2043,7 +2095,7 @@ func (x *CreateProjectResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateProjectResponse.ProtoReflect.Descriptor instead.
 func (*CreateProjectResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{32}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *CreateProjectResponse) GetCreatedProjectId() string {
@@ -2063,7 +2115,7 @@ type AddProjectUserRequest struct {
 
 func (x *AddProjectUserRequest) Reset() {
 	*x = AddProjectUserRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[33]
+	mi := &file_proto_v1_projects_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2075,7 +2127,7 @@ func (x *AddProjectUserRequest) String() string {
 func (*AddProjectUserRequest) ProtoMessage() {}
 
 func (x *AddProjectUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[33]
+	mi := &file_proto_v1_projects_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2088,7 +2140,7 @@ func (x *AddProjectUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddProjectUserRequest.ProtoReflect.Descriptor instead.
 func (*AddProjectUserRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{33}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *AddProjectUserRequest) GetProjectId() string {
@@ -2114,7 +2166,7 @@ type DeleteProjectRequest struct {
 
 func (x *DeleteProjectRequest) Reset() {
 	*x = DeleteProjectRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[34]
+	mi := &file_proto_v1_projects_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2126,7 +2178,7 @@ func (x *DeleteProjectRequest) String() string {
 func (*DeleteProjectRequest) ProtoMessage() {}
 
 func (x *DeleteProjectRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[34]
+	mi := &file_proto_v1_projects_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2139,7 +2191,7 @@ func (x *DeleteProjectRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteProjectRequest.ProtoReflect.Descriptor instead.
 func (*DeleteProjectRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{34}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *DeleteProjectRequest) GetProjectId() string {
@@ -2161,7 +2213,7 @@ type GetCommitRequest struct {
 
 func (x *GetCommitRequest) Reset() {
 	*x = GetCommitRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[35]
+	mi := &file_proto_v1_projects_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2173,7 +2225,7 @@ func (x *GetCommitRequest) String() string {
 func (*GetCommitRequest) ProtoMessage() {}
 
 func (x *GetCommitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[35]
+	mi := &file_proto_v1_projects_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2186,7 +2238,7 @@ func (x *GetCommitRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCommitRequest.ProtoReflect.Descriptor instead.
 func (*GetCommitRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{35}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *GetCommitRequest) GetCommitId() string {
@@ -2215,7 +2267,7 @@ type GetCommitResponse struct {
 
 func (x *GetCommitResponse) Reset() {
 	*x = GetCommitResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[36]
+	mi := &file_proto_v1_projects_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2227,7 +2279,7 @@ func (x *GetCommitResponse) String() string {
 func (*GetCommitResponse) ProtoMessage() {}
 
 func (x *GetCommitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[36]
+	mi := &file_proto_v1_projects_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2240,7 +2292,7 @@ func (x *GetCommitResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCommitResponse.ProtoReflect.Descriptor instead.
 func (*GetCommitResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{36}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *GetCommitResponse) GetCommitId() string {
@@ -2373,6 +2425,10 @@ const file_proto_v1_projects_proto_rawDesc = "" +
 	"\x19RemoveProjectAssetRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x19\n" +
+	"\basset_id\x18\x02 \x01(\tR\aassetId\"R\n" +
+	"\x16AddProjectAssetRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x19\n" +
 	"\basset_id\x18\x02 \x01(\tR\aassetId\"a\n" +
 	"\x12MediaVideoMetadata\x12\x19\n" +
 	"\basset_id\x18\x01 \x01(\tR\aassetId\x12\x14\n" +
@@ -2428,13 +2484,14 @@ const file_proto_v1_projects_proto_rawDesc = "" +
 	"\x1cMEDIA_TEXT_COLOR_UNSPECIFIED\x10\x00\x12\x1a\n" +
 	"\x16MEDIA_TEXT_COLOR_BLACK\x10\x01\x12\x1a\n" +
 	"\x16MEDIA_TEXT_COLOR_WHITE\x10\x02\x12\x1a\n" +
-	"\x16MEDIA_TEXT_COLOR_CLEAR\x10\x032\xc8\x05\n" +
+	"\x16MEDIA_TEXT_COLOR_CLEAR\x10\x032\x8f\x06\n" +
 	"\x0eProjectService\x12;\n" +
 	"\n" +
 	"CommitEdit\x12\x15.v1.CommitEditRequest\x1a\x16.v1.CommitEditResponse\x128\n" +
 	"\tGetCommit\x12\x14.v1.GetCommitRequest\x1a\x15.v1.GetCommitResponse\x12A\n" +
 	"\fListProjects\x12\x17.v1.ListProjectsRequest\x1a\x18.v1.ListProjectsResponse\x12P\n" +
-	"\x11ListProjectAssets\x12\x1c.v1.ListProjectAssetsRequest\x1a\x1d.v1.ListProjectAssetsResponse\x12K\n" +
+	"\x11ListProjectAssets\x12\x1c.v1.ListProjectAssetsRequest\x1a\x1d.v1.ListProjectAssetsResponse\x12E\n" +
+	"\x0fAddProjectAsset\x12\x1a.v1.AddProjectAssetRequest\x1a\x16.google.protobuf.Empty\x12K\n" +
 	"\x12RemoveProjectAsset\x12\x1d.v1.RemoveProjectAssetRequest\x1a\x16.google.protobuf.Empty\x12V\n" +
 	"\x13ListProjectBranches\x12\x1e.v1.ListProjectBranchesRequest\x1a\x1f.v1.ListProjectBranchesResponse\x12D\n" +
 	"\rCreateProject\x12\x18.v1.CreateProjectRequest\x1a\x19.v1.CreateProjectResponse\x12C\n" +
@@ -2455,7 +2512,7 @@ func file_proto_v1_projects_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_v1_projects_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_v1_projects_proto_msgTypes = make([]protoimpl.MessageInfo, 37)
+var file_proto_v1_projects_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
 var file_proto_v1_projects_proto_goTypes = []any{
 	(MediaTextColor)(0),                 // 0: v1.MediaTextColor
 	(*MediaImageOverlay)(nil),           // 1: v1.MediaImageOverlay
@@ -2482,22 +2539,23 @@ var file_proto_v1_projects_proto_goTypes = []any{
 	(*ListProjectsResponse)(nil),        // 22: v1.ListProjectsResponse
 	(*ListProjectAssetsRequest)(nil),    // 23: v1.ListProjectAssetsRequest
 	(*RemoveProjectAssetRequest)(nil),   // 24: v1.RemoveProjectAssetRequest
-	(*MediaVideoMetadata)(nil),          // 25: v1.MediaVideoMetadata
-	(*MediaAudioMetadata)(nil),          // 26: v1.MediaAudioMetadata
-	(*MediaImageMetadata)(nil),          // 27: v1.MediaImageMetadata
-	(*ListProjectAssetsResponse)(nil),   // 28: v1.ListProjectAssetsResponse
-	(*ListProjectBranchesRequest)(nil),  // 29: v1.ListProjectBranchesRequest
-	(*BranchMetadata)(nil),              // 30: v1.BranchMetadata
-	(*ListProjectBranchesResponse)(nil), // 31: v1.ListProjectBranchesResponse
-	(*CreateProjectRequest)(nil),        // 32: v1.CreateProjectRequest
-	(*CreateProjectResponse)(nil),       // 33: v1.CreateProjectResponse
-	(*AddProjectUserRequest)(nil),       // 34: v1.AddProjectUserRequest
-	(*DeleteProjectRequest)(nil),        // 35: v1.DeleteProjectRequest
-	(*GetCommitRequest)(nil),            // 36: v1.GetCommitRequest
-	(*GetCommitResponse)(nil),           // 37: v1.GetCommitResponse
-	(*timestamppb.Timestamp)(nil),       // 38: google.protobuf.Timestamp
-	(*User)(nil),                        // 39: v1.User
-	(*emptypb.Empty)(nil),               // 40: google.protobuf.Empty
+	(*AddProjectAssetRequest)(nil),      // 25: v1.AddProjectAssetRequest
+	(*MediaVideoMetadata)(nil),          // 26: v1.MediaVideoMetadata
+	(*MediaAudioMetadata)(nil),          // 27: v1.MediaAudioMetadata
+	(*MediaImageMetadata)(nil),          // 28: v1.MediaImageMetadata
+	(*ListProjectAssetsResponse)(nil),   // 29: v1.ListProjectAssetsResponse
+	(*ListProjectBranchesRequest)(nil),  // 30: v1.ListProjectBranchesRequest
+	(*BranchMetadata)(nil),              // 31: v1.BranchMetadata
+	(*ListProjectBranchesResponse)(nil), // 32: v1.ListProjectBranchesResponse
+	(*CreateProjectRequest)(nil),        // 33: v1.CreateProjectRequest
+	(*CreateProjectResponse)(nil),       // 34: v1.CreateProjectResponse
+	(*AddProjectUserRequest)(nil),       // 35: v1.AddProjectUserRequest
+	(*DeleteProjectRequest)(nil),        // 36: v1.DeleteProjectRequest
+	(*GetCommitRequest)(nil),            // 37: v1.GetCommitRequest
+	(*GetCommitResponse)(nil),           // 38: v1.GetCommitResponse
+	(*timestamppb.Timestamp)(nil),       // 39: google.protobuf.Timestamp
+	(*User)(nil),                        // 40: v1.User
+	(*emptypb.Empty)(nil),               // 41: google.protobuf.Empty
 }
 var file_proto_v1_projects_proto_depIdxs = []int32{
 	3,  // 0: v1.MediaImageOverlay.pos:type_name -> v1.MediaPosition
@@ -2509,9 +2567,9 @@ var file_proto_v1_projects_proto_depIdxs = []int32{
 	17, // 6: v1.MediaVideoEffect.sepia:type_name -> v1.SepiaEffect
 	18, // 7: v1.MediaVideoEffect.saturation:type_name -> v1.SaturationEffect
 	19, // 8: v1.MediaVideoEffect.brightness:type_name -> v1.BrightnessEffect
-	25, // 9: v1.SectionVideo.meta:type_name -> v1.MediaVideoMetadata
+	26, // 9: v1.SectionVideo.meta:type_name -> v1.MediaVideoMetadata
 	5,  // 10: v1.SectionVideo.effects:type_name -> v1.MediaVideoEffect
-	26, // 11: v1.SectionAudio.meta:type_name -> v1.MediaAudioMetadata
+	27, // 11: v1.SectionAudio.meta:type_name -> v1.MediaAudioMetadata
 	6,  // 12: v1.PlaybackSection.video:type_name -> v1.SectionVideo
 	4,  // 13: v1.PlaybackSection.overlays:type_name -> v1.MediaOverlay
 	7,  // 14: v1.PlaybackAudio.audio:type_name -> v1.SectionAudio
@@ -2521,36 +2579,38 @@ var file_proto_v1_projects_proto_depIdxs = []int32{
 	14, // 18: v1.CommitEditResponse.err:type_name -> v1.CommitEditError
 	10, // 19: v1.AutoSaveRequest.auto_save_state:type_name -> v1.PlaybackState
 	15, // 20: v1.CommitEditError.stale_branch:type_name -> v1.StaleBranchError
-	38, // 21: v1.ProjectMetadata.created_at:type_name -> google.protobuf.Timestamp
-	39, // 22: v1.ProjectMetadata.created_by:type_name -> v1.User
+	39, // 21: v1.ProjectMetadata.created_at:type_name -> google.protobuf.Timestamp
+	40, // 22: v1.ProjectMetadata.created_by:type_name -> v1.User
 	20, // 23: v1.ListProjectsResponse.projects:type_name -> v1.ProjectMetadata
-	25, // 24: v1.ListProjectAssetsResponse.videos:type_name -> v1.MediaVideoMetadata
-	27, // 25: v1.ListProjectAssetsResponse.images:type_name -> v1.MediaImageMetadata
-	26, // 26: v1.ListProjectAssetsResponse.audios:type_name -> v1.MediaAudioMetadata
-	30, // 27: v1.ListProjectBranchesResponse.branches:type_name -> v1.BranchMetadata
+	26, // 24: v1.ListProjectAssetsResponse.videos:type_name -> v1.MediaVideoMetadata
+	28, // 25: v1.ListProjectAssetsResponse.images:type_name -> v1.MediaImageMetadata
+	27, // 26: v1.ListProjectAssetsResponse.audios:type_name -> v1.MediaAudioMetadata
+	31, // 27: v1.ListProjectBranchesResponse.branches:type_name -> v1.BranchMetadata
 	10, // 28: v1.GetCommitResponse.commit_state:type_name -> v1.PlaybackState
 	11, // 29: v1.ProjectService.CommitEdit:input_type -> v1.CommitEditRequest
-	36, // 30: v1.ProjectService.GetCommit:input_type -> v1.GetCommitRequest
+	37, // 30: v1.ProjectService.GetCommit:input_type -> v1.GetCommitRequest
 	21, // 31: v1.ProjectService.ListProjects:input_type -> v1.ListProjectsRequest
 	23, // 32: v1.ProjectService.ListProjectAssets:input_type -> v1.ListProjectAssetsRequest
-	24, // 33: v1.ProjectService.RemoveProjectAsset:input_type -> v1.RemoveProjectAssetRequest
-	29, // 34: v1.ProjectService.ListProjectBranches:input_type -> v1.ListProjectBranchesRequest
-	32, // 35: v1.ProjectService.CreateProject:input_type -> v1.CreateProjectRequest
-	34, // 36: v1.ProjectService.AddProjectUser:input_type -> v1.AddProjectUserRequest
-	35, // 37: v1.ProjectService.DeleteProject:input_type -> v1.DeleteProjectRequest
-	13, // 38: v1.ProjectService.AutoSave:input_type -> v1.AutoSaveRequest
-	12, // 39: v1.ProjectService.CommitEdit:output_type -> v1.CommitEditResponse
-	37, // 40: v1.ProjectService.GetCommit:output_type -> v1.GetCommitResponse
-	22, // 41: v1.ProjectService.ListProjects:output_type -> v1.ListProjectsResponse
-	28, // 42: v1.ProjectService.ListProjectAssets:output_type -> v1.ListProjectAssetsResponse
-	40, // 43: v1.ProjectService.RemoveProjectAsset:output_type -> google.protobuf.Empty
-	31, // 44: v1.ProjectService.ListProjectBranches:output_type -> v1.ListProjectBranchesResponse
-	33, // 45: v1.ProjectService.CreateProject:output_type -> v1.CreateProjectResponse
-	40, // 46: v1.ProjectService.AddProjectUser:output_type -> google.protobuf.Empty
-	40, // 47: v1.ProjectService.DeleteProject:output_type -> google.protobuf.Empty
-	40, // 48: v1.ProjectService.AutoSave:output_type -> google.protobuf.Empty
-	39, // [39:49] is the sub-list for method output_type
-	29, // [29:39] is the sub-list for method input_type
+	25, // 33: v1.ProjectService.AddProjectAsset:input_type -> v1.AddProjectAssetRequest
+	24, // 34: v1.ProjectService.RemoveProjectAsset:input_type -> v1.RemoveProjectAssetRequest
+	30, // 35: v1.ProjectService.ListProjectBranches:input_type -> v1.ListProjectBranchesRequest
+	33, // 36: v1.ProjectService.CreateProject:input_type -> v1.CreateProjectRequest
+	35, // 37: v1.ProjectService.AddProjectUser:input_type -> v1.AddProjectUserRequest
+	36, // 38: v1.ProjectService.DeleteProject:input_type -> v1.DeleteProjectRequest
+	13, // 39: v1.ProjectService.AutoSave:input_type -> v1.AutoSaveRequest
+	12, // 40: v1.ProjectService.CommitEdit:output_type -> v1.CommitEditResponse
+	38, // 41: v1.ProjectService.GetCommit:output_type -> v1.GetCommitResponse
+	22, // 42: v1.ProjectService.ListProjects:output_type -> v1.ListProjectsResponse
+	29, // 43: v1.ProjectService.ListProjectAssets:output_type -> v1.ListProjectAssetsResponse
+	41, // 44: v1.ProjectService.AddProjectAsset:output_type -> google.protobuf.Empty
+	41, // 45: v1.ProjectService.RemoveProjectAsset:output_type -> google.protobuf.Empty
+	32, // 46: v1.ProjectService.ListProjectBranches:output_type -> v1.ListProjectBranchesResponse
+	34, // 47: v1.ProjectService.CreateProject:output_type -> v1.CreateProjectResponse
+	41, // 48: v1.ProjectService.AddProjectUser:output_type -> google.protobuf.Empty
+	41, // 49: v1.ProjectService.DeleteProject:output_type -> google.protobuf.Empty
+	41, // 50: v1.ProjectService.AutoSave:output_type -> google.protobuf.Empty
+	40, // [40:51] is the sub-list for method output_type
+	29, // [29:40] is the sub-list for method input_type
 	29, // [29:29] is the sub-list for extension type_name
 	29, // [29:29] is the sub-list for extension extendee
 	0,  // [0:29] is the sub-list for field type_name
@@ -2580,14 +2640,14 @@ func file_proto_v1_projects_proto_init() {
 	file_proto_v1_projects_proto_msgTypes[13].OneofWrappers = []any{
 		(*CommitEditError_StaleBranch)(nil),
 	}
-	file_proto_v1_projects_proto_msgTypes[29].OneofWrappers = []any{}
+	file_proto_v1_projects_proto_msgTypes[30].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_v1_projects_proto_rawDesc), len(file_proto_v1_projects_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   37,
+			NumMessages:   38,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

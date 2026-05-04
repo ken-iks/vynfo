@@ -106,7 +106,7 @@ export function Projects() {
           </div>
           {selectedProject ? (
             <MediaHolder
-              projectId={selectedProject.id}
+              workspaceId={currentWorkspaceId}
               onUploadCompleted={() =>
                 showUploadNotice("Video upload finished")
               }
@@ -126,7 +126,7 @@ export function Projects() {
           </div>
           {selectedProject ? (
             <MediaHolder
-              projectId={selectedProject.id}
+              workspaceId={currentWorkspaceId}
               mediaType="audio"
               onUploadCompleted={() =>
                 showUploadNotice("Audio upload finished")
@@ -156,7 +156,7 @@ export function Projects() {
               <CardContent>
                 {selectedProject ? (
                   <UploadImageWizard
-                    projectId={selectedProject.id}
+                    workspaceId={currentWorkspaceId}
                     onUploadCompleted={() => {
                       showUploadNotice("Image upload finished");
                       setProjectPage("view");

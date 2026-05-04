@@ -10,6 +10,7 @@ import { Settings } from "./settings/Settings.tsx";
 import { Spaces, SpaceRoute } from "./spaces/Spaces.tsx";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Vfs } from "./vfs/Vfs";
 
 function App() {
   return (
@@ -78,6 +79,7 @@ function AppShell() {
             <Route path="/projects" element={<Projects />} />
             <Route path="/spaces" element={<Spaces />} />
             <Route path="/spaces/:spaceId" element={<SpaceRoute />} />
+            <Route path="/vfs" element={<Vfs />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/projects" replace />} />
           </Route>

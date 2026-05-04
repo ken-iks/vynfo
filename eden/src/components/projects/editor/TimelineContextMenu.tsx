@@ -40,6 +40,17 @@ interface TimelineContextMenuProps {
 
 const COPIED_SECTION_STORAGE_KEY = "vynfo.timeline.copiedSection";
 
+function readCopiedSection() {
+  const copiedSectionJson = localStorage.getItem(COPIED_SECTION_STORAGE_KEY);
+  if (copiedSectionJson === null) return undefined;
+  try {
+    return fromJsonString(PlaybackSectionSchema, copiedSectionJson);
+  } catch {
+    localStorage.removeItem(COPIED_SECTION_STORAGE_KEY);
+    return undefined;
+  }
+}
+
 export function TimelineContextMenu({
   menuContext,
   availableVideos,
@@ -55,8 +66,23 @@ export function TimelineContextMenu({
   const audioSectionIndex = menuContext?.audioSectionIndex ?? null;
   const hasSectionSelection =
     sectionIndex !== null || audioSectionIndex !== null;
-  const hasCopiedSection =
-    localStorage.getItem(COPIED_SECTION_STORAGE_KEY) !== null;
+  const availableVideoIds = new Set(
+    availableVideos.map((video) => video.assetId).filter(Boolean),
+  );
+  const availableImageIds = new Set(
+    availableImages.map((image) => image.assetId).filter(Boolean),
+  );
+  const copiedSection = readCopiedSection();
+  const canPasteSection =
+    copiedSection !== undefined &&
+    (copiedSection.video?.meta?.assetId === undefined ||
+      copiedSection.video.meta.assetId === "" ||
+      availableVideoIds.has(copiedSection.video.meta.assetId)) &&
+    copiedSection.overlays.every((overlay) => {
+      if (overlay.kind.case !== "image") return true;
+      const assetId = overlay.kind.value.assetId;
+      return assetId === "" || availableImageIds.has(assetId);
+    });
   const copySection = (index: number) => {
     const section = editorStore.sections[index];
     if (!section) return;
@@ -67,10 +93,8 @@ export function TimelineContextMenu({
   };
   const pasteSection = () => {
     if (menuContext === null) return;
-    const copiedSectionJson = localStorage.getItem(COPIED_SECTION_STORAGE_KEY);
-    if (copiedSectionJson === null) return;
-    const section = fromJsonString(PlaybackSectionSchema, copiedSectionJson);
-    onPasteSectionAtTrackPx(menuContext.trackPx, section);
+    if (!canPasteSection || copiedSection === undefined) return;
+    onPasteSectionAtTrackPx(menuContext.trackPx, copiedSection);
   };
 
   return (
@@ -140,7 +164,7 @@ export function TimelineContextMenu({
         </>
       )}
       <ContextMenuItem
-        disabled={!hasCopiedSection || menuContext === null}
+        disabled={!canPasteSection || menuContext === null}
         onSelect={pasteSection}
       >
         Paste selection here

@@ -46,6 +46,9 @@ const (
 	// ProjectServiceListProjectAssetsProcedure is the fully-qualified name of the ProjectService's
 	// ListProjectAssets RPC.
 	ProjectServiceListProjectAssetsProcedure = "/v1.ProjectService/ListProjectAssets"
+	// ProjectServiceAddProjectAssetProcedure is the fully-qualified name of the ProjectService's
+	// AddProjectAsset RPC.
+	ProjectServiceAddProjectAssetProcedure = "/v1.ProjectService/AddProjectAsset"
 	// ProjectServiceRemoveProjectAssetProcedure is the fully-qualified name of the ProjectService's
 	// RemoveProjectAsset RPC.
 	ProjectServiceRemoveProjectAssetProcedure = "/v1.ProjectService/RemoveProjectAsset"
@@ -71,6 +74,7 @@ type ProjectServiceClient interface {
 	GetCommit(context.Context, *connect.Request[v1.GetCommitRequest]) (*connect.Response[v1.GetCommitResponse], error)
 	ListProjects(context.Context, *connect.Request[v1.ListProjectsRequest]) (*connect.Response[v1.ListProjectsResponse], error)
 	ListProjectAssets(context.Context, *connect.Request[v1.ListProjectAssetsRequest]) (*connect.Response[v1.ListProjectAssetsResponse], error)
+	AddProjectAsset(context.Context, *connect.Request[v1.AddProjectAssetRequest]) (*connect.Response[emptypb.Empty], error)
 	RemoveProjectAsset(context.Context, *connect.Request[v1.RemoveProjectAssetRequest]) (*connect.Response[emptypb.Empty], error)
 	ListProjectBranches(context.Context, *connect.Request[v1.ListProjectBranchesRequest]) (*connect.Response[v1.ListProjectBranchesResponse], error)
 	CreateProject(context.Context, *connect.Request[v1.CreateProjectRequest]) (*connect.Response[v1.CreateProjectResponse], error)
@@ -112,6 +116,12 @@ func NewProjectServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			httpClient,
 			baseURL+ProjectServiceListProjectAssetsProcedure,
 			connect.WithSchema(projectServiceMethods.ByName("ListProjectAssets")),
+			connect.WithClientOptions(opts...),
+		),
+		addProjectAsset: connect.NewClient[v1.AddProjectAssetRequest, emptypb.Empty](
+			httpClient,
+			baseURL+ProjectServiceAddProjectAssetProcedure,
+			connect.WithSchema(projectServiceMethods.ByName("AddProjectAsset")),
 			connect.WithClientOptions(opts...),
 		),
 		removeProjectAsset: connect.NewClient[v1.RemoveProjectAssetRequest, emptypb.Empty](
@@ -159,6 +169,7 @@ type projectServiceClient struct {
 	getCommit           *connect.Client[v1.GetCommitRequest, v1.GetCommitResponse]
 	listProjects        *connect.Client[v1.ListProjectsRequest, v1.ListProjectsResponse]
 	listProjectAssets   *connect.Client[v1.ListProjectAssetsRequest, v1.ListProjectAssetsResponse]
+	addProjectAsset     *connect.Client[v1.AddProjectAssetRequest, emptypb.Empty]
 	removeProjectAsset  *connect.Client[v1.RemoveProjectAssetRequest, emptypb.Empty]
 	listProjectBranches *connect.Client[v1.ListProjectBranchesRequest, v1.ListProjectBranchesResponse]
 	createProject       *connect.Client[v1.CreateProjectRequest, v1.CreateProjectResponse]
@@ -185,6 +196,11 @@ func (c *projectServiceClient) ListProjects(ctx context.Context, req *connect.Re
 // ListProjectAssets calls v1.ProjectService.ListProjectAssets.
 func (c *projectServiceClient) ListProjectAssets(ctx context.Context, req *connect.Request[v1.ListProjectAssetsRequest]) (*connect.Response[v1.ListProjectAssetsResponse], error) {
 	return c.listProjectAssets.CallUnary(ctx, req)
+}
+
+// AddProjectAsset calls v1.ProjectService.AddProjectAsset.
+func (c *projectServiceClient) AddProjectAsset(ctx context.Context, req *connect.Request[v1.AddProjectAssetRequest]) (*connect.Response[emptypb.Empty], error) {
+	return c.addProjectAsset.CallUnary(ctx, req)
 }
 
 // RemoveProjectAsset calls v1.ProjectService.RemoveProjectAsset.
@@ -223,6 +239,7 @@ type ProjectServiceHandler interface {
 	GetCommit(context.Context, *connect.Request[v1.GetCommitRequest]) (*connect.Response[v1.GetCommitResponse], error)
 	ListProjects(context.Context, *connect.Request[v1.ListProjectsRequest]) (*connect.Response[v1.ListProjectsResponse], error)
 	ListProjectAssets(context.Context, *connect.Request[v1.ListProjectAssetsRequest]) (*connect.Response[v1.ListProjectAssetsResponse], error)
+	AddProjectAsset(context.Context, *connect.Request[v1.AddProjectAssetRequest]) (*connect.Response[emptypb.Empty], error)
 	RemoveProjectAsset(context.Context, *connect.Request[v1.RemoveProjectAssetRequest]) (*connect.Response[emptypb.Empty], error)
 	ListProjectBranches(context.Context, *connect.Request[v1.ListProjectBranchesRequest]) (*connect.Response[v1.ListProjectBranchesResponse], error)
 	CreateProject(context.Context, *connect.Request[v1.CreateProjectRequest]) (*connect.Response[v1.CreateProjectResponse], error)
@@ -260,6 +277,12 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 		ProjectServiceListProjectAssetsProcedure,
 		svc.ListProjectAssets,
 		connect.WithSchema(projectServiceMethods.ByName("ListProjectAssets")),
+		connect.WithHandlerOptions(opts...),
+	)
+	projectServiceAddProjectAssetHandler := connect.NewUnaryHandler(
+		ProjectServiceAddProjectAssetProcedure,
+		svc.AddProjectAsset,
+		connect.WithSchema(projectServiceMethods.ByName("AddProjectAsset")),
 		connect.WithHandlerOptions(opts...),
 	)
 	projectServiceRemoveProjectAssetHandler := connect.NewUnaryHandler(
@@ -308,6 +331,8 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 			projectServiceListProjectsHandler.ServeHTTP(w, r)
 		case ProjectServiceListProjectAssetsProcedure:
 			projectServiceListProjectAssetsHandler.ServeHTTP(w, r)
+		case ProjectServiceAddProjectAssetProcedure:
+			projectServiceAddProjectAssetHandler.ServeHTTP(w, r)
 		case ProjectServiceRemoveProjectAssetProcedure:
 			projectServiceRemoveProjectAssetHandler.ServeHTTP(w, r)
 		case ProjectServiceListProjectBranchesProcedure:
@@ -343,6 +368,10 @@ func (UnimplementedProjectServiceHandler) ListProjects(context.Context, *connect
 
 func (UnimplementedProjectServiceHandler) ListProjectAssets(context.Context, *connect.Request[v1.ListProjectAssetsRequest]) (*connect.Response[v1.ListProjectAssetsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.ListProjectAssets is not implemented"))
+}
+
+func (UnimplementedProjectServiceHandler) AddProjectAsset(context.Context, *connect.Request[v1.AddProjectAssetRequest]) (*connect.Response[emptypb.Empty], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.AddProjectAsset is not implemented"))
 }
 
 func (UnimplementedProjectServiceHandler) RemoveProjectAsset(context.Context, *connect.Request[v1.RemoveProjectAssetRequest]) (*connect.Response[emptypb.Empty], error) {
