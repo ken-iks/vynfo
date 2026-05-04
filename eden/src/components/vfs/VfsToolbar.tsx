@@ -19,7 +19,8 @@ export function VfsToolbar({
         <SectionTitle>Vynfo File System </SectionTitle>
         <SectionSubtitle>
           {" "}
-          Store files that can be used across all workspace projects{" "}
+          Store files that can be used across all workspace projects and
+          references from all spaces{" "}
         </SectionSubtitle>
       </div>
       <div className="flex items-center gap-2">

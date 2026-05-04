@@ -1,4 +1,5 @@
 import type { ProjectMetadata } from "../../gen/proto/v1/projects_pb";
+import { SectionSubtitle } from "../shared/SectionSubtitle";
 import { SectionTitle } from "../shared/SectionTitle";
 import { CreateProjectDialog } from "./CreateProjectDialog";
 import { ProjectRowActions } from "./ProjectRowActions";
@@ -25,7 +26,14 @@ export function ProjectsList({ onSelect }: ProjectsListProps) {
   return (
     <div className="px-12 pt-12">
       <div className="mb-2 flex items-center justify-between">
-        <SectionTitle>Projects</SectionTitle>
+        <div>
+          <SectionTitle>Projects</SectionTitle>
+          <SectionSubtitle>
+            {" "}
+            Vynfo projects are the main video editing surface area. Collaborate
+            with teammates and agents on your most ambitious work!{" "}
+          </SectionSubtitle>
+        </div>
         <div className="flex items-center gap-2">
           <CreateProjectDialog
             workspaceId={currentWorkspaceId}
