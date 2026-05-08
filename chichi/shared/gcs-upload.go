@@ -8,6 +8,9 @@ import (
 	"cloud.google.com/go/storage"
 )
 
+const ORIGINAL_VIDEOS_OBJECT_PATH = "original-videos"
+const ORIGINAL_AUDIOS_OBJECT_PATH = "original-audios"
+
 // Base uploader for writing to bytes to cloud storage
 // use withSignedUrl to generate a signed url for the recently uploaded bytes
 // Default url lifetime is 15 mins

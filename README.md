@@ -54,6 +54,9 @@ Clear the volume data:
 Run local db migration:
 `goose -dir database/schema postgres "postgres://dev:dev@localhost:5432/vynfo?sslmode=disable" up`
 
+To run linter:
+golangci-lint run ./...
+
 Eden commands:
 
 Add shadcn components:
