@@ -1,12 +1,27 @@
 package shared
 
 import (
+	"fmt"
 	"io"
 	"strings"
 	"time"
 
 	"cloud.google.com/go/storage"
 )
+
+const ORIGINAL_VIDEOS_OBJECT_PATH = "original-videos"
+const ORIGINAL_AUDIOS_OBJECT_PATH = "original-audios"
+
+func GetUploadPath(assetID string, assetType string) (string, error) {
+	switch assetType {
+	case "video":
+		return fmt.Sprintf("%s/%s.mp4", ORIGINAL_VIDEOS_OBJECT_PATH, assetID), nil
+	case "audio":
+		return fmt.Sprintf("%s/%s.mp3", ORIGINAL_AUDIOS_OBJECT_PATH, assetID), nil
+	default:
+		return "", fmt.Errorf("unsupported upload asset type: %s", assetType)
+	}
+}
 
 // Base uploader for writing to bytes to cloud storage
 // use withSignedUrl to generate a signed url for the recently uploaded bytes

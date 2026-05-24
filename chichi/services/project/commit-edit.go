@@ -110,6 +110,21 @@ func (p *ProjectServiceServer) CommitEdit(
 		slog.Error("error creating commit", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	if prevCommitID != "" {
+		previousCommitID, err := uuid.Parse(prevCommitID)
+		if err != nil {
+			slog.Error("error parsing previous commit id", "error", err)
+			return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		}
+		_, err = q.CreateCommitParent(ctx, db.CreateCommitParentParams{
+			CommitID: commit.ID,
+			ParentID: previousCommitID,
+		})
+		if err != nil {
+			slog.Error("error creating commit parent", "error", err)
+			return nil, connect.NewError(connect.CodeInternal, err)
+		}
+	}
 	updatedBranch, err := q.SetBranchCommitID(ctx, db.SetBranchCommitIDParams{
 		TipCommitID: uuid.NullUUID{UUID: commit.ID, Valid: true},
 		ID:          currBranch.ID,

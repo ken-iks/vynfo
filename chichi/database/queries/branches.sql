@@ -21,16 +21,17 @@ SELECT * FROM branches WHERE project_id = $1 AND name = $2;
 
 -- name: GetBranchCommitHistory :many
 WITH RECURSIVE history AS (
-    SELECT c.*
+    SELECT c.*, 0 AS depth
     FROM branches b
     JOIN commits c ON c.id = b.tip_commit_id
-    WHERE b.id = $1
+    WHERE b.project_id = $1 AND b.id = $2
 
     UNION
 
-    SELECT c.*
+    SELECT c.*, h.depth + 1 AS depth
     FROM commits c
     JOIN commit_parents cp ON cp.parent_id = c.id
     JOIN history h ON h.id = cp.commit_id
+    WHERE cp.position = 0
 )
-SELECT * FROM history;
+SELECT id, user_id, project_id, state, message, created_at FROM history ORDER BY depth;

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Application, Sprite, Texture } from "pixi.js";
 import { videoRuntime } from "../stores/videoRuntime";
-import { useVideoEffects } from "./useVideoEffects";
+import { useVideoEffects } from "./hooks/useVideoEffects";
 
 export function VideoCanvas({ video }: { video: HTMLVideoElement | null }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);

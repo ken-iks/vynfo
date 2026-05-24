@@ -146,3 +146,17 @@ func ProbeDuration(fp string) (float64, error) {
 	}
 	return strconv.ParseFloat(strings.TrimSpace(string(out)), 64)
 }
+
+func ProbeHasAudio(fp string) (bool, error) {
+	out, err := exec.Command("ffprobe",
+		"-v", "error",
+		"-select_streams", "a",
+		"-show_entries", "stream=index",
+		"-of", "csv=p=0",
+		fp,
+	).Output()
+	if err != nil {
+		return false, err
+	}
+	return strings.TrimSpace(string(out)) != "", nil
+}

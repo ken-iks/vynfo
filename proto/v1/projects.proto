@@ -99,11 +99,10 @@ message PlaybackAudio {
 
 message PlaybackState {
     repeated PlaybackSection video_sections = 1;
+    // NOTE: audio sections will be clamped to the full length of the video sections
     repeated PlaybackAudio audio_sections = 2;
 }
 
-// PlaybackEditor holds a list of sections controlling the current edited state of
-// the playback editor. When we make a commit, we optionally include a previous commit id.
 // NOTE: you can only not include the previous commit id when you are making the first commit
 // for a branch. 
 message CommitEditRequest {
@@ -143,21 +142,29 @@ message StaleBranchError {
 
 // ======================== Supported Effects =========================== //
 
-// Blur will apply a blur to the video section at a growing intensity scale
+// Video effects are defined in ffmpeg terms. The frontend may approximate
+// these with Pixi filters for live preview, but export is the source of truth.
+
+// Blur applies ffmpeg `gblur=sigma=<intensity>`.
+// ffmpeg range: 0.0 to 1024.0. ffmpeg default: 0.5.
 message BlurEffect {
-    double intensity = 1; // 1 - 20. Recommended is 8
+    double intensity = 1;
 }
 
-// Sepia will apply a default sepria effect to the full video segment
-// As a simplification, this is a grayscale + warm brown color tint
+// Sepia applies ffmpeg
+// `colorchannelmixer=.393:.769:.189:0:.349:.686:.168:0:.272:.534:.131`.
 message SepiaEffect {}
 
+// Saturation applies ffmpeg `eq=saturation=<strength>`.
+// ffmpeg range: 0.0 to 3.0. 0.0 is grayscale, 1.0 is unchanged.
 message SaturationEffect {
-    double strength = 1; // -1 grayscale, 0 unchanged, 1 extra saturated
+    double strength = 1;
 }
 
+// Brightness applies ffmpeg `eq=brightness=<strength>`.
+// ffmpeg range: -1.0 to 1.0. 0.0 is unchanged.
 message BrightnessEffect {
-    double strength = 1; // >1 brighter than normal, <1 darker than normal
+    double strength = 1;
 }
 
 // ========================  Projects CRUD  ============================ //
@@ -205,6 +212,7 @@ message MediaVideoMetadata {
     string asset_id = 1;
     string title = 2;
     double duration = 3;
+    bool has_audio = 4;
 }
 
 message MediaAudioMetadata {
@@ -266,6 +274,19 @@ message DeleteProjectRequest {
     string project_id = 1;
 }
 
+message ExportProjectRequest {
+    string workspace_id = 1;
+    string project_id = 2;
+
+    // export will default to latest commit unless you specify an earlier
+    // commit that you would like to export
+    optional string commit_id = 3;
+}
+
+message ExportProjectResponse {
+    string signed_url_for_download = 1;
+}
+
 // ========================  Commits CRUD  ============================ //
 
 message GetCommitRequest {
@@ -282,10 +303,28 @@ message GetCommitResponse {
     PlaybackState commit_state = 4;
 }
 
+message ListCommitsRequest {
+    string project_id = 1;
+    string branch_id = 2;
+}
+
+message CommitMetadata {
+    string id = 1;
+    string project_id = 2;
+    string user_id = 3;
+    string message = 4;
+    google.protobuf.Timestamp created_at = 5;
+}
+
+message ListCommitsResponse {
+    repeated CommitMetadata commits = 1;
+}
+
 // ====================== Service Definition ============================== //
 service ProjectService {
     rpc CommitEdit(CommitEditRequest) returns (CommitEditResponse);
     rpc GetCommit(GetCommitRequest) returns (GetCommitResponse);
+    rpc ListCommits(ListCommitsRequest) returns (ListCommitsResponse);
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
     rpc ListProjectAssets(ListProjectAssetsRequest) returns (ListProjectAssetsResponse);
     rpc AddProjectAsset(AddProjectAssetRequest) returns (google.protobuf.Empty);
@@ -294,5 +333,6 @@ service ProjectService {
     rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
     rpc AddProjectUser(AddProjectUserRequest) returns (google.protobuf.Empty);
     rpc DeleteProject(DeleteProjectRequest) returns (google.protobuf.Empty);
+    rpc ExportProject(ExportProjectRequest) returns (ExportProjectResponse);
     rpc AutoSave(AutoSaveRequest) returns (google.protobuf.Empty);
 }

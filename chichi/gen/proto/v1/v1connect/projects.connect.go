@@ -40,6 +40,9 @@ const (
 	// ProjectServiceGetCommitProcedure is the fully-qualified name of the ProjectService's GetCommit
 	// RPC.
 	ProjectServiceGetCommitProcedure = "/v1.ProjectService/GetCommit"
+	// ProjectServiceListCommitsProcedure is the fully-qualified name of the ProjectService's
+	// ListCommits RPC.
+	ProjectServiceListCommitsProcedure = "/v1.ProjectService/ListCommits"
 	// ProjectServiceListProjectsProcedure is the fully-qualified name of the ProjectService's
 	// ListProjects RPC.
 	ProjectServiceListProjectsProcedure = "/v1.ProjectService/ListProjects"
@@ -64,6 +67,9 @@ const (
 	// ProjectServiceDeleteProjectProcedure is the fully-qualified name of the ProjectService's
 	// DeleteProject RPC.
 	ProjectServiceDeleteProjectProcedure = "/v1.ProjectService/DeleteProject"
+	// ProjectServiceExportProjectProcedure is the fully-qualified name of the ProjectService's
+	// ExportProject RPC.
+	ProjectServiceExportProjectProcedure = "/v1.ProjectService/ExportProject"
 	// ProjectServiceAutoSaveProcedure is the fully-qualified name of the ProjectService's AutoSave RPC.
 	ProjectServiceAutoSaveProcedure = "/v1.ProjectService/AutoSave"
 )
@@ -72,6 +78,7 @@ const (
 type ProjectServiceClient interface {
 	CommitEdit(context.Context, *connect.Request[v1.CommitEditRequest]) (*connect.Response[v1.CommitEditResponse], error)
 	GetCommit(context.Context, *connect.Request[v1.GetCommitRequest]) (*connect.Response[v1.GetCommitResponse], error)
+	ListCommits(context.Context, *connect.Request[v1.ListCommitsRequest]) (*connect.Response[v1.ListCommitsResponse], error)
 	ListProjects(context.Context, *connect.Request[v1.ListProjectsRequest]) (*connect.Response[v1.ListProjectsResponse], error)
 	ListProjectAssets(context.Context, *connect.Request[v1.ListProjectAssetsRequest]) (*connect.Response[v1.ListProjectAssetsResponse], error)
 	AddProjectAsset(context.Context, *connect.Request[v1.AddProjectAssetRequest]) (*connect.Response[emptypb.Empty], error)
@@ -80,6 +87,7 @@ type ProjectServiceClient interface {
 	CreateProject(context.Context, *connect.Request[v1.CreateProjectRequest]) (*connect.Response[v1.CreateProjectResponse], error)
 	AddProjectUser(context.Context, *connect.Request[v1.AddProjectUserRequest]) (*connect.Response[emptypb.Empty], error)
 	DeleteProject(context.Context, *connect.Request[v1.DeleteProjectRequest]) (*connect.Response[emptypb.Empty], error)
+	ExportProject(context.Context, *connect.Request[v1.ExportProjectRequest]) (*connect.Response[v1.ExportProjectResponse], error)
 	AutoSave(context.Context, *connect.Request[v1.AutoSaveRequest]) (*connect.Response[emptypb.Empty], error)
 }
 
@@ -104,6 +112,12 @@ func NewProjectServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			httpClient,
 			baseURL+ProjectServiceGetCommitProcedure,
 			connect.WithSchema(projectServiceMethods.ByName("GetCommit")),
+			connect.WithClientOptions(opts...),
+		),
+		listCommits: connect.NewClient[v1.ListCommitsRequest, v1.ListCommitsResponse](
+			httpClient,
+			baseURL+ProjectServiceListCommitsProcedure,
+			connect.WithSchema(projectServiceMethods.ByName("ListCommits")),
 			connect.WithClientOptions(opts...),
 		),
 		listProjects: connect.NewClient[v1.ListProjectsRequest, v1.ListProjectsResponse](
@@ -154,6 +168,12 @@ func NewProjectServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(projectServiceMethods.ByName("DeleteProject")),
 			connect.WithClientOptions(opts...),
 		),
+		exportProject: connect.NewClient[v1.ExportProjectRequest, v1.ExportProjectResponse](
+			httpClient,
+			baseURL+ProjectServiceExportProjectProcedure,
+			connect.WithSchema(projectServiceMethods.ByName("ExportProject")),
+			connect.WithClientOptions(opts...),
+		),
 		autoSave: connect.NewClient[v1.AutoSaveRequest, emptypb.Empty](
 			httpClient,
 			baseURL+ProjectServiceAutoSaveProcedure,
@@ -167,6 +187,7 @@ func NewProjectServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 type projectServiceClient struct {
 	commitEdit          *connect.Client[v1.CommitEditRequest, v1.CommitEditResponse]
 	getCommit           *connect.Client[v1.GetCommitRequest, v1.GetCommitResponse]
+	listCommits         *connect.Client[v1.ListCommitsRequest, v1.ListCommitsResponse]
 	listProjects        *connect.Client[v1.ListProjectsRequest, v1.ListProjectsResponse]
 	listProjectAssets   *connect.Client[v1.ListProjectAssetsRequest, v1.ListProjectAssetsResponse]
 	addProjectAsset     *connect.Client[v1.AddProjectAssetRequest, emptypb.Empty]
@@ -175,6 +196,7 @@ type projectServiceClient struct {
 	createProject       *connect.Client[v1.CreateProjectRequest, v1.CreateProjectResponse]
 	addProjectUser      *connect.Client[v1.AddProjectUserRequest, emptypb.Empty]
 	deleteProject       *connect.Client[v1.DeleteProjectRequest, emptypb.Empty]
+	exportProject       *connect.Client[v1.ExportProjectRequest, v1.ExportProjectResponse]
 	autoSave            *connect.Client[v1.AutoSaveRequest, emptypb.Empty]
 }
 
@@ -186,6 +208,11 @@ func (c *projectServiceClient) CommitEdit(ctx context.Context, req *connect.Requ
 // GetCommit calls v1.ProjectService.GetCommit.
 func (c *projectServiceClient) GetCommit(ctx context.Context, req *connect.Request[v1.GetCommitRequest]) (*connect.Response[v1.GetCommitResponse], error) {
 	return c.getCommit.CallUnary(ctx, req)
+}
+
+// ListCommits calls v1.ProjectService.ListCommits.
+func (c *projectServiceClient) ListCommits(ctx context.Context, req *connect.Request[v1.ListCommitsRequest]) (*connect.Response[v1.ListCommitsResponse], error) {
+	return c.listCommits.CallUnary(ctx, req)
 }
 
 // ListProjects calls v1.ProjectService.ListProjects.
@@ -228,6 +255,11 @@ func (c *projectServiceClient) DeleteProject(ctx context.Context, req *connect.R
 	return c.deleteProject.CallUnary(ctx, req)
 }
 
+// ExportProject calls v1.ProjectService.ExportProject.
+func (c *projectServiceClient) ExportProject(ctx context.Context, req *connect.Request[v1.ExportProjectRequest]) (*connect.Response[v1.ExportProjectResponse], error) {
+	return c.exportProject.CallUnary(ctx, req)
+}
+
 // AutoSave calls v1.ProjectService.AutoSave.
 func (c *projectServiceClient) AutoSave(ctx context.Context, req *connect.Request[v1.AutoSaveRequest]) (*connect.Response[emptypb.Empty], error) {
 	return c.autoSave.CallUnary(ctx, req)
@@ -237,6 +269,7 @@ func (c *projectServiceClient) AutoSave(ctx context.Context, req *connect.Reques
 type ProjectServiceHandler interface {
 	CommitEdit(context.Context, *connect.Request[v1.CommitEditRequest]) (*connect.Response[v1.CommitEditResponse], error)
 	GetCommit(context.Context, *connect.Request[v1.GetCommitRequest]) (*connect.Response[v1.GetCommitResponse], error)
+	ListCommits(context.Context, *connect.Request[v1.ListCommitsRequest]) (*connect.Response[v1.ListCommitsResponse], error)
 	ListProjects(context.Context, *connect.Request[v1.ListProjectsRequest]) (*connect.Response[v1.ListProjectsResponse], error)
 	ListProjectAssets(context.Context, *connect.Request[v1.ListProjectAssetsRequest]) (*connect.Response[v1.ListProjectAssetsResponse], error)
 	AddProjectAsset(context.Context, *connect.Request[v1.AddProjectAssetRequest]) (*connect.Response[emptypb.Empty], error)
@@ -245,6 +278,7 @@ type ProjectServiceHandler interface {
 	CreateProject(context.Context, *connect.Request[v1.CreateProjectRequest]) (*connect.Response[v1.CreateProjectResponse], error)
 	AddProjectUser(context.Context, *connect.Request[v1.AddProjectUserRequest]) (*connect.Response[emptypb.Empty], error)
 	DeleteProject(context.Context, *connect.Request[v1.DeleteProjectRequest]) (*connect.Response[emptypb.Empty], error)
+	ExportProject(context.Context, *connect.Request[v1.ExportProjectRequest]) (*connect.Response[v1.ExportProjectResponse], error)
 	AutoSave(context.Context, *connect.Request[v1.AutoSaveRequest]) (*connect.Response[emptypb.Empty], error)
 }
 
@@ -265,6 +299,12 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 		ProjectServiceGetCommitProcedure,
 		svc.GetCommit,
 		connect.WithSchema(projectServiceMethods.ByName("GetCommit")),
+		connect.WithHandlerOptions(opts...),
+	)
+	projectServiceListCommitsHandler := connect.NewUnaryHandler(
+		ProjectServiceListCommitsProcedure,
+		svc.ListCommits,
+		connect.WithSchema(projectServiceMethods.ByName("ListCommits")),
 		connect.WithHandlerOptions(opts...),
 	)
 	projectServiceListProjectsHandler := connect.NewUnaryHandler(
@@ -315,6 +355,12 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 		connect.WithSchema(projectServiceMethods.ByName("DeleteProject")),
 		connect.WithHandlerOptions(opts...),
 	)
+	projectServiceExportProjectHandler := connect.NewUnaryHandler(
+		ProjectServiceExportProjectProcedure,
+		svc.ExportProject,
+		connect.WithSchema(projectServiceMethods.ByName("ExportProject")),
+		connect.WithHandlerOptions(opts...),
+	)
 	projectServiceAutoSaveHandler := connect.NewUnaryHandler(
 		ProjectServiceAutoSaveProcedure,
 		svc.AutoSave,
@@ -327,6 +373,8 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 			projectServiceCommitEditHandler.ServeHTTP(w, r)
 		case ProjectServiceGetCommitProcedure:
 			projectServiceGetCommitHandler.ServeHTTP(w, r)
+		case ProjectServiceListCommitsProcedure:
+			projectServiceListCommitsHandler.ServeHTTP(w, r)
 		case ProjectServiceListProjectsProcedure:
 			projectServiceListProjectsHandler.ServeHTTP(w, r)
 		case ProjectServiceListProjectAssetsProcedure:
@@ -343,6 +391,8 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 			projectServiceAddProjectUserHandler.ServeHTTP(w, r)
 		case ProjectServiceDeleteProjectProcedure:
 			projectServiceDeleteProjectHandler.ServeHTTP(w, r)
+		case ProjectServiceExportProjectProcedure:
+			projectServiceExportProjectHandler.ServeHTTP(w, r)
 		case ProjectServiceAutoSaveProcedure:
 			projectServiceAutoSaveHandler.ServeHTTP(w, r)
 		default:
@@ -360,6 +410,10 @@ func (UnimplementedProjectServiceHandler) CommitEdit(context.Context, *connect.R
 
 func (UnimplementedProjectServiceHandler) GetCommit(context.Context, *connect.Request[v1.GetCommitRequest]) (*connect.Response[v1.GetCommitResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.GetCommit is not implemented"))
+}
+
+func (UnimplementedProjectServiceHandler) ListCommits(context.Context, *connect.Request[v1.ListCommitsRequest]) (*connect.Response[v1.ListCommitsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.ListCommits is not implemented"))
 }
 
 func (UnimplementedProjectServiceHandler) ListProjects(context.Context, *connect.Request[v1.ListProjectsRequest]) (*connect.Response[v1.ListProjectsResponse], error) {
@@ -392,6 +446,10 @@ func (UnimplementedProjectServiceHandler) AddProjectUser(context.Context, *conne
 
 func (UnimplementedProjectServiceHandler) DeleteProject(context.Context, *connect.Request[v1.DeleteProjectRequest]) (*connect.Response[emptypb.Empty], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.DeleteProject is not implemented"))
+}
+
+func (UnimplementedProjectServiceHandler) ExportProject(context.Context, *connect.Request[v1.ExportProjectRequest]) (*connect.Response[v1.ExportProjectResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.ExportProject is not implemented"))
 }
 
 func (UnimplementedProjectServiceHandler) AutoSave(context.Context, *connect.Request[v1.AutoSaveRequest]) (*connect.Response[emptypb.Empty], error) {

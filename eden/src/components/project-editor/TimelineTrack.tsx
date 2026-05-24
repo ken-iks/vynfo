@@ -1,6 +1,7 @@
 import {
   MagnifyingGlassMinusIcon,
   MagnifyingGlassPlusIcon,
+  PlusIcon,
 } from "@heroicons/react/24/outline";
 import { useCallback, useEffect, useState } from "react";
 import { useSnapshot } from "valtio";
@@ -10,17 +11,17 @@ import type {
   MediaVideoMetadata,
   PlaybackSection,
 } from "@/gen/proto/v1/projects_pb";
-import { editorStore, snap, sourceDurationMs } from "../stores/editor";
+import { editorStore } from "../stores/editor";
 import { TimelineSection } from "./TimelineSection";
 import { TimelineRuler } from "./TimelineRuler";
 import { TimelineContextMenu } from "./TimelineContextMenu";
 import { EffectsComposer } from "./EffectsComposer";
+import { AudioTimelineSection } from "./AudioTimelineSection";
 import { useTimelineReorder } from "./hooks/useTimelineReorder";
 import { msToPx, pxToMs } from "./geometry";
 import { ContextMenu, ContextMenuTrigger } from "../ui/context-menu";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { formatDuration } from "@/utils/timestamp-conversaions";
 import { useTimelineLayout } from "./hooks/useTimelineLayout";
 import { useTimelineContextMenu } from "./hooks/useTimelineContextMenu";
 import { useTimelineSeeking } from "./hooks/useTimelineSeeking";
@@ -190,6 +191,23 @@ export function TimelineTrack({
     [clampTrackPx, pxPerSecond],
   );
 
+  const addLaneSource = useCallback(
+    (kind: "audio" | "video", assetId: string | undefined) => {
+      if (assetId === undefined) return;
+      if (kind === "video") {
+        const video = availableVideos.find((v) => v.assetId === assetId);
+        if (video === undefined) return;
+        editorStore.addVideoSection(video);
+        return;
+      }
+
+      const audio = availableAudios.find((a) => a.assetId === assetId);
+      if (audio === undefined) return;
+      editorStore.addAudioAtNextAvailable(audio);
+    },
+    [availableAudios, availableVideos],
+  );
+
   return (
     <div
       className={cn(
@@ -257,13 +275,29 @@ export function TimelineTrack({
                 {timelineLayout.lanes.map((lane) => (
                   <div
                     key={lane.key}
-                    className="absolute inset-x-0 flex items-center border-b border-border/40 px-2 text-left text-[10px] font-medium text-muted-foreground hover:bg-muted/40"
+                    className="group/lane-label absolute inset-x-0 flex items-center gap-1 border-b border-border/40 px-2 text-left text-[10px] font-medium text-muted-foreground hover:bg-muted/40"
                     style={{
                       top: lane.topPx,
                       height: LANE_HEIGHT,
                     }}
                   >
-                    <span className="truncate">{lane.title}</span>
+                    <span className="min-w-0 flex-1 truncate">
+                      {lane.title}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      className="size-5 opacity-0 group-hover/lane-label:opacity-100"
+                      disabled={lane.assetId === undefined}
+                      aria-label={`Add ${lane.title}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addLaneSource(lane.kind, lane.assetId);
+                      }}
+                    >
+                      <PlusIcon />
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -430,163 +464,23 @@ export function TimelineTrack({
                           />
                         );
                       })}
-                      {editorSnapshot.audioSections.map((section, i) => {
-                        const sectionDuration =
-                          section.endTimeMillis - section.startTimeMillis;
-                        const audioStart =
-                          section.audio?.audioStartTimeMillies ?? 0n;
-                        const audioEnd = audioStart + sectionDuration;
-                        const sourceMs = sourceDurationMs(
-                          section.audio?.meta?.duration,
-                        );
-                        const leftPx = msToPx(
-                          section.startTimeMillis,
-                          pxPerSecond,
-                        );
-                        const widthPx = msToPx(sectionDuration, pxPerSecond);
-                        const topPx =
-                          timelineLayout.lanes[
-                            timelineLayout.audioSectionLaneIndices[i]
-                          ]?.topPx ?? 0;
-                        return (
-                          <div
-                            key={i}
-                            data-slot="editor-timeline-audio-section"
-                            data-audio-index={i}
-                            data-selected={
-                              editorSnapshot.selectedAudioSectionIndex === i
-                            }
-                            className={cn(
-                              "group/audio-section absolute select-none overflow-hidden rounded-sm",
-                              "bg-emerald-700 text-white",
-                              editorSnapshot.selectedAudioSectionIndex === i &&
-                                "ring-2 ring-primary",
-                            )}
-                            style={{
-                              left: leftPx,
-                              top: topPx,
-                              width: widthPx,
-                              height: LANE_HEIGHT,
-                            }}
-                            onPointerDown={(e) => {
-                              if (e.button !== 0) return;
-                              editorStore.selectAudioSection(i);
-                            }}
-                          >
-                            <div
-                              className="absolute inset-y-0 left-0 w-1.5 cursor-ew-resize bg-foreground/20 hover:bg-primary"
-                              onPointerDown={(e) => {
-                                e.stopPropagation();
-                                if (e.button !== 0) return;
-                                const startClientX = e.clientX;
-                                const initialAudioStart = audioStart;
-                                const initialDuration = sectionDuration;
-                                const maxAudioStart =
-                                  initialAudioStart + initialDuration - 500n;
-                                const onMove = (ev: PointerEvent) => {
-                                  const deltaMs = snap(
-                                    pxToMs(
-                                      ev.clientX - startClientX,
-                                      pxPerSecond,
-                                    ),
-                                  );
-                                  let newAudioStart =
-                                    initialAudioStart + deltaMs;
-                                  if (newAudioStart < 0n) {
-                                    newAudioStart = 0n;
-                                  }
-                                  if (newAudioStart > maxAudioStart) {
-                                    newAudioStart = maxAudioStart;
-                                  }
-                                  const newDuration =
-                                    initialDuration -
-                                    (newAudioStart - initialAudioStart);
-                                  editorStore.trimAudioStart(
-                                    i,
-                                    newDuration,
-                                    newAudioStart,
-                                  );
-                                };
-                                const onUp = () => {
-                                  window.removeEventListener(
-                                    "pointermove",
-                                    onMove,
-                                  );
-                                  window.removeEventListener("pointerup", onUp);
-                                  window.removeEventListener(
-                                    "pointercancel",
-                                    onUp,
-                                  );
-                                };
-                                window.addEventListener("pointermove", onMove);
-                                window.addEventListener("pointerup", onUp);
-                                window.addEventListener("pointercancel", onUp);
-                              }}
-                            />
-                            <div
-                              className="absolute inset-y-0 right-0 w-1.5 cursor-ew-resize bg-foreground/20 hover:bg-primary"
-                              onPointerDown={(e) => {
-                                e.stopPropagation();
-                                if (e.button !== 0) return;
-                                const startClientX = e.clientX;
-                                const initialDuration = sectionDuration;
-                                const maxDuration = sourceMs - audioStart;
-                                const onMove = (ev: PointerEvent) => {
-                                  const deltaMs = snap(
-                                    pxToMs(
-                                      ev.clientX - startClientX,
-                                      pxPerSecond,
-                                    ),
-                                  );
-                                  let newDuration = initialDuration + deltaMs;
-                                  if (newDuration < 500n) {
-                                    newDuration = 500n;
-                                  }
-                                  if (newDuration > maxDuration) {
-                                    newDuration = maxDuration;
-                                  }
-                                  editorStore.trimAudioEnd(i, newDuration);
-                                };
-                                const onUp = () => {
-                                  window.removeEventListener(
-                                    "pointermove",
-                                    onMove,
-                                  );
-                                  window.removeEventListener("pointerup", onUp);
-                                  window.removeEventListener(
-                                    "pointercancel",
-                                    onUp,
-                                  );
-                                };
-                                window.addEventListener("pointermove", onMove);
-                                window.addEventListener("pointerup", onUp);
-                                window.addEventListener("pointercancel", onUp);
-                              }}
-                            />
-                            <button
-                              type="button"
-                              className="absolute right-2 top-1 z-10 flex size-4 items-center justify-center rounded-xs bg-background/80 text-muted-foreground opacity-0 ring-1 ring-foreground/10 group-hover/audio-section:opacity-100 hover:bg-destructive hover:text-destructive-foreground"
-                              onPointerDown={(e) => e.stopPropagation()}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                editorStore.removeAudioSection(i);
-                              }}
-                              aria-label="Remove audio section"
-                            >
-                              ×
-                            </button>
-                            <div className="flex h-full flex-col justify-center gap-0.5 px-2 py-1 pr-8">
-                              <span className="truncate text-[11px] font-medium leading-none">
-                                {section.audio?.meta?.title ?? "Untitled"}
-                              </span>
-                              <span className="truncate text-[9px] leading-none text-white/75 tabular-nums">
-                                {formatDuration(Number(audioStart))} -{" "}
-                                {formatDuration(Number(audioEnd))}
-                              </span>
-                            </div>
-                          </div>
-                        );
-                      })}
+                      {editorSnapshot.audioSections.map((section, i) => (
+                        <AudioTimelineSection
+                          key={i}
+                          section={section}
+                          index={i}
+                          isSelected={
+                            editorSnapshot.selectedAudioSectionIndex === i
+                          }
+                          topPx={
+                            timelineLayout.lanes[
+                              timelineLayout.audioSectionLaneIndices[i]
+                            ]?.topPx ?? 0
+                          }
+                          pxPerSecond={pxPerSecond}
+                          totalDuration={totalDuration}
+                        />
+                      ))}
                       {totalDuration > 0n && (
                         <div
                           className="absolute top-0 bottom-0 z-20 w-px cursor-ew-resize bg-primary"

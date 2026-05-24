@@ -10,16 +10,17 @@ import type {
   MediaVideoMetadata,
   ProjectMetadata,
 } from "@/gen/proto/v1/projects_pb";
-import { AudioPlayer, VideoPlayer } from "../upload/VideoPlayer";
-import { VideoCanvas } from "../upload/VideoCanvas";
+import { AudioPlayer, VideoPlayer } from "../project-editor/VideoPlayer";
+import { VideoCanvas } from "../project-editor/VideoCanvas";
 import { MediaOverlayCanvas } from "../upload/MediaOverlayCanvas";
 import { EmptyVideoPlayer } from "../upload/EmptyVideoPlayer";
-import { VideoPlayerPlaceholder } from "../upload/VideoPlayerPlaceholder";
+import { VideoPlayerPlaceholder } from "../project-editor/VideoPlayerPlaceholder";
 import { PlaybackControls } from "../upload/PlaybackControls";
 import { editorStore } from "../stores/editor";
 import { mediaAssetStore } from "../stores/mediaAssets";
 import { EditorTimeline } from "../project-editor/EditorTimeline";
 import { CommitDialog } from "../project-editor/CommitDialog";
+import { ExportDialogue } from "../project-editor/ExportDialogue";
 import { SectionTitle } from "../shared/SectionTitle";
 import {
   Select,
@@ -295,6 +296,11 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
               editorSnap.audioSections.length === 0
             }
             onCommitSuccess={handleCommitSuccess}
+          />
+          <ExportDialogue
+            projectId={project.id}
+            branchId={selectedBranchMetadata?.id}
+            branchName={selectedBranch}
           />
         </div>
       </div>
