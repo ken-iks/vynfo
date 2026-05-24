@@ -33,6 +33,7 @@ export interface TimelineLane {
   title: string;
   kind: "audio" | "video";
   topPx: number;
+  assetId: string | undefined;
 }
 
 export interface TimelineGroupHeader {
@@ -75,6 +76,7 @@ export function useTimelineLayout({
       key: string,
       title: string,
       kind: "audio" | "video",
+      assetId: string | undefined,
     ): number => {
       const existingLaneIndex = laneIndicesByKey.get(key);
       if (existingLaneIndex !== undefined) return existingLaneIndex;
@@ -85,6 +87,7 @@ export function useTimelineLayout({
         title,
         kind,
         topPx: nextTopPx,
+        assetId,
       });
       nextTopPx += LANE_HEIGHT + LANE_GAP;
       return laneIndex;
@@ -95,7 +98,12 @@ export function useTimelineLayout({
       addGroupHeader("video", "Video Tracks");
       for (const video of availableVideos) {
         if (!video.assetId) continue;
-        addLane(`video-${video.assetId}`, video.title || "Untitled", "video");
+        addLane(
+          `video-${video.assetId}`,
+          video.title || "Untitled",
+          "video",
+          video.assetId,
+        );
       }
     }
 
@@ -108,6 +116,7 @@ export function useTimelineLayout({
         key,
         section.video?.meta?.title ?? "Untitled",
         "video",
+        section.video?.meta?.assetId,
       );
     }
 
@@ -117,7 +126,12 @@ export function useTimelineLayout({
       addGroupHeader("audio", "Audio Tracks");
       for (const audio of availableAudios) {
         if (!audio.assetId) continue;
-        addLane(`audio-${audio.assetId}`, audio.title || "Untitled", "audio");
+        addLane(
+          `audio-${audio.assetId}`,
+          audio.title || "Untitled",
+          "audio",
+          audio.assetId,
+        );
       }
     }
 
@@ -130,6 +144,7 @@ export function useTimelineLayout({
         key,
         section.audio?.meta?.title ?? "Untitled",
         "audio",
+        section.audio?.meta?.assetId,
       );
     }
 

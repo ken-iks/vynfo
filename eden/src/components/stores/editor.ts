@@ -49,16 +49,15 @@ class EditorStore {
   playbackTimeMillis = 0n;
   editRevision = 0;
 
-  get totalDurationMillis(): bigint {
-    const videoDuration = this.sections.reduce(
+  get videoDurationMillis(): bigint {
+    return this.sections.reduce(
       (sum, s) => sum + (s.endTimeMillis - s.startTimeMillis),
       0n,
     );
-    const audioDuration = this.audioSections.reduce(
-      (max, s) => (s.endTimeMillis > max ? s.endTimeMillis : max),
-      0n,
-    );
-    return videoDuration > audioDuration ? videoDuration : audioDuration;
+  }
+
+  get totalDurationMillis(): bigint {
+    return this.videoDurationMillis;
   }
 
   get activeSectionIndex(): number | null {
@@ -119,13 +118,22 @@ class EditorStore {
       this.sections.splice(insertAtIndex, 0, section);
     }
     this.rippleRecompute();
+    this.clampAudioSectionsToVideoDuration();
     this.markEdited();
   }
 
   addAudioAtMillis(insertTimeMillis: bigint, audio: MediaAudioMetadata) {
-    const durationMillis = snap(BigInt(Math.floor(audio.duration * 1000)));
+    const videoDuration = this.videoDurationMillis;
+    const start = insertTimeMillis;
+    if (start >= videoDuration) return false;
+
+    const sourceMs = sourceDurationMs(audio.duration);
+    const timelineRemaining = videoDuration - start;
+    const maxDuration =
+      sourceMs < timelineRemaining ? sourceMs : timelineRemaining;
+    const durationMillis = maxDuration;
     if (durationMillis < MIN_DURATION_MS) return false;
-    const start = snap(insertTimeMillis);
+
     const section = create(PlaybackAudioSchema, {
       startTimeMillis: start,
       endTimeMillis: start + durationMillis,
@@ -142,6 +150,35 @@ class EditorStore {
     this.selectedOverlay = null;
     this.markEdited();
     return true;
+  }
+
+  addAudioAtNextAvailable(audio: MediaAudioMetadata) {
+    const videoDuration = this.videoDurationMillis;
+    const sourceMs = sourceDurationMs(audio.duration);
+    if (videoDuration < MIN_DURATION_MS) return false;
+    if (sourceMs < MIN_DURATION_MS) return false;
+
+    const sortedSections = [...this.audioSections].sort((a, b) => {
+      if (a.startTimeMillis < b.startTimeMillis) return -1;
+      if (a.startTimeMillis > b.startTimeMillis) return 1;
+      return 0;
+    });
+    let gapStart = 0n;
+
+    for (const section of sortedSections) {
+      if (section.startTimeMillis > gapStart) {
+        const gapDuration = section.startTimeMillis - gapStart;
+        if (gapDuration >= MIN_DURATION_MS) {
+          return this.addAudioAtMillis(gapStart, audio);
+        }
+      }
+      if (section.endTimeMillis > gapStart) {
+        gapStart = section.endTimeMillis;
+      }
+    }
+
+    if (videoDuration - gapStart < MIN_DURATION_MS) return false;
+    return this.addAudioAtMillis(gapStart, audio);
   }
 
   removeSection(index: number) {
@@ -167,6 +204,7 @@ class EditorStore {
       };
     }
     this.rippleRecompute();
+    this.clampAudioSectionsToVideoDuration();
     this.markEdited();
   }
 
@@ -234,6 +272,7 @@ class EditorStore {
     };
     this.audioSections.splice(index, 1, left, right);
     this.selectedAudioSectionIndex = index + 1;
+    this.clampAudioSectionsToVideoDuration();
     this.markEdited();
   }
 
@@ -255,6 +294,7 @@ class EditorStore {
       video: { ...section.video, videoStartTimeMillies: videoStart },
     };
     this.rippleRecompute();
+    this.clampAudioSectionsToVideoDuration();
     this.markEdited();
   }
 
@@ -273,6 +313,7 @@ class EditorStore {
       endTimeMillis: section.startTimeMillis + duration,
     };
     this.rippleRecompute();
+    this.clampAudioSectionsToVideoDuration();
     this.markEdited();
   }
 
@@ -285,11 +326,12 @@ class EditorStore {
     if (!section.audio) return;
     const sourceMs = sourceDurationMs(section.audio.meta?.duration);
 
-    const audioStart = snap(newAudioStartMs);
-    const duration = snap(newDurationMs);
+    const audioStart = newAudioStartMs;
+    const duration = newDurationMs;
     if (audioStart < 0n) return;
     if (duration < MIN_DURATION_MS) return;
     if (audioStart + duration > sourceMs) return;
+    if (section.startTimeMillis + duration > this.videoDurationMillis) return;
 
     const nextSection = {
       ...section,
@@ -307,9 +349,10 @@ class EditorStore {
     const sourceMs = sourceDurationMs(section.audio.meta?.duration);
     const audioStart = section.audio.audioStartTimeMillies;
 
-    const duration = snap(newDurationMs);
+    const duration = newDurationMs;
     if (duration < MIN_DURATION_MS) return;
     if (audioStart + duration > sourceMs) return;
+    if (section.startTimeMillis + duration > this.videoDurationMillis) return;
 
     const nextSection = {
       ...section,
@@ -317,6 +360,60 @@ class EditorStore {
     };
     if (this.audioOverlaps(nextSection, index)) return;
     this.audioSections[index] = nextSection;
+    this.markEdited();
+  }
+
+  moveAudioSection(index: number, newStartTimeMillis: bigint) {
+    const section = this.audioSections[index];
+    if (!section?.audio) return;
+    const duration = section.endTimeMillis - section.startTimeMillis;
+    const maxStart = this.videoDurationMillis - duration;
+    if (duration < MIN_DURATION_MS) return;
+    if (maxStart < 0n) return;
+
+    let startTimeMillis = newStartTimeMillis;
+    if (startTimeMillis < 0n) {
+      startTimeMillis = 0n;
+    }
+    if (startTimeMillis > maxStart) {
+      startTimeMillis = maxStart;
+    }
+    if (startTimeMillis === section.startTimeMillis) return;
+
+    const nextSection = {
+      ...section,
+      startTimeMillis,
+      endTimeMillis: startTimeMillis + duration,
+    };
+    if (this.audioOverlaps(nextSection, index)) return;
+
+    this.audioSections[index] = nextSection;
+    this.sortAudioSections();
+    this.selectedAudioSectionIndex = this.audioSections.indexOf(nextSection);
+    this.markEdited();
+  }
+
+  slipAudioSource(index: number, newAudioStartMs: bigint) {
+    const section = this.audioSections[index];
+    if (!section?.audio) return;
+    const duration = section.endTimeMillis - section.startTimeMillis;
+    const sourceMs = sourceDurationMs(section.audio.meta?.duration);
+    if (duration < MIN_DURATION_MS) return;
+    if (duration > sourceMs) return;
+
+    let audioStart = newAudioStartMs;
+    const maxAudioStart = sourceMs - duration;
+    if (audioStart < 0n) {
+      audioStart = 0n;
+    }
+    if (audioStart > maxAudioStart) {
+      audioStart = maxAudioStart;
+    }
+
+    this.audioSections[index] = {
+      ...section,
+      audio: { ...section.audio, audioStartTimeMillies: audioStart },
+    };
     this.markEdited();
   }
 
@@ -331,6 +428,7 @@ class EditorStore {
       this.selectedSectionIndex = adjusted;
     }
     this.rippleRecompute();
+    this.clampAudioSectionsToVideoDuration();
     this.markEdited();
   }
 
@@ -469,6 +567,7 @@ class EditorStore {
     this.sections.push(section);
     this.selectedSectionIndex = this.sections.length - 1;
     this.rippleRecompute();
+    this.clampAudioSectionsToVideoDuration();
     this.markEdited();
   }
 
@@ -487,6 +586,7 @@ class EditorStore {
     this.selectedSectionIndex = clamped;
     this.selectedOverlay = null;
     this.rippleRecompute();
+    this.clampAudioSectionsToVideoDuration();
     this.markEdited();
   }
 
@@ -564,6 +664,7 @@ class EditorStore {
     }
     this.selectedOverlay = null;
     this.rippleRecompute();
+    this.clampAudioSectionsToVideoDuration();
     this.markEdited();
     return true;
   }
@@ -576,6 +677,7 @@ class EditorStore {
     this.selectedOverlay = null;
     this.playbackTimeMillis = 0n;
     this.rippleRecompute();
+    this.clampAudioSectionsToVideoDuration();
     this.editRevision = 0;
   }
 
@@ -588,6 +690,7 @@ class EditorStore {
     this.selectedOverlay = null;
     this.playbackTimeMillis = 0n;
     this.rippleRecompute();
+    this.clampAudioSectionsToVideoDuration();
     this.editRevision = 0;
   }
 
@@ -629,6 +732,47 @@ class EditorStore {
       }
       running += duration;
     }
+  }
+
+  private clampAudioSectionsToVideoDuration() {
+    const videoDuration = this.videoDurationMillis;
+    const selectedIndex = this.selectedAudioSectionIndex;
+    const nextAudioSections: PlaybackAudio[] = [];
+    let nextSelectedIndex: number | null = null;
+
+    for (let i = 0; i < this.audioSections.length; i++) {
+      const section = this.audioSections[i];
+      if (!section.audio) continue;
+      if (section.startTimeMillis >= videoDuration) continue;
+
+      const sourceMs = sourceDurationMs(section.audio.meta?.duration);
+      const audioStart = section.audio.audioStartTimeMillies;
+      if (audioStart >= sourceMs) continue;
+
+      const sourceEndMillis =
+        section.startTimeMillis + (sourceMs - audioStart);
+      let endTimeMillis =
+        section.endTimeMillis < videoDuration
+          ? section.endTimeMillis
+          : videoDuration;
+      if (endTimeMillis > sourceEndMillis) {
+        endTimeMillis = sourceEndMillis;
+      }
+      if (endTimeMillis - section.startTimeMillis < MIN_DURATION_MS) continue;
+
+      const nextSection =
+        endTimeMillis === section.endTimeMillis
+          ? section
+          : { ...section, endTimeMillis };
+      if (selectedIndex === i) {
+        nextSelectedIndex = nextAudioSections.length;
+      }
+      nextAudioSections.push(nextSection);
+    }
+
+    this.audioSections = nextAudioSections;
+    this.selectedAudioSectionIndex = nextSelectedIndex;
+    this.sortAudioSections();
   }
 
   private audioOverlaps(section: PlaybackAudio, ignoreIndex: number | null) {
