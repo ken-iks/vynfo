@@ -88,7 +88,12 @@ func (f *FileServiceServer) UploadAudio(
 	}
 
 	originalUploadErr := make(chan error, 1)
-	originalUploadFp := fmt.Sprintf("%s/%s", shared.ORIGINAL_AUDIOS_OBJECT_PATH, audio.AssetID.String())
+	originalUploadFp, err := shared.GetUploadPath(audio.AssetID.String(), "audio")
+	if err != nil {
+		slog.Error("error resolving original audio upload path", "error", err)
+		f.cleanupFailedMediaUpload(ctx, asset.ID, nil, "audio")
+		return connect.NewError(connect.CodeInternal, err)
+	}
 	go func(audioBytes []byte, objectPath string) {
 		bucket := f.storageClient.Bucket("vedit-v1")
 		w := bucket.Object(objectPath).NewWriter(ctx)
@@ -137,13 +142,23 @@ func (f *FileServiceServer) UploadAudio(
 	)
 	if err != nil {
 		<-originalUploadErr
-		f.cleanupFailedMediaUpload(ctx, asset.ID, append(uploadedObjects, originalUploadFp), "audio")
+		f.cleanupFailedMediaUpload(
+			ctx,
+			asset.ID,
+			append(uploadedObjects, originalUploadFp),
+			"audio",
+		)
 		return err
 	}
 
 	if err := <-originalUploadErr; err != nil {
 		slog.Error("error uploading original audio file", "error", err)
-		f.cleanupFailedMediaUpload(ctx, asset.ID, append(uploadedObjects, originalUploadFp), "audio")
+		f.cleanupFailedMediaUpload(
+			ctx,
+			asset.ID,
+			append(uploadedObjects, originalUploadFp),
+			"audio",
+		)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -151,7 +166,12 @@ func (f *FileServiceServer) UploadAudio(
 	manifestPath := fmt.Sprintf("manifests/%s.m3u8", audio.AssetID.String())
 	if err != nil {
 		slog.Error("error uploading manifest", "error", err)
-		f.cleanupFailedMediaUpload(ctx, asset.ID, append(uploadedObjects, originalUploadFp, manifestPath), "audio")
+		f.cleanupFailedMediaUpload(
+			ctx,
+			asset.ID,
+			append(uploadedObjects, originalUploadFp, manifestPath),
+			"audio",
+		)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 
@@ -163,7 +183,12 @@ func (f *FileServiceServer) UploadAudio(
 		},
 	}
 	if err := stream.Send(msg); err != nil {
-		f.cleanupFailedMediaUpload(ctx, asset.ID, append(uploadedObjects, manifestPath, originalUploadFp), "audio")
+		f.cleanupFailedMediaUpload(
+			ctx,
+			asset.ID,
+			append(uploadedObjects, manifestPath, originalUploadFp),
+			"audio",
+		)
 		return err
 	}
 	return nil

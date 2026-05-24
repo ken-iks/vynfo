@@ -99,11 +99,10 @@ message PlaybackAudio {
 
 message PlaybackState {
     repeated PlaybackSection video_sections = 1;
+    // NOTE: audio sections will be clamped to the full length of the video sections
     repeated PlaybackAudio audio_sections = 2;
 }
 
-// PlaybackEditor holds a list of sections controlling the current edited state of
-// the playback editor. When we make a commit, we optionally include a previous commit id.
 // NOTE: you can only not include the previous commit id when you are making the first commit
 // for a branch. 
 message CommitEditRequest {
@@ -143,6 +142,17 @@ message StaleBranchError {
 
 // ======================== Supported Effects =========================== //
 
+// THese are based on FFMPeg filters
+
+//////////////////
+//
+// brightness: -1.0 to 1.0, default 0
+// saturation:  0.0 to 3.0, default 1
+// contrast:   -1000.0 to 1000.0, default 1
+// blur:     0 to 1024, default 0.5
+//
+///////////////////
+
 // Blur will apply a blur to the video section at a growing intensity scale
 message BlurEffect {
     double intensity = 1; // 1 - 20. Recommended is 8
@@ -153,11 +163,11 @@ message BlurEffect {
 message SepiaEffect {}
 
 message SaturationEffect {
-    double strength = 1; // -1 grayscale, 0 unchanged, 1 extra saturated
+    double strength = 1; // 0 grayscale, 1 unchanged, 1 extra saturated
 }
 
 message BrightnessEffect {
-    double strength = 1; // >1 brighter than normal, <1 darker than normal
+    double strength = 1; // >0 brighter than normal, <0 darker than normal
 }
 
 // ========================  Projects CRUD  ============================ //
