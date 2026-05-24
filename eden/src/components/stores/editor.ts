@@ -393,30 +393,6 @@ class EditorStore {
     this.markEdited();
   }
 
-  slipAudioSource(index: number, newAudioStartMs: bigint) {
-    const section = this.audioSections[index];
-    if (!section?.audio) return;
-    const duration = section.endTimeMillis - section.startTimeMillis;
-    const sourceMs = sourceDurationMs(section.audio.meta?.duration);
-    if (duration < MIN_DURATION_MS) return;
-    if (duration > sourceMs) return;
-
-    let audioStart = newAudioStartMs;
-    const maxAudioStart = sourceMs - duration;
-    if (audioStart < 0n) {
-      audioStart = 0n;
-    }
-    if (audioStart > maxAudioStart) {
-      audioStart = maxAudioStart;
-    }
-
-    this.audioSections[index] = {
-      ...section,
-      audio: { ...section.audio, audioStartTimeMillies: audioStart },
-    };
-    this.markEdited();
-  }
-
   reorder(fromIndex: number, toIndex: number) {
     if (fromIndex === toIndex) return;
     if (fromIndex < 0 || fromIndex >= this.sections.length) return;
