@@ -15,4 +15,3 @@ type FilterGraphAudioCut struct {
 	offsetIntoVideoSeconds uint64
 	volume                 float64
 }
-

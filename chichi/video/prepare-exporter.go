@@ -10,7 +10,10 @@ import (
 	"vynfo.com/vynfo/shared"
 )
 
-func PrepareExporter(state *v1.PlaybackState, client *storage.Client) (*exporter.VideoExportBuilder, error) {
+func PrepareExporter(
+	state *v1.PlaybackState,
+	client *storage.Client,
+) (*exporter.VideoExportBuilder, error) {
 	builder := exporter.Init()
 
 	// step 1: add inputs to the builder

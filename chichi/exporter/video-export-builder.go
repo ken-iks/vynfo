@@ -110,5 +110,3 @@ func (v *VideoExportBuilder) SetOutputPath(outputFp string) error {
 	v.ready = true
 	return nil
 }
-
-
