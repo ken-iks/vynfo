@@ -708,7 +708,8 @@ func (x *PlaybackAudio) GetAudio() *SectionAudio {
 type PlaybackState struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	VideoSections []*PlaybackSection     `protobuf:"bytes,1,rep,name=video_sections,json=videoSections,proto3" json:"video_sections,omitempty"`
-	AudioSections []*PlaybackAudio       `protobuf:"bytes,2,rep,name=audio_sections,json=audioSections,proto3" json:"audio_sections,omitempty"`
+	// NOTE: audio sections will be clamped to the full length of the video sections
+	AudioSections []*PlaybackAudio `protobuf:"bytes,2,rep,name=audio_sections,json=audioSections,proto3" json:"audio_sections,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -757,8 +758,6 @@ func (x *PlaybackState) GetAudioSections() []*PlaybackAudio {
 	return nil
 }
 
-// PlaybackEditor holds a list of sections controlling the current edited state of
-// the playback editor. When we make a commit, we optionally include a previous commit id.
 // NOTE: you can only not include the previous commit id when you are making the first commit
 // for a branch.
 type CommitEditRequest struct {
@@ -1103,7 +1102,7 @@ func (x *StaleBranchError) GetCurrentBranchTipUuid() string {
 // Blur will apply a blur to the video section at a growing intensity scale
 type BlurEffect struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Intensity     float64                `protobuf:"fixed64,1,opt,name=intensity,proto3" json:"intensity,omitempty"` // 1 - 20. Recommended is 8
+	Intensity     float64                `protobuf:"fixed64,1,opt,name=intensity,proto3" json:"intensity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1185,7 +1184,7 @@ func (*SepiaEffect) Descriptor() ([]byte, []int) {
 
 type SaturationEffect struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Strength      float64                `protobuf:"fixed64,1,opt,name=strength,proto3" json:"strength,omitempty"` // -1 grayscale, 0 unchanged, 1 extra saturated
+	Strength      float64                `protobuf:"fixed64,1,opt,name=strength,proto3" json:"strength,omitempty"` // 0 grayscale, 1 unchanged, >1  saturated
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1229,7 +1228,7 @@ func (x *SaturationEffect) GetStrength() float64 {
 
 type BrightnessEffect struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Strength      float64                `protobuf:"fixed64,1,opt,name=strength,proto3" json:"strength,omitempty"` // >1 brighter than normal, <1 darker than normal
+	Strength      float64                `protobuf:"fixed64,1,opt,name=strength,proto3" json:"strength,omitempty"` // >0 brighter than normal, <0 darker than normal
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2201,6 +2200,112 @@ func (x *DeleteProjectRequest) GetProjectId() string {
 	return ""
 }
 
+type ExportProjectRequest struct {
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	WorkspaceId string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	ProjectId   string                 `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	// export will default to latest commit unless you specify an earlier
+	// commit that you would like to export
+	CommitId      *string `protobuf:"bytes,3,opt,name=commit_id,json=commitId,proto3,oneof" json:"commit_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExportProjectRequest) Reset() {
+	*x = ExportProjectRequest{}
+	mi := &file_proto_v1_projects_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExportProjectRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExportProjectRequest) ProtoMessage() {}
+
+func (x *ExportProjectRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_projects_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExportProjectRequest.ProtoReflect.Descriptor instead.
+func (*ExportProjectRequest) Descriptor() ([]byte, []int) {
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *ExportProjectRequest) GetWorkspaceId() string {
+	if x != nil {
+		return x.WorkspaceId
+	}
+	return ""
+}
+
+func (x *ExportProjectRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *ExportProjectRequest) GetCommitId() string {
+	if x != nil && x.CommitId != nil {
+		return *x.CommitId
+	}
+	return ""
+}
+
+type ExportProjectResponse struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	SignedUrlForDownload string                 `protobuf:"bytes,1,opt,name=signed_url_for_download,json=signedUrlForDownload,proto3" json:"signed_url_for_download,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *ExportProjectResponse) Reset() {
+	*x = ExportProjectResponse{}
+	mi := &file_proto_v1_projects_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExportProjectResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExportProjectResponse) ProtoMessage() {}
+
+func (x *ExportProjectResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_projects_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExportProjectResponse.ProtoReflect.Descriptor instead.
+func (*ExportProjectResponse) Descriptor() ([]byte, []int) {
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *ExportProjectResponse) GetSignedUrlForDownload() string {
+	if x != nil {
+		return x.SignedUrlForDownload
+	}
+	return ""
+}
+
 type GetCommitRequest struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	CommitId string                 `protobuf:"bytes,1,opt,name=commit_id,json=commitId,proto3" json:"commit_id,omitempty"`
@@ -2213,7 +2318,7 @@ type GetCommitRequest struct {
 
 func (x *GetCommitRequest) Reset() {
 	*x = GetCommitRequest{}
-	mi := &file_proto_v1_projects_proto_msgTypes[36]
+	mi := &file_proto_v1_projects_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2225,7 +2330,7 @@ func (x *GetCommitRequest) String() string {
 func (*GetCommitRequest) ProtoMessage() {}
 
 func (x *GetCommitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[36]
+	mi := &file_proto_v1_projects_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2238,7 +2343,7 @@ func (x *GetCommitRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCommitRequest.ProtoReflect.Descriptor instead.
 func (*GetCommitRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{36}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *GetCommitRequest) GetCommitId() string {
@@ -2267,7 +2372,7 @@ type GetCommitResponse struct {
 
 func (x *GetCommitResponse) Reset() {
 	*x = GetCommitResponse{}
-	mi := &file_proto_v1_projects_proto_msgTypes[37]
+	mi := &file_proto_v1_projects_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2279,7 +2384,7 @@ func (x *GetCommitResponse) String() string {
 func (*GetCommitResponse) ProtoMessage() {}
 
 func (x *GetCommitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_projects_proto_msgTypes[37]
+	mi := &file_proto_v1_projects_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2292,7 +2397,7 @@ func (x *GetCommitResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCommitResponse.ProtoReflect.Descriptor instead.
 func (*GetCommitResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_projects_proto_rawDescGZIP(), []int{37}
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *GetCommitResponse) GetCommitId() string {
@@ -2470,7 +2575,16 @@ const file_proto_v1_projects_proto_rawDesc = "" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\"5\n" +
 	"\x14DeleteProjectRequest\x12\x1d\n" +
 	"\n" +
-	"project_id\x18\x01 \x01(\tR\tprojectId\"L\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\"\x88\x01\n" +
+	"\x14ExportProjectRequest\x12!\n" +
+	"\fworkspace_id\x18\x01 \x01(\tR\vworkspaceId\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x02 \x01(\tR\tprojectId\x12 \n" +
+	"\tcommit_id\x18\x03 \x01(\tH\x00R\bcommitId\x88\x01\x01B\f\n" +
+	"\n" +
+	"_commit_id\"N\n" +
+	"\x15ExportProjectResponse\x125\n" +
+	"\x17signed_url_for_download\x18\x01 \x01(\tR\x14signedUrlForDownload\"L\n" +
 	"\x10GetCommitRequest\x12\x1b\n" +
 	"\tcommit_id\x18\x01 \x01(\tR\bcommitId\x12\x1b\n" +
 	"\tbranch_id\x18\x02 \x01(\tR\bbranchId\"\x9f\x01\n" +
@@ -2484,7 +2598,7 @@ const file_proto_v1_projects_proto_rawDesc = "" +
 	"\x1cMEDIA_TEXT_COLOR_UNSPECIFIED\x10\x00\x12\x1a\n" +
 	"\x16MEDIA_TEXT_COLOR_BLACK\x10\x01\x12\x1a\n" +
 	"\x16MEDIA_TEXT_COLOR_WHITE\x10\x02\x12\x1a\n" +
-	"\x16MEDIA_TEXT_COLOR_CLEAR\x10\x032\x8f\x06\n" +
+	"\x16MEDIA_TEXT_COLOR_CLEAR\x10\x032\xd5\x06\n" +
 	"\x0eProjectService\x12;\n" +
 	"\n" +
 	"CommitEdit\x12\x15.v1.CommitEditRequest\x1a\x16.v1.CommitEditResponse\x128\n" +
@@ -2496,7 +2610,8 @@ const file_proto_v1_projects_proto_rawDesc = "" +
 	"\x13ListProjectBranches\x12\x1e.v1.ListProjectBranchesRequest\x1a\x1f.v1.ListProjectBranchesResponse\x12D\n" +
 	"\rCreateProject\x12\x18.v1.CreateProjectRequest\x1a\x19.v1.CreateProjectResponse\x12C\n" +
 	"\x0eAddProjectUser\x12\x19.v1.AddProjectUserRequest\x1a\x16.google.protobuf.Empty\x12A\n" +
-	"\rDeleteProject\x12\x18.v1.DeleteProjectRequest\x1a\x16.google.protobuf.Empty\x127\n" +
+	"\rDeleteProject\x12\x18.v1.DeleteProjectRequest\x1a\x16.google.protobuf.Empty\x12D\n" +
+	"\rExportProject\x12\x18.v1.ExportProjectRequest\x1a\x19.v1.ExportProjectResponse\x127\n" +
 	"\bAutoSave\x12\x13.v1.AutoSaveRequest\x1a\x16.google.protobuf.EmptyB\x1eZ\x1cvynfo.com/vynfo/gen/proto/v1b\x06proto3"
 
 var (
@@ -2512,7 +2627,7 @@ func file_proto_v1_projects_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_v1_projects_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_v1_projects_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
+var file_proto_v1_projects_proto_msgTypes = make([]protoimpl.MessageInfo, 40)
 var file_proto_v1_projects_proto_goTypes = []any{
 	(MediaTextColor)(0),                 // 0: v1.MediaTextColor
 	(*MediaImageOverlay)(nil),           // 1: v1.MediaImageOverlay
@@ -2551,11 +2666,13 @@ var file_proto_v1_projects_proto_goTypes = []any{
 	(*CreateProjectResponse)(nil),       // 34: v1.CreateProjectResponse
 	(*AddProjectUserRequest)(nil),       // 35: v1.AddProjectUserRequest
 	(*DeleteProjectRequest)(nil),        // 36: v1.DeleteProjectRequest
-	(*GetCommitRequest)(nil),            // 37: v1.GetCommitRequest
-	(*GetCommitResponse)(nil),           // 38: v1.GetCommitResponse
-	(*timestamppb.Timestamp)(nil),       // 39: google.protobuf.Timestamp
-	(*User)(nil),                        // 40: v1.User
-	(*emptypb.Empty)(nil),               // 41: google.protobuf.Empty
+	(*ExportProjectRequest)(nil),        // 37: v1.ExportProjectRequest
+	(*ExportProjectResponse)(nil),       // 38: v1.ExportProjectResponse
+	(*GetCommitRequest)(nil),            // 39: v1.GetCommitRequest
+	(*GetCommitResponse)(nil),           // 40: v1.GetCommitResponse
+	(*timestamppb.Timestamp)(nil),       // 41: google.protobuf.Timestamp
+	(*User)(nil),                        // 42: v1.User
+	(*emptypb.Empty)(nil),               // 43: google.protobuf.Empty
 }
 var file_proto_v1_projects_proto_depIdxs = []int32{
 	3,  // 0: v1.MediaImageOverlay.pos:type_name -> v1.MediaPosition
@@ -2579,8 +2696,8 @@ var file_proto_v1_projects_proto_depIdxs = []int32{
 	14, // 18: v1.CommitEditResponse.err:type_name -> v1.CommitEditError
 	10, // 19: v1.AutoSaveRequest.auto_save_state:type_name -> v1.PlaybackState
 	15, // 20: v1.CommitEditError.stale_branch:type_name -> v1.StaleBranchError
-	39, // 21: v1.ProjectMetadata.created_at:type_name -> google.protobuf.Timestamp
-	40, // 22: v1.ProjectMetadata.created_by:type_name -> v1.User
+	41, // 21: v1.ProjectMetadata.created_at:type_name -> google.protobuf.Timestamp
+	42, // 22: v1.ProjectMetadata.created_by:type_name -> v1.User
 	20, // 23: v1.ListProjectsResponse.projects:type_name -> v1.ProjectMetadata
 	26, // 24: v1.ListProjectAssetsResponse.videos:type_name -> v1.MediaVideoMetadata
 	28, // 25: v1.ListProjectAssetsResponse.images:type_name -> v1.MediaImageMetadata
@@ -2588,7 +2705,7 @@ var file_proto_v1_projects_proto_depIdxs = []int32{
 	31, // 27: v1.ListProjectBranchesResponse.branches:type_name -> v1.BranchMetadata
 	10, // 28: v1.GetCommitResponse.commit_state:type_name -> v1.PlaybackState
 	11, // 29: v1.ProjectService.CommitEdit:input_type -> v1.CommitEditRequest
-	37, // 30: v1.ProjectService.GetCommit:input_type -> v1.GetCommitRequest
+	39, // 30: v1.ProjectService.GetCommit:input_type -> v1.GetCommitRequest
 	21, // 31: v1.ProjectService.ListProjects:input_type -> v1.ListProjectsRequest
 	23, // 32: v1.ProjectService.ListProjectAssets:input_type -> v1.ListProjectAssetsRequest
 	25, // 33: v1.ProjectService.AddProjectAsset:input_type -> v1.AddProjectAssetRequest
@@ -2597,20 +2714,22 @@ var file_proto_v1_projects_proto_depIdxs = []int32{
 	33, // 36: v1.ProjectService.CreateProject:input_type -> v1.CreateProjectRequest
 	35, // 37: v1.ProjectService.AddProjectUser:input_type -> v1.AddProjectUserRequest
 	36, // 38: v1.ProjectService.DeleteProject:input_type -> v1.DeleteProjectRequest
-	13, // 39: v1.ProjectService.AutoSave:input_type -> v1.AutoSaveRequest
-	12, // 40: v1.ProjectService.CommitEdit:output_type -> v1.CommitEditResponse
-	38, // 41: v1.ProjectService.GetCommit:output_type -> v1.GetCommitResponse
-	22, // 42: v1.ProjectService.ListProjects:output_type -> v1.ListProjectsResponse
-	29, // 43: v1.ProjectService.ListProjectAssets:output_type -> v1.ListProjectAssetsResponse
-	41, // 44: v1.ProjectService.AddProjectAsset:output_type -> google.protobuf.Empty
-	41, // 45: v1.ProjectService.RemoveProjectAsset:output_type -> google.protobuf.Empty
-	32, // 46: v1.ProjectService.ListProjectBranches:output_type -> v1.ListProjectBranchesResponse
-	34, // 47: v1.ProjectService.CreateProject:output_type -> v1.CreateProjectResponse
-	41, // 48: v1.ProjectService.AddProjectUser:output_type -> google.protobuf.Empty
-	41, // 49: v1.ProjectService.DeleteProject:output_type -> google.protobuf.Empty
-	41, // 50: v1.ProjectService.AutoSave:output_type -> google.protobuf.Empty
-	40, // [40:51] is the sub-list for method output_type
-	29, // [29:40] is the sub-list for method input_type
+	37, // 39: v1.ProjectService.ExportProject:input_type -> v1.ExportProjectRequest
+	13, // 40: v1.ProjectService.AutoSave:input_type -> v1.AutoSaveRequest
+	12, // 41: v1.ProjectService.CommitEdit:output_type -> v1.CommitEditResponse
+	40, // 42: v1.ProjectService.GetCommit:output_type -> v1.GetCommitResponse
+	22, // 43: v1.ProjectService.ListProjects:output_type -> v1.ListProjectsResponse
+	29, // 44: v1.ProjectService.ListProjectAssets:output_type -> v1.ListProjectAssetsResponse
+	43, // 45: v1.ProjectService.AddProjectAsset:output_type -> google.protobuf.Empty
+	43, // 46: v1.ProjectService.RemoveProjectAsset:output_type -> google.protobuf.Empty
+	32, // 47: v1.ProjectService.ListProjectBranches:output_type -> v1.ListProjectBranchesResponse
+	34, // 48: v1.ProjectService.CreateProject:output_type -> v1.CreateProjectResponse
+	43, // 49: v1.ProjectService.AddProjectUser:output_type -> google.protobuf.Empty
+	43, // 50: v1.ProjectService.DeleteProject:output_type -> google.protobuf.Empty
+	38, // 51: v1.ProjectService.ExportProject:output_type -> v1.ExportProjectResponse
+	43, // 52: v1.ProjectService.AutoSave:output_type -> google.protobuf.Empty
+	41, // [41:53] is the sub-list for method output_type
+	29, // [29:41] is the sub-list for method input_type
 	29, // [29:29] is the sub-list for extension type_name
 	29, // [29:29] is the sub-list for extension extendee
 	0,  // [0:29] is the sub-list for field type_name
@@ -2641,13 +2760,14 @@ func file_proto_v1_projects_proto_init() {
 		(*CommitEditError_StaleBranch)(nil),
 	}
 	file_proto_v1_projects_proto_msgTypes[30].OneofWrappers = []any{}
+	file_proto_v1_projects_proto_msgTypes[36].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_v1_projects_proto_rawDesc), len(file_proto_v1_projects_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   38,
+			NumMessages:   40,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

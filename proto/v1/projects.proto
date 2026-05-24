@@ -275,6 +275,19 @@ message DeleteProjectRequest {
     string project_id = 1;
 }
 
+message ExportProjectRequest {
+    string workspace_id = 1;
+    string project_id = 2;
+
+    // export will default to latest commit unless you specify an earlier
+    // commit that you would like to export
+    optional string commit_id = 3;
+}
+
+message ExportProjectResponse {
+    string signed_url_for_download = 1;
+}
+
 // ========================  Commits CRUD  ============================ //
 
 message GetCommitRequest {
@@ -303,5 +316,6 @@ service ProjectService {
     rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
     rpc AddProjectUser(AddProjectUserRequest) returns (google.protobuf.Empty);
     rpc DeleteProject(DeleteProjectRequest) returns (google.protobuf.Empty);
+    rpc ExportProject(ExportProjectRequest) returns (ExportProjectResponse);
     rpc AutoSave(AutoSaveRequest) returns (google.protobuf.Empty);
 }

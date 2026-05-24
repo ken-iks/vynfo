@@ -64,6 +64,9 @@ const (
 	// ProjectServiceDeleteProjectProcedure is the fully-qualified name of the ProjectService's
 	// DeleteProject RPC.
 	ProjectServiceDeleteProjectProcedure = "/v1.ProjectService/DeleteProject"
+	// ProjectServiceExportProjectProcedure is the fully-qualified name of the ProjectService's
+	// ExportProject RPC.
+	ProjectServiceExportProjectProcedure = "/v1.ProjectService/ExportProject"
 	// ProjectServiceAutoSaveProcedure is the fully-qualified name of the ProjectService's AutoSave RPC.
 	ProjectServiceAutoSaveProcedure = "/v1.ProjectService/AutoSave"
 )
@@ -80,6 +83,7 @@ type ProjectServiceClient interface {
 	CreateProject(context.Context, *connect.Request[v1.CreateProjectRequest]) (*connect.Response[v1.CreateProjectResponse], error)
 	AddProjectUser(context.Context, *connect.Request[v1.AddProjectUserRequest]) (*connect.Response[emptypb.Empty], error)
 	DeleteProject(context.Context, *connect.Request[v1.DeleteProjectRequest]) (*connect.Response[emptypb.Empty], error)
+	ExportProject(context.Context, *connect.Request[v1.ExportProjectRequest]) (*connect.Response[v1.ExportProjectResponse], error)
 	AutoSave(context.Context, *connect.Request[v1.AutoSaveRequest]) (*connect.Response[emptypb.Empty], error)
 }
 
@@ -154,6 +158,12 @@ func NewProjectServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(projectServiceMethods.ByName("DeleteProject")),
 			connect.WithClientOptions(opts...),
 		),
+		exportProject: connect.NewClient[v1.ExportProjectRequest, v1.ExportProjectResponse](
+			httpClient,
+			baseURL+ProjectServiceExportProjectProcedure,
+			connect.WithSchema(projectServiceMethods.ByName("ExportProject")),
+			connect.WithClientOptions(opts...),
+		),
 		autoSave: connect.NewClient[v1.AutoSaveRequest, emptypb.Empty](
 			httpClient,
 			baseURL+ProjectServiceAutoSaveProcedure,
@@ -175,6 +185,7 @@ type projectServiceClient struct {
 	createProject       *connect.Client[v1.CreateProjectRequest, v1.CreateProjectResponse]
 	addProjectUser      *connect.Client[v1.AddProjectUserRequest, emptypb.Empty]
 	deleteProject       *connect.Client[v1.DeleteProjectRequest, emptypb.Empty]
+	exportProject       *connect.Client[v1.ExportProjectRequest, v1.ExportProjectResponse]
 	autoSave            *connect.Client[v1.AutoSaveRequest, emptypb.Empty]
 }
 
@@ -228,6 +239,11 @@ func (c *projectServiceClient) DeleteProject(ctx context.Context, req *connect.R
 	return c.deleteProject.CallUnary(ctx, req)
 }
 
+// ExportProject calls v1.ProjectService.ExportProject.
+func (c *projectServiceClient) ExportProject(ctx context.Context, req *connect.Request[v1.ExportProjectRequest]) (*connect.Response[v1.ExportProjectResponse], error) {
+	return c.exportProject.CallUnary(ctx, req)
+}
+
 // AutoSave calls v1.ProjectService.AutoSave.
 func (c *projectServiceClient) AutoSave(ctx context.Context, req *connect.Request[v1.AutoSaveRequest]) (*connect.Response[emptypb.Empty], error) {
 	return c.autoSave.CallUnary(ctx, req)
@@ -245,6 +261,7 @@ type ProjectServiceHandler interface {
 	CreateProject(context.Context, *connect.Request[v1.CreateProjectRequest]) (*connect.Response[v1.CreateProjectResponse], error)
 	AddProjectUser(context.Context, *connect.Request[v1.AddProjectUserRequest]) (*connect.Response[emptypb.Empty], error)
 	DeleteProject(context.Context, *connect.Request[v1.DeleteProjectRequest]) (*connect.Response[emptypb.Empty], error)
+	ExportProject(context.Context, *connect.Request[v1.ExportProjectRequest]) (*connect.Response[v1.ExportProjectResponse], error)
 	AutoSave(context.Context, *connect.Request[v1.AutoSaveRequest]) (*connect.Response[emptypb.Empty], error)
 }
 
@@ -315,6 +332,12 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 		connect.WithSchema(projectServiceMethods.ByName("DeleteProject")),
 		connect.WithHandlerOptions(opts...),
 	)
+	projectServiceExportProjectHandler := connect.NewUnaryHandler(
+		ProjectServiceExportProjectProcedure,
+		svc.ExportProject,
+		connect.WithSchema(projectServiceMethods.ByName("ExportProject")),
+		connect.WithHandlerOptions(opts...),
+	)
 	projectServiceAutoSaveHandler := connect.NewUnaryHandler(
 		ProjectServiceAutoSaveProcedure,
 		svc.AutoSave,
@@ -343,6 +366,8 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 			projectServiceAddProjectUserHandler.ServeHTTP(w, r)
 		case ProjectServiceDeleteProjectProcedure:
 			projectServiceDeleteProjectHandler.ServeHTTP(w, r)
+		case ProjectServiceExportProjectProcedure:
+			projectServiceExportProjectHandler.ServeHTTP(w, r)
 		case ProjectServiceAutoSaveProcedure:
 			projectServiceAutoSaveHandler.ServeHTTP(w, r)
 		default:
@@ -392,6 +417,10 @@ func (UnimplementedProjectServiceHandler) AddProjectUser(context.Context, *conne
 
 func (UnimplementedProjectServiceHandler) DeleteProject(context.Context, *connect.Request[v1.DeleteProjectRequest]) (*connect.Response[emptypb.Empty], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.DeleteProject is not implemented"))
+}
+
+func (UnimplementedProjectServiceHandler) ExportProject(context.Context, *connect.Request[v1.ExportProjectRequest]) (*connect.Response[v1.ExportProjectResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.ExportProject is not implemented"))
 }
 
 func (UnimplementedProjectServiceHandler) AutoSave(context.Context, *connect.Request[v1.AutoSaveRequest]) (*connect.Response[emptypb.Empty], error) {
