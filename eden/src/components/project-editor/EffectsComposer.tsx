@@ -19,12 +19,20 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { editorStore } from "../stores/editor";
 import { useEffect, useRef, useState } from "react";
+import {
+  defaultLevelForVideoEffect,
+  getVideoEffectDefinition,
+  isLeveledVideoEffectKind,
+  levelForVideoEffectValue,
+  type LeveledVideoEffectKind,
+  type VideoEffectKind,
+  valueForVideoEffectLevel,
+  VIDEO_EFFECT_KINDS,
+} from "./videoEffectDefinitions";
 
 type DraftEffect =
-  | { id: number; kind: "blur"; intensity: number }
-  | { id: number; kind: "sepia" }
-  | { id: number; kind: "saturation"; strength: number }
-  | { id: number; kind: "brightness"; strength: number };
+  | { id: number; kind: LeveledVideoEffectKind; level: number }
+  | { id: number; kind: "sepia" };
 
 interface EffectsComposerProps {
   open: boolean;
@@ -32,17 +40,8 @@ interface EffectsComposerProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function effectLabel(effect: DraftEffect) {
-  switch (effect.kind) {
-    case "blur":
-      return "Blur";
-    case "sepia":
-      return "Sepia";
-    case "saturation":
-      return "Saturation";
-    case "brightness":
-      return "Brightness";
-  }
+function effectLabel(kind: VideoEffectKind) {
+  return getVideoEffectDefinition(kind).label;
 }
 
 function protoEffectToDraft(effect: MediaVideoEffect, id: number): DraftEffect {
@@ -51,7 +50,14 @@ function protoEffectToDraft(effect: MediaVideoEffect, id: number): DraftEffect {
       return {
         id,
         kind: "blur",
-        intensity: effect.effect.value.intensity || 8,
+        level: levelForVideoEffectValue(
+          "blur",
+          effect.effect.value.intensity ||
+            valueForVideoEffectLevel(
+              "blur",
+              defaultLevelForVideoEffect("blur"),
+            ),
+        ),
       };
     case "sepia":
       return { id, kind: "sepia" };
@@ -59,13 +65,19 @@ function protoEffectToDraft(effect: MediaVideoEffect, id: number): DraftEffect {
       return {
         id,
         kind: "saturation",
-        strength: effect.effect.value.strength,
+        level: levelForVideoEffectValue(
+          "saturation",
+          effect.effect.value.strength,
+        ),
       };
     case "brightness":
       return {
         id,
         kind: "brightness",
-        strength: effect.effect.value.strength || 1,
+        level: levelForVideoEffectValue(
+          "brightness",
+          effect.effect.value.strength,
+        ),
       };
     case undefined:
       return { id, kind: "sepia" };
@@ -78,7 +90,9 @@ function draftEffectToProto(effect: DraftEffect): MediaVideoEffect {
       return create(MediaVideoEffectSchema, {
         effect: {
           case: "blur",
-          value: create(BlurEffectSchema, { intensity: effect.intensity }),
+          value: create(BlurEffectSchema, {
+            intensity: valueForVideoEffectLevel("blur", effect.level),
+          }),
         },
       });
     case "sepia":
@@ -92,14 +106,18 @@ function draftEffectToProto(effect: DraftEffect): MediaVideoEffect {
       return create(MediaVideoEffectSchema, {
         effect: {
           case: "saturation",
-          value: create(SaturationEffectSchema, { strength: effect.strength }),
+          value: create(SaturationEffectSchema, {
+            strength: valueForVideoEffectLevel("saturation", effect.level),
+          }),
         },
       });
     case "brightness":
       return create(MediaVideoEffectSchema, {
         effect: {
           case: "brightness",
-          value: create(BrightnessEffectSchema, { strength: effect.strength }),
+          value: create(BrightnessEffectSchema, {
+            strength: valueForVideoEffectLevel("brightness", effect.level),
+          }),
         },
       });
   }
@@ -126,32 +144,17 @@ export function EffectsComposer({
     setDraftEffects(nextEffects);
   }, [open, sectionIndex]);
 
-  const addEffect = (kind: DraftEffect["kind"]) => {
+  const addEffect = (kind: VideoEffectKind) => {
     const id = nextId.current;
     nextId.current += 1;
 
-    switch (kind) {
-      case "blur":
-        setDraftEffects((effects) => [
-          ...effects,
-          { id, kind: "blur", intensity: 8 },
-        ]);
-        return;
-      case "sepia":
-        setDraftEffects((effects) => [...effects, { id, kind: "sepia" }]);
-        return;
-      case "saturation":
-        setDraftEffects((effects) => [
-          ...effects,
-          { id, kind: "saturation", strength: -1 },
-        ]);
-        return;
-      case "brightness":
-        setDraftEffects((effects) => [
-          ...effects,
-          { id, kind: "brightness", strength: 1.2 },
-        ]);
-        return;
+    if (isLeveledVideoEffectKind(kind)) {
+      setDraftEffects((effects) => [
+        ...effects,
+        { id, kind, level: defaultLevelForVideoEffect(kind) },
+      ]);
+    } else {
+      setDraftEffects((effects) => [...effects, { id, kind }]);
     }
   };
 
@@ -175,32 +178,12 @@ export function EffectsComposer({
     });
   };
 
-  const updateBlurIntensity = (index: number, value: number[]) => {
-    const intensity = value[0] ?? 8;
+  const updateEffectLevel = (index: number, value: number[]) => {
+    const level = value[0] ?? 1;
     setDraftEffects((effects) =>
       effects.map((effect, i) => {
-        if (i !== index || effect.kind !== "blur") return effect;
-        return { ...effect, intensity };
-      }),
-    );
-  };
-
-  const updateSaturationStrength = (index: number, value: number[]) => {
-    const strength = value[0] ?? 0;
-    setDraftEffects((effects) =>
-      effects.map((effect, i) => {
-        if (i !== index || effect.kind !== "saturation") return effect;
-        return { ...effect, strength };
-      }),
-    );
-  };
-
-  const updateBrightnessStrength = (index: number, value: number[]) => {
-    const strength = value[0] ?? 1;
-    setDraftEffects((effects) =>
-      effects.map((effect, i) => {
-        if (i !== index || effect.kind !== "brightness") return effect;
-        return { ...effect, strength };
+        if (i !== index || effect.kind === "sepia") return effect;
+        return { ...effect, level };
       }),
     );
   };
@@ -216,62 +199,33 @@ export function EffectsComposer({
   };
 
   const renderEffectControls = (effect: DraftEffect, index: number) => {
-    switch (effect.kind) {
-      case "blur":
+    const definition = getVideoEffectDefinition(effect.kind);
+
+    if (effect.kind === "sepia" || definition.kind === "sepia") {
+      const sepiaDefinition = getVideoEffectDefinition("sepia");
+      if (sepiaDefinition.kind === "sepia") {
         return (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-muted-foreground">
-              <span>Intensity</span>
-              <span className="tabular-nums">
-                {effect.intensity.toFixed(1)}
-              </span>
-            </div>
-            <Slider
-              min={1}
-              max={20}
-              step={0.5}
-              value={[effect.intensity]}
-              onValueChange={(value) => updateBlurIntensity(index, value)}
-            />
-          </div>
+          <p className="text-muted-foreground">{sepiaDefinition.description}</p>
         );
-      case "sepia":
-        return (
-          <p className="text-muted-foreground">Default warm vintage tone.</p>
-        );
-      case "saturation":
-        return (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-muted-foreground">
-              <span>Strength</span>
-              <span className="tabular-nums">{effect.strength.toFixed(2)}</span>
-            </div>
-            <Slider
-              min={-1}
-              max={1}
-              step={0.05}
-              value={[effect.strength]}
-              onValueChange={(value) => updateSaturationStrength(index, value)}
-            />
-          </div>
-        );
-      case "brightness":
-        return (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-muted-foreground">
-              <span>Strength</span>
-              <span className="tabular-nums">{effect.strength.toFixed(2)}</span>
-            </div>
-            <Slider
-              min={0}
-              max={2}
-              step={0.05}
-              value={[effect.strength]}
-              onValueChange={(value) => updateBrightnessStrength(index, value)}
-            />
-          </div>
-        );
+      }
+      return null;
     }
+
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-muted-foreground">
+          <span>{definition.controlLabel}</span>
+          <span className="tabular-nums">Level {effect.level}</span>
+        </div>
+        <Slider
+          min={1}
+          max={10}
+          step={1}
+          value={[effect.level]}
+          onValueChange={(value) => updateEffectLevel(index, value)}
+        />
+      </div>
+    );
   };
 
   return (
@@ -285,34 +239,16 @@ export function EffectsComposer({
         </DialogHeader>
 
         <div className="flex flex-wrap gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => addEffect("blur")}
-          >
-            Add blur
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => addEffect("sepia")}
-          >
-            Add sepia
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => addEffect("saturation")}
-          >
-            Add saturation
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => addEffect("brightness")}
-          >
-            Add brightness
-          </Button>
+          {VIDEO_EFFECT_KINDS.map((kind) => (
+            <Button
+              key={kind}
+              type="button"
+              variant="outline"
+              onClick={() => addEffect(kind)}
+            >
+              Add {effectLabel(kind).toLowerCase()}
+            </Button>
+          ))}
         </div>
 
         <div className="max-h-96 space-y-3 overflow-y-auto">
@@ -325,7 +261,9 @@ export function EffectsComposer({
               <div key={effect.id} className="space-y-3 border p-3">
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <div className="font-medium">{effectLabel(effect)}</div>
+                    <div className="font-medium">
+                      {effectLabel(effect.kind)}
+                    </div>
                     <div className="text-muted-foreground">
                       Layer {index + 1} of {draftEffects.length}
                     </div>

@@ -142,31 +142,29 @@ message StaleBranchError {
 
 // ======================== Supported Effects =========================== //
 
-// THese are based on FFMPeg filters
+// Video effects are defined in ffmpeg terms. The frontend may approximate
+// these with Pixi filters for live preview, but export is the source of truth.
 
-//////////////////
-//
-// brightness: -1.0 to 1.0, default 0
-// saturation:  0.0 to 3.0, default 1
-// blur:     0 to 1024, default 0.5
-//
-///////////////////
-
-// Blur will apply a blur to the video section at a growing intensity scale
+// Blur applies ffmpeg `gblur=sigma=<intensity>`.
+// ffmpeg range: 0.0 to 1024.0. ffmpeg default: 0.5.
 message BlurEffect {
     double intensity = 1;
 }
 
-// Sepia will apply a default sepria effect to the full video segment
-// As a simplification, this is a grayscale + warm brown color tint
+// Sepia applies ffmpeg
+// `colorchannelmixer=.393:.769:.189:0:.349:.686:.168:0:.272:.534:.131`.
 message SepiaEffect {}
 
+// Saturation applies ffmpeg `eq=saturation=<strength>`.
+// ffmpeg range: 0.0 to 3.0. 0.0 is grayscale, 1.0 is unchanged.
 message SaturationEffect {
-    double strength = 1; // 0 grayscale, 1 unchanged, >1  saturated
+    double strength = 1;
 }
 
+// Brightness applies ffmpeg `eq=brightness=<strength>`.
+// ffmpeg range: -1.0 to 1.0. 0.0 is unchanged.
 message BrightnessEffect {
-    double strength = 1; // >0 brighter than normal, <0 darker than normal
+    double strength = 1;
 }
 
 // ========================  Projects CRUD  ============================ //

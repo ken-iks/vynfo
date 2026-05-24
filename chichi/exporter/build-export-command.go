@@ -98,6 +98,14 @@ func (v *VideoExportBuilder) BuildExportCommand() (*exec.Cmd, error) {
 		"[video]",
 		"-map",
 		"["+audioLabel+"]",
+		"-c:v",
+		"libx264",
+		"-pix_fmt",
+		"yuv420p",
+		"-c:a",
+		"aac",
+		"-movflags",
+		"+faststart",
 		v.outputFp,
 	)
 

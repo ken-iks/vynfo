@@ -43,7 +43,10 @@ func (p *ProjectServiceServer) ExportProject(
 		return nil, connect.NewError(connect.CodeNotFound, err)
 	}
 	if project.WorkspaceID != workspaceID {
-		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("project not found in workspace"))
+		return nil, connect.NewError(
+			connect.CodeNotFound,
+			fmt.Errorf("project not found in workspace"),
+		)
 	}
 
 	commit, err := p.getCommitForExport(ctx, projectID, req.Msg.GetCommitId())
@@ -125,7 +128,10 @@ func (p *ProjectServiceServer) getCommitForExport(
 			return db.Commit{}, connect.NewError(connect.CodeNotFound, err)
 		}
 		if commit.ProjectID != projectID {
-			return db.Commit{}, connect.NewError(connect.CodeNotFound, fmt.Errorf("commit not found in project"))
+			return db.Commit{}, connect.NewError(
+				connect.CodeNotFound,
+				fmt.Errorf("commit not found in project"),
+			)
 		}
 		return commit, nil
 	}
@@ -139,7 +145,10 @@ func (p *ProjectServiceServer) getCommitForExport(
 		return db.Commit{}, connect.NewError(connect.CodeNotFound, err)
 	}
 	if !mainBranch.TipCommitID.Valid {
-		return db.Commit{}, connect.NewError(connect.CodeFailedPrecondition, fmt.Errorf("project has no commits to export"))
+		return db.Commit{}, connect.NewError(
+			connect.CodeFailedPrecondition,
+			fmt.Errorf("project has no commits to export"),
+		)
 	}
 	commit, err := p.queries.GetCommitByID(ctx, mainBranch.TipCommitID.UUID)
 	if err != nil {

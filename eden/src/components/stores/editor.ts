@@ -725,8 +725,7 @@ class EditorStore {
       const audioStart = section.audio.audioStartTimeMillies;
       if (audioStart >= sourceMs) continue;
 
-      const sourceEndMillis =
-        section.startTimeMillis + (sourceMs - audioStart);
+      const sourceEndMillis = section.startTimeMillis + (sourceMs - audioStart);
       let endTimeMillis =
         section.endTimeMillis < videoDuration
           ? section.endTimeMillis

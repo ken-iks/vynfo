@@ -10,11 +10,11 @@ import type {
   MediaVideoMetadata,
   ProjectMetadata,
 } from "@/gen/proto/v1/projects_pb";
-import { AudioPlayer, VideoPlayer } from "../upload/VideoPlayer";
-import { VideoCanvas } from "../upload/VideoCanvas";
+import { AudioPlayer, VideoPlayer } from "../project-editor/VideoPlayer";
+import { VideoCanvas } from "../project-editor/VideoCanvas";
 import { MediaOverlayCanvas } from "../upload/MediaOverlayCanvas";
 import { EmptyVideoPlayer } from "../upload/EmptyVideoPlayer";
-import { VideoPlayerPlaceholder } from "../upload/VideoPlayerPlaceholder";
+import { VideoPlayerPlaceholder } from "../project-editor/VideoPlayerPlaceholder";
 import { PlaybackControls } from "../upload/PlaybackControls";
 import { editorStore } from "../stores/editor";
 import { mediaAssetStore } from "../stores/mediaAssets";

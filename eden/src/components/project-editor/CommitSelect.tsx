@@ -92,7 +92,9 @@ export function CommitSelect({
       >
         <SelectTrigger className="w-full">
           <SelectValue
-            placeholder={isLoadingCommits ? "Loading commits..." : "Select a commit"}
+            placeholder={
+              isLoadingCommits ? "Loading commits..." : "Select a commit"
+            }
           />
         </SelectTrigger>
         <SelectContent>

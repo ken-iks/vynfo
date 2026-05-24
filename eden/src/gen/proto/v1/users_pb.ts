@@ -2,16 +2,28 @@
 // @generated from file proto/v1/users.proto (package v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type {
+  GenFile,
+  GenMessage,
+  GenService,
+} from "@bufbuild/protobuf/codegenv2";
+import {
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from "@bufbuild/protobuf/codegenv2";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file proto/v1/users.proto.
  */
-export const file_proto_v1_users: GenFile = /*@__PURE__*/
-  fileDesc("ChRwcm90by92MS91c2Vycy5wcm90bxICdjEiXwoEVXNlchIPCgd1c2VyX2lkGAEgASgJEg0KBWVtYWlsGAIgASgJEhQKDGRpc3BsYXlfbmFtZRgDIAEoCRIhChlzaWduZWRfZGlzcGxheV9waG90b19wYXRoGAQgASgJIg4KDEdldE1lUmVxdWVzdCJBCg1HZXRNZVJlc3BvbnNlEhYKBHVzZXIYASABKAsyCC52MS5Vc2VyEhgKEG5lZWRzX29uYm9hcmRpbmcYAiABKAgiSAoZQ29tcGxldGVPbmJvYXJkaW5nUmVxdWVzdBIUCgxkaXNwbGF5X25hbWUYASABKAkSFQoNZGlzcGxheV9waG90bxgCIAEoDCI0ChpDb21wbGV0ZU9uYm9hcmRpbmdSZXNwb25zZRIWCgR1c2VyGAEgASgLMggudjEuVXNlcjKRAQoMVXNlcnNTZXJ2aWNlEiwKBUdldE1lEhAudjEuR2V0TWVSZXF1ZXN0GhEudjEuR2V0TWVSZXNwb25zZRJTChJDb21wbGV0ZU9uYm9hcmRpbmcSHS52MS5Db21wbGV0ZU9uYm9hcmRpbmdSZXF1ZXN0Gh4udjEuQ29tcGxldGVPbmJvYXJkaW5nUmVzcG9uc2VCHlocdnluZm8uY29tL3Z5bmZvL2dlbi9wcm90by92MWIGcHJvdG8z", [file_google_protobuf_timestamp]);
+export const file_proto_v1_users: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    "ChRwcm90by92MS91c2Vycy5wcm90bxICdjEiXwoEVXNlchIPCgd1c2VyX2lkGAEgASgJEg0KBWVtYWlsGAIgASgJEhQKDGRpc3BsYXlfbmFtZRgDIAEoCRIhChlzaWduZWRfZGlzcGxheV9waG90b19wYXRoGAQgASgJIg4KDEdldE1lUmVxdWVzdCJBCg1HZXRNZVJlc3BvbnNlEhYKBHVzZXIYASABKAsyCC52MS5Vc2VyEhgKEG5lZWRzX29uYm9hcmRpbmcYAiABKAgiSAoZQ29tcGxldGVPbmJvYXJkaW5nUmVxdWVzdBIUCgxkaXNwbGF5X25hbWUYASABKAkSFQoNZGlzcGxheV9waG90bxgCIAEoDCI0ChpDb21wbGV0ZU9uYm9hcmRpbmdSZXNwb25zZRIWCgR1c2VyGAEgASgLMggudjEuVXNlcjKRAQoMVXNlcnNTZXJ2aWNlEiwKBUdldE1lEhAudjEuR2V0TWVSZXF1ZXN0GhEudjEuR2V0TWVSZXNwb25zZRJTChJDb21wbGV0ZU9uYm9hcmRpbmcSHS52MS5Db21wbGV0ZU9uYm9hcmRpbmdSZXF1ZXN0Gh4udjEuQ29tcGxldGVPbmJvYXJkaW5nUmVzcG9uc2VCHlocdnluZm8uY29tL3Z5bmZvL2dlbi9wcm90by92MWIGcHJvdG8z",
+    [file_google_protobuf_timestamp],
+  );
 
 /**
  * @generated from message v1.User
@@ -42,7 +54,8 @@ export type User = Message<"v1.User"> & {
  * Describes the message v1.User.
  * Use `create(UserSchema)` to create a new message.
  */
-export const UserSchema: GenMessage<User> = /*@__PURE__*/
+export const UserSchema: GenMessage<User> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_users, 0);
 
 /**
@@ -53,14 +66,14 @@ export const UserSchema: GenMessage<User> = /*@__PURE__*/
  *
  * @generated from message v1.GetMeRequest
  */
-export type GetMeRequest = Message<"v1.GetMeRequest"> & {
-};
+export type GetMeRequest = Message<"v1.GetMeRequest"> & {};
 
 /**
  * Describes the message v1.GetMeRequest.
  * Use `create(GetMeRequestSchema)` to create a new message.
  */
-export const GetMeRequestSchema: GenMessage<GetMeRequest> = /*@__PURE__*/
+export const GetMeRequestSchema: GenMessage<GetMeRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_users, 1);
 
 /**
@@ -82,50 +95,55 @@ export type GetMeResponse = Message<"v1.GetMeResponse"> & {
  * Describes the message v1.GetMeResponse.
  * Use `create(GetMeResponseSchema)` to create a new message.
  */
-export const GetMeResponseSchema: GenMessage<GetMeResponse> = /*@__PURE__*/
+export const GetMeResponseSchema: GenMessage<GetMeResponse> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_users, 2);
 
 /**
- * CompleteOnboarding signs up a user with display name and 
+ * CompleteOnboarding signs up a user with display name and
  * display photo and is the blocker on the user being able to
  * use the application
  *
  * @generated from message v1.CompleteOnboardingRequest
  */
-export type CompleteOnboardingRequest = Message<"v1.CompleteOnboardingRequest"> & {
-  /**
-   * @generated from field: string display_name = 1;
-   */
-  displayName: string;
+export type CompleteOnboardingRequest =
+  Message<"v1.CompleteOnboardingRequest"> & {
+    /**
+     * @generated from field: string display_name = 1;
+     */
+    displayName: string;
 
-  /**
-   * @generated from field: bytes display_photo = 2;
-   */
-  displayPhoto: Uint8Array;
-};
+    /**
+     * @generated from field: bytes display_photo = 2;
+     */
+    displayPhoto: Uint8Array;
+  };
 
 /**
  * Describes the message v1.CompleteOnboardingRequest.
  * Use `create(CompleteOnboardingRequestSchema)` to create a new message.
  */
-export const CompleteOnboardingRequestSchema: GenMessage<CompleteOnboardingRequest> = /*@__PURE__*/
+export const CompleteOnboardingRequestSchema: GenMessage<CompleteOnboardingRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_users, 3);
 
 /**
  * @generated from message v1.CompleteOnboardingResponse
  */
-export type CompleteOnboardingResponse = Message<"v1.CompleteOnboardingResponse"> & {
-  /**
-   * @generated from field: v1.User user = 1;
-   */
-  user?: User;
-};
+export type CompleteOnboardingResponse =
+  Message<"v1.CompleteOnboardingResponse"> & {
+    /**
+     * @generated from field: v1.User user = 1;
+     */
+    user?: User;
+  };
 
 /**
  * Describes the message v1.CompleteOnboardingResponse.
  * Use `create(CompleteOnboardingResponseSchema)` to create a new message.
  */
-export const CompleteOnboardingResponseSchema: GenMessage<CompleteOnboardingResponse> = /*@__PURE__*/
+export const CompleteOnboardingResponseSchema: GenMessage<CompleteOnboardingResponse> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_users, 4);
 
 /**
@@ -139,7 +157,7 @@ export const UsersService: GenService<{
     methodKind: "unary";
     input: typeof GetMeRequestSchema;
     output: typeof GetMeResponseSchema;
-  },
+  };
   /**
    * @generated from rpc v1.UsersService.CompleteOnboarding
    */
@@ -147,7 +165,5 @@ export const UsersService: GenService<{
     methodKind: "unary";
     input: typeof CompleteOnboardingRequestSchema;
     output: typeof CompleteOnboardingResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_proto_v1_users, 0);
-
+  };
+}> = /*@__PURE__*/ serviceDesc(file_proto_v1_users, 0);
