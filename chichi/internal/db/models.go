@@ -140,6 +140,7 @@ type User struct {
 type Video struct {
 	AssetID  uuid.UUID
 	Duration float64
+	HasAudio bool
 }
 
 type Workspace struct {

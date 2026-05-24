@@ -13,6 +13,7 @@ import (
 func PrepareExporter(
 	state *v1.PlaybackState,
 	client *storage.Client,
+	outputFp string,
 ) (*exporter.VideoExportBuilder, error) {
 	builder := exporter.Init()
 
@@ -31,6 +32,7 @@ func PrepareExporter(
 			}
 			urls = append(urls, url)
 			assetLookupIdx[id] = len(urls) - 1
+			seen[id] = true
 		}
 	}
 	for _, audio := range state.AudioSections {
@@ -42,10 +44,13 @@ func PrepareExporter(
 			}
 			urls = append(urls, url)
 			assetLookupIdx[id] = len(urls) - 1
+			seen[id] = true
 		}
 	}
 
-	builder.SetInputs(urls, assetLookupIdx)
+	if err := builder.SetInputs(urls, assetLookupIdx); err != nil {
+		return nil, err
+	}
 
 	// step 2: add video cuts
 	for _, video := range state.VideoSections {
@@ -53,11 +58,13 @@ func PrepareExporter(
 		if err != nil {
 			return nil, err
 		}
+		startTimeInVideoMillis := video.Video.VideoStartTimeMillies
+		endTimeInVideoMillis := startTimeInVideoMillis + (video.EndTimeMillis - video.StartTimeMillis)
 		err = builder.AppendVideoCut(
 			video.Video.Meta.AssetId,
-			float64(video.StartTimeMillis)/1000,
-			float64(video.EndTimeMillis)/1000,
-			true,
+			float64(startTimeInVideoMillis)/1000,
+			float64(endTimeInVideoMillis)/1000,
+			video.Video.Meta.HasAudio,
 			effects,
 		)
 		if err != nil {
@@ -81,7 +88,7 @@ func PrepareExporter(
 	}
 
 	// step 4: give builder a filepath
-	builder.SetOutputPath("new_video.mp4")
+	builder.SetOutputPath(outputFp)
 
 	// step 5: return the ready exporter
 	return builder.AssertReady()

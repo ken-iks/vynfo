@@ -40,6 +40,9 @@ const (
 	// ProjectServiceGetCommitProcedure is the fully-qualified name of the ProjectService's GetCommit
 	// RPC.
 	ProjectServiceGetCommitProcedure = "/v1.ProjectService/GetCommit"
+	// ProjectServiceListCommitsProcedure is the fully-qualified name of the ProjectService's
+	// ListCommits RPC.
+	ProjectServiceListCommitsProcedure = "/v1.ProjectService/ListCommits"
 	// ProjectServiceListProjectsProcedure is the fully-qualified name of the ProjectService's
 	// ListProjects RPC.
 	ProjectServiceListProjectsProcedure = "/v1.ProjectService/ListProjects"
@@ -75,6 +78,7 @@ const (
 type ProjectServiceClient interface {
 	CommitEdit(context.Context, *connect.Request[v1.CommitEditRequest]) (*connect.Response[v1.CommitEditResponse], error)
 	GetCommit(context.Context, *connect.Request[v1.GetCommitRequest]) (*connect.Response[v1.GetCommitResponse], error)
+	ListCommits(context.Context, *connect.Request[v1.ListCommitsRequest]) (*connect.Response[v1.ListCommitsResponse], error)
 	ListProjects(context.Context, *connect.Request[v1.ListProjectsRequest]) (*connect.Response[v1.ListProjectsResponse], error)
 	ListProjectAssets(context.Context, *connect.Request[v1.ListProjectAssetsRequest]) (*connect.Response[v1.ListProjectAssetsResponse], error)
 	AddProjectAsset(context.Context, *connect.Request[v1.AddProjectAssetRequest]) (*connect.Response[emptypb.Empty], error)
@@ -108,6 +112,12 @@ func NewProjectServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			httpClient,
 			baseURL+ProjectServiceGetCommitProcedure,
 			connect.WithSchema(projectServiceMethods.ByName("GetCommit")),
+			connect.WithClientOptions(opts...),
+		),
+		listCommits: connect.NewClient[v1.ListCommitsRequest, v1.ListCommitsResponse](
+			httpClient,
+			baseURL+ProjectServiceListCommitsProcedure,
+			connect.WithSchema(projectServiceMethods.ByName("ListCommits")),
 			connect.WithClientOptions(opts...),
 		),
 		listProjects: connect.NewClient[v1.ListProjectsRequest, v1.ListProjectsResponse](
@@ -177,6 +187,7 @@ func NewProjectServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 type projectServiceClient struct {
 	commitEdit          *connect.Client[v1.CommitEditRequest, v1.CommitEditResponse]
 	getCommit           *connect.Client[v1.GetCommitRequest, v1.GetCommitResponse]
+	listCommits         *connect.Client[v1.ListCommitsRequest, v1.ListCommitsResponse]
 	listProjects        *connect.Client[v1.ListProjectsRequest, v1.ListProjectsResponse]
 	listProjectAssets   *connect.Client[v1.ListProjectAssetsRequest, v1.ListProjectAssetsResponse]
 	addProjectAsset     *connect.Client[v1.AddProjectAssetRequest, emptypb.Empty]
@@ -197,6 +208,11 @@ func (c *projectServiceClient) CommitEdit(ctx context.Context, req *connect.Requ
 // GetCommit calls v1.ProjectService.GetCommit.
 func (c *projectServiceClient) GetCommit(ctx context.Context, req *connect.Request[v1.GetCommitRequest]) (*connect.Response[v1.GetCommitResponse], error) {
 	return c.getCommit.CallUnary(ctx, req)
+}
+
+// ListCommits calls v1.ProjectService.ListCommits.
+func (c *projectServiceClient) ListCommits(ctx context.Context, req *connect.Request[v1.ListCommitsRequest]) (*connect.Response[v1.ListCommitsResponse], error) {
+	return c.listCommits.CallUnary(ctx, req)
 }
 
 // ListProjects calls v1.ProjectService.ListProjects.
@@ -253,6 +269,7 @@ func (c *projectServiceClient) AutoSave(ctx context.Context, req *connect.Reques
 type ProjectServiceHandler interface {
 	CommitEdit(context.Context, *connect.Request[v1.CommitEditRequest]) (*connect.Response[v1.CommitEditResponse], error)
 	GetCommit(context.Context, *connect.Request[v1.GetCommitRequest]) (*connect.Response[v1.GetCommitResponse], error)
+	ListCommits(context.Context, *connect.Request[v1.ListCommitsRequest]) (*connect.Response[v1.ListCommitsResponse], error)
 	ListProjects(context.Context, *connect.Request[v1.ListProjectsRequest]) (*connect.Response[v1.ListProjectsResponse], error)
 	ListProjectAssets(context.Context, *connect.Request[v1.ListProjectAssetsRequest]) (*connect.Response[v1.ListProjectAssetsResponse], error)
 	AddProjectAsset(context.Context, *connect.Request[v1.AddProjectAssetRequest]) (*connect.Response[emptypb.Empty], error)
@@ -282,6 +299,12 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 		ProjectServiceGetCommitProcedure,
 		svc.GetCommit,
 		connect.WithSchema(projectServiceMethods.ByName("GetCommit")),
+		connect.WithHandlerOptions(opts...),
+	)
+	projectServiceListCommitsHandler := connect.NewUnaryHandler(
+		ProjectServiceListCommitsProcedure,
+		svc.ListCommits,
+		connect.WithSchema(projectServiceMethods.ByName("ListCommits")),
 		connect.WithHandlerOptions(opts...),
 	)
 	projectServiceListProjectsHandler := connect.NewUnaryHandler(
@@ -350,6 +373,8 @@ func NewProjectServiceHandler(svc ProjectServiceHandler, opts ...connect.Handler
 			projectServiceCommitEditHandler.ServeHTTP(w, r)
 		case ProjectServiceGetCommitProcedure:
 			projectServiceGetCommitHandler.ServeHTTP(w, r)
+		case ProjectServiceListCommitsProcedure:
+			projectServiceListCommitsHandler.ServeHTTP(w, r)
 		case ProjectServiceListProjectsProcedure:
 			projectServiceListProjectsHandler.ServeHTTP(w, r)
 		case ProjectServiceListProjectAssetsProcedure:
@@ -385,6 +410,10 @@ func (UnimplementedProjectServiceHandler) CommitEdit(context.Context, *connect.R
 
 func (UnimplementedProjectServiceHandler) GetCommit(context.Context, *connect.Request[v1.GetCommitRequest]) (*connect.Response[v1.GetCommitResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.GetCommit is not implemented"))
+}
+
+func (UnimplementedProjectServiceHandler) ListCommits(context.Context, *connect.Request[v1.ListCommitsRequest]) (*connect.Response[v1.ListCommitsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ProjectService.ListCommits is not implemented"))
 }
 
 func (UnimplementedProjectServiceHandler) ListProjects(context.Context, *connect.Request[v1.ListProjectsRequest]) (*connect.Response[v1.ListProjectsResponse], error) {

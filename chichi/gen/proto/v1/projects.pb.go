@@ -1603,6 +1603,7 @@ type MediaVideoMetadata struct {
 	AssetId       string                 `protobuf:"bytes,1,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	Duration      float64                `protobuf:"fixed64,3,opt,name=duration,proto3" json:"duration,omitempty"`
+	HasAudio      bool                   `protobuf:"varint,4,opt,name=has_audio,json=hasAudio,proto3" json:"has_audio,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1656,6 +1657,13 @@ func (x *MediaVideoMetadata) GetDuration() float64 {
 		return x.Duration
 	}
 	return 0
+}
+
+func (x *MediaVideoMetadata) GetHasAudio() bool {
+	if x != nil {
+		return x.HasAudio
+	}
+	return false
 }
 
 type MediaAudioMetadata struct {
@@ -2428,6 +2436,178 @@ func (x *GetCommitResponse) GetCommitState() *PlaybackState {
 	return nil
 }
 
+type ListCommitsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId     string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	BranchId      string                 `protobuf:"bytes,2,opt,name=branch_id,json=branchId,proto3" json:"branch_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCommitsRequest) Reset() {
+	*x = ListCommitsRequest{}
+	mi := &file_proto_v1_projects_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCommitsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCommitsRequest) ProtoMessage() {}
+
+func (x *ListCommitsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_projects_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCommitsRequest.ProtoReflect.Descriptor instead.
+func (*ListCommitsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *ListCommitsRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *ListCommitsRequest) GetBranchId() string {
+	if x != nil {
+		return x.BranchId
+	}
+	return ""
+}
+
+type CommitMetadata struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ProjectId     string                 `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Message       string                 `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommitMetadata) Reset() {
+	*x = CommitMetadata{}
+	mi := &file_proto_v1_projects_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommitMetadata) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommitMetadata) ProtoMessage() {}
+
+func (x *CommitMetadata) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_projects_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommitMetadata.ProtoReflect.Descriptor instead.
+func (*CommitMetadata) Descriptor() ([]byte, []int) {
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *CommitMetadata) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *CommitMetadata) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *CommitMetadata) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CommitMetadata) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *CommitMetadata) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+type ListCommitsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Commits       []*CommitMetadata      `protobuf:"bytes,1,rep,name=commits,proto3" json:"commits,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCommitsResponse) Reset() {
+	*x = ListCommitsResponse{}
+	mi := &file_proto_v1_projects_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCommitsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCommitsResponse) ProtoMessage() {}
+
+func (x *ListCommitsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_projects_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCommitsResponse.ProtoReflect.Descriptor instead.
+func (*ListCommitsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_v1_projects_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *ListCommitsResponse) GetCommits() []*CommitMetadata {
+	if x != nil {
+		return x.Commits
+	}
+	return nil
+}
+
 var File_proto_v1_projects_proto protoreflect.FileDescriptor
 
 const file_proto_v1_projects_proto_rawDesc = "" +
@@ -2534,11 +2714,12 @@ const file_proto_v1_projects_proto_rawDesc = "" +
 	"\x16AddProjectAssetRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x19\n" +
-	"\basset_id\x18\x02 \x01(\tR\aassetId\"a\n" +
+	"\basset_id\x18\x02 \x01(\tR\aassetId\"~\n" +
 	"\x12MediaVideoMetadata\x12\x19\n" +
 	"\basset_id\x18\x01 \x01(\tR\aassetId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1a\n" +
-	"\bduration\x18\x03 \x01(\x01R\bduration\"a\n" +
+	"\bduration\x18\x03 \x01(\x01R\bduration\x12\x1b\n" +
+	"\thas_audio\x18\x04 \x01(\bR\bhasAudio\"a\n" +
 	"\x12MediaAudioMetadata\x12\x19\n" +
 	"\basset_id\x18\x01 \x01(\tR\aassetId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1a\n" +
@@ -2593,16 +2774,31 @@ const file_proto_v1_projects_proto_rawDesc = "" +
 	"\n" +
 	"project_id\x18\x02 \x01(\tR\tprojectId\x12\x18\n" +
 	"\amessage\x18\x03 \x01(\tR\amessage\x124\n" +
-	"\fcommit_state\x18\x04 \x01(\v2\x11.v1.PlaybackStateR\vcommitState*\x86\x01\n" +
+	"\fcommit_state\x18\x04 \x01(\v2\x11.v1.PlaybackStateR\vcommitState\"P\n" +
+	"\x12ListCommitsRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1b\n" +
+	"\tbranch_id\x18\x02 \x01(\tR\bbranchId\"\xad\x01\n" +
+	"\x0eCommitMetadata\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x02 \x01(\tR\tprojectId\x12\x17\n" +
+	"\auser_id\x18\x03 \x01(\tR\x06userId\x12\x18\n" +
+	"\amessage\x18\x04 \x01(\tR\amessage\x129\n" +
+	"\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"C\n" +
+	"\x13ListCommitsResponse\x12,\n" +
+	"\acommits\x18\x01 \x03(\v2\x12.v1.CommitMetadataR\acommits*\x86\x01\n" +
 	"\x0eMediaTextColor\x12 \n" +
 	"\x1cMEDIA_TEXT_COLOR_UNSPECIFIED\x10\x00\x12\x1a\n" +
 	"\x16MEDIA_TEXT_COLOR_BLACK\x10\x01\x12\x1a\n" +
 	"\x16MEDIA_TEXT_COLOR_WHITE\x10\x02\x12\x1a\n" +
-	"\x16MEDIA_TEXT_COLOR_CLEAR\x10\x032\xd5\x06\n" +
+	"\x16MEDIA_TEXT_COLOR_CLEAR\x10\x032\x95\a\n" +
 	"\x0eProjectService\x12;\n" +
 	"\n" +
 	"CommitEdit\x12\x15.v1.CommitEditRequest\x1a\x16.v1.CommitEditResponse\x128\n" +
-	"\tGetCommit\x12\x14.v1.GetCommitRequest\x1a\x15.v1.GetCommitResponse\x12A\n" +
+	"\tGetCommit\x12\x14.v1.GetCommitRequest\x1a\x15.v1.GetCommitResponse\x12>\n" +
+	"\vListCommits\x12\x16.v1.ListCommitsRequest\x1a\x17.v1.ListCommitsResponse\x12A\n" +
 	"\fListProjects\x12\x17.v1.ListProjectsRequest\x1a\x18.v1.ListProjectsResponse\x12P\n" +
 	"\x11ListProjectAssets\x12\x1c.v1.ListProjectAssetsRequest\x1a\x1d.v1.ListProjectAssetsResponse\x12E\n" +
 	"\x0fAddProjectAsset\x12\x1a.v1.AddProjectAssetRequest\x1a\x16.google.protobuf.Empty\x12K\n" +
@@ -2627,7 +2823,7 @@ func file_proto_v1_projects_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_v1_projects_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_v1_projects_proto_msgTypes = make([]protoimpl.MessageInfo, 40)
+var file_proto_v1_projects_proto_msgTypes = make([]protoimpl.MessageInfo, 43)
 var file_proto_v1_projects_proto_goTypes = []any{
 	(MediaTextColor)(0),                 // 0: v1.MediaTextColor
 	(*MediaImageOverlay)(nil),           // 1: v1.MediaImageOverlay
@@ -2670,9 +2866,12 @@ var file_proto_v1_projects_proto_goTypes = []any{
 	(*ExportProjectResponse)(nil),       // 38: v1.ExportProjectResponse
 	(*GetCommitRequest)(nil),            // 39: v1.GetCommitRequest
 	(*GetCommitResponse)(nil),           // 40: v1.GetCommitResponse
-	(*timestamppb.Timestamp)(nil),       // 41: google.protobuf.Timestamp
-	(*User)(nil),                        // 42: v1.User
-	(*emptypb.Empty)(nil),               // 43: google.protobuf.Empty
+	(*ListCommitsRequest)(nil),          // 41: v1.ListCommitsRequest
+	(*CommitMetadata)(nil),              // 42: v1.CommitMetadata
+	(*ListCommitsResponse)(nil),         // 43: v1.ListCommitsResponse
+	(*timestamppb.Timestamp)(nil),       // 44: google.protobuf.Timestamp
+	(*User)(nil),                        // 45: v1.User
+	(*emptypb.Empty)(nil),               // 46: google.protobuf.Empty
 }
 var file_proto_v1_projects_proto_depIdxs = []int32{
 	3,  // 0: v1.MediaImageOverlay.pos:type_name -> v1.MediaPosition
@@ -2696,43 +2895,47 @@ var file_proto_v1_projects_proto_depIdxs = []int32{
 	14, // 18: v1.CommitEditResponse.err:type_name -> v1.CommitEditError
 	10, // 19: v1.AutoSaveRequest.auto_save_state:type_name -> v1.PlaybackState
 	15, // 20: v1.CommitEditError.stale_branch:type_name -> v1.StaleBranchError
-	41, // 21: v1.ProjectMetadata.created_at:type_name -> google.protobuf.Timestamp
-	42, // 22: v1.ProjectMetadata.created_by:type_name -> v1.User
+	44, // 21: v1.ProjectMetadata.created_at:type_name -> google.protobuf.Timestamp
+	45, // 22: v1.ProjectMetadata.created_by:type_name -> v1.User
 	20, // 23: v1.ListProjectsResponse.projects:type_name -> v1.ProjectMetadata
 	26, // 24: v1.ListProjectAssetsResponse.videos:type_name -> v1.MediaVideoMetadata
 	28, // 25: v1.ListProjectAssetsResponse.images:type_name -> v1.MediaImageMetadata
 	27, // 26: v1.ListProjectAssetsResponse.audios:type_name -> v1.MediaAudioMetadata
 	31, // 27: v1.ListProjectBranchesResponse.branches:type_name -> v1.BranchMetadata
 	10, // 28: v1.GetCommitResponse.commit_state:type_name -> v1.PlaybackState
-	11, // 29: v1.ProjectService.CommitEdit:input_type -> v1.CommitEditRequest
-	39, // 30: v1.ProjectService.GetCommit:input_type -> v1.GetCommitRequest
-	21, // 31: v1.ProjectService.ListProjects:input_type -> v1.ListProjectsRequest
-	23, // 32: v1.ProjectService.ListProjectAssets:input_type -> v1.ListProjectAssetsRequest
-	25, // 33: v1.ProjectService.AddProjectAsset:input_type -> v1.AddProjectAssetRequest
-	24, // 34: v1.ProjectService.RemoveProjectAsset:input_type -> v1.RemoveProjectAssetRequest
-	30, // 35: v1.ProjectService.ListProjectBranches:input_type -> v1.ListProjectBranchesRequest
-	33, // 36: v1.ProjectService.CreateProject:input_type -> v1.CreateProjectRequest
-	35, // 37: v1.ProjectService.AddProjectUser:input_type -> v1.AddProjectUserRequest
-	36, // 38: v1.ProjectService.DeleteProject:input_type -> v1.DeleteProjectRequest
-	37, // 39: v1.ProjectService.ExportProject:input_type -> v1.ExportProjectRequest
-	13, // 40: v1.ProjectService.AutoSave:input_type -> v1.AutoSaveRequest
-	12, // 41: v1.ProjectService.CommitEdit:output_type -> v1.CommitEditResponse
-	40, // 42: v1.ProjectService.GetCommit:output_type -> v1.GetCommitResponse
-	22, // 43: v1.ProjectService.ListProjects:output_type -> v1.ListProjectsResponse
-	29, // 44: v1.ProjectService.ListProjectAssets:output_type -> v1.ListProjectAssetsResponse
-	43, // 45: v1.ProjectService.AddProjectAsset:output_type -> google.protobuf.Empty
-	43, // 46: v1.ProjectService.RemoveProjectAsset:output_type -> google.protobuf.Empty
-	32, // 47: v1.ProjectService.ListProjectBranches:output_type -> v1.ListProjectBranchesResponse
-	34, // 48: v1.ProjectService.CreateProject:output_type -> v1.CreateProjectResponse
-	43, // 49: v1.ProjectService.AddProjectUser:output_type -> google.protobuf.Empty
-	43, // 50: v1.ProjectService.DeleteProject:output_type -> google.protobuf.Empty
-	38, // 51: v1.ProjectService.ExportProject:output_type -> v1.ExportProjectResponse
-	43, // 52: v1.ProjectService.AutoSave:output_type -> google.protobuf.Empty
-	41, // [41:53] is the sub-list for method output_type
-	29, // [29:41] is the sub-list for method input_type
-	29, // [29:29] is the sub-list for extension type_name
-	29, // [29:29] is the sub-list for extension extendee
-	0,  // [0:29] is the sub-list for field type_name
+	44, // 29: v1.CommitMetadata.created_at:type_name -> google.protobuf.Timestamp
+	42, // 30: v1.ListCommitsResponse.commits:type_name -> v1.CommitMetadata
+	11, // 31: v1.ProjectService.CommitEdit:input_type -> v1.CommitEditRequest
+	39, // 32: v1.ProjectService.GetCommit:input_type -> v1.GetCommitRequest
+	41, // 33: v1.ProjectService.ListCommits:input_type -> v1.ListCommitsRequest
+	21, // 34: v1.ProjectService.ListProjects:input_type -> v1.ListProjectsRequest
+	23, // 35: v1.ProjectService.ListProjectAssets:input_type -> v1.ListProjectAssetsRequest
+	25, // 36: v1.ProjectService.AddProjectAsset:input_type -> v1.AddProjectAssetRequest
+	24, // 37: v1.ProjectService.RemoveProjectAsset:input_type -> v1.RemoveProjectAssetRequest
+	30, // 38: v1.ProjectService.ListProjectBranches:input_type -> v1.ListProjectBranchesRequest
+	33, // 39: v1.ProjectService.CreateProject:input_type -> v1.CreateProjectRequest
+	35, // 40: v1.ProjectService.AddProjectUser:input_type -> v1.AddProjectUserRequest
+	36, // 41: v1.ProjectService.DeleteProject:input_type -> v1.DeleteProjectRequest
+	37, // 42: v1.ProjectService.ExportProject:input_type -> v1.ExportProjectRequest
+	13, // 43: v1.ProjectService.AutoSave:input_type -> v1.AutoSaveRequest
+	12, // 44: v1.ProjectService.CommitEdit:output_type -> v1.CommitEditResponse
+	40, // 45: v1.ProjectService.GetCommit:output_type -> v1.GetCommitResponse
+	43, // 46: v1.ProjectService.ListCommits:output_type -> v1.ListCommitsResponse
+	22, // 47: v1.ProjectService.ListProjects:output_type -> v1.ListProjectsResponse
+	29, // 48: v1.ProjectService.ListProjectAssets:output_type -> v1.ListProjectAssetsResponse
+	46, // 49: v1.ProjectService.AddProjectAsset:output_type -> google.protobuf.Empty
+	46, // 50: v1.ProjectService.RemoveProjectAsset:output_type -> google.protobuf.Empty
+	32, // 51: v1.ProjectService.ListProjectBranches:output_type -> v1.ListProjectBranchesResponse
+	34, // 52: v1.ProjectService.CreateProject:output_type -> v1.CreateProjectResponse
+	46, // 53: v1.ProjectService.AddProjectUser:output_type -> google.protobuf.Empty
+	46, // 54: v1.ProjectService.DeleteProject:output_type -> google.protobuf.Empty
+	38, // 55: v1.ProjectService.ExportProject:output_type -> v1.ExportProjectResponse
+	46, // 56: v1.ProjectService.AutoSave:output_type -> google.protobuf.Empty
+	44, // [44:57] is the sub-list for method output_type
+	31, // [31:44] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_proto_v1_projects_proto_init() }
@@ -2767,7 +2970,7 @@ func file_proto_v1_projects_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_v1_projects_proto_rawDesc), len(file_proto_v1_projects_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   40,
+			NumMessages:   43,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

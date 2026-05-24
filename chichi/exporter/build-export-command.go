@@ -35,17 +35,21 @@ func (v *VideoExportBuilder) BuildExportCommand() (*exec.Cmd, error) {
 
 		// Make the equivalent audio cut for the same video stream.
 		// When audio is excluded, keep the stream shape but mute it before concat.
-		volume := "1"
 		if !cut.includeAudio {
-			volume = "0"
+			fmt.Fprintf(
+				&filterGraph,
+				"anullsrc=channel_layout=stereo:sample_rate=48000,atrim=duration=%s,asetpts=PTS-STARTPTS[a%d];",
+				formatFloat(cut.endTimeSeconds-cut.startTimeSeconds),
+				cutIdx,
+			)
+			continue
 		}
 		fmt.Fprintf(
 			&filterGraph,
-			"[%d:a]atrim=start=%s:end=%s,asetpts=PTS-STARTPTS,volume=%s[a%d];",
+			"[%d:a]atrim=start=%s:end=%s,asetpts=PTS-STARTPTS,volume=1[a%d];",
 			cut.inputIndex,
 			formatFloat(cut.startTimeSeconds),
 			formatFloat(cut.endTimeSeconds),
-			volume,
 			cutIdx,
 		)
 	}

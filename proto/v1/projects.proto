@@ -214,6 +214,7 @@ message MediaVideoMetadata {
     string asset_id = 1;
     string title = 2;
     double duration = 3;
+    bool has_audio = 4;
 }
 
 message MediaAudioMetadata {
@@ -304,10 +305,28 @@ message GetCommitResponse {
     PlaybackState commit_state = 4;
 }
 
+message ListCommitsRequest {
+    string project_id = 1;
+    string branch_id = 2;
+}
+
+message CommitMetadata {
+    string id = 1;
+    string project_id = 2;
+    string user_id = 3;
+    string message = 4;
+    google.protobuf.Timestamp created_at = 5;
+}
+
+message ListCommitsResponse {
+    repeated CommitMetadata commits = 1;
+}
+
 // ====================== Service Definition ============================== //
 service ProjectService {
     rpc CommitEdit(CommitEditRequest) returns (CommitEditResponse);
     rpc GetCommit(GetCommitRequest) returns (GetCommitResponse);
+    rpc ListCommits(ListCommitsRequest) returns (ListCommitsResponse);
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
     rpc ListProjectAssets(ListProjectAssetsRequest) returns (ListProjectAssetsResponse);
     rpc AddProjectAsset(AddProjectAssetRequest) returns (google.protobuf.Empty);

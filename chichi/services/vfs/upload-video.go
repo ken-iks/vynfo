@@ -65,6 +65,11 @@ func (f *FileServiceServer) UploadVideo(
 		slog.Error("could not dertermine video length", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
+	hasAudio, err := vid.ProbeHasAudio(tmpFile.Name())
+	if err != nil {
+		slog.Error("could not determine whether video has audio", "error", err)
+		return connect.NewError(connect.CodeInternal, err)
+	}
 	totalSegments := int(math.Ceil(videoDuration / float64(uploadSegmentLength)))
 	if totalSegments < 1 {
 		totalSegments = 1
@@ -83,6 +88,7 @@ func (f *FileServiceServer) UploadVideo(
 	video, err := f.queries.CreateVideo(ctx, db.CreateVideoParams{
 		AssetID:  asset.ID,
 		Duration: videoDuration,
+		HasAudio: hasAudio,
 	})
 	if err != nil {
 		slog.Error("error creating video", "error", err)

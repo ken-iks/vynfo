@@ -20,6 +20,7 @@ import { editorStore } from "../stores/editor";
 import { mediaAssetStore } from "../stores/mediaAssets";
 import { EditorTimeline } from "../project-editor/EditorTimeline";
 import { CommitDialog } from "../project-editor/CommitDialog";
+import { ExportDialogue } from "../project-editor/ExportDialogue";
 import { SectionTitle } from "../shared/SectionTitle";
 import {
   Select,
@@ -295,6 +296,11 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
               editorSnap.audioSections.length === 0
             }
             onCommitSuccess={handleCommitSuccess}
+          />
+          <ExportDialogue
+            projectId={project.id}
+            branchId={selectedBranchMetadata?.id}
+            branchName={selectedBranch}
           />
         </div>
       </div>

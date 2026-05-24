@@ -39,6 +39,7 @@ func GetAssetMetadata(
 				AssetId:  vid.AssetID.String(),
 				Title:    a.DisplayName,
 				Duration: vid.Duration,
+				HasAudio: vid.HasAudio,
 			})
 		case "photo":
 			img, err := queries.GetImageById(ctx, a.ID)
