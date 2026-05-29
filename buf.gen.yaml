@@ -9,7 +9,38 @@ plugins:
   - local: protoc-gen-connect-go
     out: chichi/gen
     opt: paths=source_relative
-  # 3. TypeScript Protobuf (Classes/Interfaces)
+    exclude_types:
+      - v1.internal.agent_runtime
+      - v1.internal.agent_backend
+  # 3. Go gRPC (Internal Agent Server/Client logic)
+  - local: protoc-gen-go-grpc
+    out: chichi/gen
+    opt: paths=source_relative
+    types:
+      - v1.internal.agent_runtime
+      - v1.internal.agent_backend
+  # 4. TypeScript Protobuf (Classes/Interfaces)
   - local: ./eden/node_modules/.bin/protoc-gen-es
     out: eden/src/gen
     opt: target=ts
+    exclude_types:
+      - v1.internal.agent_runtime
+      - v1.internal.agent_backend
+  # 5. Python Protobuf (Classes/Interfaces)
+  - remote: buf.build/protocolbuffers/python
+    out: mensah
+    types:
+      - v1.internal.agent_runtime
+      - v1.internal.agent_backend
+  # 6. Python Protobuf type stubs
+  - remote: buf.build/protocolbuffers/pyi
+    out: mensah
+    types:
+      - v1.internal.agent_runtime
+      - v1.internal.agent_backend
+  # 7. Python gRPC (Internal Agent Server/Client logic)
+  - remote: buf.build/grpc/python
+    out: mensah
+    types:
+      - v1.internal.agent_runtime
+      - v1.internal.agent_backend

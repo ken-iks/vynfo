@@ -14,7 +14,7 @@ func SignManifest(bucket *storage.BucketHandle, manifest string, expiry time.Tim
 	for i, line := range strings.Split(manifest, "\n") {
 		trimmed := strings.TrimSpace(line)
 		if trimmed == "" || strings.HasPrefix(trimmed, "#") {
-			result.WriteString(line + "\n")
+			result.WriteString(fmt.Sprintf("%s\n", line))
 			continue
 		}
 		url, err := bucket.SignedURL(trimmed, &storage.SignedURLOptions{
@@ -26,7 +26,7 @@ func SignManifest(bucket *storage.BucketHandle, manifest string, expiry time.Tim
 			return "", fmt.Errorf("signing %s: %w", trimmed, err)
 		}
 		slog.Debug("signManifest signed segment", "lineIdx", i, "object", trimmed)
-		result.WriteString(url + "\n")
+		result.WriteString(fmt.Sprintf("%s\n", url))
 	}
 	return result.String(), nil
 }

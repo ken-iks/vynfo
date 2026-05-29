@@ -2,21 +2,10 @@
 // @generated from file proto/v1/spaces.proto (package v1, syntax proto3)
 /* eslint-disable */
 
-import type {
-  GenFile,
-  GenMessage,
-  GenService,
-} from "@bufbuild/protobuf/codegenv2";
-import {
-  fileDesc,
-  messageDesc,
-  serviceDesc,
-} from "@bufbuild/protobuf/codegenv2";
+import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import type { EmptySchema, Timestamp } from "@bufbuild/protobuf/wkt";
-import {
-  file_google_protobuf_empty,
-  file_google_protobuf_timestamp,
-} from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_empty, file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { User } from "./users_pb";
 import { file_proto_v1_users } from "./users_pb";
 import type { Message } from "@bufbuild/protobuf";
@@ -24,16 +13,8 @@ import type { Message } from "@bufbuild/protobuf";
 /**
  * Describes the file proto/v1/spaces.proto.
  */
-export const file_proto_v1_spaces: GenFile =
-  /*@__PURE__*/
-  fileDesc(
-    "ChVwcm90by92MS9zcGFjZXMucHJvdG8SAnYxInQKDFByb2plY3RTcGFjZRIQCghzcGFjZV9pZBgBIAEoCRIUCgx3b3Jrc3BhY2VfaWQYAiABKAkSFQoNYWRtaW5fdXNlcl9pZBgDIAEoCRIXCgV1c2VycxgEIAMoCzIILnYxLlVzZXISDAoEbmFtZRgFIAEoCSI4ChJDcmVhdGVTcGFjZVJlcXVlc3QSFAoMd29ya3NwYWNlX2lkGAEgASgJEgwKBG5hbWUYAiABKAkiLwoTQ3JlYXRlU3BhY2VSZXNwb25zZRIYChBjcmVhdGVkX3NwYWNlX2lkGAEgASgJIjgKE0FkZFNwYWNlVXNlclJlcXVlc3QSEAoIc3BhY2VfaWQYASABKAkSDwoHdXNlcl9pZBgCIAEoCSIpChFMaXN0U3BhY2VzUmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkiFwoVTGlzdFVzZXJTcGFjZXNSZXF1ZXN0IjYKEkxpc3RTcGFjZXNSZXNwb25zZRIgCgZzcGFjZXMYASADKAsyEC52MS5Qcm9qZWN0U3BhY2UiOQoMU3BhY2VNZXNzYWdlEg8KB2NvbnRlbnQYASABKAkSGAoGYXV0aG9yGAIgASgLMggudjEuVXNlciKcAQoYU3BhY2VNZXNzYWdlV2l0aE1ldGFkYXRhEhIKCm1lc3NhZ2VfaWQYASABKAkSJwoNc3BhY2VfbWVzc2FnZRgCIAEoCzIQLnYxLlNwYWNlTWVzc2FnZRIuCgpjcmVhdGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBITCgtyZXBseV9jb3VudBgEIAEoBCIsChhMaXN0U3BhY2VNZXNzYWdlc1JlcXVlc3QSEAoIc3BhY2VfaWQYASABKAkiRwofTGlzdFNwYWNlTWVzc2FnZUNoaWxkcmVuUmVxdWVzdBIQCghzcGFjZV9pZBgBIAEoCRISCgptZXNzYWdlX2lkGAIgASgJIksKGUxpc3RTcGFjZU1lc3NhZ2VzUmVzcG9uc2USLgoIbWVzc2FnZXMYASADKAsyHC52MS5TcGFjZU1lc3NhZ2VXaXRoTWV0YWRhdGEiigEKF1NlbmRTcGFjZU1lc3NhZ2VSZXF1ZXN0EhAKCHNwYWNlX2lkGAEgASgJEicKDXNwYWNlX21lc3NhZ2UYAiABKAsyEC52MS5TcGFjZU1lc3NhZ2USHgoRcGFyZW50X21lc3NhZ2VfaWQYAyABKAlIAIgBAUIUChJfcGFyZW50X21lc3NhZ2VfaWQiMwoYU2VuZFNwYWNlTWVzc2FnZVJlc3BvbnNlEhcKD3NlbnRfbWVzc2FnZV9pZBgBIAEoCSIkChBPcGVuU3BhY2VSZXF1ZXN0EhAKCHNwYWNlX2lkGAEgASgJIi4KEU9wZW5TcGFjZVJlc3BvbnNlEhkKEW5ld19tZXNzYWdlX2FsZXJ0GAEgASgIMs8ECg1TcGFjZXNTZXJ2aWNlEj4KC0NyZWF0ZVNwYWNlEhYudjEuQ3JlYXRlU3BhY2VSZXF1ZXN0GhcudjEuQ3JlYXRlU3BhY2VSZXNwb25zZRI/CgxBZGRTcGFjZVVzZXISFy52MS5BZGRTcGFjZVVzZXJSZXF1ZXN0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5EjsKCkxpc3RTcGFjZXMSFS52MS5MaXN0U3BhY2VzUmVxdWVzdBoWLnYxLkxpc3RTcGFjZXNSZXNwb25zZRJDCg5MaXN0VXNlclNwYWNlcxIZLnYxLkxpc3RVc2VyU3BhY2VzUmVxdWVzdBoWLnYxLkxpc3RTcGFjZXNSZXNwb25zZRI6CglPcGVuU3BhY2USFC52MS5PcGVuU3BhY2VSZXF1ZXN0GhUudjEuT3BlblNwYWNlUmVzcG9uc2UwARJQChFMaXN0U3BhY2VNZXNzYWdlcxIcLnYxLkxpc3RTcGFjZU1lc3NhZ2VzUmVxdWVzdBodLnYxLkxpc3RTcGFjZU1lc3NhZ2VzUmVzcG9uc2USXgoYTGlzdFNwYWNlTWVzc2FnZUNoaWxkcmVuEiMudjEuTGlzdFNwYWNlTWVzc2FnZUNoaWxkcmVuUmVxdWVzdBodLnYxLkxpc3RTcGFjZU1lc3NhZ2VzUmVzcG9uc2USTQoQU2VuZFNwYWNlTWVzc2FnZRIbLnYxLlNlbmRTcGFjZU1lc3NhZ2VSZXF1ZXN0GhwudjEuU2VuZFNwYWNlTWVzc2FnZVJlc3BvbnNlQh5aHHZ5bmZvLmNvbS92eW5mby9nZW4vcHJvdG8vdjFiBnByb3RvMw",
-    [
-      file_google_protobuf_timestamp,
-      file_google_protobuf_empty,
-      file_proto_v1_users,
-    ],
-  );
+export const file_proto_v1_spaces: GenFile = /*@__PURE__*/
+  fileDesc("ChVwcm90by92MS9zcGFjZXMucHJvdG8SAnYxInQKDFByb2plY3RTcGFjZRIQCghzcGFjZV9pZBgBIAEoCRIUCgx3b3Jrc3BhY2VfaWQYAiABKAkSFQoNYWRtaW5fdXNlcl9pZBgDIAEoCRIXCgV1c2VycxgEIAMoCzIILnYxLlVzZXISDAoEbmFtZRgFIAEoCSI4ChJDcmVhdGVTcGFjZVJlcXVlc3QSFAoMd29ya3NwYWNlX2lkGAEgASgJEgwKBG5hbWUYAiABKAkiLwoTQ3JlYXRlU3BhY2VSZXNwb25zZRIYChBjcmVhdGVkX3NwYWNlX2lkGAEgASgJIjgKE0FkZFNwYWNlVXNlclJlcXVlc3QSEAoIc3BhY2VfaWQYASABKAkSDwoHdXNlcl9pZBgCIAEoCSIpChFMaXN0U3BhY2VzUmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkiFwoVTGlzdFVzZXJTcGFjZXNSZXF1ZXN0IjYKEkxpc3RTcGFjZXNSZXNwb25zZRIgCgZzcGFjZXMYASADKAsyEC52MS5Qcm9qZWN0U3BhY2UiOQoMU3BhY2VNZXNzYWdlEg8KB2NvbnRlbnQYASABKAkSGAoGYXV0aG9yGAIgASgLMggudjEuVXNlciKcAQoYU3BhY2VNZXNzYWdlV2l0aE1ldGFkYXRhEhIKCm1lc3NhZ2VfaWQYASABKAkSJwoNc3BhY2VfbWVzc2FnZRgCIAEoCzIQLnYxLlNwYWNlTWVzc2FnZRIuCgpjcmVhdGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBITCgtyZXBseV9jb3VudBgEIAEoBCIsChhMaXN0U3BhY2VNZXNzYWdlc1JlcXVlc3QSEAoIc3BhY2VfaWQYASABKAkiRwofTGlzdFNwYWNlTWVzc2FnZUNoaWxkcmVuUmVxdWVzdBIQCghzcGFjZV9pZBgBIAEoCRISCgptZXNzYWdlX2lkGAIgASgJIksKGUxpc3RTcGFjZU1lc3NhZ2VzUmVzcG9uc2USLgoIbWVzc2FnZXMYASADKAsyHC52MS5TcGFjZU1lc3NhZ2VXaXRoTWV0YWRhdGEiigEKF1NlbmRTcGFjZU1lc3NhZ2VSZXF1ZXN0EhAKCHNwYWNlX2lkGAEgASgJEicKDXNwYWNlX21lc3NhZ2UYAiABKAsyEC52MS5TcGFjZU1lc3NhZ2USHgoRcGFyZW50X21lc3NhZ2VfaWQYAyABKAlIAIgBAUIUChJfcGFyZW50X21lc3NhZ2VfaWQiMwoYU2VuZFNwYWNlTWVzc2FnZVJlc3BvbnNlEhcKD3NlbnRfbWVzc2FnZV9pZBgBIAEoCSIkChBPcGVuU3BhY2VSZXF1ZXN0EhAKCHNwYWNlX2lkGAEgASgJIi4KEU9wZW5TcGFjZVJlc3BvbnNlEhkKEW5ld19tZXNzYWdlX2FsZXJ0GAEgASgIMs8ECg1TcGFjZXNTZXJ2aWNlEj4KC0NyZWF0ZVNwYWNlEhYudjEuQ3JlYXRlU3BhY2VSZXF1ZXN0GhcudjEuQ3JlYXRlU3BhY2VSZXNwb25zZRI/CgxBZGRTcGFjZVVzZXISFy52MS5BZGRTcGFjZVVzZXJSZXF1ZXN0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5EjsKCkxpc3RTcGFjZXMSFS52MS5MaXN0U3BhY2VzUmVxdWVzdBoWLnYxLkxpc3RTcGFjZXNSZXNwb25zZRJDCg5MaXN0VXNlclNwYWNlcxIZLnYxLkxpc3RVc2VyU3BhY2VzUmVxdWVzdBoWLnYxLkxpc3RTcGFjZXNSZXNwb25zZRI6CglPcGVuU3BhY2USFC52MS5PcGVuU3BhY2VSZXF1ZXN0GhUudjEuT3BlblNwYWNlUmVzcG9uc2UwARJQChFMaXN0U3BhY2VNZXNzYWdlcxIcLnYxLkxpc3RTcGFjZU1lc3NhZ2VzUmVxdWVzdBodLnYxLkxpc3RTcGFjZU1lc3NhZ2VzUmVzcG9uc2USXgoYTGlzdFNwYWNlTWVzc2FnZUNoaWxkcmVuEiMudjEuTGlzdFNwYWNlTWVzc2FnZUNoaWxkcmVuUmVxdWVzdBodLnYxLkxpc3RTcGFjZU1lc3NhZ2VzUmVzcG9uc2USTQoQU2VuZFNwYWNlTWVzc2FnZRIbLnYxLlNlbmRTcGFjZU1lc3NhZ2VSZXF1ZXN0GhwudjEuU2VuZFNwYWNlTWVzc2FnZVJlc3BvbnNlQh5aHHZ5bmZvLmNvbS92eW5mby9nZW4vcHJvdG8vdjFiBnByb3RvMw", [file_google_protobuf_timestamp, file_google_protobuf_empty, file_proto_v1_users]);
 
 /**
  * A ProjectSpace is a collaboration container scoped to a single project.
@@ -73,8 +54,7 @@ export type ProjectSpace = Message<"v1.ProjectSpace"> & {
  * Describes the message v1.ProjectSpace.
  * Use `create(ProjectSpaceSchema)` to create a new message.
  */
-export const ProjectSpaceSchema: GenMessage<ProjectSpace> =
-  /*@__PURE__*/
+export const ProjectSpaceSchema: GenMessage<ProjectSpace> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 0);
 
 /**
@@ -99,8 +79,7 @@ export type CreateSpaceRequest = Message<"v1.CreateSpaceRequest"> & {
  * Describes the message v1.CreateSpaceRequest.
  * Use `create(CreateSpaceRequestSchema)` to create a new message.
  */
-export const CreateSpaceRequestSchema: GenMessage<CreateSpaceRequest> =
-  /*@__PURE__*/
+export const CreateSpaceRequestSchema: GenMessage<CreateSpaceRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 1);
 
 /**
@@ -117,8 +96,7 @@ export type CreateSpaceResponse = Message<"v1.CreateSpaceResponse"> & {
  * Describes the message v1.CreateSpaceResponse.
  * Use `create(CreateSpaceResponseSchema)` to create a new message.
  */
-export const CreateSpaceResponseSchema: GenMessage<CreateSpaceResponse> =
-  /*@__PURE__*/
+export const CreateSpaceResponseSchema: GenMessage<CreateSpaceResponse> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 2);
 
 /**
@@ -143,8 +121,7 @@ export type AddSpaceUserRequest = Message<"v1.AddSpaceUserRequest"> & {
  * Describes the message v1.AddSpaceUserRequest.
  * Use `create(AddSpaceUserRequestSchema)` to create a new message.
  */
-export const AddSpaceUserRequestSchema: GenMessage<AddSpaceUserRequest> =
-  /*@__PURE__*/
+export const AddSpaceUserRequestSchema: GenMessage<AddSpaceUserRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 3);
 
 /**
@@ -163,21 +140,20 @@ export type ListSpacesRequest = Message<"v1.ListSpacesRequest"> & {
  * Describes the message v1.ListSpacesRequest.
  * Use `create(ListSpacesRequestSchema)` to create a new message.
  */
-export const ListSpacesRequestSchema: GenMessage<ListSpacesRequest> =
-  /*@__PURE__*/
+export const ListSpacesRequestSchema: GenMessage<ListSpacesRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 4);
 
 /**
  * @generated from message v1.ListUserSpacesRequest
  */
-export type ListUserSpacesRequest = Message<"v1.ListUserSpacesRequest"> & {};
+export type ListUserSpacesRequest = Message<"v1.ListUserSpacesRequest"> & {
+};
 
 /**
  * Describes the message v1.ListUserSpacesRequest.
  * Use `create(ListUserSpacesRequestSchema)` to create a new message.
  */
-export const ListUserSpacesRequestSchema: GenMessage<ListUserSpacesRequest> =
-  /*@__PURE__*/
+export const ListUserSpacesRequestSchema: GenMessage<ListUserSpacesRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 5);
 
 /**
@@ -194,8 +170,7 @@ export type ListSpacesResponse = Message<"v1.ListSpacesResponse"> & {
  * Describes the message v1.ListSpacesResponse.
  * Use `create(ListSpacesResponseSchema)` to create a new message.
  */
-export const ListSpacesResponseSchema: GenMessage<ListSpacesResponse> =
-  /*@__PURE__*/
+export const ListSpacesResponseSchema: GenMessage<ListSpacesResponse> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 6);
 
 /**
@@ -219,8 +194,7 @@ export type SpaceMessage = Message<"v1.SpaceMessage"> & {
  * Describes the message v1.SpaceMessage.
  * Use `create(SpaceMessageSchema)` to create a new message.
  */
-export const SpaceMessageSchema: GenMessage<SpaceMessage> =
-  /*@__PURE__*/
+export const SpaceMessageSchema: GenMessage<SpaceMessage> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 7);
 
 /**
@@ -229,57 +203,53 @@ export const SpaceMessageSchema: GenMessage<SpaceMessage> =
  *
  * @generated from message v1.SpaceMessageWithMetadata
  */
-export type SpaceMessageWithMetadata =
-  Message<"v1.SpaceMessageWithMetadata"> & {
-    /**
-     * @generated from field: string message_id = 1;
-     */
-    messageId: string;
+export type SpaceMessageWithMetadata = Message<"v1.SpaceMessageWithMetadata"> & {
+  /**
+   * @generated from field: string message_id = 1;
+   */
+  messageId: string;
 
-    /**
-     * @generated from field: v1.SpaceMessage space_message = 2;
-     */
-    spaceMessage?: SpaceMessage;
+  /**
+   * @generated from field: v1.SpaceMessage space_message = 2;
+   */
+  spaceMessage?: SpaceMessage;
 
-    /**
-     * @generated from field: google.protobuf.Timestamp created_at = 3;
-     */
-    createdAt?: Timestamp;
+  /**
+   * @generated from field: google.protobuf.Timestamp created_at = 3;
+   */
+  createdAt?: Timestamp;
 
-    /**
-     * @generated from field: uint64 reply_count = 4;
-     */
-    replyCount: bigint;
-  };
+  /**
+   * @generated from field: uint64 reply_count = 4;
+   */
+  replyCount: bigint;
+};
 
 /**
  * Describes the message v1.SpaceMessageWithMetadata.
  * Use `create(SpaceMessageWithMetadataSchema)` to create a new message.
  */
-export const SpaceMessageWithMetadataSchema: GenMessage<SpaceMessageWithMetadata> =
-  /*@__PURE__*/
+export const SpaceMessageWithMetadataSchema: GenMessage<SpaceMessageWithMetadata> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 8);
 
 /**
  * A ListSpaceMessagesRequest will retrieve all messages
- * in the space's main thread of messages.
+ * in the space's main thread of messages. 
  *
  * @generated from message v1.ListSpaceMessagesRequest
  */
-export type ListSpaceMessagesRequest =
-  Message<"v1.ListSpaceMessagesRequest"> & {
-    /**
-     * @generated from field: string space_id = 1;
-     */
-    spaceId: string;
-  };
+export type ListSpaceMessagesRequest = Message<"v1.ListSpaceMessagesRequest"> & {
+  /**
+   * @generated from field: string space_id = 1;
+   */
+  spaceId: string;
+};
 
 /**
  * Describes the message v1.ListSpaceMessagesRequest.
  * Use `create(ListSpaceMessagesRequestSchema)` to create a new message.
  */
-export const ListSpaceMessagesRequestSchema: GenMessage<ListSpaceMessagesRequest> =
-  /*@__PURE__*/
+export const ListSpaceMessagesRequestSchema: GenMessage<ListSpaceMessagesRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 9);
 
 /**
@@ -289,44 +259,40 @@ export const ListSpaceMessagesRequestSchema: GenMessage<ListSpaceMessagesRequest
  *
  * @generated from message v1.ListSpaceMessageChildrenRequest
  */
-export type ListSpaceMessageChildrenRequest =
-  Message<"v1.ListSpaceMessageChildrenRequest"> & {
-    /**
-     * @generated from field: string space_id = 1;
-     */
-    spaceId: string;
+export type ListSpaceMessageChildrenRequest = Message<"v1.ListSpaceMessageChildrenRequest"> & {
+  /**
+   * @generated from field: string space_id = 1;
+   */
+  spaceId: string;
 
-    /**
-     * @generated from field: string message_id = 2;
-     */
-    messageId: string;
-  };
+  /**
+   * @generated from field: string message_id = 2;
+   */
+  messageId: string;
+};
 
 /**
  * Describes the message v1.ListSpaceMessageChildrenRequest.
  * Use `create(ListSpaceMessageChildrenRequestSchema)` to create a new message.
  */
-export const ListSpaceMessageChildrenRequestSchema: GenMessage<ListSpaceMessageChildrenRequest> =
-  /*@__PURE__*/
+export const ListSpaceMessageChildrenRequestSchema: GenMessage<ListSpaceMessageChildrenRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 10);
 
 /**
  * @generated from message v1.ListSpaceMessagesResponse
  */
-export type ListSpaceMessagesResponse =
-  Message<"v1.ListSpaceMessagesResponse"> & {
-    /**
-     * @generated from field: repeated v1.SpaceMessageWithMetadata messages = 1;
-     */
-    messages: SpaceMessageWithMetadata[];
-  };
+export type ListSpaceMessagesResponse = Message<"v1.ListSpaceMessagesResponse"> & {
+  /**
+   * @generated from field: repeated v1.SpaceMessageWithMetadata messages = 1;
+   */
+  messages: SpaceMessageWithMetadata[];
+};
 
 /**
  * Describes the message v1.ListSpaceMessagesResponse.
  * Use `create(ListSpaceMessagesResponseSchema)` to create a new message.
  */
-export const ListSpaceMessagesResponseSchema: GenMessage<ListSpaceMessagesResponse> =
-  /*@__PURE__*/
+export const ListSpaceMessagesResponseSchema: GenMessage<ListSpaceMessagesResponse> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 11);
 
 /**
@@ -369,27 +335,24 @@ export type SendSpaceMessageRequest = Message<"v1.SendSpaceMessageRequest"> & {
  * Describes the message v1.SendSpaceMessageRequest.
  * Use `create(SendSpaceMessageRequestSchema)` to create a new message.
  */
-export const SendSpaceMessageRequestSchema: GenMessage<SendSpaceMessageRequest> =
-  /*@__PURE__*/
+export const SendSpaceMessageRequestSchema: GenMessage<SendSpaceMessageRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 12);
 
 /**
  * @generated from message v1.SendSpaceMessageResponse
  */
-export type SendSpaceMessageResponse =
-  Message<"v1.SendSpaceMessageResponse"> & {
-    /**
-     * @generated from field: string sent_message_id = 1;
-     */
-    sentMessageId: string;
-  };
+export type SendSpaceMessageResponse = Message<"v1.SendSpaceMessageResponse"> & {
+  /**
+   * @generated from field: string sent_message_id = 1;
+   */
+  sentMessageId: string;
+};
 
 /**
  * Describes the message v1.SendSpaceMessageResponse.
  * Use `create(SendSpaceMessageResponseSchema)` to create a new message.
  */
-export const SendSpaceMessageResponseSchema: GenMessage<SendSpaceMessageResponse> =
-  /*@__PURE__*/
+export const SendSpaceMessageResponseSchema: GenMessage<SendSpaceMessageResponse> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 13);
 
 /**
@@ -398,7 +361,7 @@ export const SendSpaceMessageResponseSchema: GenMessage<SendSpaceMessageResponse
  * to the underlying space and the client should trigger the appropraite re request
  *
  * This opens a server streaming subscription - so the connection is closed when the
- * stream context is cancelled.
+ * stream context is cancelled. 
  *
  * @generated from message v1.OpenSpaceRequest
  */
@@ -413,8 +376,7 @@ export type OpenSpaceRequest = Message<"v1.OpenSpaceRequest"> & {
  * Describes the message v1.OpenSpaceRequest.
  * Use `create(OpenSpaceRequestSchema)` to create a new message.
  */
-export const OpenSpaceRequestSchema: GenMessage<OpenSpaceRequest> =
-  /*@__PURE__*/
+export const OpenSpaceRequestSchema: GenMessage<OpenSpaceRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 14);
 
 /**
@@ -434,8 +396,7 @@ export type OpenSpaceResponse = Message<"v1.OpenSpaceResponse"> & {
  * Describes the message v1.OpenSpaceResponse.
  * Use `create(OpenSpaceResponseSchema)` to create a new message.
  */
-export const OpenSpaceResponseSchema: GenMessage<OpenSpaceResponse> =
-  /*@__PURE__*/
+export const OpenSpaceResponseSchema: GenMessage<OpenSpaceResponse> = /*@__PURE__*/
   messageDesc(file_proto_v1_spaces, 15);
 
 /**
@@ -451,7 +412,7 @@ export const SpacesService: GenService<{
     methodKind: "unary";
     input: typeof CreateSpaceRequestSchema;
     output: typeof CreateSpaceResponseSchema;
-  };
+  },
   /**
    * @generated from rpc v1.SpacesService.AddSpaceUser
    */
@@ -459,7 +420,7 @@ export const SpacesService: GenService<{
     methodKind: "unary";
     input: typeof AddSpaceUserRequestSchema;
     output: typeof EmptySchema;
-  };
+  },
   /**
    * @generated from rpc v1.SpacesService.ListSpaces
    */
@@ -467,7 +428,7 @@ export const SpacesService: GenService<{
     methodKind: "unary";
     input: typeof ListSpacesRequestSchema;
     output: typeof ListSpacesResponseSchema;
-  };
+  },
   /**
    * @generated from rpc v1.SpacesService.ListUserSpaces
    */
@@ -475,7 +436,7 @@ export const SpacesService: GenService<{
     methodKind: "unary";
     input: typeof ListUserSpacesRequestSchema;
     output: typeof ListSpacesResponseSchema;
-  };
+  },
   /**
    * @generated from rpc v1.SpacesService.OpenSpace
    */
@@ -483,7 +444,7 @@ export const SpacesService: GenService<{
     methodKind: "server_streaming";
     input: typeof OpenSpaceRequestSchema;
     output: typeof OpenSpaceResponseSchema;
-  };
+  },
   /**
    * @generated from rpc v1.SpacesService.ListSpaceMessages
    */
@@ -491,7 +452,7 @@ export const SpacesService: GenService<{
     methodKind: "unary";
     input: typeof ListSpaceMessagesRequestSchema;
     output: typeof ListSpaceMessagesResponseSchema;
-  };
+  },
   /**
    * @generated from rpc v1.SpacesService.ListSpaceMessageChildren
    */
@@ -499,7 +460,7 @@ export const SpacesService: GenService<{
     methodKind: "unary";
     input: typeof ListSpaceMessageChildrenRequestSchema;
     output: typeof ListSpaceMessagesResponseSchema;
-  };
+  },
   /**
    * @generated from rpc v1.SpacesService.SendSpaceMessage
    */
@@ -507,5 +468,7 @@ export const SpacesService: GenService<{
     methodKind: "unary";
     input: typeof SendSpaceMessageRequestSchema;
     output: typeof SendSpaceMessageResponseSchema;
-  };
-}> = /*@__PURE__*/ serviceDesc(file_proto_v1_spaces, 0);
+  },
+}> = /*@__PURE__*/
+  serviceDesc(file_proto_v1_spaces, 0);
+

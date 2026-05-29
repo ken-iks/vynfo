@@ -1099,7 +1099,8 @@ func (x *StaleBranchError) GetCurrentBranchTipUuid() string {
 	return ""
 }
 
-// Blur will apply a blur to the video section at a growing intensity scale
+// Blur applies ffmpeg `gblur=sigma=<intensity>`.
+// ffmpeg range: 0.0 to 1024.0. ffmpeg default: 0.5.
 type BlurEffect struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Intensity     float64                `protobuf:"fixed64,1,opt,name=intensity,proto3" json:"intensity,omitempty"`
@@ -1144,8 +1145,8 @@ func (x *BlurEffect) GetIntensity() float64 {
 	return 0
 }
 
-// Sepia will apply a default sepria effect to the full video segment
-// As a simplification, this is a grayscale + warm brown color tint
+// Sepia applies ffmpeg
+// `colorchannelmixer=.393:.769:.189:0:.349:.686:.168:0:.272:.534:.131`.
 type SepiaEffect struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -1182,9 +1183,11 @@ func (*SepiaEffect) Descriptor() ([]byte, []int) {
 	return file_proto_v1_projects_proto_rawDescGZIP(), []int{16}
 }
 
+// Saturation applies ffmpeg `eq=saturation=<strength>`.
+// ffmpeg range: 0.0 to 3.0. 0.0 is grayscale, 1.0 is unchanged.
 type SaturationEffect struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Strength      float64                `protobuf:"fixed64,1,opt,name=strength,proto3" json:"strength,omitempty"` // 0 grayscale, 1 unchanged, >1  saturated
+	Strength      float64                `protobuf:"fixed64,1,opt,name=strength,proto3" json:"strength,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1226,9 +1229,11 @@ func (x *SaturationEffect) GetStrength() float64 {
 	return 0
 }
 
+// Brightness applies ffmpeg `eq=brightness=<strength>`.
+// ffmpeg range: -1.0 to 1.0. 0.0 is unchanged.
 type BrightnessEffect struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Strength      float64                `protobuf:"fixed64,1,opt,name=strength,proto3" json:"strength,omitempty"` // >0 brighter than normal, <0 darker than normal
+	Strength      float64                `protobuf:"fixed64,1,opt,name=strength,proto3" json:"strength,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

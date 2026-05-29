@@ -7,6 +7,7 @@ modules:
       - node_modules
       - eden/.pnpm-store
       - eden/node_modules
+      - mensah/.venv
 lint:
   use:
     - STANDARD

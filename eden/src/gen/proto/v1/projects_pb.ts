@@ -2,23 +2,10 @@
 // @generated from file proto/v1/projects.proto (package v1, syntax proto3)
 /* eslint-disable */
 
-import type {
-  GenEnum,
-  GenFile,
-  GenMessage,
-  GenService,
-} from "@bufbuild/protobuf/codegenv2";
-import {
-  enumDesc,
-  fileDesc,
-  messageDesc,
-  serviceDesc,
-} from "@bufbuild/protobuf/codegenv2";
+import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import type { EmptySchema, Timestamp } from "@bufbuild/protobuf/wkt";
-import {
-  file_google_protobuf_empty,
-  file_google_protobuf_timestamp,
-} from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_empty, file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { User } from "./users_pb";
 import { file_proto_v1_users } from "./users_pb";
 import type { Message } from "@bufbuild/protobuf";
@@ -26,16 +13,8 @@ import type { Message } from "@bufbuild/protobuf";
 /**
  * Describes the file proto/v1/projects.proto.
  */
-export const file_proto_v1_projects: GenFile =
-  /*@__PURE__*/
-  fileDesc(
-    "Chdwcm90by92MS9wcm9qZWN0cy5wcm90bxICdjEiRQoRTWVkaWFJbWFnZU92ZXJsYXkSEAoIYXNzZXRfaWQYASABKAkSHgoDcG9zGAIgASgLMhEudjEuTWVkaWFQb3NpdGlvbiJmChBNZWRpYVRleHRPdmVybGF5Eh4KA3BvcxgBIAEoCzIRLnYxLk1lZGlhUG9zaXRpb24SIQoFY29sb3IYAiABKA4yEi52MS5NZWRpYVRleHRDb2xvchIPCgdjb250ZW50GAMgASgJIk0KDU1lZGlhUG9zaXRpb24SFgoObGVmdF9jb3JuZXJfcHgYASABKAQSFgoObGVmdF9jb3JuZXJfcHkYAiABKAQSDAoEc2l6ZRgDIAEoBCJkCgxNZWRpYU92ZXJsYXkSJgoFaW1hZ2UYASABKAsyFS52MS5NZWRpYUltYWdlT3ZlcmxheUgAEiQKBHRleHQYAiABKAsyFC52MS5NZWRpYVRleHRPdmVybGF5SABCBgoEa2luZCK2AQoQTWVkaWFWaWRlb0VmZmVjdBIeCgRibHVyGAEgASgLMg4udjEuQmx1ckVmZmVjdEgAEiAKBXNlcGlhGAIgASgLMg8udjEuU2VwaWFFZmZlY3RIABIqCgpzYXR1cmF0aW9uGAMgASgLMhQudjEuU2F0dXJhdGlvbkVmZmVjdEgAEioKCmJyaWdodG5lc3MYBCABKAsyFC52MS5CcmlnaHRuZXNzRWZmZWN0SABCCAoGZWZmZWN0In0KDFNlY3Rpb25WaWRlbxIkCgRtZXRhGAEgASgLMhYudjEuTWVkaWFWaWRlb01ldGFkYXRhEiAKGHZpZGVvX3N0YXJ0X3RpbWVfbWlsbGllcxgCIAEoBBIlCgdlZmZlY3RzGAMgAygLMhQudjEuTWVkaWFWaWRlb0VmZmVjdCJWCgxTZWN0aW9uQXVkaW8SJAoEbWV0YRgBIAEoCzIWLnYxLk1lZGlhQXVkaW9NZXRhZGF0YRIgChhhdWRpb19zdGFydF90aW1lX21pbGxpZXMYAiABKAQiigEKD1BsYXliYWNrU2VjdGlvbhIZChFzdGFydF90aW1lX21pbGxpcxgBIAEoBBIXCg9lbmRfdGltZV9taWxsaXMYAiABKAQSHwoFdmlkZW8YAyABKAsyEC52MS5TZWN0aW9uVmlkZW8SIgoIb3ZlcmxheXMYBSADKAsyEC52MS5NZWRpYU92ZXJsYXkiZAoNUGxheWJhY2tBdWRpbxIZChFzdGFydF90aW1lX21pbGxpcxgBIAEoBBIXCg9lbmRfdGltZV9taWxsaXMYAiABKAQSHwoFYXVkaW8YAyABKAsyEC52MS5TZWN0aW9uQXVkaW8iZwoNUGxheWJhY2tTdGF0ZRIrCg52aWRlb19zZWN0aW9ucxgBIAMoCzITLnYxLlBsYXliYWNrU2VjdGlvbhIpCg5hdWRpb19zZWN0aW9ucxgCIAMoCzIRLnYxLlBsYXliYWNrQXVkaW8itQEKEUNvbW1pdEVkaXRSZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkSEwoLYnJhbmNoX25hbWUYAiABKAkSFgoOY29tbWl0X21lc3NhZ2UYAyABKAkSHwoScHJldmlvdXNfY29tbWl0X2lkGAQgASgJSACIAQESJwoMY29tbWl0X3N0YXRlGAUgASgLMhEudjEuUGxheWJhY2tTdGF0ZUIVChNfcHJldmlvdXNfY29tbWl0X2lkIl0KEkNvbW1pdEVkaXRSZXNwb25zZRIXCg1uZXdfY29tbWl0X2lkGAEgASgJSAASIgoDZXJyGAIgASgLMhMudjEuQ29tbWl0RWRpdEVycm9ySABCCgoIcmVzcG9uc2UiZAoPQXV0b1NhdmVSZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkSEQoJYnJhbmNoX2lkGAIgASgJEioKD2F1dG9fc2F2ZV9zdGF0ZRgDIAEoCzIRLnYxLlBsYXliYWNrU3RhdGUiTQoPQ29tbWl0RWRpdEVycm9yEiwKDHN0YWxlX2JyYW5jaBgCIAEoCzIULnYxLlN0YWxlQnJhbmNoRXJyb3JIAEIMCgplcnJvcl90eXBlIlQKEFN0YWxlQnJhbmNoRXJyb3ISHwoXYXNzdW1lZF9icmFuY2hfdGlwX3V1aWQYASABKAkSHwoXY3VycmVudF9icmFuY2hfdGlwX3V1aWQYAiABKAkiHwoKQmx1ckVmZmVjdBIRCglpbnRlbnNpdHkYASABKAEiDQoLU2VwaWFFZmZlY3QiJAoQU2F0dXJhdGlvbkVmZmVjdBIQCghzdHJlbmd0aBgBIAEoASIkChBCcmlnaHRuZXNzRWZmZWN0EhAKCHN0cmVuZ3RoGAEgASgBIqQBCg9Qcm9qZWN0TWV0YWRhdGESCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIuCgpjcmVhdGVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIUCgx3b3Jrc3BhY2VfaWQYBSABKAkSHAoKY3JlYXRlZF9ieRgGIAEoCzIILnYxLlVzZXIiKwoTTGlzdFByb2plY3RzUmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkiPQoUTGlzdFByb2plY3RzUmVzcG9uc2USJQoIcHJvamVjdHMYASADKAsyEy52MS5Qcm9qZWN0TWV0YWRhdGEiLgoYTGlzdFByb2plY3RBc3NldHNSZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkiQQoZUmVtb3ZlUHJvamVjdEFzc2V0UmVxdWVzdBISCgpwcm9qZWN0X2lkGAEgASgJEhAKCGFzc2V0X2lkGAIgASgJIj4KFkFkZFByb2plY3RBc3NldFJlcXVlc3QSEgoKcHJvamVjdF9pZBgBIAEoCRIQCghhc3NldF9pZBgCIAEoCSJaChJNZWRpYVZpZGVvTWV0YWRhdGESEAoIYXNzZXRfaWQYASABKAkSDQoFdGl0bGUYAiABKAkSEAoIZHVyYXRpb24YAyABKAESEQoJaGFzX2F1ZGlvGAQgASgIIkcKEk1lZGlhQXVkaW9NZXRhZGF0YRIQCghhc3NldF9pZBgBIAEoCRINCgV0aXRsZRgCIAEoCRIQCghkdXJhdGlvbhgDIAEoASJfChJNZWRpYUltYWdlTWV0YWRhdGESEAoIYXNzZXRfaWQYASABKAkSEgoKc2lnbmVkX3VybBgCIAEoCRINCgV0aXRsZRgDIAEoCRIUCgxjb250ZW50X3R5cGUYBCABKAkikwEKGUxpc3RQcm9qZWN0QXNzZXRzUmVzcG9uc2USJgoGdmlkZW9zGAEgAygLMhYudjEuTWVkaWFWaWRlb01ldGFkYXRhEiYKBmltYWdlcxgCIAMoCzIWLnYxLk1lZGlhSW1hZ2VNZXRhZGF0YRImCgZhdWRpb3MYAyADKAsyFi52MS5NZWRpYUF1ZGlvTWV0YWRhdGEiMAoaTGlzdFByb2plY3RCcmFuY2hlc1JlcXVlc3QSEgoKcHJvamVjdF9pZBgBIAEoCSJYCg5CcmFuY2hNZXRhZGF0YRIMCgRuYW1lGAEgASgJEhoKDXRpcF9jb21taXRfaWQYAiABKAlIAIgBARIKCgJpZBgDIAEoCUIQCg5fdGlwX2NvbW1pdF9pZCJDChtMaXN0UHJvamVjdEJyYW5jaGVzUmVzcG9uc2USJAoIYnJhbmNoZXMYASADKAsyEi52MS5CcmFuY2hNZXRhZGF0YSJfChRDcmVhdGVQcm9qZWN0UmVxdWVzdBIUCgxwcm9qZWN0X25hbWUYASABKAkSGwoTcHJvamVjdF9kZXNjcmlwdGlvbhgCIAEoCRIUCgx3b3Jrc3BhY2VfaWQYAyABKAkiMwoVQ3JlYXRlUHJvamVjdFJlc3BvbnNlEhoKEmNyZWF0ZWRfcHJvamVjdF9pZBgBIAEoCSI8ChVBZGRQcm9qZWN0VXNlclJlcXVlc3QSEgoKcHJvamVjdF9pZBgBIAEoCRIPCgd1c2VyX2lkGAIgASgJIioKFERlbGV0ZVByb2plY3RSZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkiZgoURXhwb3J0UHJvamVjdFJlcXVlc3QSFAoMd29ya3NwYWNlX2lkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSFgoJY29tbWl0X2lkGAMgASgJSACIAQFCDAoKX2NvbW1pdF9pZCI4ChVFeHBvcnRQcm9qZWN0UmVzcG9uc2USHwoXc2lnbmVkX3VybF9mb3JfZG93bmxvYWQYASABKAkiOAoQR2V0Q29tbWl0UmVxdWVzdBIRCgljb21taXRfaWQYASABKAkSEQoJYnJhbmNoX2lkGAIgASgJInQKEUdldENvbW1pdFJlc3BvbnNlEhEKCWNvbW1pdF9pZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEg8KB21lc3NhZ2UYAyABKAkSJwoMY29tbWl0X3N0YXRlGAQgASgLMhEudjEuUGxheWJhY2tTdGF0ZSI7ChJMaXN0Q29tbWl0c1JlcXVlc3QSEgoKcHJvamVjdF9pZBgBIAEoCRIRCglicmFuY2hfaWQYAiABKAkiggEKDkNvbW1pdE1ldGFkYXRhEgoKAmlkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSDwoHdXNlcl9pZBgDIAEoCRIPCgdtZXNzYWdlGAQgASgJEi4KCmNyZWF0ZWRfYXQYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIjoKE0xpc3RDb21taXRzUmVzcG9uc2USIwoHY29tbWl0cxgBIAMoCzISLnYxLkNvbW1pdE1ldGFkYXRhKoYBCg5NZWRpYVRleHRDb2xvchIgChxNRURJQV9URVhUX0NPTE9SX1VOU1BFQ0lGSUVEEAASGgoWTUVESUFfVEVYVF9DT0xPUl9CTEFDSxABEhoKFk1FRElBX1RFWFRfQ09MT1JfV0hJVEUQAhIaChZNRURJQV9URVhUX0NPTE9SX0NMRUFSEAMylQcKDlByb2plY3RTZXJ2aWNlEjsKCkNvbW1pdEVkaXQSFS52MS5Db21taXRFZGl0UmVxdWVzdBoWLnYxLkNvbW1pdEVkaXRSZXNwb25zZRI4CglHZXRDb21taXQSFC52MS5HZXRDb21taXRSZXF1ZXN0GhUudjEuR2V0Q29tbWl0UmVzcG9uc2USPgoLTGlzdENvbW1pdHMSFi52MS5MaXN0Q29tbWl0c1JlcXVlc3QaFy52MS5MaXN0Q29tbWl0c1Jlc3BvbnNlEkEKDExpc3RQcm9qZWN0cxIXLnYxLkxpc3RQcm9qZWN0c1JlcXVlc3QaGC52MS5MaXN0UHJvamVjdHNSZXNwb25zZRJQChFMaXN0UHJvamVjdEFzc2V0cxIcLnYxLkxpc3RQcm9qZWN0QXNzZXRzUmVxdWVzdBodLnYxLkxpc3RQcm9qZWN0QXNzZXRzUmVzcG9uc2USRQoPQWRkUHJvamVjdEFzc2V0EhoudjEuQWRkUHJvamVjdEFzc2V0UmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRJLChJSZW1vdmVQcm9qZWN0QXNzZXQSHS52MS5SZW1vdmVQcm9qZWN0QXNzZXRSZXF1ZXN0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5ElYKE0xpc3RQcm9qZWN0QnJhbmNoZXMSHi52MS5MaXN0UHJvamVjdEJyYW5jaGVzUmVxdWVzdBofLnYxLkxpc3RQcm9qZWN0QnJhbmNoZXNSZXNwb25zZRJECg1DcmVhdGVQcm9qZWN0EhgudjEuQ3JlYXRlUHJvamVjdFJlcXVlc3QaGS52MS5DcmVhdGVQcm9qZWN0UmVzcG9uc2USQwoOQWRkUHJvamVjdFVzZXISGS52MS5BZGRQcm9qZWN0VXNlclJlcXVlc3QaFi5nb29nbGUucHJvdG9idWYuRW1wdHkSQQoNRGVsZXRlUHJvamVjdBIYLnYxLkRlbGV0ZVByb2plY3RSZXF1ZXN0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5EkQKDUV4cG9ydFByb2plY3QSGC52MS5FeHBvcnRQcm9qZWN0UmVxdWVzdBoZLnYxLkV4cG9ydFByb2plY3RSZXNwb25zZRI3CghBdXRvU2F2ZRITLnYxLkF1dG9TYXZlUmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eUIeWhx2eW5mby5jb20vdnluZm8vZ2VuL3Byb3RvL3YxYgZwcm90bzM",
-    [
-      file_google_protobuf_timestamp,
-      file_google_protobuf_empty,
-      file_proto_v1_users,
-    ],
-  );
+export const file_proto_v1_projects: GenFile = /*@__PURE__*/
+  fileDesc("Chdwcm90by92MS9wcm9qZWN0cy5wcm90bxICdjEiRQoRTWVkaWFJbWFnZU92ZXJsYXkSEAoIYXNzZXRfaWQYASABKAkSHgoDcG9zGAIgASgLMhEudjEuTWVkaWFQb3NpdGlvbiJmChBNZWRpYVRleHRPdmVybGF5Eh4KA3BvcxgBIAEoCzIRLnYxLk1lZGlhUG9zaXRpb24SIQoFY29sb3IYAiABKA4yEi52MS5NZWRpYVRleHRDb2xvchIPCgdjb250ZW50GAMgASgJIk0KDU1lZGlhUG9zaXRpb24SFgoObGVmdF9jb3JuZXJfcHgYASABKAQSFgoObGVmdF9jb3JuZXJfcHkYAiABKAQSDAoEc2l6ZRgDIAEoBCJkCgxNZWRpYU92ZXJsYXkSJgoFaW1hZ2UYASABKAsyFS52MS5NZWRpYUltYWdlT3ZlcmxheUgAEiQKBHRleHQYAiABKAsyFC52MS5NZWRpYVRleHRPdmVybGF5SABCBgoEa2luZCK2AQoQTWVkaWFWaWRlb0VmZmVjdBIeCgRibHVyGAEgASgLMg4udjEuQmx1ckVmZmVjdEgAEiAKBXNlcGlhGAIgASgLMg8udjEuU2VwaWFFZmZlY3RIABIqCgpzYXR1cmF0aW9uGAMgASgLMhQudjEuU2F0dXJhdGlvbkVmZmVjdEgAEioKCmJyaWdodG5lc3MYBCABKAsyFC52MS5CcmlnaHRuZXNzRWZmZWN0SABCCAoGZWZmZWN0In0KDFNlY3Rpb25WaWRlbxIkCgRtZXRhGAEgASgLMhYudjEuTWVkaWFWaWRlb01ldGFkYXRhEiAKGHZpZGVvX3N0YXJ0X3RpbWVfbWlsbGllcxgCIAEoBBIlCgdlZmZlY3RzGAMgAygLMhQudjEuTWVkaWFWaWRlb0VmZmVjdCJWCgxTZWN0aW9uQXVkaW8SJAoEbWV0YRgBIAEoCzIWLnYxLk1lZGlhQXVkaW9NZXRhZGF0YRIgChhhdWRpb19zdGFydF90aW1lX21pbGxpZXMYAiABKAQiigEKD1BsYXliYWNrU2VjdGlvbhIZChFzdGFydF90aW1lX21pbGxpcxgBIAEoBBIXCg9lbmRfdGltZV9taWxsaXMYAiABKAQSHwoFdmlkZW8YAyABKAsyEC52MS5TZWN0aW9uVmlkZW8SIgoIb3ZlcmxheXMYBSADKAsyEC52MS5NZWRpYU92ZXJsYXkiZAoNUGxheWJhY2tBdWRpbxIZChFzdGFydF90aW1lX21pbGxpcxgBIAEoBBIXCg9lbmRfdGltZV9taWxsaXMYAiABKAQSHwoFYXVkaW8YAyABKAsyEC52MS5TZWN0aW9uQXVkaW8iZwoNUGxheWJhY2tTdGF0ZRIrCg52aWRlb19zZWN0aW9ucxgBIAMoCzITLnYxLlBsYXliYWNrU2VjdGlvbhIpCg5hdWRpb19zZWN0aW9ucxgCIAMoCzIRLnYxLlBsYXliYWNrQXVkaW8itQEKEUNvbW1pdEVkaXRSZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkSEwoLYnJhbmNoX25hbWUYAiABKAkSFgoOY29tbWl0X21lc3NhZ2UYAyABKAkSHwoScHJldmlvdXNfY29tbWl0X2lkGAQgASgJSACIAQESJwoMY29tbWl0X3N0YXRlGAUgASgLMhEudjEuUGxheWJhY2tTdGF0ZUIVChNfcHJldmlvdXNfY29tbWl0X2lkIl0KEkNvbW1pdEVkaXRSZXNwb25zZRIXCg1uZXdfY29tbWl0X2lkGAEgASgJSAASIgoDZXJyGAIgASgLMhMudjEuQ29tbWl0RWRpdEVycm9ySABCCgoIcmVzcG9uc2UiZAoPQXV0b1NhdmVSZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkSEQoJYnJhbmNoX2lkGAIgASgJEioKD2F1dG9fc2F2ZV9zdGF0ZRgDIAEoCzIRLnYxLlBsYXliYWNrU3RhdGUiTQoPQ29tbWl0RWRpdEVycm9yEiwKDHN0YWxlX2JyYW5jaBgCIAEoCzIULnYxLlN0YWxlQnJhbmNoRXJyb3JIAEIMCgplcnJvcl90eXBlIlQKEFN0YWxlQnJhbmNoRXJyb3ISHwoXYXNzdW1lZF9icmFuY2hfdGlwX3V1aWQYASABKAkSHwoXY3VycmVudF9icmFuY2hfdGlwX3V1aWQYAiABKAkiHwoKQmx1ckVmZmVjdBIRCglpbnRlbnNpdHkYASABKAEiDQoLU2VwaWFFZmZlY3QiJAoQU2F0dXJhdGlvbkVmZmVjdBIQCghzdHJlbmd0aBgBIAEoASIkChBCcmlnaHRuZXNzRWZmZWN0EhAKCHN0cmVuZ3RoGAEgASgBIqQBCg9Qcm9qZWN0TWV0YWRhdGESCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIuCgpjcmVhdGVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIUCgx3b3Jrc3BhY2VfaWQYBSABKAkSHAoKY3JlYXRlZF9ieRgGIAEoCzIILnYxLlVzZXIiKwoTTGlzdFByb2plY3RzUmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkiPQoUTGlzdFByb2plY3RzUmVzcG9uc2USJQoIcHJvamVjdHMYASADKAsyEy52MS5Qcm9qZWN0TWV0YWRhdGEiLgoYTGlzdFByb2plY3RBc3NldHNSZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkiQQoZUmVtb3ZlUHJvamVjdEFzc2V0UmVxdWVzdBISCgpwcm9qZWN0X2lkGAEgASgJEhAKCGFzc2V0X2lkGAIgASgJIj4KFkFkZFByb2plY3RBc3NldFJlcXVlc3QSEgoKcHJvamVjdF9pZBgBIAEoCRIQCghhc3NldF9pZBgCIAEoCSJaChJNZWRpYVZpZGVvTWV0YWRhdGESEAoIYXNzZXRfaWQYASABKAkSDQoFdGl0bGUYAiABKAkSEAoIZHVyYXRpb24YAyABKAESEQoJaGFzX2F1ZGlvGAQgASgIIkcKEk1lZGlhQXVkaW9NZXRhZGF0YRIQCghhc3NldF9pZBgBIAEoCRINCgV0aXRsZRgCIAEoCRIQCghkdXJhdGlvbhgDIAEoASJfChJNZWRpYUltYWdlTWV0YWRhdGESEAoIYXNzZXRfaWQYASABKAkSEgoKc2lnbmVkX3VybBgCIAEoCRINCgV0aXRsZRgDIAEoCRIUCgxjb250ZW50X3R5cGUYBCABKAkikwEKGUxpc3RQcm9qZWN0QXNzZXRzUmVzcG9uc2USJgoGdmlkZW9zGAEgAygLMhYudjEuTWVkaWFWaWRlb01ldGFkYXRhEiYKBmltYWdlcxgCIAMoCzIWLnYxLk1lZGlhSW1hZ2VNZXRhZGF0YRImCgZhdWRpb3MYAyADKAsyFi52MS5NZWRpYUF1ZGlvTWV0YWRhdGEiMAoaTGlzdFByb2plY3RCcmFuY2hlc1JlcXVlc3QSEgoKcHJvamVjdF9pZBgBIAEoCSJYCg5CcmFuY2hNZXRhZGF0YRIMCgRuYW1lGAEgASgJEhoKDXRpcF9jb21taXRfaWQYAiABKAlIAIgBARIKCgJpZBgDIAEoCUIQCg5fdGlwX2NvbW1pdF9pZCJDChtMaXN0UHJvamVjdEJyYW5jaGVzUmVzcG9uc2USJAoIYnJhbmNoZXMYASADKAsyEi52MS5CcmFuY2hNZXRhZGF0YSJfChRDcmVhdGVQcm9qZWN0UmVxdWVzdBIUCgxwcm9qZWN0X25hbWUYASABKAkSGwoTcHJvamVjdF9kZXNjcmlwdGlvbhgCIAEoCRIUCgx3b3Jrc3BhY2VfaWQYAyABKAkiMwoVQ3JlYXRlUHJvamVjdFJlc3BvbnNlEhoKEmNyZWF0ZWRfcHJvamVjdF9pZBgBIAEoCSI8ChVBZGRQcm9qZWN0VXNlclJlcXVlc3QSEgoKcHJvamVjdF9pZBgBIAEoCRIPCgd1c2VyX2lkGAIgASgJIioKFERlbGV0ZVByb2plY3RSZXF1ZXN0EhIKCnByb2plY3RfaWQYASABKAkiZgoURXhwb3J0UHJvamVjdFJlcXVlc3QSFAoMd29ya3NwYWNlX2lkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSFgoJY29tbWl0X2lkGAMgASgJSACIAQFCDAoKX2NvbW1pdF9pZCI4ChVFeHBvcnRQcm9qZWN0UmVzcG9uc2USHwoXc2lnbmVkX3VybF9mb3JfZG93bmxvYWQYASABKAkiOAoQR2V0Q29tbWl0UmVxdWVzdBIRCgljb21taXRfaWQYASABKAkSEQoJYnJhbmNoX2lkGAIgASgJInQKEUdldENvbW1pdFJlc3BvbnNlEhEKCWNvbW1pdF9pZBgBIAEoCRISCgpwcm9qZWN0X2lkGAIgASgJEg8KB21lc3NhZ2UYAyABKAkSJwoMY29tbWl0X3N0YXRlGAQgASgLMhEudjEuUGxheWJhY2tTdGF0ZSI7ChJMaXN0Q29tbWl0c1JlcXVlc3QSEgoKcHJvamVjdF9pZBgBIAEoCRIRCglicmFuY2hfaWQYAiABKAkiggEKDkNvbW1pdE1ldGFkYXRhEgoKAmlkGAEgASgJEhIKCnByb2plY3RfaWQYAiABKAkSDwoHdXNlcl9pZBgDIAEoCRIPCgdtZXNzYWdlGAQgASgJEi4KCmNyZWF0ZWRfYXQYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIjoKE0xpc3RDb21taXRzUmVzcG9uc2USIwoHY29tbWl0cxgBIAMoCzISLnYxLkNvbW1pdE1ldGFkYXRhKoYBCg5NZWRpYVRleHRDb2xvchIgChxNRURJQV9URVhUX0NPTE9SX1VOU1BFQ0lGSUVEEAASGgoWTUVESUFfVEVYVF9DT0xPUl9CTEFDSxABEhoKFk1FRElBX1RFWFRfQ09MT1JfV0hJVEUQAhIaChZNRURJQV9URVhUX0NPTE9SX0NMRUFSEAMylQcKDlByb2plY3RTZXJ2aWNlEjsKCkNvbW1pdEVkaXQSFS52MS5Db21taXRFZGl0UmVxdWVzdBoWLnYxLkNvbW1pdEVkaXRSZXNwb25zZRI4CglHZXRDb21taXQSFC52MS5HZXRDb21taXRSZXF1ZXN0GhUudjEuR2V0Q29tbWl0UmVzcG9uc2USPgoLTGlzdENvbW1pdHMSFi52MS5MaXN0Q29tbWl0c1JlcXVlc3QaFy52MS5MaXN0Q29tbWl0c1Jlc3BvbnNlEkEKDExpc3RQcm9qZWN0cxIXLnYxLkxpc3RQcm9qZWN0c1JlcXVlc3QaGC52MS5MaXN0UHJvamVjdHNSZXNwb25zZRJQChFMaXN0UHJvamVjdEFzc2V0cxIcLnYxLkxpc3RQcm9qZWN0QXNzZXRzUmVxdWVzdBodLnYxLkxpc3RQcm9qZWN0QXNzZXRzUmVzcG9uc2USRQoPQWRkUHJvamVjdEFzc2V0EhoudjEuQWRkUHJvamVjdEFzc2V0UmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRJLChJSZW1vdmVQcm9qZWN0QXNzZXQSHS52MS5SZW1vdmVQcm9qZWN0QXNzZXRSZXF1ZXN0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5ElYKE0xpc3RQcm9qZWN0QnJhbmNoZXMSHi52MS5MaXN0UHJvamVjdEJyYW5jaGVzUmVxdWVzdBofLnYxLkxpc3RQcm9qZWN0QnJhbmNoZXNSZXNwb25zZRJECg1DcmVhdGVQcm9qZWN0EhgudjEuQ3JlYXRlUHJvamVjdFJlcXVlc3QaGS52MS5DcmVhdGVQcm9qZWN0UmVzcG9uc2USQwoOQWRkUHJvamVjdFVzZXISGS52MS5BZGRQcm9qZWN0VXNlclJlcXVlc3QaFi5nb29nbGUucHJvdG9idWYuRW1wdHkSQQoNRGVsZXRlUHJvamVjdBIYLnYxLkRlbGV0ZVByb2plY3RSZXF1ZXN0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5EkQKDUV4cG9ydFByb2plY3QSGC52MS5FeHBvcnRQcm9qZWN0UmVxdWVzdBoZLnYxLkV4cG9ydFByb2plY3RSZXNwb25zZRI3CghBdXRvU2F2ZRITLnYxLkF1dG9TYXZlUmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eUIeWhx2eW5mby5jb20vdnluZm8vZ2VuL3Byb3RvL3YxYgZwcm90bzM", [file_google_protobuf_timestamp, file_google_protobuf_empty, file_proto_v1_users]);
 
 /**
  * MediaImage is a reference to an image asset that can either take up the full video frame,
@@ -61,8 +40,7 @@ export type MediaImageOverlay = Message<"v1.MediaImageOverlay"> & {
  * Describes the message v1.MediaImageOverlay.
  * Use `create(MediaImageOverlaySchema)` to create a new message.
  */
-export const MediaImageOverlaySchema: GenMessage<MediaImageOverlay> =
-  /*@__PURE__*/
+export const MediaImageOverlaySchema: GenMessage<MediaImageOverlay> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 0);
 
 /**
@@ -93,8 +71,7 @@ export type MediaTextOverlay = Message<"v1.MediaTextOverlay"> & {
  * Describes the message v1.MediaTextOverlay.
  * Use `create(MediaTextOverlaySchema)` to create a new message.
  */
-export const MediaTextOverlaySchema: GenMessage<MediaTextOverlay> =
-  /*@__PURE__*/
+export const MediaTextOverlaySchema: GenMessage<MediaTextOverlay> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 1);
 
 /**
@@ -121,8 +98,7 @@ export type MediaPosition = Message<"v1.MediaPosition"> & {
  * Describes the message v1.MediaPosition.
  * Use `create(MediaPositionSchema)` to create a new message.
  */
-export const MediaPositionSchema: GenMessage<MediaPosition> =
-  /*@__PURE__*/
+export const MediaPositionSchema: GenMessage<MediaPosition> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 2);
 
 /**
@@ -135,30 +111,26 @@ export type MediaOverlay = Message<"v1.MediaOverlay"> & {
   /**
    * @generated from oneof v1.MediaOverlay.kind
    */
-  kind:
-    | {
-        /**
-         * @generated from field: v1.MediaImageOverlay image = 1;
-         */
-        value: MediaImageOverlay;
-        case: "image";
-      }
-    | {
-        /**
-         * @generated from field: v1.MediaTextOverlay text = 2;
-         */
-        value: MediaTextOverlay;
-        case: "text";
-      }
-    | { case: undefined; value?: undefined };
+  kind: {
+    /**
+     * @generated from field: v1.MediaImageOverlay image = 1;
+     */
+    value: MediaImageOverlay;
+    case: "image";
+  } | {
+    /**
+     * @generated from field: v1.MediaTextOverlay text = 2;
+     */
+    value: MediaTextOverlay;
+    case: "text";
+  } | { case: undefined; value?: undefined };
 };
 
 /**
  * Describes the message v1.MediaOverlay.
  * Use `create(MediaOverlaySchema)` to create a new message.
  */
-export const MediaOverlaySchema: GenMessage<MediaOverlay> =
-  /*@__PURE__*/
+export const MediaOverlaySchema: GenMessage<MediaOverlay> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 3);
 
 /**
@@ -170,44 +142,38 @@ export type MediaVideoEffect = Message<"v1.MediaVideoEffect"> & {
   /**
    * @generated from oneof v1.MediaVideoEffect.effect
    */
-  effect:
-    | {
-        /**
-         * @generated from field: v1.BlurEffect blur = 1;
-         */
-        value: BlurEffect;
-        case: "blur";
-      }
-    | {
-        /**
-         * @generated from field: v1.SepiaEffect sepia = 2;
-         */
-        value: SepiaEffect;
-        case: "sepia";
-      }
-    | {
-        /**
-         * @generated from field: v1.SaturationEffect saturation = 3;
-         */
-        value: SaturationEffect;
-        case: "saturation";
-      }
-    | {
-        /**
-         * @generated from field: v1.BrightnessEffect brightness = 4;
-         */
-        value: BrightnessEffect;
-        case: "brightness";
-      }
-    | { case: undefined; value?: undefined };
+  effect: {
+    /**
+     * @generated from field: v1.BlurEffect blur = 1;
+     */
+    value: BlurEffect;
+    case: "blur";
+  } | {
+    /**
+     * @generated from field: v1.SepiaEffect sepia = 2;
+     */
+    value: SepiaEffect;
+    case: "sepia";
+  } | {
+    /**
+     * @generated from field: v1.SaturationEffect saturation = 3;
+     */
+    value: SaturationEffect;
+    case: "saturation";
+  } | {
+    /**
+     * @generated from field: v1.BrightnessEffect brightness = 4;
+     */
+    value: BrightnessEffect;
+    case: "brightness";
+  } | { case: undefined; value?: undefined };
 };
 
 /**
  * Describes the message v1.MediaVideoEffect.
  * Use `create(MediaVideoEffectSchema)` to create a new message.
  */
-export const MediaVideoEffectSchema: GenMessage<MediaVideoEffect> =
-  /*@__PURE__*/
+export const MediaVideoEffectSchema: GenMessage<MediaVideoEffect> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 4);
 
 /**
@@ -242,8 +208,7 @@ export type SectionVideo = Message<"v1.SectionVideo"> & {
  * Describes the message v1.SectionVideo.
  * Use `create(SectionVideoSchema)` to create a new message.
  */
-export const SectionVideoSchema: GenMessage<SectionVideo> =
-  /*@__PURE__*/
+export const SectionVideoSchema: GenMessage<SectionVideo> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 5);
 
 /**
@@ -269,13 +234,12 @@ export type SectionAudio = Message<"v1.SectionAudio"> & {
  * Describes the message v1.SectionAudio.
  * Use `create(SectionAudioSchema)` to create a new message.
  */
-export const SectionAudioSchema: GenMessage<SectionAudio> =
-  /*@__PURE__*/
+export const SectionAudioSchema: GenMessage<SectionAudio> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 6);
 
 /**
- * PlaybackSection represents a particular cut of playback that is displayed between
- * these timestamps containing these assets.
+ * PlaybackSection represents a particular cut of playback that is displayed between 
+ * these timestamps containing these assets. 
  *
  * @generated from message v1.PlaybackSection
  */
@@ -305,8 +269,7 @@ export type PlaybackSection = Message<"v1.PlaybackSection"> & {
  * Describes the message v1.PlaybackSection.
  * Use `create(PlaybackSectionSchema)` to create a new message.
  */
-export const PlaybackSectionSchema: GenMessage<PlaybackSection> =
-  /*@__PURE__*/
+export const PlaybackSectionSchema: GenMessage<PlaybackSection> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 7);
 
 /**
@@ -333,8 +296,7 @@ export type PlaybackAudio = Message<"v1.PlaybackAudio"> & {
  * Describes the message v1.PlaybackAudio.
  * Use `create(PlaybackAudioSchema)` to create a new message.
  */
-export const PlaybackAudioSchema: GenMessage<PlaybackAudio> =
-  /*@__PURE__*/
+export const PlaybackAudioSchema: GenMessage<PlaybackAudio> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 8);
 
 /**
@@ -358,13 +320,12 @@ export type PlaybackState = Message<"v1.PlaybackState"> & {
  * Describes the message v1.PlaybackState.
  * Use `create(PlaybackStateSchema)` to create a new message.
  */
-export const PlaybackStateSchema: GenMessage<PlaybackState> =
-  /*@__PURE__*/
+export const PlaybackStateSchema: GenMessage<PlaybackState> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 9);
 
 /**
  * NOTE: you can only not include the previous commit id when you are making the first commit
- * for a branch.
+ * for a branch. 
  *
  * @generated from message v1.CommitEditRequest
  */
@@ -399,8 +360,7 @@ export type CommitEditRequest = Message<"v1.CommitEditRequest"> & {
  * Describes the message v1.CommitEditRequest.
  * Use `create(CommitEditRequestSchema)` to create a new message.
  */
-export const CommitEditRequestSchema: GenMessage<CommitEditRequest> =
-  /*@__PURE__*/
+export const CommitEditRequestSchema: GenMessage<CommitEditRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 10);
 
 /**
@@ -410,30 +370,26 @@ export type CommitEditResponse = Message<"v1.CommitEditResponse"> & {
   /**
    * @generated from oneof v1.CommitEditResponse.response
    */
-  response:
-    | {
-        /**
-         * @generated from field: string new_commit_id = 1;
-         */
-        value: string;
-        case: "newCommitId";
-      }
-    | {
-        /**
-         * @generated from field: v1.CommitEditError err = 2;
-         */
-        value: CommitEditError;
-        case: "err";
-      }
-    | { case: undefined; value?: undefined };
+  response: {
+    /**
+     * @generated from field: string new_commit_id = 1;
+     */
+    value: string;
+    case: "newCommitId";
+  } | {
+    /**
+     * @generated from field: v1.CommitEditError err = 2;
+     */
+    value: CommitEditError;
+    case: "err";
+  } | { case: undefined; value?: undefined };
 };
 
 /**
  * Describes the message v1.CommitEditResponse.
  * Use `create(CommitEditResponseSchema)` to create a new message.
  */
-export const CommitEditResponseSchema: GenMessage<CommitEditResponse> =
-  /*@__PURE__*/
+export const CommitEditResponseSchema: GenMessage<CommitEditResponse> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 11);
 
 /**
@@ -464,8 +420,7 @@ export type AutoSaveRequest = Message<"v1.AutoSaveRequest"> & {
  * Describes the message v1.AutoSaveRequest.
  * Use `create(AutoSaveRequestSchema)` to create a new message.
  */
-export const AutoSaveRequestSchema: GenMessage<AutoSaveRequest> =
-  /*@__PURE__*/
+export const AutoSaveRequestSchema: GenMessage<AutoSaveRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 12);
 
 /**
@@ -475,23 +430,20 @@ export type CommitEditError = Message<"v1.CommitEditError"> & {
   /**
    * @generated from oneof v1.CommitEditError.error_type
    */
-  errorType:
-    | {
-        /**
-         * @generated from field: v1.StaleBranchError stale_branch = 2;
-         */
-        value: StaleBranchError;
-        case: "staleBranch";
-      }
-    | { case: undefined; value?: undefined };
+  errorType: {
+    /**
+     * @generated from field: v1.StaleBranchError stale_branch = 2;
+     */
+    value: StaleBranchError;
+    case: "staleBranch";
+  } | { case: undefined; value?: undefined };
 };
 
 /**
  * Describes the message v1.CommitEditError.
  * Use `create(CommitEditErrorSchema)` to create a new message.
  */
-export const CommitEditErrorSchema: GenMessage<CommitEditError> =
-  /*@__PURE__*/
+export const CommitEditErrorSchema: GenMessage<CommitEditError> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 13);
 
 /**
@@ -513,12 +465,12 @@ export type StaleBranchError = Message<"v1.StaleBranchError"> & {
  * Describes the message v1.StaleBranchError.
  * Use `create(StaleBranchErrorSchema)` to create a new message.
  */
-export const StaleBranchErrorSchema: GenMessage<StaleBranchError> =
-  /*@__PURE__*/
+export const StaleBranchErrorSchema: GenMessage<StaleBranchError> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 14);
 
 /**
- * Blur will apply a blur to the video section at a growing intensity scale
+ * Blur applies ffmpeg `gblur=sigma=<intensity>`.
+ * ffmpeg range: 0.0 to 1024.0. ffmpeg default: 0.5.
  *
  * @generated from message v1.BlurEffect
  */
@@ -533,33 +485,33 @@ export type BlurEffect = Message<"v1.BlurEffect"> & {
  * Describes the message v1.BlurEffect.
  * Use `create(BlurEffectSchema)` to create a new message.
  */
-export const BlurEffectSchema: GenMessage<BlurEffect> =
-  /*@__PURE__*/
+export const BlurEffectSchema: GenMessage<BlurEffect> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 15);
 
 /**
- * Sepia will apply a default sepria effect to the full video segment
- * As a simplification, this is a grayscale + warm brown color tint
+ * Sepia applies ffmpeg
+ * `colorchannelmixer=.393:.769:.189:0:.349:.686:.168:0:.272:.534:.131`.
  *
  * @generated from message v1.SepiaEffect
  */
-export type SepiaEffect = Message<"v1.SepiaEffect"> & {};
+export type SepiaEffect = Message<"v1.SepiaEffect"> & {
+};
 
 /**
  * Describes the message v1.SepiaEffect.
  * Use `create(SepiaEffectSchema)` to create a new message.
  */
-export const SepiaEffectSchema: GenMessage<SepiaEffect> =
-  /*@__PURE__*/
+export const SepiaEffectSchema: GenMessage<SepiaEffect> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 16);
 
 /**
+ * Saturation applies ffmpeg `eq=saturation=<strength>`.
+ * ffmpeg range: 0.0 to 3.0. 0.0 is grayscale, 1.0 is unchanged.
+ *
  * @generated from message v1.SaturationEffect
  */
 export type SaturationEffect = Message<"v1.SaturationEffect"> & {
   /**
-   * 0 grayscale, 1 unchanged, >1  saturated
-   *
    * @generated from field: double strength = 1;
    */
   strength: number;
@@ -569,17 +521,17 @@ export type SaturationEffect = Message<"v1.SaturationEffect"> & {
  * Describes the message v1.SaturationEffect.
  * Use `create(SaturationEffectSchema)` to create a new message.
  */
-export const SaturationEffectSchema: GenMessage<SaturationEffect> =
-  /*@__PURE__*/
+export const SaturationEffectSchema: GenMessage<SaturationEffect> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 17);
 
 /**
+ * Brightness applies ffmpeg `eq=brightness=<strength>`.
+ * ffmpeg range: -1.0 to 1.0. 0.0 is unchanged.
+ *
  * @generated from message v1.BrightnessEffect
  */
 export type BrightnessEffect = Message<"v1.BrightnessEffect"> & {
   /**
-   * >0 brighter than normal, <0 darker than normal
-   *
    * @generated from field: double strength = 1;
    */
   strength: number;
@@ -589,8 +541,7 @@ export type BrightnessEffect = Message<"v1.BrightnessEffect"> & {
  * Describes the message v1.BrightnessEffect.
  * Use `create(BrightnessEffectSchema)` to create a new message.
  */
-export const BrightnessEffectSchema: GenMessage<BrightnessEffect> =
-  /*@__PURE__*/
+export const BrightnessEffectSchema: GenMessage<BrightnessEffect> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 18);
 
 /**
@@ -635,8 +586,7 @@ export type ProjectMetadata = Message<"v1.ProjectMetadata"> & {
  * Describes the message v1.ProjectMetadata.
  * Use `create(ProjectMetadataSchema)` to create a new message.
  */
-export const ProjectMetadataSchema: GenMessage<ProjectMetadata> =
-  /*@__PURE__*/
+export const ProjectMetadataSchema: GenMessage<ProjectMetadata> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 19);
 
 /**
@@ -655,8 +605,7 @@ export type ListProjectsRequest = Message<"v1.ListProjectsRequest"> & {
  * Describes the message v1.ListProjectsRequest.
  * Use `create(ListProjectsRequestSchema)` to create a new message.
  */
-export const ListProjectsRequestSchema: GenMessage<ListProjectsRequest> =
-  /*@__PURE__*/
+export const ListProjectsRequestSchema: GenMessage<ListProjectsRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 20);
 
 /**
@@ -675,8 +624,7 @@ export type ListProjectsResponse = Message<"v1.ListProjectsResponse"> & {
  * Describes the message v1.ListProjectsResponse.
  * Use `create(ListProjectsResponseSchema)` to create a new message.
  */
-export const ListProjectsResponseSchema: GenMessage<ListProjectsResponse> =
-  /*@__PURE__*/
+export const ListProjectsResponseSchema: GenMessage<ListProjectsResponse> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 21);
 
 /**
@@ -685,44 +633,40 @@ export const ListProjectsResponseSchema: GenMessage<ListProjectsResponse> =
  *
  * @generated from message v1.ListProjectAssetsRequest
  */
-export type ListProjectAssetsRequest =
-  Message<"v1.ListProjectAssetsRequest"> & {
-    /**
-     * @generated from field: string project_id = 1;
-     */
-    projectId: string;
-  };
+export type ListProjectAssetsRequest = Message<"v1.ListProjectAssetsRequest"> & {
+  /**
+   * @generated from field: string project_id = 1;
+   */
+  projectId: string;
+};
 
 /**
  * Describes the message v1.ListProjectAssetsRequest.
  * Use `create(ListProjectAssetsRequestSchema)` to create a new message.
  */
-export const ListProjectAssetsRequestSchema: GenMessage<ListProjectAssetsRequest> =
-  /*@__PURE__*/
+export const ListProjectAssetsRequestSchema: GenMessage<ListProjectAssetsRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 22);
 
 /**
  * @generated from message v1.RemoveProjectAssetRequest
  */
-export type RemoveProjectAssetRequest =
-  Message<"v1.RemoveProjectAssetRequest"> & {
-    /**
-     * @generated from field: string project_id = 1;
-     */
-    projectId: string;
+export type RemoveProjectAssetRequest = Message<"v1.RemoveProjectAssetRequest"> & {
+  /**
+   * @generated from field: string project_id = 1;
+   */
+  projectId: string;
 
-    /**
-     * @generated from field: string asset_id = 2;
-     */
-    assetId: string;
-  };
+  /**
+   * @generated from field: string asset_id = 2;
+   */
+  assetId: string;
+};
 
 /**
  * Describes the message v1.RemoveProjectAssetRequest.
  * Use `create(RemoveProjectAssetRequestSchema)` to create a new message.
  */
-export const RemoveProjectAssetRequestSchema: GenMessage<RemoveProjectAssetRequest> =
-  /*@__PURE__*/
+export const RemoveProjectAssetRequestSchema: GenMessage<RemoveProjectAssetRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 23);
 
 /**
@@ -744,8 +688,7 @@ export type AddProjectAssetRequest = Message<"v1.AddProjectAssetRequest"> & {
  * Describes the message v1.AddProjectAssetRequest.
  * Use `create(AddProjectAssetRequestSchema)` to create a new message.
  */
-export const AddProjectAssetRequestSchema: GenMessage<AddProjectAssetRequest> =
-  /*@__PURE__*/
+export const AddProjectAssetRequestSchema: GenMessage<AddProjectAssetRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 24);
 
 /**
@@ -780,8 +723,7 @@ export type MediaVideoMetadata = Message<"v1.MediaVideoMetadata"> & {
  * Describes the message v1.MediaVideoMetadata.
  * Use `create(MediaVideoMetadataSchema)` to create a new message.
  */
-export const MediaVideoMetadataSchema: GenMessage<MediaVideoMetadata> =
-  /*@__PURE__*/
+export const MediaVideoMetadataSchema: GenMessage<MediaVideoMetadata> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 25);
 
 /**
@@ -810,8 +752,7 @@ export type MediaAudioMetadata = Message<"v1.MediaAudioMetadata"> & {
  * Describes the message v1.MediaAudioMetadata.
  * Use `create(MediaAudioMetadataSchema)` to create a new message.
  */
-export const MediaAudioMetadataSchema: GenMessage<MediaAudioMetadata> =
-  /*@__PURE__*/
+export const MediaAudioMetadataSchema: GenMessage<MediaAudioMetadata> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 26);
 
 /**
@@ -845,8 +786,7 @@ export type MediaImageMetadata = Message<"v1.MediaImageMetadata"> & {
  * Describes the message v1.MediaImageMetadata.
  * Use `create(MediaImageMetadataSchema)` to create a new message.
  */
-export const MediaImageMetadataSchema: GenMessage<MediaImageMetadata> =
-  /*@__PURE__*/
+export const MediaImageMetadataSchema: GenMessage<MediaImageMetadata> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 27);
 
 /**
@@ -855,30 +795,28 @@ export const MediaImageMetadataSchema: GenMessage<MediaImageMetadata> =
  *
  * @generated from message v1.ListProjectAssetsResponse
  */
-export type ListProjectAssetsResponse =
-  Message<"v1.ListProjectAssetsResponse"> & {
-    /**
-     * @generated from field: repeated v1.MediaVideoMetadata videos = 1;
-     */
-    videos: MediaVideoMetadata[];
+export type ListProjectAssetsResponse = Message<"v1.ListProjectAssetsResponse"> & {
+  /**
+   * @generated from field: repeated v1.MediaVideoMetadata videos = 1;
+   */
+  videos: MediaVideoMetadata[];
 
-    /**
-     * @generated from field: repeated v1.MediaImageMetadata images = 2;
-     */
-    images: MediaImageMetadata[];
+  /**
+   * @generated from field: repeated v1.MediaImageMetadata images = 2;
+   */
+  images: MediaImageMetadata[];
 
-    /**
-     * @generated from field: repeated v1.MediaAudioMetadata audios = 3;
-     */
-    audios: MediaAudioMetadata[];
-  };
+  /**
+   * @generated from field: repeated v1.MediaAudioMetadata audios = 3;
+   */
+  audios: MediaAudioMetadata[];
+};
 
 /**
  * Describes the message v1.ListProjectAssetsResponse.
  * Use `create(ListProjectAssetsResponseSchema)` to create a new message.
  */
-export const ListProjectAssetsResponseSchema: GenMessage<ListProjectAssetsResponse> =
-  /*@__PURE__*/
+export const ListProjectAssetsResponseSchema: GenMessage<ListProjectAssetsResponse> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 28);
 
 /**
@@ -886,20 +824,18 @@ export const ListProjectAssetsResponseSchema: GenMessage<ListProjectAssetsRespon
  *
  * @generated from message v1.ListProjectBranchesRequest
  */
-export type ListProjectBranchesRequest =
-  Message<"v1.ListProjectBranchesRequest"> & {
-    /**
-     * @generated from field: string project_id = 1;
-     */
-    projectId: string;
-  };
+export type ListProjectBranchesRequest = Message<"v1.ListProjectBranchesRequest"> & {
+  /**
+   * @generated from field: string project_id = 1;
+   */
+  projectId: string;
+};
 
 /**
  * Describes the message v1.ListProjectBranchesRequest.
  * Use `create(ListProjectBranchesRequestSchema)` to create a new message.
  */
-export const ListProjectBranchesRequestSchema: GenMessage<ListProjectBranchesRequest> =
-  /*@__PURE__*/
+export const ListProjectBranchesRequestSchema: GenMessage<ListProjectBranchesRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 29);
 
 /**
@@ -928,8 +864,7 @@ export type BranchMetadata = Message<"v1.BranchMetadata"> & {
  * Describes the message v1.BranchMetadata.
  * Use `create(BranchMetadataSchema)` to create a new message.
  */
-export const BranchMetadataSchema: GenMessage<BranchMetadata> =
-  /*@__PURE__*/
+export const BranchMetadataSchema: GenMessage<BranchMetadata> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 30);
 
 /**
@@ -937,20 +872,18 @@ export const BranchMetadataSchema: GenMessage<BranchMetadata> =
  *
  * @generated from message v1.ListProjectBranchesResponse
  */
-export type ListProjectBranchesResponse =
-  Message<"v1.ListProjectBranchesResponse"> & {
-    /**
-     * @generated from field: repeated v1.BranchMetadata branches = 1;
-     */
-    branches: BranchMetadata[];
-  };
+export type ListProjectBranchesResponse = Message<"v1.ListProjectBranchesResponse"> & {
+  /**
+   * @generated from field: repeated v1.BranchMetadata branches = 1;
+   */
+  branches: BranchMetadata[];
+};
 
 /**
  * Describes the message v1.ListProjectBranchesResponse.
  * Use `create(ListProjectBranchesResponseSchema)` to create a new message.
  */
-export const ListProjectBranchesResponseSchema: GenMessage<ListProjectBranchesResponse> =
-  /*@__PURE__*/
+export const ListProjectBranchesResponseSchema: GenMessage<ListProjectBranchesResponse> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 31);
 
 /**
@@ -977,8 +910,7 @@ export type CreateProjectRequest = Message<"v1.CreateProjectRequest"> & {
  * Describes the message v1.CreateProjectRequest.
  * Use `create(CreateProjectRequestSchema)` to create a new message.
  */
-export const CreateProjectRequestSchema: GenMessage<CreateProjectRequest> =
-  /*@__PURE__*/
+export const CreateProjectRequestSchema: GenMessage<CreateProjectRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 32);
 
 /**
@@ -995,8 +927,7 @@ export type CreateProjectResponse = Message<"v1.CreateProjectResponse"> & {
  * Describes the message v1.CreateProjectResponse.
  * Use `create(CreateProjectResponseSchema)` to create a new message.
  */
-export const CreateProjectResponseSchema: GenMessage<CreateProjectResponse> =
-  /*@__PURE__*/
+export const CreateProjectResponseSchema: GenMessage<CreateProjectResponse> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 33);
 
 /**
@@ -1018,8 +949,7 @@ export type AddProjectUserRequest = Message<"v1.AddProjectUserRequest"> & {
  * Describes the message v1.AddProjectUserRequest.
  * Use `create(AddProjectUserRequestSchema)` to create a new message.
  */
-export const AddProjectUserRequestSchema: GenMessage<AddProjectUserRequest> =
-  /*@__PURE__*/
+export const AddProjectUserRequestSchema: GenMessage<AddProjectUserRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 34);
 
 /**
@@ -1036,8 +966,7 @@ export type DeleteProjectRequest = Message<"v1.DeleteProjectRequest"> & {
  * Describes the message v1.DeleteProjectRequest.
  * Use `create(DeleteProjectRequestSchema)` to create a new message.
  */
-export const DeleteProjectRequestSchema: GenMessage<DeleteProjectRequest> =
-  /*@__PURE__*/
+export const DeleteProjectRequestSchema: GenMessage<DeleteProjectRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 35);
 
 /**
@@ -1067,8 +996,7 @@ export type ExportProjectRequest = Message<"v1.ExportProjectRequest"> & {
  * Describes the message v1.ExportProjectRequest.
  * Use `create(ExportProjectRequestSchema)` to create a new message.
  */
-export const ExportProjectRequestSchema: GenMessage<ExportProjectRequest> =
-  /*@__PURE__*/
+export const ExportProjectRequestSchema: GenMessage<ExportProjectRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 36);
 
 /**
@@ -1085,8 +1013,7 @@ export type ExportProjectResponse = Message<"v1.ExportProjectResponse"> & {
  * Describes the message v1.ExportProjectResponse.
  * Use `create(ExportProjectResponseSchema)` to create a new message.
  */
-export const ExportProjectResponseSchema: GenMessage<ExportProjectResponse> =
-  /*@__PURE__*/
+export const ExportProjectResponseSchema: GenMessage<ExportProjectResponse> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 37);
 
 /**
@@ -1111,8 +1038,7 @@ export type GetCommitRequest = Message<"v1.GetCommitRequest"> & {
  * Describes the message v1.GetCommitRequest.
  * Use `create(GetCommitRequestSchema)` to create a new message.
  */
-export const GetCommitRequestSchema: GenMessage<GetCommitRequest> =
-  /*@__PURE__*/
+export const GetCommitRequestSchema: GenMessage<GetCommitRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 38);
 
 /**
@@ -1144,8 +1070,7 @@ export type GetCommitResponse = Message<"v1.GetCommitResponse"> & {
  * Describes the message v1.GetCommitResponse.
  * Use `create(GetCommitResponseSchema)` to create a new message.
  */
-export const GetCommitResponseSchema: GenMessage<GetCommitResponse> =
-  /*@__PURE__*/
+export const GetCommitResponseSchema: GenMessage<GetCommitResponse> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 39);
 
 /**
@@ -1167,8 +1092,7 @@ export type ListCommitsRequest = Message<"v1.ListCommitsRequest"> & {
  * Describes the message v1.ListCommitsRequest.
  * Use `create(ListCommitsRequestSchema)` to create a new message.
  */
-export const ListCommitsRequestSchema: GenMessage<ListCommitsRequest> =
-  /*@__PURE__*/
+export const ListCommitsRequestSchema: GenMessage<ListCommitsRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 40);
 
 /**
@@ -1205,8 +1129,7 @@ export type CommitMetadata = Message<"v1.CommitMetadata"> & {
  * Describes the message v1.CommitMetadata.
  * Use `create(CommitMetadataSchema)` to create a new message.
  */
-export const CommitMetadataSchema: GenMessage<CommitMetadata> =
-  /*@__PURE__*/
+export const CommitMetadataSchema: GenMessage<CommitMetadata> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 41);
 
 /**
@@ -1223,8 +1146,7 @@ export type ListCommitsResponse = Message<"v1.ListCommitsResponse"> & {
  * Describes the message v1.ListCommitsResponse.
  * Use `create(ListCommitsResponseSchema)` to create a new message.
  */
-export const ListCommitsResponseSchema: GenMessage<ListCommitsResponse> =
-  /*@__PURE__*/
+export const ListCommitsResponseSchema: GenMessage<ListCommitsResponse> = /*@__PURE__*/
   messageDesc(file_proto_v1_projects, 42);
 
 /**
@@ -1255,8 +1177,7 @@ export enum MediaTextColor {
 /**
  * Describes the enum v1.MediaTextColor.
  */
-export const MediaTextColorSchema: GenEnum<MediaTextColor> =
-  /*@__PURE__*/
+export const MediaTextColorSchema: GenEnum<MediaTextColor> = /*@__PURE__*/
   enumDesc(file_proto_v1_projects, 0);
 
 /**
@@ -1272,7 +1193,7 @@ export const ProjectService: GenService<{
     methodKind: "unary";
     input: typeof CommitEditRequestSchema;
     output: typeof CommitEditResponseSchema;
-  };
+  },
   /**
    * @generated from rpc v1.ProjectService.GetCommit
    */
@@ -1280,7 +1201,7 @@ export const ProjectService: GenService<{
     methodKind: "unary";
     input: typeof GetCommitRequestSchema;
     output: typeof GetCommitResponseSchema;
-  };
+  },
   /**
    * @generated from rpc v1.ProjectService.ListCommits
    */
@@ -1288,7 +1209,7 @@ export const ProjectService: GenService<{
     methodKind: "unary";
     input: typeof ListCommitsRequestSchema;
     output: typeof ListCommitsResponseSchema;
-  };
+  },
   /**
    * @generated from rpc v1.ProjectService.ListProjects
    */
@@ -1296,7 +1217,7 @@ export const ProjectService: GenService<{
     methodKind: "unary";
     input: typeof ListProjectsRequestSchema;
     output: typeof ListProjectsResponseSchema;
-  };
+  },
   /**
    * @generated from rpc v1.ProjectService.ListProjectAssets
    */
@@ -1304,7 +1225,7 @@ export const ProjectService: GenService<{
     methodKind: "unary";
     input: typeof ListProjectAssetsRequestSchema;
     output: typeof ListProjectAssetsResponseSchema;
-  };
+  },
   /**
    * @generated from rpc v1.ProjectService.AddProjectAsset
    */
@@ -1312,7 +1233,7 @@ export const ProjectService: GenService<{
     methodKind: "unary";
     input: typeof AddProjectAssetRequestSchema;
     output: typeof EmptySchema;
-  };
+  },
   /**
    * @generated from rpc v1.ProjectService.RemoveProjectAsset
    */
@@ -1320,7 +1241,7 @@ export const ProjectService: GenService<{
     methodKind: "unary";
     input: typeof RemoveProjectAssetRequestSchema;
     output: typeof EmptySchema;
-  };
+  },
   /**
    * @generated from rpc v1.ProjectService.ListProjectBranches
    */
@@ -1328,7 +1249,7 @@ export const ProjectService: GenService<{
     methodKind: "unary";
     input: typeof ListProjectBranchesRequestSchema;
     output: typeof ListProjectBranchesResponseSchema;
-  };
+  },
   /**
    * @generated from rpc v1.ProjectService.CreateProject
    */
@@ -1336,7 +1257,7 @@ export const ProjectService: GenService<{
     methodKind: "unary";
     input: typeof CreateProjectRequestSchema;
     output: typeof CreateProjectResponseSchema;
-  };
+  },
   /**
    * @generated from rpc v1.ProjectService.AddProjectUser
    */
@@ -1344,7 +1265,7 @@ export const ProjectService: GenService<{
     methodKind: "unary";
     input: typeof AddProjectUserRequestSchema;
     output: typeof EmptySchema;
-  };
+  },
   /**
    * @generated from rpc v1.ProjectService.DeleteProject
    */
@@ -1352,7 +1273,7 @@ export const ProjectService: GenService<{
     methodKind: "unary";
     input: typeof DeleteProjectRequestSchema;
     output: typeof EmptySchema;
-  };
+  },
   /**
    * @generated from rpc v1.ProjectService.ExportProject
    */
@@ -1360,7 +1281,7 @@ export const ProjectService: GenService<{
     methodKind: "unary";
     input: typeof ExportProjectRequestSchema;
     output: typeof ExportProjectResponseSchema;
-  };
+  },
   /**
    * @generated from rpc v1.ProjectService.AutoSave
    */
@@ -1368,5 +1289,7 @@ export const ProjectService: GenService<{
     methodKind: "unary";
     input: typeof AutoSaveRequestSchema;
     output: typeof EmptySchema;
-  };
-}> = /*@__PURE__*/ serviceDesc(file_proto_v1_projects, 0);
+  },
+}> = /*@__PURE__*/
+  serviceDesc(file_proto_v1_projects, 0);
+

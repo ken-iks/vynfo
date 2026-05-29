@@ -1,0 +1,15 @@
+{
+  "include": [
+    "mensah"
+  ],
+  "venvPath": "mensah",
+  "venv": ".venv",
+  "executionEnvironments": [
+    {
+      "root": "mensah",
+      "extraPaths": [
+        "mensah"
+      ]
+    }
+  ]
+}

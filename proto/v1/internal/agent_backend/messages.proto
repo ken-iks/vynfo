@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package v1.internal.agent_backend;
+
+option go_package = "vynfo.com/vynfo/gen/proto/v1/internal/agent_backend";
+
+import "proto/v1/conversations.proto";
+
+message GetConversationMessagesRequest {
+    string conversation_id = 1;
+}
+
+message ConversationMessage {
+  oneof message {
+    v1.UserMessage user_message = 1;
+    v1.AgentMessage agent_message = 2;
+  }
+}
+
+message GetConversationMessagesResponse {
+  repeated ConversationMessage messages = 1;
+}
+
+service ConversationService {
+    rpc GetConversationMessages(GetConversationMessagesRequest) returns (GetConversationMessagesResponse);
+}

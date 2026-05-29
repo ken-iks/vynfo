@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = "vynfo.com/vynfo/gen/proto/v1";
+
+message UserMessage {
+    string content = 1;
+}
+
+message AgentMessage {
+    string content = 1;
+}

@@ -1,0 +1,16 @@
+[project]
+name = "mensah"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "grpcio>=1.80.0",
+    "protobuf>=6.33.6",
+    # Use the slim package with only the OpenAI extra. The `pydantic-ai` umbrella package
+    # pulls every optional provider integration, including Temporal, whose protobuf
+    # constraints can force uv to backtrack to much older Pydantic AI releases.
+    "pydantic-ai-slim[openai]>=1.104.0",
+    "python-dotenv>=1.2.1",
+    "tavily>=1.1.0",
+]

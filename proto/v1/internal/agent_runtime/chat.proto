@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package v1.internal.agent_runtime;
+
+option go_package = "vynfo.com/vynfo/gen/proto/v1/internal/agent_runtime";
+
+message StreamChatRequest {
+    string prompt = 1;
+    string conversation_id  = 2;
+}
+
+message StreamChatResponse {
+    string message_id = 1;
+    oneof body {
+        TextDelta text = 2;
+        ReasoningDelta reasoning = 3;
+        ToolCall tool_call = 4;
+        Finished finished = 5;
+    }
+}
+
+message TextDelta {
+    string content = 1;
+}
+
+message ReasoningDelta {
+    string content = 1;
+}
+
+message Finished {}
+
+enum ToolCallStatus {
+    TOOL_CALL_STATUS_UNSPECIFIED = 0;
+    TOOL_CALL_STATUS_REQUESTED = 1;
+    TOOL_CALL_STATUS_COMPLETE = 2;
+    TOOL_CALL_STATUS_DENIED = 3;
+    TOOL_CALL_STATUS_ERRORED = 4;
+}
+
+message ToolCall {
+    ToolCallStatus status = 1;
+    oneof call {
+        ToolWebSearch web_search = 2;
+        ToolFetchWebPage page_fetch = 3;
+    }
+}
+
+message ToolWebSearch {
+    string query = 1;
+}
+
+message ToolFetchWebPage {
+    repeated string urls = 2;
+}
+
+service ChatService {
+    rpc StreamChat(StreamChatRequest) returns (stream StreamChatResponse);
+}
