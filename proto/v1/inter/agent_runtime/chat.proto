@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package v1.inter.agent_runtime;
+
+option go_package = "vynfo.com/vynfo/gen/proto/v1/inter/agent_runtime";
+
+message StreamChatRequest {
+    string prompt = 1;
+
+    // previous conversation messages are a json string that can be
+    // parsed into the pydantic-ai message history array
+    repeated string previous_conversation_messages = 2;
+
+    // only whitelisted users are able to send agent messages for now
+    string user_id = 3;
+    string workspace_id = 4;
+}
+
+message StreamChatResponse {
+    string message_id = 1;
+    oneof body {
+        TextDelta text = 2;
+        ReasoningDelta reasoning = 3;
+        ToolCall tool_call = 4;
+        Finished finished = 5;
+    }
+}
+
+message TextDelta {
+    string content = 1;
+}
+
+message ReasoningDelta {
+    string content = 1;
+}
+
+message RunMetadata {
+    uint32 input_tokens = 1;
+    uint32 output_tokens = 2;
+    uint32 reasoning_tokens = 3;
+    uint32 num_provider_requests = 4;
+    uint32 num_tool_calls = 5;
+}
+
+message Finished {
+    string pydantic_new_messages_json = 1;
+    RunMetadata run_metadata = 2;
+}
+
+enum ToolCallStatus {
+    TOOL_CALL_STATUS_UNSPECIFIED = 0;
+    TOOL_CALL_STATUS_REQUESTED = 1;
+    TOOL_CALL_STATUS_COMPLETE = 2;
+    TOOL_CALL_STATUS_DENIED = 3;
+    TOOL_CALL_STATUS_ERRORED = 4;
+}
+
+message ToolCall {
+    ToolCallStatus status = 1;
+    oneof call {
+        ToolWebSearch web_search = 2;
+        ToolFetchWebPage page_fetch = 3;
+    }
+}
+
+message ToolWebSearch {
+    string query = 1;
+}
+
+message ToolFetchWebPage {
+    repeated string urls = 2;
+}
+
+service ChatService {
+    rpc StreamChat(StreamChatRequest) returns (stream StreamChatResponse);
+}

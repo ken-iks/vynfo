@@ -2,15 +2,17 @@
 // @generated from file proto/v1/conversations.proto (package v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
+import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type { StreamChatResponseSchema } from "./inter/agent_runtime/chat_pb";
+import { file_proto_v1_inter_agent_runtime_chat } from "./inter/agent_runtime/chat_pb";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file proto/v1/conversations.proto.
  */
 export const file_proto_v1_conversations: GenFile = /*@__PURE__*/
-  fileDesc("Chxwcm90by92MS9jb252ZXJzYXRpb25zLnByb3RvEgJ2MSIeCgtVc2VyTWVzc2FnZRIPCgdjb250ZW50GAEgASgJIh8KDEFnZW50TWVzc2FnZRIPCgdjb250ZW50GAEgASgJQh5aHHZ5bmZvLmNvbS92eW5mby9nZW4vcHJvdG8vdjFiBnByb3RvMw");
+  fileDesc("Chxwcm90by92MS9jb252ZXJzYXRpb25zLnByb3RvEgJ2MSIeCgtVc2VyTWVzc2FnZRIPCgdjb250ZW50GAEgASgJIh8KDEFnZW50TWVzc2FnZRIPCgdjb250ZW50GAEgASgJIlkKF1NlbmRBZ2VudE1lc3NhZ2VSZXF1ZXN0Eg8KB2NvbnRlbnQYASABKAkSFAoMd29ya3NwYWNlX2lkGAIgASgJEhcKD2NvbnZlcnNhdGlvbl9pZBgDIAEoCTJ0ChNDb252ZXJzYXRpb25TZXJ2aWNlEl0KEFNlbmRBZ2VudE1lc3NhZ2USGy52MS5TZW5kQWdlbnRNZXNzYWdlUmVxdWVzdBoqLnYxLmludGVyLmFnZW50X3J1bnRpbWUuU3RyZWFtQ2hhdFJlc3BvbnNlMAFCHlocdnluZm8uY29tL3Z5bmZvL2dlbi9wcm90by92MWIGcHJvdG8z", [file_proto_v1_inter_agent_runtime_chat]);
 
 /**
  * @generated from message v1.UserMessage
@@ -45,4 +47,46 @@ export type AgentMessage = Message<"v1.AgentMessage"> & {
  */
 export const AgentMessageSchema: GenMessage<AgentMessage> = /*@__PURE__*/
   messageDesc(file_proto_v1_conversations, 1);
+
+/**
+ * @generated from message v1.SendAgentMessageRequest
+ */
+export type SendAgentMessageRequest = Message<"v1.SendAgentMessageRequest"> & {
+  /**
+   * @generated from field: string content = 1;
+   */
+  content: string;
+
+  /**
+   * @generated from field: string workspace_id = 2;
+   */
+  workspaceId: string;
+
+  /**
+   * @generated from field: string conversation_id = 3;
+   */
+  conversationId: string;
+};
+
+/**
+ * Describes the message v1.SendAgentMessageRequest.
+ * Use `create(SendAgentMessageRequestSchema)` to create a new message.
+ */
+export const SendAgentMessageRequestSchema: GenMessage<SendAgentMessageRequest> = /*@__PURE__*/
+  messageDesc(file_proto_v1_conversations, 2);
+
+/**
+ * @generated from service v1.ConversationService
+ */
+export const ConversationService: GenService<{
+  /**
+   * @generated from rpc v1.ConversationService.SendAgentMessage
+   */
+  sendAgentMessage: {
+    methodKind: "server_streaming";
+    input: typeof SendAgentMessageRequestSchema;
+    output: typeof StreamChatResponseSchema;
+  },
+}> = /*@__PURE__*/
+  serviceDesc(file_proto_v1_conversations, 0);
 

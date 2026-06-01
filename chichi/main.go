@@ -17,6 +17,7 @@ import (
 	"vynfo.com/vynfo/gen/proto/v1/v1connect"
 	dbgen "vynfo.com/vynfo/internal/db"
 	"vynfo.com/vynfo/messages"
+	"vynfo.com/vynfo/services/conversation"
 	"vynfo.com/vynfo/services/project"
 	"vynfo.com/vynfo/services/spaces"
 	"vynfo.com/vynfo/services/users"
@@ -62,6 +63,11 @@ func main() {
 	ctx := context.Background()
 	firebaseAuth := auth.NewFirebaseAuth(ctx)
 
+	vynfoClients, err := InitiateClients()
+	if err != nil {
+		slog.Error("vynfo clients init error", "error", err)
+	}
+
 	// ==================== ProjectService Deps ========================== //
 	storageClient, err := storage.NewClient(ctx)
 	if err != nil {
@@ -89,6 +95,9 @@ func main() {
 	UsersService := users.NewUsersServiceServer(storageClient, db, dbgen.New(db))
 	WorkspacesService := workspaces.NewWorkspacesServiceServer(db, dbgen.New(db))
 
+	// ==================== Conversations Deps ========================== //
+	ConversationsService := conversations.NewConversationServiceServer(storageClient, db, dbgen.New(db), vynfoClients.Mensah)
+	
 	mux := http.NewServeMux()
 	// Proto service endpoints
 	projectPath, projectHandler := v1connect.NewProjectServiceHandler(
@@ -116,6 +125,11 @@ func main() {
 		connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
 	)
 	mountConnectHandler(mux, filePath, fileHandler)
+	conversationsPath, conversationsHandler := v1connect.NewConversationServiceHandler(
+		ConversationsService,
+		connect.WithInterceptors(auth.FirebaseInterceptor(firebaseAuth)),
+	)
+	mountConnectHandler(mux, conversationsPath, conversationsHandler)
 	// Http service endpoints for HLS video serving
 	mux.HandleFunc("GET /video", ProjectService.GetManifest)
 	mux.Handle(

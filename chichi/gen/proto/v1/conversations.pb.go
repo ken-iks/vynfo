@@ -12,6 +12,7 @@ import (
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
+	agent_runtime "vynfo.com/vynfo/gen/proto/v1/inter/agent_runtime"
 )
 
 const (
@@ -109,15 +110,81 @@ func (x *AgentMessage) GetContent() string {
 	return ""
 }
 
+type SendAgentMessageRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Content        string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
+	WorkspaceId    string                 `protobuf:"bytes,2,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	ConversationId string                 `protobuf:"bytes,3,opt,name=conversation_id,json=conversationId,proto3" json:"conversation_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *SendAgentMessageRequest) Reset() {
+	*x = SendAgentMessageRequest{}
+	mi := &file_proto_v1_conversations_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendAgentMessageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendAgentMessageRequest) ProtoMessage() {}
+
+func (x *SendAgentMessageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_conversations_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendAgentMessageRequest.ProtoReflect.Descriptor instead.
+func (*SendAgentMessageRequest) Descriptor() ([]byte, []int) {
+	return file_proto_v1_conversations_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *SendAgentMessageRequest) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *SendAgentMessageRequest) GetWorkspaceId() string {
+	if x != nil {
+		return x.WorkspaceId
+	}
+	return ""
+}
+
+func (x *SendAgentMessageRequest) GetConversationId() string {
+	if x != nil {
+		return x.ConversationId
+	}
+	return ""
+}
+
 var File_proto_v1_conversations_proto protoreflect.FileDescriptor
 
 const file_proto_v1_conversations_proto_rawDesc = "" +
 	"\n" +
-	"\x1cproto/v1/conversations.proto\x12\x02v1\"'\n" +
+	"\x1cproto/v1/conversations.proto\x12\x02v1\x1a'proto/v1/inter/agent_runtime/chat.proto\"'\n" +
 	"\vUserMessage\x12\x18\n" +
 	"\acontent\x18\x01 \x01(\tR\acontent\"(\n" +
 	"\fAgentMessage\x12\x18\n" +
-	"\acontent\x18\x01 \x01(\tR\acontentB\x1eZ\x1cvynfo.com/vynfo/gen/proto/v1b\x06proto3"
+	"\acontent\x18\x01 \x01(\tR\acontent\"\x7f\n" +
+	"\x17SendAgentMessageRequest\x12\x18\n" +
+	"\acontent\x18\x01 \x01(\tR\acontent\x12!\n" +
+	"\fworkspace_id\x18\x02 \x01(\tR\vworkspaceId\x12'\n" +
+	"\x0fconversation_id\x18\x03 \x01(\tR\x0econversationId2t\n" +
+	"\x13ConversationService\x12]\n" +
+	"\x10SendAgentMessage\x12\x1b.v1.SendAgentMessageRequest\x1a*.v1.inter.agent_runtime.StreamChatResponse0\x01B\x1eZ\x1cvynfo.com/vynfo/gen/proto/v1b\x06proto3"
 
 var (
 	file_proto_v1_conversations_proto_rawDescOnce sync.Once
@@ -131,14 +198,18 @@ func file_proto_v1_conversations_proto_rawDescGZIP() []byte {
 	return file_proto_v1_conversations_proto_rawDescData
 }
 
-var file_proto_v1_conversations_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_proto_v1_conversations_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_proto_v1_conversations_proto_goTypes = []any{
-	(*UserMessage)(nil),  // 0: v1.UserMessage
-	(*AgentMessage)(nil), // 1: v1.AgentMessage
+	(*UserMessage)(nil),                      // 0: v1.UserMessage
+	(*AgentMessage)(nil),                     // 1: v1.AgentMessage
+	(*SendAgentMessageRequest)(nil),          // 2: v1.SendAgentMessageRequest
+	(*agent_runtime.StreamChatResponse)(nil), // 3: v1.inter.agent_runtime.StreamChatResponse
 }
 var file_proto_v1_conversations_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
+	2, // 0: v1.ConversationService.SendAgentMessage:input_type -> v1.SendAgentMessageRequest
+	3, // 1: v1.ConversationService.SendAgentMessage:output_type -> v1.inter.agent_runtime.StreamChatResponse
+	1, // [1:2] is the sub-list for method output_type
+	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -155,9 +226,9 @@ func file_proto_v1_conversations_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_v1_conversations_proto_rawDesc), len(file_proto_v1_conversations_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
-			NumServices:   0,
+			NumServices:   1,
 		},
 		GoTypes:           file_proto_v1_conversations_proto_goTypes,
 		DependencyIndexes: file_proto_v1_conversations_proto_depIdxs,

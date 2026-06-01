@@ -174,6 +174,15 @@ This project uses React 19.2.10 or newer. Do not use deprecated React types or A
 - Never use `FormEventHandler` or `React.FormEvent` for form submission handlers. Use `SubmitEventHandler` instead.
 - Before adding React types or APIs, prefer the current React 19-compatible form and avoid deprecated aliases, patterns, or imports.
 
+### 10. Favor correct long-term fixes over temporary convenience
+
+When the user asks how to make a specific file or code path work, inspect the actual file and recommend or implement the correct long-term approach, even if it takes more work.
+
+- Never suggest a temporary fix, fake implementation, weaker workaround, or lazy convenience path when the correct approach is knowable.
+- Do not suggest loosening production types, passing `None`, deleting useful type information, moving setup into the wrong layer, or otherwise making the product worse to avoid straightforward support code.
+- Do not stop at "this may be abstract" or "you could fake it" when the concrete ownership, initialization path, abstract methods, or incompatible signatures can be discovered and fixed properly.
+- If tooling reports exact missing methods or incompatible signatures, use that feedback to complete the correct implementation before responding.
+
 <!--
 To add another rule, append:
 

@@ -4,10 +4,22 @@ package v1;
 
 option go_package = "vynfo.com/vynfo/gen/proto/v1";
 
+import "proto/v1/inter/agent_runtime/chat.proto";
+
 message UserMessage {
     string content = 1;
 }
 
 message AgentMessage {
     string content = 1;
+}
+
+message SendAgentMessageRequest {
+    string content = 1;
+    string workspace_id = 2;
+    string conversation_id = 3;
+}
+
+service ConversationService {
+    rpc SendAgentMessage(SendAgentMessageRequest) returns (stream v1.inter.agent_runtime.StreamChatResponse);
 }

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package v1.inter.agent_backend;
+
+option go_package = "vynfo.com/vynfo/gen/proto/v1/inter/agent_backend";
+
+message AuthenticateUserAndPromptRequest {
+  string user_id = 1;
+  string workspace_id = 2;
+  string prompt = 3;
+}
+
+message AuthenticateUserAndPromptResponse {
+  bool valid = 1;
+}
+
+service AgentBackendService {
+    rpc AuthenticateUserAndPrompt(AuthenticateUserAndPromptRequest) returns (AuthenticateUserAndPromptResponse);
+}
