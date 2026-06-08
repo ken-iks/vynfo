@@ -8,7 +8,7 @@ from proto.v1.inter.agent_backend import (
 )
 
 
-class AgentBackendServiceStub(object):
+class AgentBackendServiceStub:
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -25,7 +25,7 @@ class AgentBackendServiceStub(object):
         )
 
 
-class AgentBackendServiceServicer(object):
+class AgentBackendServiceServicer:
     """Missing associated documentation comment in .proto file."""
 
     def AuthenticateUserAndPrompt(self, request, context):
@@ -53,7 +53,7 @@ def add_AgentBackendServiceServicer_to_server(servicer, server):
 
 
 # This class is part of an EXPERIMENTAL API.
-class AgentBackendService(object):
+class AgentBackendService:
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod

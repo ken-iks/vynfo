@@ -8,7 +8,7 @@ from proto.v1.inter.agent_runtime import (
 )
 
 
-class ChatServiceStub(object):
+class ChatServiceStub:
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -25,7 +25,7 @@ class ChatServiceStub(object):
         )
 
 
-class ChatServiceServicer(object):
+class ChatServiceServicer:
     """Missing associated documentation comment in .proto file."""
 
     def StreamChat(self, request, context):
@@ -53,7 +53,7 @@ def add_ChatServiceServicer_to_server(servicer, server):
 
 
 # This class is part of an EXPERIMENTAL API.
-class ChatService(object):
+class ChatService:
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod

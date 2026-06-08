@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        (unknown)
-// source: proto/v1/conversations.proto
+// source: proto/v1/conversation.proto
 
 package v1
 
@@ -31,7 +31,7 @@ type UserMessage struct {
 
 func (x *UserMessage) Reset() {
 	*x = UserMessage{}
-	mi := &file_proto_v1_conversations_proto_msgTypes[0]
+	mi := &file_proto_v1_conversation_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +43,7 @@ func (x *UserMessage) String() string {
 func (*UserMessage) ProtoMessage() {}
 
 func (x *UserMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_conversations_proto_msgTypes[0]
+	mi := &file_proto_v1_conversation_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +56,7 @@ func (x *UserMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserMessage.ProtoReflect.Descriptor instead.
 func (*UserMessage) Descriptor() ([]byte, []int) {
-	return file_proto_v1_conversations_proto_rawDescGZIP(), []int{0}
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *UserMessage) GetContent() string {
@@ -75,7 +75,7 @@ type AgentMessage struct {
 
 func (x *AgentMessage) Reset() {
 	*x = AgentMessage{}
-	mi := &file_proto_v1_conversations_proto_msgTypes[1]
+	mi := &file_proto_v1_conversation_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -87,7 +87,7 @@ func (x *AgentMessage) String() string {
 func (*AgentMessage) ProtoMessage() {}
 
 func (x *AgentMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_conversations_proto_msgTypes[1]
+	mi := &file_proto_v1_conversation_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -100,7 +100,7 @@ func (x *AgentMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentMessage.ProtoReflect.Descriptor instead.
 func (*AgentMessage) Descriptor() ([]byte, []int) {
-	return file_proto_v1_conversations_proto_rawDescGZIP(), []int{1}
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *AgentMessage) GetContent() string {
@@ -121,7 +121,7 @@ type SendAgentMessageRequest struct {
 
 func (x *SendAgentMessageRequest) Reset() {
 	*x = SendAgentMessageRequest{}
-	mi := &file_proto_v1_conversations_proto_msgTypes[2]
+	mi := &file_proto_v1_conversation_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -133,7 +133,7 @@ func (x *SendAgentMessageRequest) String() string {
 func (*SendAgentMessageRequest) ProtoMessage() {}
 
 func (x *SendAgentMessageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_conversations_proto_msgTypes[2]
+	mi := &file_proto_v1_conversation_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -146,7 +146,7 @@ func (x *SendAgentMessageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendAgentMessageRequest.ProtoReflect.Descriptor instead.
 func (*SendAgentMessageRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_conversations_proto_rawDescGZIP(), []int{2}
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *SendAgentMessageRequest) GetContent() string {
@@ -170,11 +170,11 @@ func (x *SendAgentMessageRequest) GetConversationId() string {
 	return ""
 }
 
-var File_proto_v1_conversations_proto protoreflect.FileDescriptor
+var File_proto_v1_conversation_proto protoreflect.FileDescriptor
 
-const file_proto_v1_conversations_proto_rawDesc = "" +
+const file_proto_v1_conversation_proto_rawDesc = "" +
 	"\n" +
-	"\x1cproto/v1/conversations.proto\x12\x02v1\x1a'proto/v1/inter/agent_runtime/chat.proto\"'\n" +
+	"\x1bproto/v1/conversation.proto\x12\x02v1\x1a'proto/v1/inter/agent_runtime/chat.proto\"'\n" +
 	"\vUserMessage\x12\x18\n" +
 	"\acontent\x18\x01 \x01(\tR\acontent\"(\n" +
 	"\fAgentMessage\x12\x18\n" +
@@ -187,25 +187,25 @@ const file_proto_v1_conversations_proto_rawDesc = "" +
 	"\x10SendAgentMessage\x12\x1b.v1.SendAgentMessageRequest\x1a*.v1.inter.agent_runtime.StreamChatResponse0\x01B\x1eZ\x1cvynfo.com/vynfo/gen/proto/v1b\x06proto3"
 
 var (
-	file_proto_v1_conversations_proto_rawDescOnce sync.Once
-	file_proto_v1_conversations_proto_rawDescData []byte
+	file_proto_v1_conversation_proto_rawDescOnce sync.Once
+	file_proto_v1_conversation_proto_rawDescData []byte
 )
 
-func file_proto_v1_conversations_proto_rawDescGZIP() []byte {
-	file_proto_v1_conversations_proto_rawDescOnce.Do(func() {
-		file_proto_v1_conversations_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_v1_conversations_proto_rawDesc), len(file_proto_v1_conversations_proto_rawDesc)))
+func file_proto_v1_conversation_proto_rawDescGZIP() []byte {
+	file_proto_v1_conversation_proto_rawDescOnce.Do(func() {
+		file_proto_v1_conversation_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_v1_conversation_proto_rawDesc), len(file_proto_v1_conversation_proto_rawDesc)))
 	})
-	return file_proto_v1_conversations_proto_rawDescData
+	return file_proto_v1_conversation_proto_rawDescData
 }
 
-var file_proto_v1_conversations_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_proto_v1_conversations_proto_goTypes = []any{
+var file_proto_v1_conversation_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_proto_v1_conversation_proto_goTypes = []any{
 	(*UserMessage)(nil),                      // 0: v1.UserMessage
 	(*AgentMessage)(nil),                     // 1: v1.AgentMessage
 	(*SendAgentMessageRequest)(nil),          // 2: v1.SendAgentMessageRequest
 	(*agent_runtime.StreamChatResponse)(nil), // 3: v1.inter.agent_runtime.StreamChatResponse
 }
-var file_proto_v1_conversations_proto_depIdxs = []int32{
+var file_proto_v1_conversation_proto_depIdxs = []int32{
 	2, // 0: v1.ConversationService.SendAgentMessage:input_type -> v1.SendAgentMessageRequest
 	3, // 1: v1.ConversationService.SendAgentMessage:output_type -> v1.inter.agent_runtime.StreamChatResponse
 	1, // [1:2] is the sub-list for method output_type
@@ -215,26 +215,26 @@ var file_proto_v1_conversations_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_proto_v1_conversations_proto_init() }
-func file_proto_v1_conversations_proto_init() {
-	if File_proto_v1_conversations_proto != nil {
+func init() { file_proto_v1_conversation_proto_init() }
+func file_proto_v1_conversation_proto_init() {
+	if File_proto_v1_conversation_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_v1_conversations_proto_rawDesc), len(file_proto_v1_conversations_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_v1_conversation_proto_rawDesc), len(file_proto_v1_conversation_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_proto_v1_conversations_proto_goTypes,
-		DependencyIndexes: file_proto_v1_conversations_proto_depIdxs,
-		MessageInfos:      file_proto_v1_conversations_proto_msgTypes,
+		GoTypes:           file_proto_v1_conversation_proto_goTypes,
+		DependencyIndexes: file_proto_v1_conversation_proto_depIdxs,
+		MessageInfos:      file_proto_v1_conversation_proto_msgTypes,
 	}.Build()
-	File_proto_v1_conversations_proto = out.File
-	file_proto_v1_conversations_proto_goTypes = nil
-	file_proto_v1_conversations_proto_depIdxs = nil
+	File_proto_v1_conversation_proto = out.File
+	file_proto_v1_conversation_proto_goTypes = nil
+	file_proto_v1_conversation_proto_depIdxs = nil
 }
