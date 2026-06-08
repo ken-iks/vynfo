@@ -33,7 +33,7 @@ func (s *AgentBackendServiceServer) AuthenticateUserAndPrompt(
 	}
 	membership, err := s.queries.IsWorkspaceMember(ctx, db.IsWorkspaceMemberParams{
 		WorkspaceID: workspaceId,
-		MemberID: userId,
+		MemberID:    userId,
 	})
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to check workspace membership")

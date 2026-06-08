@@ -2,8 +2,16 @@
 // @generated from file proto/v1/conversations.proto (package v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type {
+  GenFile,
+  GenMessage,
+  GenService,
+} from "@bufbuild/protobuf/codegenv2";
+import {
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from "@bufbuild/protobuf/codegenv2";
 import type { StreamChatResponseSchema } from "./inter/agent_runtime/chat_pb";
 import { file_proto_v1_inter_agent_runtime_chat } from "./inter/agent_runtime/chat_pb";
 import type { Message } from "@bufbuild/protobuf";
@@ -11,8 +19,12 @@ import type { Message } from "@bufbuild/protobuf";
 /**
  * Describes the file proto/v1/conversations.proto.
  */
-export const file_proto_v1_conversations: GenFile = /*@__PURE__*/
-  fileDesc("Chxwcm90by92MS9jb252ZXJzYXRpb25zLnByb3RvEgJ2MSIeCgtVc2VyTWVzc2FnZRIPCgdjb250ZW50GAEgASgJIh8KDEFnZW50TWVzc2FnZRIPCgdjb250ZW50GAEgASgJIlkKF1NlbmRBZ2VudE1lc3NhZ2VSZXF1ZXN0Eg8KB2NvbnRlbnQYASABKAkSFAoMd29ya3NwYWNlX2lkGAIgASgJEhcKD2NvbnZlcnNhdGlvbl9pZBgDIAEoCTJ0ChNDb252ZXJzYXRpb25TZXJ2aWNlEl0KEFNlbmRBZ2VudE1lc3NhZ2USGy52MS5TZW5kQWdlbnRNZXNzYWdlUmVxdWVzdBoqLnYxLmludGVyLmFnZW50X3J1bnRpbWUuU3RyZWFtQ2hhdFJlc3BvbnNlMAFCHlocdnluZm8uY29tL3Z5bmZvL2dlbi9wcm90by92MWIGcHJvdG8z", [file_proto_v1_inter_agent_runtime_chat]);
+export const file_proto_v1_conversations: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    "Chxwcm90by92MS9jb252ZXJzYXRpb25zLnByb3RvEgJ2MSIeCgtVc2VyTWVzc2FnZRIPCgdjb250ZW50GAEgASgJIh8KDEFnZW50TWVzc2FnZRIPCgdjb250ZW50GAEgASgJIlkKF1NlbmRBZ2VudE1lc3NhZ2VSZXF1ZXN0Eg8KB2NvbnRlbnQYASABKAkSFAoMd29ya3NwYWNlX2lkGAIgASgJEhcKD2NvbnZlcnNhdGlvbl9pZBgDIAEoCTJ0ChNDb252ZXJzYXRpb25TZXJ2aWNlEl0KEFNlbmRBZ2VudE1lc3NhZ2USGy52MS5TZW5kQWdlbnRNZXNzYWdlUmVxdWVzdBoqLnYxLmludGVyLmFnZW50X3J1bnRpbWUuU3RyZWFtQ2hhdFJlc3BvbnNlMAFCHlocdnluZm8uY29tL3Z5bmZvL2dlbi9wcm90by92MWIGcHJvdG8z",
+    [file_proto_v1_inter_agent_runtime_chat],
+  );
 
 /**
  * @generated from message v1.UserMessage
@@ -28,7 +40,8 @@ export type UserMessage = Message<"v1.UserMessage"> & {
  * Describes the message v1.UserMessage.
  * Use `create(UserMessageSchema)` to create a new message.
  */
-export const UserMessageSchema: GenMessage<UserMessage> = /*@__PURE__*/
+export const UserMessageSchema: GenMessage<UserMessage> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_conversations, 0);
 
 /**
@@ -45,7 +58,8 @@ export type AgentMessage = Message<"v1.AgentMessage"> & {
  * Describes the message v1.AgentMessage.
  * Use `create(AgentMessageSchema)` to create a new message.
  */
-export const AgentMessageSchema: GenMessage<AgentMessage> = /*@__PURE__*/
+export const AgentMessageSchema: GenMessage<AgentMessage> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_conversations, 1);
 
 /**
@@ -72,7 +86,8 @@ export type SendAgentMessageRequest = Message<"v1.SendAgentMessageRequest"> & {
  * Describes the message v1.SendAgentMessageRequest.
  * Use `create(SendAgentMessageRequestSchema)` to create a new message.
  */
-export const SendAgentMessageRequestSchema: GenMessage<SendAgentMessageRequest> = /*@__PURE__*/
+export const SendAgentMessageRequestSchema: GenMessage<SendAgentMessageRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_conversations, 2);
 
 /**
@@ -86,7 +101,5 @@ export const ConversationService: GenService<{
     methodKind: "server_streaming";
     input: typeof SendAgentMessageRequestSchema;
     output: typeof StreamChatResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_proto_v1_conversations, 0);
-
+  };
+}> = /*@__PURE__*/ serviceDesc(file_proto_v1_conversations, 0);

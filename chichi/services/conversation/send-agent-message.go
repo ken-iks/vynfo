@@ -17,12 +17,12 @@ func (c *ConversationServiceServer) SendAgentMessage(
 	onboardedUser, err := auth.RequireOnboardedUser(ctx, c.queries)
 	if err != nil {
 		return err
-	} 
+	}
 	userId := onboardedUser.ID.String()
 
 	responseStream, err := c.mensahClient.StreamChat(ctx, &agent_runtime.StreamChatRequest{
-		Prompt: req.Msg.GetContent(),
-		UserId: userId,
+		Prompt:      req.Msg.GetContent(),
+		UserId:      userId,
 		WorkspaceId: req.Msg.GetConversationId(),
 		// TODO: get conversation messages from db
 	})

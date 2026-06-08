@@ -18,8 +18,9 @@ else:
 
 _T = _typing.TypeVar("_T")
 
-class _MaybeAsyncIterator(_abc.AsyncIterator[_T], _abc.Iterator[_T], metaclass=_abc_1.ABCMeta): ...
-
+class _MaybeAsyncIterator(
+    _abc.AsyncIterator[_T], _abc.Iterator[_T], metaclass=_abc_1.ABCMeta
+): ...
 class _ServicerContext(_grpc.ServicerContext, _aio.ServicerContext):  # type: ignore[misc, type-arg]
     ...
 
@@ -31,12 +32,16 @@ class ChatServiceStub:
     def __new__(cls, channel: _grpc.Channel) -> _Self: ...
     @_typing.overload
     def __new__(cls, channel: _aio.Channel) -> ChatServiceAsyncStub: ...
-    StreamChat: _grpc.UnaryStreamMultiCallable[_chat_pb2.StreamChatRequest, _chat_pb2.StreamChatResponse]
+    StreamChat: _grpc.UnaryStreamMultiCallable[
+        _chat_pb2.StreamChatRequest, _chat_pb2.StreamChatResponse
+    ]
 
 @_typing.type_check_only
 class ChatServiceAsyncStub(ChatServiceStub):
     def __init__(self, channel: _aio.Channel) -> None: ...
-    StreamChat: _aio.UnaryStreamMultiCallable[_chat_pb2.StreamChatRequest, _chat_pb2.StreamChatResponse]  # type: ignore[assignment]
+    StreamChat: _aio.UnaryStreamMultiCallable[
+        _chat_pb2.StreamChatRequest, _chat_pb2.StreamChatResponse
+    ]  # type: ignore[assignment]
 
 class ChatServiceServicer(metaclass=_abc_1.ABCMeta):
     @_abc_1.abstractmethod
@@ -44,6 +49,11 @@ class ChatServiceServicer(metaclass=_abc_1.ABCMeta):
         self,
         request: _chat_pb2.StreamChatRequest,
         context: _ServicerContext,
-    ) -> _typing.Union[_abc.Iterator[_chat_pb2.StreamChatResponse], _abc.AsyncIterator[_chat_pb2.StreamChatResponse]]: ...
+    ) -> _typing.Union[
+        _abc.Iterator[_chat_pb2.StreamChatResponse],
+        _abc.AsyncIterator[_chat_pb2.StreamChatResponse],
+    ]: ...
 
-def add_ChatServiceServicer_to_server(servicer: ChatServiceServicer, server: _typing.Union[_grpc.Server, _aio.Server]) -> None: ...
+def add_ChatServiceServicer_to_server(
+    servicer: ChatServiceServicer, server: _typing.Union[_grpc.Server, _aio.Server]
+) -> None: ...

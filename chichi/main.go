@@ -117,8 +117,13 @@ func main() {
 	WorkspacesService := workspaces.NewWorkspacesServiceServer(db, dbgen.New(db))
 
 	// ==================== Conversations Deps ========================== //
-	ConversationsService := conversations.NewConversationServiceServer(storageClient, db, dbgen.New(db), vynfoClients.Mensah)
-	
+	ConversationsService := conversations.NewConversationServiceServer(
+		storageClient,
+		db,
+		dbgen.New(db),
+		vynfoClients.Mensah,
+	)
+
 	mux := http.NewServeMux()
 	// Proto service endpoints
 	projectPath, projectHandler := v1connect.NewProjectServiceHandler(
@@ -158,7 +163,7 @@ func main() {
 		http.StripPrefix("/segments/", http.FileServer(http.Dir("segments"))),
 	)
 	slog.Info("startup successful", "port", address)
-	
+
 	// Internal services are initialized as pure grpc services since they do not
 	// require http handling
 	go runInternalServices(dbgen.New(db))

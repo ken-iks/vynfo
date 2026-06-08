@@ -18,8 +18,9 @@ else:
 
 _T = _typing.TypeVar("_T")
 
-class _MaybeAsyncIterator(_abc.AsyncIterator[_T], _abc.Iterator[_T], metaclass=_abc_1.ABCMeta): ...
-
+class _MaybeAsyncIterator(
+    _abc.AsyncIterator[_T], _abc.Iterator[_T], metaclass=_abc_1.ABCMeta
+): ...
 class _ServicerContext(_grpc.ServicerContext, _aio.ServicerContext):  # type: ignore[misc, type-arg]
     ...
 
@@ -31,12 +32,18 @@ class AgentBackendServiceStub:
     def __new__(cls, channel: _grpc.Channel) -> _Self: ...
     @_typing.overload
     def __new__(cls, channel: _aio.Channel) -> AgentBackendServiceAsyncStub: ...
-    AuthenticateUserAndPrompt: _grpc.UnaryUnaryMultiCallable[_backend_pb2.AuthenticateUserAndPromptRequest, _backend_pb2.AuthenticateUserAndPromptResponse]
+    AuthenticateUserAndPrompt: _grpc.UnaryUnaryMultiCallable[
+        _backend_pb2.AuthenticateUserAndPromptRequest,
+        _backend_pb2.AuthenticateUserAndPromptResponse,
+    ]
 
 @_typing.type_check_only
 class AgentBackendServiceAsyncStub(AgentBackendServiceStub):
     def __init__(self, channel: _aio.Channel) -> None: ...
-    AuthenticateUserAndPrompt: _aio.UnaryUnaryMultiCallable[_backend_pb2.AuthenticateUserAndPromptRequest, _backend_pb2.AuthenticateUserAndPromptResponse]  # type: ignore[assignment]
+    AuthenticateUserAndPrompt: _aio.UnaryUnaryMultiCallable[
+        _backend_pb2.AuthenticateUserAndPromptRequest,
+        _backend_pb2.AuthenticateUserAndPromptResponse,
+    ]  # type: ignore[assignment]
 
 class AgentBackendServiceServicer(metaclass=_abc_1.ABCMeta):
     @_abc_1.abstractmethod
@@ -44,6 +51,12 @@ class AgentBackendServiceServicer(metaclass=_abc_1.ABCMeta):
         self,
         request: _backend_pb2.AuthenticateUserAndPromptRequest,
         context: _ServicerContext,
-    ) -> _typing.Union[_backend_pb2.AuthenticateUserAndPromptResponse, _abc.Awaitable[_backend_pb2.AuthenticateUserAndPromptResponse]]: ...
+    ) -> _typing.Union[
+        _backend_pb2.AuthenticateUserAndPromptResponse,
+        _abc.Awaitable[_backend_pb2.AuthenticateUserAndPromptResponse],
+    ]: ...
 
-def add_AgentBackendServiceServicer_to_server(servicer: AgentBackendServiceServicer, server: _typing.Union[_grpc.Server, _aio.Server]) -> None: ...
+def add_AgentBackendServiceServicer_to_server(
+    servicer: AgentBackendServiceServicer,
+    server: _typing.Union[_grpc.Server, _aio.Server],
+) -> None: ...

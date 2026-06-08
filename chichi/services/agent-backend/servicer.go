@@ -11,5 +11,5 @@ type AgentBackendServiceServer struct {
 }
 
 func NewAgentBackServiceServer(queries *dbgen.Queries) *AgentBackendServiceServer {
- return &AgentBackendServiceServer{ queries: queries }
+	return &AgentBackendServiceServer{queries: queries}
 }
