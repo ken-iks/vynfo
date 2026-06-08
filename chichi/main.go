@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"embed"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 
@@ -13,10 +14,13 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/pressly/goose/v3"
 	"github.com/rs/cors"
+	"google.golang.org/grpc"
 	"vynfo.com/vynfo/auth"
+	agentbackendpb "vynfo.com/vynfo/gen/proto/v1/inter/agent_backend"
 	"vynfo.com/vynfo/gen/proto/v1/v1connect"
 	dbgen "vynfo.com/vynfo/internal/db"
 	"vynfo.com/vynfo/messages"
+	agentbackend "vynfo.com/vynfo/services/agent-backend"
 	"vynfo.com/vynfo/services/conversation"
 	"vynfo.com/vynfo/services/project"
 	"vynfo.com/vynfo/services/spaces"
@@ -44,6 +48,23 @@ func runMigrations() (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func runInternalServices(queries *dbgen.Queries) {
+	listener, err := net.Listen("tcp", ":50052")
+	if err != nil {
+		slog.Error("grpc listen error", "error", err)
+		os.Exit(1)
+	}
+
+	agentBackendService := agentbackend.NewAgentBackServiceServer(queries)
+	grpcServer := grpc.NewServer()
+
+	agentbackendpb.RegisterAgentBackendServiceServer(grpcServer, agentBackendService)
+	if err := grpcServer.Serve(listener); err != nil {
+		slog.Error("grpc serve error", "error", err)
+		os.Exit(1)
+	}
 }
 
 func mountConnectHandler(mux *http.ServeMux, path string, handler http.Handler) {
@@ -137,6 +158,11 @@ func main() {
 		http.StripPrefix("/segments/", http.FileServer(http.Dir("segments"))),
 	)
 	slog.Info("startup successful", "port", address)
+	
+	// Internal services are initialized as pure grpc services since they do not
+	// require http handling
+	go runInternalServices(dbgen.New(db))
+
 	http.ListenAndServe(
 		address,
 		cors.AllowAll().Handler(mux),
