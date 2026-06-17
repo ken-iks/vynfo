@@ -30,27 +30,21 @@ const sidebarRoutes: SidebarRoute[] = [
     disabled: false,
   },
   {
-    title: "Spaces",
+    title: "Reviews",
     icon: "/icons/spaces-icon.svg",
     path: "/spaces",
     disabled: false,
   },
   {
-    title: "VFS",
+    title: "Files",
     icon: "/icons/vfs-icon.svg",
     path: "/vfs",
     disabled: false,
   },
   {
-    title: "Vynfo Agent",
+    title: "Ask Murch",
     icon: "/icons/agent-icon.svg",
-    path: "/agent",
-    disabled: true,
-  },
-  {
-    title: "Vynfo Reviews",
-    icon: "/icons/review-icon.svg",
-    path: "/reviews",
+    path: "/murch",
     disabled: true,
   },
 ];

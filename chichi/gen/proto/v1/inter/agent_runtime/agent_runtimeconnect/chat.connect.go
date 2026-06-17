@@ -35,11 +35,15 @@ const (
 const (
 	// ChatServiceStreamChatProcedure is the fully-qualified name of the ChatService's StreamChat RPC.
 	ChatServiceStreamChatProcedure = "/v1.inter.agent_runtime.ChatService/StreamChat"
+	// ChatServiceGenerateTitleProcedure is the fully-qualified name of the ChatService's GenerateTitle
+	// RPC.
+	ChatServiceGenerateTitleProcedure = "/v1.inter.agent_runtime.ChatService/GenerateTitle"
 )
 
 // ChatServiceClient is a client for the v1.inter.agent_runtime.ChatService service.
 type ChatServiceClient interface {
 	StreamChat(context.Context, *connect.Request[agent_runtime.StreamChatRequest]) (*connect.ServerStreamForClient[agent_runtime.StreamChatResponse], error)
+	GenerateTitle(context.Context, *connect.Request[agent_runtime.GenerateTitleRequest]) (*connect.Response[agent_runtime.GenerateTitleResponse], error)
 }
 
 // NewChatServiceClient constructs a client for the v1.inter.agent_runtime.ChatService service. By
@@ -59,12 +63,19 @@ func NewChatServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(chatServiceMethods.ByName("StreamChat")),
 			connect.WithClientOptions(opts...),
 		),
+		generateTitle: connect.NewClient[agent_runtime.GenerateTitleRequest, agent_runtime.GenerateTitleResponse](
+			httpClient,
+			baseURL+ChatServiceGenerateTitleProcedure,
+			connect.WithSchema(chatServiceMethods.ByName("GenerateTitle")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // chatServiceClient implements ChatServiceClient.
 type chatServiceClient struct {
-	streamChat *connect.Client[agent_runtime.StreamChatRequest, agent_runtime.StreamChatResponse]
+	streamChat    *connect.Client[agent_runtime.StreamChatRequest, agent_runtime.StreamChatResponse]
+	generateTitle *connect.Client[agent_runtime.GenerateTitleRequest, agent_runtime.GenerateTitleResponse]
 }
 
 // StreamChat calls v1.inter.agent_runtime.ChatService.StreamChat.
@@ -72,9 +83,15 @@ func (c *chatServiceClient) StreamChat(ctx context.Context, req *connect.Request
 	return c.streamChat.CallServerStream(ctx, req)
 }
 
+// GenerateTitle calls v1.inter.agent_runtime.ChatService.GenerateTitle.
+func (c *chatServiceClient) GenerateTitle(ctx context.Context, req *connect.Request[agent_runtime.GenerateTitleRequest]) (*connect.Response[agent_runtime.GenerateTitleResponse], error) {
+	return c.generateTitle.CallUnary(ctx, req)
+}
+
 // ChatServiceHandler is an implementation of the v1.inter.agent_runtime.ChatService service.
 type ChatServiceHandler interface {
 	StreamChat(context.Context, *connect.Request[agent_runtime.StreamChatRequest], *connect.ServerStream[agent_runtime.StreamChatResponse]) error
+	GenerateTitle(context.Context, *connect.Request[agent_runtime.GenerateTitleRequest]) (*connect.Response[agent_runtime.GenerateTitleResponse], error)
 }
 
 // NewChatServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -90,10 +107,18 @@ func NewChatServiceHandler(svc ChatServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(chatServiceMethods.ByName("StreamChat")),
 		connect.WithHandlerOptions(opts...),
 	)
+	chatServiceGenerateTitleHandler := connect.NewUnaryHandler(
+		ChatServiceGenerateTitleProcedure,
+		svc.GenerateTitle,
+		connect.WithSchema(chatServiceMethods.ByName("GenerateTitle")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/v1.inter.agent_runtime.ChatService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ChatServiceStreamChatProcedure:
 			chatServiceStreamChatHandler.ServeHTTP(w, r)
+		case ChatServiceGenerateTitleProcedure:
+			chatServiceGenerateTitleHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -105,4 +130,8 @@ type UnimplementedChatServiceHandler struct{}
 
 func (UnimplementedChatServiceHandler) StreamChat(context.Context, *connect.Request[agent_runtime.StreamChatRequest], *connect.ServerStream[agent_runtime.StreamChatResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("v1.inter.agent_runtime.ChatService.StreamChat is not implemented"))
+}
+
+func (UnimplementedChatServiceHandler) GenerateTitle(context.Context, *connect.Request[agent_runtime.GenerateTitleRequest]) (*connect.Response[agent_runtime.GenerateTitleResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.inter.agent_runtime.ChatService.GenerateTitle is not implemented"))
 }

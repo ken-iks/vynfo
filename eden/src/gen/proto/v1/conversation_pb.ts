@@ -2,16 +2,10 @@
 // @generated from file proto/v1/conversation.proto (package v1, syntax proto3)
 /* eslint-disable */
 
-import type {
-  GenFile,
-  GenMessage,
-  GenService,
-} from "@bufbuild/protobuf/codegenv2";
-import {
-  fileDesc,
-  messageDesc,
-  serviceDesc,
-} from "@bufbuild/protobuf/codegenv2";
+import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type { EmptySchema, Timestamp } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_empty, file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { StreamChatResponseSchema } from "./inter/agent_runtime/chat_pb";
 import { file_proto_v1_inter_agent_runtime_chat } from "./inter/agent_runtime/chat_pb";
 import type { Message } from "@bufbuild/protobuf";
@@ -19,12 +13,8 @@ import type { Message } from "@bufbuild/protobuf";
 /**
  * Describes the file proto/v1/conversation.proto.
  */
-export const file_proto_v1_conversation: GenFile =
-  /*@__PURE__*/
-  fileDesc(
-    "Chtwcm90by92MS9jb252ZXJzYXRpb24ucHJvdG8SAnYxIh4KC1VzZXJNZXNzYWdlEg8KB2NvbnRlbnQYASABKAkiHwoMQWdlbnRNZXNzYWdlEg8KB2NvbnRlbnQYASABKAkiWQoXU2VuZEFnZW50TWVzc2FnZVJlcXVlc3QSDwoHY29udGVudBgBIAEoCRIUCgx3b3Jrc3BhY2VfaWQYAiABKAkSFwoPY29udmVyc2F0aW9uX2lkGAMgASgJMnQKE0NvbnZlcnNhdGlvblNlcnZpY2USXQoQU2VuZEFnZW50TWVzc2FnZRIbLnYxLlNlbmRBZ2VudE1lc3NhZ2VSZXF1ZXN0GioudjEuaW50ZXIuYWdlbnRfcnVudGltZS5TdHJlYW1DaGF0UmVzcG9uc2UwAUIeWhx2eW5mby5jb20vdnluZm8vZ2VuL3Byb3RvL3YxYgZwcm90bzM",
-    [file_proto_v1_inter_agent_runtime_chat],
-  );
+export const file_proto_v1_conversation: GenFile = /*@__PURE__*/
+  fileDesc("Chtwcm90by92MS9jb252ZXJzYXRpb24ucHJvdG8SAnYxIh4KC1VzZXJNZXNzYWdlEg8KB2NvbnRlbnQYASABKAkiHwoMQWdlbnRNZXNzYWdlEg8KB2NvbnRlbnQYASABKAkiWQoXU2VuZEFnZW50TWVzc2FnZVJlcXVlc3QSDwoHY29udGVudBgBIAEoCRIUCgx3b3Jrc3BhY2VfaWQYAiABKAkSFwoPY29udmVyc2F0aW9uX2lkGAMgASgJIowBCg5BSUNvbnZlcnNhdGlvbhIXCg9jb252ZXJzYXRpb25faWQYASABKAkSDQoFdGl0bGUYAiABKAkSHQoVY29udmVyc2F0aW9uX293bmVyX2lkGAMgASgJEjMKD2xhc3RfdXBkYXRlZF9hdBgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiLAobQ3JlYXRlQUlDb252ZXJzYXRpb25SZXF1ZXN0Eg0KBXRpdGxlGAEgASgJIkgKHENyZWF0ZUFJQ29udmVyc2F0aW9uUmVzcG9uc2USKAoMY29udmVyc2F0aW9uGAEgASgLMhIudjEuQUlDb252ZXJzYXRpb24iMwoYR2V0QUlDb252ZXJzYXRpb25SZXF1ZXN0EhcKD2NvbnZlcnNhdGlvbl9pZBgBIAEoCSJlChlHZXRBSUNvbnZlcnNhdGlvblJlc3BvbnNlEigKDGNvbnZlcnNhdGlvbhgBIAEoCzISLnYxLkFJQ29udmVyc2F0aW9uEh4KFnB5ZGFudGljX21lc3NhZ2VzX2pzb24YAiADKAkiHAoaTGlzdEFJQ29udmVyc2F0aW9uc1JlcXVlc3QiSAobTGlzdEFJQ29udmVyc2F0aW9uc1Jlc3BvbnNlEikKDWNvbnZlcnNhdGlvbnMYASADKAsyEi52MS5BSUNvbnZlcnNhdGlvbiJFChtVcGRhdGVBSUNvbnZlcnNhdGlvblJlcXVlc3QSFwoPY29udmVyc2F0aW9uX2lkGAEgASgJEg0KBXRpdGxlGAIgASgJIjYKG0RlbGV0ZUFJQ29udmVyc2F0aW9uUmVxdWVzdBIXCg9jb252ZXJzYXRpb25faWQYASABKAkylwQKE0NvbnZlcnNhdGlvblNlcnZpY2USWQoUQ3JlYXRlQUlDb252ZXJzYXRpb24SHy52MS5DcmVhdGVBSUNvbnZlcnNhdGlvblJlcXVlc3QaIC52MS5DcmVhdGVBSUNvbnZlcnNhdGlvblJlc3BvbnNlElAKEUdldEFJQ29udmVyc2F0aW9uEhwudjEuR2V0QUlDb252ZXJzYXRpb25SZXF1ZXN0Gh0udjEuR2V0QUlDb252ZXJzYXRpb25SZXNwb25zZRJWChNMaXN0QUlDb252ZXJzYXRpb25zEh4udjEuTGlzdEFJQ29udmVyc2F0aW9uc1JlcXVlc3QaHy52MS5MaXN0QUlDb252ZXJzYXRpb25zUmVzcG9uc2USSwoUVXBkYXRlQUlDb252ZXJzYXRpb24SHy52MS5VcGRhdGVBSUNvbnZlcnNhdGlvblJlcXVlc3QaEi52MS5BSUNvbnZlcnNhdGlvbhJPChREZWxldGVBSUNvbnZlcnNhdGlvbhIfLnYxLkRlbGV0ZUFJQ29udmVyc2F0aW9uUmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRJdChBTZW5kQWdlbnRNZXNzYWdlEhsudjEuU2VuZEFnZW50TWVzc2FnZVJlcXVlc3QaKi52MS5pbnRlci5hZ2VudF9ydW50aW1lLlN0cmVhbUNoYXRSZXNwb25zZTABQh5aHHZ5bmZvLmNvbS92eW5mby9nZW4vcHJvdG8vdjFiBnByb3RvMw", [file_google_protobuf_empty, file_google_protobuf_timestamp, file_proto_v1_inter_agent_runtime_chat]);
 
 /**
  * @generated from message v1.UserMessage
@@ -40,8 +30,7 @@ export type UserMessage = Message<"v1.UserMessage"> & {
  * Describes the message v1.UserMessage.
  * Use `create(UserMessageSchema)` to create a new message.
  */
-export const UserMessageSchema: GenMessage<UserMessage> =
-  /*@__PURE__*/
+export const UserMessageSchema: GenMessage<UserMessage> = /*@__PURE__*/
   messageDesc(file_proto_v1_conversation, 0);
 
 /**
@@ -58,8 +47,7 @@ export type AgentMessage = Message<"v1.AgentMessage"> & {
  * Describes the message v1.AgentMessage.
  * Use `create(AgentMessageSchema)` to create a new message.
  */
-export const AgentMessageSchema: GenMessage<AgentMessage> =
-  /*@__PURE__*/
+export const AgentMessageSchema: GenMessage<AgentMessage> = /*@__PURE__*/
   messageDesc(file_proto_v1_conversation, 1);
 
 /**
@@ -86,14 +74,227 @@ export type SendAgentMessageRequest = Message<"v1.SendAgentMessageRequest"> & {
  * Describes the message v1.SendAgentMessageRequest.
  * Use `create(SendAgentMessageRequestSchema)` to create a new message.
  */
-export const SendAgentMessageRequestSchema: GenMessage<SendAgentMessageRequest> =
-  /*@__PURE__*/
+export const SendAgentMessageRequestSchema: GenMessage<SendAgentMessageRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_conversation, 2);
+
+/**
+ * @generated from message v1.AIConversation
+ */
+export type AIConversation = Message<"v1.AIConversation"> & {
+  /**
+   * @generated from field: string conversation_id = 1;
+   */
+  conversationId: string;
+
+  /**
+   * @generated from field: string title = 2;
+   */
+  title: string;
+
+  /**
+   * @generated from field: string conversation_owner_id = 3;
+   */
+  conversationOwnerId: string;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp last_updated_at = 4;
+   */
+  lastUpdatedAt?: Timestamp;
+};
+
+/**
+ * Describes the message v1.AIConversation.
+ * Use `create(AIConversationSchema)` to create a new message.
+ */
+export const AIConversationSchema: GenMessage<AIConversation> = /*@__PURE__*/
+  messageDesc(file_proto_v1_conversation, 3);
+
+/**
+ * @generated from message v1.CreateAIConversationRequest
+ */
+export type CreateAIConversationRequest = Message<"v1.CreateAIConversationRequest"> & {
+  /**
+   * @generated from field: string title = 1;
+   */
+  title: string;
+};
+
+/**
+ * Describes the message v1.CreateAIConversationRequest.
+ * Use `create(CreateAIConversationRequestSchema)` to create a new message.
+ */
+export const CreateAIConversationRequestSchema: GenMessage<CreateAIConversationRequest> = /*@__PURE__*/
+  messageDesc(file_proto_v1_conversation, 4);
+
+/**
+ * @generated from message v1.CreateAIConversationResponse
+ */
+export type CreateAIConversationResponse = Message<"v1.CreateAIConversationResponse"> & {
+  /**
+   * @generated from field: v1.AIConversation conversation = 1;
+   */
+  conversation?: AIConversation;
+};
+
+/**
+ * Describes the message v1.CreateAIConversationResponse.
+ * Use `create(CreateAIConversationResponseSchema)` to create a new message.
+ */
+export const CreateAIConversationResponseSchema: GenMessage<CreateAIConversationResponse> = /*@__PURE__*/
+  messageDesc(file_proto_v1_conversation, 5);
+
+/**
+ * @generated from message v1.GetAIConversationRequest
+ */
+export type GetAIConversationRequest = Message<"v1.GetAIConversationRequest"> & {
+  /**
+   * @generated from field: string conversation_id = 1;
+   */
+  conversationId: string;
+};
+
+/**
+ * Describes the message v1.GetAIConversationRequest.
+ * Use `create(GetAIConversationRequestSchema)` to create a new message.
+ */
+export const GetAIConversationRequestSchema: GenMessage<GetAIConversationRequest> = /*@__PURE__*/
+  messageDesc(file_proto_v1_conversation, 6);
+
+/**
+ * @generated from message v1.GetAIConversationResponse
+ */
+export type GetAIConversationResponse = Message<"v1.GetAIConversationResponse"> & {
+  /**
+   * @generated from field: v1.AIConversation conversation = 1;
+   */
+  conversation?: AIConversation;
+
+  /**
+   * @generated from field: repeated string pydantic_messages_json = 2;
+   */
+  pydanticMessagesJson: string[];
+};
+
+/**
+ * Describes the message v1.GetAIConversationResponse.
+ * Use `create(GetAIConversationResponseSchema)` to create a new message.
+ */
+export const GetAIConversationResponseSchema: GenMessage<GetAIConversationResponse> = /*@__PURE__*/
+  messageDesc(file_proto_v1_conversation, 7);
+
+/**
+ * @generated from message v1.ListAIConversationsRequest
+ */
+export type ListAIConversationsRequest = Message<"v1.ListAIConversationsRequest"> & {
+};
+
+/**
+ * Describes the message v1.ListAIConversationsRequest.
+ * Use `create(ListAIConversationsRequestSchema)` to create a new message.
+ */
+export const ListAIConversationsRequestSchema: GenMessage<ListAIConversationsRequest> = /*@__PURE__*/
+  messageDesc(file_proto_v1_conversation, 8);
+
+/**
+ * @generated from message v1.ListAIConversationsResponse
+ */
+export type ListAIConversationsResponse = Message<"v1.ListAIConversationsResponse"> & {
+  /**
+   * @generated from field: repeated v1.AIConversation conversations = 1;
+   */
+  conversations: AIConversation[];
+};
+
+/**
+ * Describes the message v1.ListAIConversationsResponse.
+ * Use `create(ListAIConversationsResponseSchema)` to create a new message.
+ */
+export const ListAIConversationsResponseSchema: GenMessage<ListAIConversationsResponse> = /*@__PURE__*/
+  messageDesc(file_proto_v1_conversation, 9);
+
+/**
+ * @generated from message v1.UpdateAIConversationRequest
+ */
+export type UpdateAIConversationRequest = Message<"v1.UpdateAIConversationRequest"> & {
+  /**
+   * @generated from field: string conversation_id = 1;
+   */
+  conversationId: string;
+
+  /**
+   * @generated from field: string title = 2;
+   */
+  title: string;
+};
+
+/**
+ * Describes the message v1.UpdateAIConversationRequest.
+ * Use `create(UpdateAIConversationRequestSchema)` to create a new message.
+ */
+export const UpdateAIConversationRequestSchema: GenMessage<UpdateAIConversationRequest> = /*@__PURE__*/
+  messageDesc(file_proto_v1_conversation, 10);
+
+/**
+ * @generated from message v1.DeleteAIConversationRequest
+ */
+export type DeleteAIConversationRequest = Message<"v1.DeleteAIConversationRequest"> & {
+  /**
+   * @generated from field: string conversation_id = 1;
+   */
+  conversationId: string;
+};
+
+/**
+ * Describes the message v1.DeleteAIConversationRequest.
+ * Use `create(DeleteAIConversationRequestSchema)` to create a new message.
+ */
+export const DeleteAIConversationRequestSchema: GenMessage<DeleteAIConversationRequest> = /*@__PURE__*/
+  messageDesc(file_proto_v1_conversation, 11);
 
 /**
  * @generated from service v1.ConversationService
  */
 export const ConversationService: GenService<{
+  /**
+   * @generated from rpc v1.ConversationService.CreateAIConversation
+   */
+  createAIConversation: {
+    methodKind: "unary";
+    input: typeof CreateAIConversationRequestSchema;
+    output: typeof CreateAIConversationResponseSchema;
+  },
+  /**
+   * @generated from rpc v1.ConversationService.GetAIConversation
+   */
+  getAIConversation: {
+    methodKind: "unary";
+    input: typeof GetAIConversationRequestSchema;
+    output: typeof GetAIConversationResponseSchema;
+  },
+  /**
+   * @generated from rpc v1.ConversationService.ListAIConversations
+   */
+  listAIConversations: {
+    methodKind: "unary";
+    input: typeof ListAIConversationsRequestSchema;
+    output: typeof ListAIConversationsResponseSchema;
+  },
+  /**
+   * @generated from rpc v1.ConversationService.UpdateAIConversation
+   */
+  updateAIConversation: {
+    methodKind: "unary";
+    input: typeof UpdateAIConversationRequestSchema;
+    output: typeof AIConversationSchema;
+  },
+  /**
+   * @generated from rpc v1.ConversationService.DeleteAIConversation
+   */
+  deleteAIConversation: {
+    methodKind: "unary";
+    input: typeof DeleteAIConversationRequestSchema;
+    output: typeof EmptySchema;
+  },
   /**
    * @generated from rpc v1.ConversationService.SendAgentMessage
    */
@@ -101,5 +302,7 @@ export const ConversationService: GenService<{
     methodKind: "server_streaming";
     input: typeof SendAgentMessageRequestSchema;
     output: typeof StreamChatResponseSchema;
-  };
-}> = /*@__PURE__*/ serviceDesc(file_proto_v1_conversation, 0);
+  },
+}> = /*@__PURE__*/
+  serviceDesc(file_proto_v1_conversation, 0);
+

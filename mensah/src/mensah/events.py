@@ -16,6 +16,7 @@ from pydantic_ai import (
 )
 
 from mensah.agent import FetchPageArgs, WebSearchArgs
+from mensah.history import model_messages_to_json_str
 from proto.v1.inter.agent_runtime import chat_pb2
 
 
@@ -24,7 +25,9 @@ async def parse_agent_stream_event(
 ) -> AsyncIterator[chat_pb2.StreamChatResponse]:
     if isinstance(event, AgentRunResultEvent):
         event_result: AgentRunResult = event.result
-        new_messages_json_str = event_result.new_messages_json().decode()
+        # on finish, we list all of the new model messages (this includes the
+        # sent message) as json strings, we can be re marshalled on load
+        new_messages_json_strs = model_messages_to_json_str(event_result.new_messages())
         usage = chat_pb2.RunMetadata(
             input_tokens=event_result.usage.input_tokens,
             output_tokens=event_result.usage.output_tokens,
@@ -35,7 +38,7 @@ async def parse_agent_stream_event(
         yield chat_pb2.StreamChatResponse(
             message_id=message_id,
             finished=chat_pb2.Finished(
-                pydantic_new_messages_json=new_messages_json_str, run_metadata=usage
+                pydantic_new_messages_json=new_messages_json_strs, run_metadata=usage
             ),
         )
     else:

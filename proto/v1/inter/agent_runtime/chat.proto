@@ -43,7 +43,10 @@ message RunMetadata {
 }
 
 message Finished {
-    string pydantic_new_messages_json = 1;
+    // we return each completed new message as json string
+    // that can be marshalled back into the pydantic message
+    // types
+    repeated string pydantic_new_messages_json = 1;
     RunMetadata run_metadata = 2;
 }
 
@@ -71,6 +74,15 @@ message ToolFetchWebPage {
     repeated string urls = 2;
 }
 
+message GenerateTitleRequest {
+    string prompt = 1;
+}
+
+message GenerateTitleResponse {
+    string title = 2;
+}
+
 service ChatService {
     rpc StreamChat(StreamChatRequest) returns (stream StreamChatResponse);
+    rpc GenerateTitle(GenerateTitleRequest) returns (GenerateTitleResponse);
 }

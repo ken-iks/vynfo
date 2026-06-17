@@ -8,6 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	http "net/http"
 	strings "strings"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
@@ -34,6 +35,21 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
+	// ConversationServiceCreateAIConversationProcedure is the fully-qualified name of the
+	// ConversationService's CreateAIConversation RPC.
+	ConversationServiceCreateAIConversationProcedure = "/v1.ConversationService/CreateAIConversation"
+	// ConversationServiceGetAIConversationProcedure is the fully-qualified name of the
+	// ConversationService's GetAIConversation RPC.
+	ConversationServiceGetAIConversationProcedure = "/v1.ConversationService/GetAIConversation"
+	// ConversationServiceListAIConversationsProcedure is the fully-qualified name of the
+	// ConversationService's ListAIConversations RPC.
+	ConversationServiceListAIConversationsProcedure = "/v1.ConversationService/ListAIConversations"
+	// ConversationServiceUpdateAIConversationProcedure is the fully-qualified name of the
+	// ConversationService's UpdateAIConversation RPC.
+	ConversationServiceUpdateAIConversationProcedure = "/v1.ConversationService/UpdateAIConversation"
+	// ConversationServiceDeleteAIConversationProcedure is the fully-qualified name of the
+	// ConversationService's DeleteAIConversation RPC.
+	ConversationServiceDeleteAIConversationProcedure = "/v1.ConversationService/DeleteAIConversation"
 	// ConversationServiceSendAgentMessageProcedure is the fully-qualified name of the
 	// ConversationService's SendAgentMessage RPC.
 	ConversationServiceSendAgentMessageProcedure = "/v1.ConversationService/SendAgentMessage"
@@ -41,6 +57,11 @@ const (
 
 // ConversationServiceClient is a client for the v1.ConversationService service.
 type ConversationServiceClient interface {
+	CreateAIConversation(context.Context, *connect.Request[v1.CreateAIConversationRequest]) (*connect.Response[v1.CreateAIConversationResponse], error)
+	GetAIConversation(context.Context, *connect.Request[v1.GetAIConversationRequest]) (*connect.Response[v1.GetAIConversationResponse], error)
+	ListAIConversations(context.Context, *connect.Request[v1.ListAIConversationsRequest]) (*connect.Response[v1.ListAIConversationsResponse], error)
+	UpdateAIConversation(context.Context, *connect.Request[v1.UpdateAIConversationRequest]) (*connect.Response[v1.AIConversation], error)
+	DeleteAIConversation(context.Context, *connect.Request[v1.DeleteAIConversationRequest]) (*connect.Response[emptypb.Empty], error)
 	SendAgentMessage(context.Context, *connect.Request[v1.SendAgentMessageRequest]) (*connect.ServerStreamForClient[agent_runtime.StreamChatResponse], error)
 }
 
@@ -55,6 +76,36 @@ func NewConversationServiceClient(httpClient connect.HTTPClient, baseURL string,
 	baseURL = strings.TrimRight(baseURL, "/")
 	conversationServiceMethods := v1.File_proto_v1_conversation_proto.Services().ByName("ConversationService").Methods()
 	return &conversationServiceClient{
+		createAIConversation: connect.NewClient[v1.CreateAIConversationRequest, v1.CreateAIConversationResponse](
+			httpClient,
+			baseURL+ConversationServiceCreateAIConversationProcedure,
+			connect.WithSchema(conversationServiceMethods.ByName("CreateAIConversation")),
+			connect.WithClientOptions(opts...),
+		),
+		getAIConversation: connect.NewClient[v1.GetAIConversationRequest, v1.GetAIConversationResponse](
+			httpClient,
+			baseURL+ConversationServiceGetAIConversationProcedure,
+			connect.WithSchema(conversationServiceMethods.ByName("GetAIConversation")),
+			connect.WithClientOptions(opts...),
+		),
+		listAIConversations: connect.NewClient[v1.ListAIConversationsRequest, v1.ListAIConversationsResponse](
+			httpClient,
+			baseURL+ConversationServiceListAIConversationsProcedure,
+			connect.WithSchema(conversationServiceMethods.ByName("ListAIConversations")),
+			connect.WithClientOptions(opts...),
+		),
+		updateAIConversation: connect.NewClient[v1.UpdateAIConversationRequest, v1.AIConversation](
+			httpClient,
+			baseURL+ConversationServiceUpdateAIConversationProcedure,
+			connect.WithSchema(conversationServiceMethods.ByName("UpdateAIConversation")),
+			connect.WithClientOptions(opts...),
+		),
+		deleteAIConversation: connect.NewClient[v1.DeleteAIConversationRequest, emptypb.Empty](
+			httpClient,
+			baseURL+ConversationServiceDeleteAIConversationProcedure,
+			connect.WithSchema(conversationServiceMethods.ByName("DeleteAIConversation")),
+			connect.WithClientOptions(opts...),
+		),
 		sendAgentMessage: connect.NewClient[v1.SendAgentMessageRequest, agent_runtime.StreamChatResponse](
 			httpClient,
 			baseURL+ConversationServiceSendAgentMessageProcedure,
@@ -66,7 +117,37 @@ func NewConversationServiceClient(httpClient connect.HTTPClient, baseURL string,
 
 // conversationServiceClient implements ConversationServiceClient.
 type conversationServiceClient struct {
-	sendAgentMessage *connect.Client[v1.SendAgentMessageRequest, agent_runtime.StreamChatResponse]
+	createAIConversation *connect.Client[v1.CreateAIConversationRequest, v1.CreateAIConversationResponse]
+	getAIConversation    *connect.Client[v1.GetAIConversationRequest, v1.GetAIConversationResponse]
+	listAIConversations  *connect.Client[v1.ListAIConversationsRequest, v1.ListAIConversationsResponse]
+	updateAIConversation *connect.Client[v1.UpdateAIConversationRequest, v1.AIConversation]
+	deleteAIConversation *connect.Client[v1.DeleteAIConversationRequest, emptypb.Empty]
+	sendAgentMessage     *connect.Client[v1.SendAgentMessageRequest, agent_runtime.StreamChatResponse]
+}
+
+// CreateAIConversation calls v1.ConversationService.CreateAIConversation.
+func (c *conversationServiceClient) CreateAIConversation(ctx context.Context, req *connect.Request[v1.CreateAIConversationRequest]) (*connect.Response[v1.CreateAIConversationResponse], error) {
+	return c.createAIConversation.CallUnary(ctx, req)
+}
+
+// GetAIConversation calls v1.ConversationService.GetAIConversation.
+func (c *conversationServiceClient) GetAIConversation(ctx context.Context, req *connect.Request[v1.GetAIConversationRequest]) (*connect.Response[v1.GetAIConversationResponse], error) {
+	return c.getAIConversation.CallUnary(ctx, req)
+}
+
+// ListAIConversations calls v1.ConversationService.ListAIConversations.
+func (c *conversationServiceClient) ListAIConversations(ctx context.Context, req *connect.Request[v1.ListAIConversationsRequest]) (*connect.Response[v1.ListAIConversationsResponse], error) {
+	return c.listAIConversations.CallUnary(ctx, req)
+}
+
+// UpdateAIConversation calls v1.ConversationService.UpdateAIConversation.
+func (c *conversationServiceClient) UpdateAIConversation(ctx context.Context, req *connect.Request[v1.UpdateAIConversationRequest]) (*connect.Response[v1.AIConversation], error) {
+	return c.updateAIConversation.CallUnary(ctx, req)
+}
+
+// DeleteAIConversation calls v1.ConversationService.DeleteAIConversation.
+func (c *conversationServiceClient) DeleteAIConversation(ctx context.Context, req *connect.Request[v1.DeleteAIConversationRequest]) (*connect.Response[emptypb.Empty], error) {
+	return c.deleteAIConversation.CallUnary(ctx, req)
 }
 
 // SendAgentMessage calls v1.ConversationService.SendAgentMessage.
@@ -76,6 +157,11 @@ func (c *conversationServiceClient) SendAgentMessage(ctx context.Context, req *c
 
 // ConversationServiceHandler is an implementation of the v1.ConversationService service.
 type ConversationServiceHandler interface {
+	CreateAIConversation(context.Context, *connect.Request[v1.CreateAIConversationRequest]) (*connect.Response[v1.CreateAIConversationResponse], error)
+	GetAIConversation(context.Context, *connect.Request[v1.GetAIConversationRequest]) (*connect.Response[v1.GetAIConversationResponse], error)
+	ListAIConversations(context.Context, *connect.Request[v1.ListAIConversationsRequest]) (*connect.Response[v1.ListAIConversationsResponse], error)
+	UpdateAIConversation(context.Context, *connect.Request[v1.UpdateAIConversationRequest]) (*connect.Response[v1.AIConversation], error)
+	DeleteAIConversation(context.Context, *connect.Request[v1.DeleteAIConversationRequest]) (*connect.Response[emptypb.Empty], error)
 	SendAgentMessage(context.Context, *connect.Request[v1.SendAgentMessageRequest], *connect.ServerStream[agent_runtime.StreamChatResponse]) error
 }
 
@@ -86,6 +172,36 @@ type ConversationServiceHandler interface {
 // and JSON codecs. They also support gzip compression.
 func NewConversationServiceHandler(svc ConversationServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
 	conversationServiceMethods := v1.File_proto_v1_conversation_proto.Services().ByName("ConversationService").Methods()
+	conversationServiceCreateAIConversationHandler := connect.NewUnaryHandler(
+		ConversationServiceCreateAIConversationProcedure,
+		svc.CreateAIConversation,
+		connect.WithSchema(conversationServiceMethods.ByName("CreateAIConversation")),
+		connect.WithHandlerOptions(opts...),
+	)
+	conversationServiceGetAIConversationHandler := connect.NewUnaryHandler(
+		ConversationServiceGetAIConversationProcedure,
+		svc.GetAIConversation,
+		connect.WithSchema(conversationServiceMethods.ByName("GetAIConversation")),
+		connect.WithHandlerOptions(opts...),
+	)
+	conversationServiceListAIConversationsHandler := connect.NewUnaryHandler(
+		ConversationServiceListAIConversationsProcedure,
+		svc.ListAIConversations,
+		connect.WithSchema(conversationServiceMethods.ByName("ListAIConversations")),
+		connect.WithHandlerOptions(opts...),
+	)
+	conversationServiceUpdateAIConversationHandler := connect.NewUnaryHandler(
+		ConversationServiceUpdateAIConversationProcedure,
+		svc.UpdateAIConversation,
+		connect.WithSchema(conversationServiceMethods.ByName("UpdateAIConversation")),
+		connect.WithHandlerOptions(opts...),
+	)
+	conversationServiceDeleteAIConversationHandler := connect.NewUnaryHandler(
+		ConversationServiceDeleteAIConversationProcedure,
+		svc.DeleteAIConversation,
+		connect.WithSchema(conversationServiceMethods.ByName("DeleteAIConversation")),
+		connect.WithHandlerOptions(opts...),
+	)
 	conversationServiceSendAgentMessageHandler := connect.NewServerStreamHandler(
 		ConversationServiceSendAgentMessageProcedure,
 		svc.SendAgentMessage,
@@ -94,6 +210,16 @@ func NewConversationServiceHandler(svc ConversationServiceHandler, opts ...conne
 	)
 	return "/v1.ConversationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
+		case ConversationServiceCreateAIConversationProcedure:
+			conversationServiceCreateAIConversationHandler.ServeHTTP(w, r)
+		case ConversationServiceGetAIConversationProcedure:
+			conversationServiceGetAIConversationHandler.ServeHTTP(w, r)
+		case ConversationServiceListAIConversationsProcedure:
+			conversationServiceListAIConversationsHandler.ServeHTTP(w, r)
+		case ConversationServiceUpdateAIConversationProcedure:
+			conversationServiceUpdateAIConversationHandler.ServeHTTP(w, r)
+		case ConversationServiceDeleteAIConversationProcedure:
+			conversationServiceDeleteAIConversationHandler.ServeHTTP(w, r)
 		case ConversationServiceSendAgentMessageProcedure:
 			conversationServiceSendAgentMessageHandler.ServeHTTP(w, r)
 		default:
@@ -104,6 +230,26 @@ func NewConversationServiceHandler(svc ConversationServiceHandler, opts ...conne
 
 // UnimplementedConversationServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedConversationServiceHandler struct{}
+
+func (UnimplementedConversationServiceHandler) CreateAIConversation(context.Context, *connect.Request[v1.CreateAIConversationRequest]) (*connect.Response[v1.CreateAIConversationResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ConversationService.CreateAIConversation is not implemented"))
+}
+
+func (UnimplementedConversationServiceHandler) GetAIConversation(context.Context, *connect.Request[v1.GetAIConversationRequest]) (*connect.Response[v1.GetAIConversationResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ConversationService.GetAIConversation is not implemented"))
+}
+
+func (UnimplementedConversationServiceHandler) ListAIConversations(context.Context, *connect.Request[v1.ListAIConversationsRequest]) (*connect.Response[v1.ListAIConversationsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ConversationService.ListAIConversations is not implemented"))
+}
+
+func (UnimplementedConversationServiceHandler) UpdateAIConversation(context.Context, *connect.Request[v1.UpdateAIConversationRequest]) (*connect.Response[v1.AIConversation], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ConversationService.UpdateAIConversation is not implemented"))
+}
+
+func (UnimplementedConversationServiceHandler) DeleteAIConversation(context.Context, *connect.Request[v1.DeleteAIConversationRequest]) (*connect.Response[emptypb.Empty], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.ConversationService.DeleteAIConversation is not implemented"))
+}
 
 func (UnimplementedConversationServiceHandler) SendAgentMessage(context.Context, *connect.Request[v1.SendAgentMessageRequest], *connect.ServerStream[agent_runtime.StreamChatResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("v1.ConversationService.SendAgentMessage is not implemented"))

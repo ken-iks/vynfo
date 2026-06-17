@@ -2,11 +2,14 @@ package conversations
 
 import (
 	"context"
+	"log/slog"
 
 	"connectrpc.com/connect"
+	"github.com/google/uuid"
 	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/gen/proto/v1/inter/agent_runtime"
+	"vynfo.com/vynfo/internal/db"
 )
 
 func (c *ConversationServiceServer) SendAgentMessage(
@@ -16,15 +19,49 @@ func (c *ConversationServiceServer) SendAgentMessage(
 ) error {
 	onboardedUser, err := auth.RequireOnboardedUser(ctx, c.queries)
 	if err != nil {
-		return err
+		return connect.NewError(connect.CodeUnauthenticated, err)
 	}
 	userId := onboardedUser.ID.String()
+	userUUID, err := uuid.Parse(userId)
+	if err != nil {
+		return connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	conversationUUID, err := uuid.Parse(req.Msg.GetConversationId())
+	if err != nil {
+		return connect.NewError(connect.CodeInvalidArgument, err)
+	}
 
+	resp, err := c.queries.AssertConversationUser(ctx, db.AssertConversationUserParams{
+		ConversationOwnerID: userUUID,
+		ID:                  conversationUUID,
+	})
+
+	if err != nil {
+		return connect.NewError(connect.CodeInternal, err)
+	}
+	if !resp {
+		return connect.NewError(connect.CodeUnauthenticated, err)
+	}
+
+	// TODO: can use a smarter form of compaction probably
+	conversationHistory, err := c.queries.ListAIConversationMessages(
+		ctx,
+		db.ListAIConversationMessagesParams{
+			ConversationID: conversationUUID,
+			Limit:          100,
+		},
+	)
+	conversationMessages := []string{}
+	for _, c := range conversationHistory {
+		conversationMessages = append(conversationMessages, c.MessageContentJsonString)
+	}
+
+	// TODO: can maybe add the prompt auth to this path too
 	responseStream, err := c.mensahClient.StreamChat(ctx, &agent_runtime.StreamChatRequest{
-		Prompt:      req.Msg.GetContent(),
-		UserId:      userId,
-		WorkspaceId: req.Msg.GetConversationId(),
-		// TODO: get conversation messages from db
+		Prompt:                       req.Msg.GetContent(),
+		UserId:                       userId,
+		WorkspaceId:                  req.Msg.GetWorkspaceId(),
+		PreviousConversationMessages: conversationMessages,
 	})
 
 	if err != nil {
@@ -35,6 +72,43 @@ func (c *ConversationServiceServer) SendAgentMessage(
 		message, err := responseStream.Recv()
 		if err != nil {
 			return err
+		}
+		// when finished, write the full run to the db
+		if finished := message.GetFinished(); finished != nil {
+			tx, err := c.db.BeginTx(ctx, nil)
+			if err != nil {
+				slog.Error("error beginning transaction")
+				return connect.NewError(connect.CodeInternal, err)
+			}
+			defer tx.Rollback()
+			p := c.queries.WithTx(tx)
+			runMeta := finished.GetRunMetadata()
+			run, err := p.CreateAiConversationRun(ctx, db.CreateAiConversationRunParams{
+				ConversationID:      conversationUUID,
+				InputTokens:         int64(runMeta.InputTokens),
+				OutputTokens:        int64(runMeta.OutputTokens),
+				ReasoningTokens:     int64(runMeta.ReasoningTokens),
+				NumProviderRequests: int64(runMeta.NumProviderRequests),
+				NumToolCalls:        int64(runMeta.NumToolCalls),
+			})
+			if err != nil {
+				slog.Error("error creating new run")
+				return connect.NewError(connect.CodeInternal, err)
+			}
+			for _, message := range finished.GetPydanticNewMessagesJson() {
+				_, err := p.AddAIConversationMessage(ctx, db.AddAIConversationMessageParams{
+					ConversationID:           conversationUUID,
+					RunID:                    run.ID,
+					MessageContentJsonString: message,
+				})
+				if err != nil {
+					slog.Error("error adding new message to ai messages table")
+					return connect.NewError(connect.CodeInternal, err)
+				}
+			}
+			if err := tx.Commit(); err != nil {
+				slog.Error("error commiting db transaction", "error", err)
+			}
 		}
 		if err := stream.Send(message); err != nil {
 			return err

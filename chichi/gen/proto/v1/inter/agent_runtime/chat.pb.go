@@ -434,9 +434,12 @@ func (x *RunMetadata) GetNumToolCalls() uint32 {
 }
 
 type Finished struct {
-	state                   protoimpl.MessageState `protogen:"open.v1"`
-	PydanticNewMessagesJson string                 `protobuf:"bytes,1,opt,name=pydantic_new_messages_json,json=pydanticNewMessagesJson,proto3" json:"pydantic_new_messages_json,omitempty"`
-	RunMetadata             *RunMetadata           `protobuf:"bytes,2,opt,name=run_metadata,json=runMetadata,proto3" json:"run_metadata,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// we return each completed new message as json string
+	// that can be marshalled back into the pydantic message
+	// types
+	PydanticNewMessagesJson []string     `protobuf:"bytes,1,rep,name=pydantic_new_messages_json,json=pydanticNewMessagesJson,proto3" json:"pydantic_new_messages_json,omitempty"`
+	RunMetadata             *RunMetadata `protobuf:"bytes,2,opt,name=run_metadata,json=runMetadata,proto3" json:"run_metadata,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
 }
@@ -471,11 +474,11 @@ func (*Finished) Descriptor() ([]byte, []int) {
 	return file_proto_v1_inter_agent_runtime_chat_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *Finished) GetPydanticNewMessagesJson() string {
+func (x *Finished) GetPydanticNewMessagesJson() []string {
 	if x != nil {
 		return x.PydanticNewMessagesJson
 	}
-	return ""
+	return nil
 }
 
 func (x *Finished) GetRunMetadata() *RunMetadata {
@@ -663,6 +666,94 @@ func (x *ToolFetchWebPage) GetUrls() []string {
 	return nil
 }
 
+type GenerateTitleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Prompt        string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GenerateTitleRequest) Reset() {
+	*x = GenerateTitleRequest{}
+	mi := &file_proto_v1_inter_agent_runtime_chat_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerateTitleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateTitleRequest) ProtoMessage() {}
+
+func (x *GenerateTitleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_inter_agent_runtime_chat_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateTitleRequest.ProtoReflect.Descriptor instead.
+func (*GenerateTitleRequest) Descriptor() ([]byte, []int) {
+	return file_proto_v1_inter_agent_runtime_chat_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GenerateTitleRequest) GetPrompt() string {
+	if x != nil {
+		return x.Prompt
+	}
+	return ""
+}
+
+type GenerateTitleResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GenerateTitleResponse) Reset() {
+	*x = GenerateTitleResponse{}
+	mi := &file_proto_v1_inter_agent_runtime_chat_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerateTitleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateTitleResponse) ProtoMessage() {}
+
+func (x *GenerateTitleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_inter_agent_runtime_chat_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateTitleResponse.ProtoReflect.Descriptor instead.
+func (*GenerateTitleResponse) Descriptor() ([]byte, []int) {
+	return file_proto_v1_inter_agent_runtime_chat_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GenerateTitleResponse) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
 var File_proto_v1_inter_agent_runtime_chat_proto protoreflect.FileDescriptor
 
 const file_proto_v1_inter_agent_runtime_chat_proto_rawDesc = "" +
@@ -692,7 +783,7 @@ const file_proto_v1_inter_agent_runtime_chat_proto_rawDesc = "" +
 	"\x15num_provider_requests\x18\x04 \x01(\rR\x13numProviderRequests\x12$\n" +
 	"\x0enum_tool_calls\x18\x05 \x01(\rR\fnumToolCalls\"\x8f\x01\n" +
 	"\bFinished\x12;\n" +
-	"\x1apydantic_new_messages_json\x18\x01 \x01(\tR\x17pydanticNewMessagesJson\x12F\n" +
+	"\x1apydantic_new_messages_json\x18\x01 \x03(\tR\x17pydanticNewMessagesJson\x12F\n" +
 	"\frun_metadata\x18\x02 \x01(\v2#.v1.inter.agent_runtime.RunMetadataR\vrunMetadata\"\xe5\x01\n" +
 	"\bToolCall\x12>\n" +
 	"\x06status\x18\x01 \x01(\x0e2&.v1.inter.agent_runtime.ToolCallStatusR\x06status\x12F\n" +
@@ -704,16 +795,21 @@ const file_proto_v1_inter_agent_runtime_chat_proto_rawDesc = "" +
 	"\rToolWebSearch\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\"&\n" +
 	"\x10ToolFetchWebPage\x12\x12\n" +
-	"\x04urls\x18\x02 \x03(\tR\x04urls*\xac\x01\n" +
+	"\x04urls\x18\x02 \x03(\tR\x04urls\".\n" +
+	"\x14GenerateTitleRequest\x12\x16\n" +
+	"\x06prompt\x18\x01 \x01(\tR\x06prompt\"-\n" +
+	"\x15GenerateTitleResponse\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title*\xac\x01\n" +
 	"\x0eToolCallStatus\x12 \n" +
 	"\x1cTOOL_CALL_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aTOOL_CALL_STATUS_REQUESTED\x10\x01\x12\x1d\n" +
 	"\x19TOOL_CALL_STATUS_COMPLETE\x10\x02\x12\x1b\n" +
 	"\x17TOOL_CALL_STATUS_DENIED\x10\x03\x12\x1c\n" +
-	"\x18TOOL_CALL_STATUS_ERRORED\x10\x042t\n" +
+	"\x18TOOL_CALL_STATUS_ERRORED\x10\x042\xe2\x01\n" +
 	"\vChatService\x12e\n" +
 	"\n" +
-	"StreamChat\x12).v1.inter.agent_runtime.StreamChatRequest\x1a*.v1.inter.agent_runtime.StreamChatResponse0\x01B2Z0vynfo.com/vynfo/gen/proto/v1/inter/agent_runtimeb\x06proto3"
+	"StreamChat\x12).v1.inter.agent_runtime.StreamChatRequest\x1a*.v1.inter.agent_runtime.StreamChatResponse0\x01\x12l\n" +
+	"\rGenerateTitle\x12,.v1.inter.agent_runtime.GenerateTitleRequest\x1a-.v1.inter.agent_runtime.GenerateTitleResponseB2Z0vynfo.com/vynfo/gen/proto/v1/inter/agent_runtimeb\x06proto3"
 
 var (
 	file_proto_v1_inter_agent_runtime_chat_proto_rawDescOnce sync.Once
@@ -728,35 +824,39 @@ func file_proto_v1_inter_agent_runtime_chat_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_v1_inter_agent_runtime_chat_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_v1_inter_agent_runtime_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_proto_v1_inter_agent_runtime_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_proto_v1_inter_agent_runtime_chat_proto_goTypes = []any{
-	(ToolCallStatus)(0),        // 0: v1.inter.agent_runtime.ToolCallStatus
-	(*StreamChatRequest)(nil),  // 1: v1.inter.agent_runtime.StreamChatRequest
-	(*StreamChatResponse)(nil), // 2: v1.inter.agent_runtime.StreamChatResponse
-	(*TextDelta)(nil),          // 3: v1.inter.agent_runtime.TextDelta
-	(*ReasoningDelta)(nil),     // 4: v1.inter.agent_runtime.ReasoningDelta
-	(*RunMetadata)(nil),        // 5: v1.inter.agent_runtime.RunMetadata
-	(*Finished)(nil),           // 6: v1.inter.agent_runtime.Finished
-	(*ToolCall)(nil),           // 7: v1.inter.agent_runtime.ToolCall
-	(*ToolWebSearch)(nil),      // 8: v1.inter.agent_runtime.ToolWebSearch
-	(*ToolFetchWebPage)(nil),   // 9: v1.inter.agent_runtime.ToolFetchWebPage
+	(ToolCallStatus)(0),           // 0: v1.inter.agent_runtime.ToolCallStatus
+	(*StreamChatRequest)(nil),     // 1: v1.inter.agent_runtime.StreamChatRequest
+	(*StreamChatResponse)(nil),    // 2: v1.inter.agent_runtime.StreamChatResponse
+	(*TextDelta)(nil),             // 3: v1.inter.agent_runtime.TextDelta
+	(*ReasoningDelta)(nil),        // 4: v1.inter.agent_runtime.ReasoningDelta
+	(*RunMetadata)(nil),           // 5: v1.inter.agent_runtime.RunMetadata
+	(*Finished)(nil),              // 6: v1.inter.agent_runtime.Finished
+	(*ToolCall)(nil),              // 7: v1.inter.agent_runtime.ToolCall
+	(*ToolWebSearch)(nil),         // 8: v1.inter.agent_runtime.ToolWebSearch
+	(*ToolFetchWebPage)(nil),      // 9: v1.inter.agent_runtime.ToolFetchWebPage
+	(*GenerateTitleRequest)(nil),  // 10: v1.inter.agent_runtime.GenerateTitleRequest
+	(*GenerateTitleResponse)(nil), // 11: v1.inter.agent_runtime.GenerateTitleResponse
 }
 var file_proto_v1_inter_agent_runtime_chat_proto_depIdxs = []int32{
-	3, // 0: v1.inter.agent_runtime.StreamChatResponse.text:type_name -> v1.inter.agent_runtime.TextDelta
-	4, // 1: v1.inter.agent_runtime.StreamChatResponse.reasoning:type_name -> v1.inter.agent_runtime.ReasoningDelta
-	7, // 2: v1.inter.agent_runtime.StreamChatResponse.tool_call:type_name -> v1.inter.agent_runtime.ToolCall
-	6, // 3: v1.inter.agent_runtime.StreamChatResponse.finished:type_name -> v1.inter.agent_runtime.Finished
-	5, // 4: v1.inter.agent_runtime.Finished.run_metadata:type_name -> v1.inter.agent_runtime.RunMetadata
-	0, // 5: v1.inter.agent_runtime.ToolCall.status:type_name -> v1.inter.agent_runtime.ToolCallStatus
-	8, // 6: v1.inter.agent_runtime.ToolCall.web_search:type_name -> v1.inter.agent_runtime.ToolWebSearch
-	9, // 7: v1.inter.agent_runtime.ToolCall.page_fetch:type_name -> v1.inter.agent_runtime.ToolFetchWebPage
-	1, // 8: v1.inter.agent_runtime.ChatService.StreamChat:input_type -> v1.inter.agent_runtime.StreamChatRequest
-	2, // 9: v1.inter.agent_runtime.ChatService.StreamChat:output_type -> v1.inter.agent_runtime.StreamChatResponse
-	9, // [9:10] is the sub-list for method output_type
-	8, // [8:9] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	3,  // 0: v1.inter.agent_runtime.StreamChatResponse.text:type_name -> v1.inter.agent_runtime.TextDelta
+	4,  // 1: v1.inter.agent_runtime.StreamChatResponse.reasoning:type_name -> v1.inter.agent_runtime.ReasoningDelta
+	7,  // 2: v1.inter.agent_runtime.StreamChatResponse.tool_call:type_name -> v1.inter.agent_runtime.ToolCall
+	6,  // 3: v1.inter.agent_runtime.StreamChatResponse.finished:type_name -> v1.inter.agent_runtime.Finished
+	5,  // 4: v1.inter.agent_runtime.Finished.run_metadata:type_name -> v1.inter.agent_runtime.RunMetadata
+	0,  // 5: v1.inter.agent_runtime.ToolCall.status:type_name -> v1.inter.agent_runtime.ToolCallStatus
+	8,  // 6: v1.inter.agent_runtime.ToolCall.web_search:type_name -> v1.inter.agent_runtime.ToolWebSearch
+	9,  // 7: v1.inter.agent_runtime.ToolCall.page_fetch:type_name -> v1.inter.agent_runtime.ToolFetchWebPage
+	1,  // 8: v1.inter.agent_runtime.ChatService.StreamChat:input_type -> v1.inter.agent_runtime.StreamChatRequest
+	10, // 9: v1.inter.agent_runtime.ChatService.GenerateTitle:input_type -> v1.inter.agent_runtime.GenerateTitleRequest
+	2,  // 10: v1.inter.agent_runtime.ChatService.StreamChat:output_type -> v1.inter.agent_runtime.StreamChatResponse
+	11, // 11: v1.inter.agent_runtime.ChatService.GenerateTitle:output_type -> v1.inter.agent_runtime.GenerateTitleResponse
+	10, // [10:12] is the sub-list for method output_type
+	8,  // [8:10] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_proto_v1_inter_agent_runtime_chat_proto_init() }
@@ -780,7 +880,7 @@ func file_proto_v1_inter_agent_runtime_chat_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_v1_inter_agent_runtime_chat_proto_rawDesc), len(file_proto_v1_inter_agent_runtime_chat_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

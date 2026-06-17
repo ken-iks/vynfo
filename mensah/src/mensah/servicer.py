@@ -4,6 +4,7 @@ from tavily import TavilyClient
 from mensah.events import parse_agent_stream_event
 from mensah.clients import Clients
 from mensah.agent import VynfoAgentDeps, get_vynfo_agent
+from mensah.history import json_str_to_model_messages
 from proto.v1.inter.agent_backend.backend_pb2 import AuthenticateUserAndPromptRequest
 from proto.v1.inter.agent_runtime import chat_pb2_grpc, chat_pb2
 
@@ -21,12 +22,22 @@ class AgentRuntimeServicer(chat_pb2_grpc.ChatServiceServicer):
         ],
     ):
         # assert we can send the prompt:
-        # is_valid = self.clients.agent_backend_service.AuthenticateUserAndPrompt(request=AuthenticateUserAndPromptRequest(user_id=request.user_id, workspace_id=request.workspace_id, prompt=request.prompt))
+        is_valid = self.clients.agent_backend_service.AuthenticateUserAndPrompt(
+            request=AuthenticateUserAndPromptRequest(
+                user_id=request.user_id,
+                workspace_id=request.workspace_id,
+                prompt=request.prompt,
+            )
+        )
 
         message_id = str(uuid4())
         if request.prompt is not None:
             async with get_vynfo_agent().run_stream_events(
-                request.prompt, deps=self.deps
+                request.prompt,
+                message_history=json_str_to_model_messages(
+                    request.previous_conversation_messages
+                ),
+                deps=self.deps,
             ) as stream:
                 async for event in stream:
                     async for response in parse_agent_stream_event(message_id, event):

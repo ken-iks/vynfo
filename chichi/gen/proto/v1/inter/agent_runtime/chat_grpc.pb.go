@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ChatService_StreamChat_FullMethodName = "/v1.inter.agent_runtime.ChatService/StreamChat"
+	ChatService_StreamChat_FullMethodName    = "/v1.inter.agent_runtime.ChatService/StreamChat"
+	ChatService_GenerateTitle_FullMethodName = "/v1.inter.agent_runtime.ChatService/GenerateTitle"
 )
 
 // ChatServiceClient is the client API for ChatService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ChatServiceClient interface {
 	StreamChat(ctx context.Context, in *StreamChatRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[StreamChatResponse], error)
+	GenerateTitle(ctx context.Context, in *GenerateTitleRequest, opts ...grpc.CallOption) (*GenerateTitleResponse, error)
 }
 
 type chatServiceClient struct {
@@ -56,11 +58,22 @@ func (c *chatServiceClient) StreamChat(ctx context.Context, in *StreamChatReques
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ChatService_StreamChatClient = grpc.ServerStreamingClient[StreamChatResponse]
 
+func (c *chatServiceClient) GenerateTitle(ctx context.Context, in *GenerateTitleRequest, opts ...grpc.CallOption) (*GenerateTitleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GenerateTitleResponse)
+	err := c.cc.Invoke(ctx, ChatService_GenerateTitle_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ChatServiceServer is the server API for ChatService service.
 // All implementations must embed UnimplementedChatServiceServer
 // for forward compatibility.
 type ChatServiceServer interface {
 	StreamChat(*StreamChatRequest, grpc.ServerStreamingServer[StreamChatResponse]) error
+	GenerateTitle(context.Context, *GenerateTitleRequest) (*GenerateTitleResponse, error)
 	mustEmbedUnimplementedChatServiceServer()
 }
 
@@ -73,6 +86,9 @@ type UnimplementedChatServiceServer struct{}
 
 func (UnimplementedChatServiceServer) StreamChat(*StreamChatRequest, grpc.ServerStreamingServer[StreamChatResponse]) error {
 	return status.Error(codes.Unimplemented, "method StreamChat not implemented")
+}
+func (UnimplementedChatServiceServer) GenerateTitle(context.Context, *GenerateTitleRequest) (*GenerateTitleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GenerateTitle not implemented")
 }
 func (UnimplementedChatServiceServer) mustEmbedUnimplementedChatServiceServer() {}
 func (UnimplementedChatServiceServer) testEmbeddedByValue()                     {}
@@ -106,13 +122,36 @@ func _ChatService_StreamChat_Handler(srv interface{}, stream grpc.ServerStream) 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ChatService_StreamChatServer = grpc.ServerStreamingServer[StreamChatResponse]
 
+func _ChatService_GenerateTitle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateTitleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChatServiceServer).GenerateTitle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ChatService_GenerateTitle_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChatServiceServer).GenerateTitle(ctx, req.(*GenerateTitleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ChatService_ServiceDesc is the grpc.ServiceDesc for ChatService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ChatService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "v1.inter.agent_runtime.ChatService",
 	HandlerType: (*ChatServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GenerateTitle",
+			Handler:    _ChatService_GenerateTitle_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "StreamChat",
