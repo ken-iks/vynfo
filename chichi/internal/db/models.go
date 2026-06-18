@@ -17,6 +17,8 @@ type AiConversation struct {
 	Title               string
 	ConversationOwnerID uuid.UUID
 	LastUpdatedAt       time.Time
+	IsArchived          bool
+	ClientID            sql.NullString
 }
 
 type AiConversationMessage struct {

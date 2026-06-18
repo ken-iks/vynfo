@@ -6,7 +6,7 @@ import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegen
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import type { EmptySchema, Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_empty, file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { StreamChatResponseSchema } from "./inter/agent_runtime/chat_pb";
+import type { GenerateTitleRequestSchema, GenerateTitleResponseSchema, StreamChatResponseSchema } from "./inter/agent_runtime/chat_pb";
 import { file_proto_v1_inter_agent_runtime_chat } from "./inter/agent_runtime/chat_pb";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file proto/v1/conversation.proto.
  */
 export const file_proto_v1_conversation: GenFile = /*@__PURE__*/
-  fileDesc("Chtwcm90by92MS9jb252ZXJzYXRpb24ucHJvdG8SAnYxIh4KC1VzZXJNZXNzYWdlEg8KB2NvbnRlbnQYASABKAkiHwoMQWdlbnRNZXNzYWdlEg8KB2NvbnRlbnQYASABKAkiWQoXU2VuZEFnZW50TWVzc2FnZVJlcXVlc3QSDwoHY29udGVudBgBIAEoCRIUCgx3b3Jrc3BhY2VfaWQYAiABKAkSFwoPY29udmVyc2F0aW9uX2lkGAMgASgJIowBCg5BSUNvbnZlcnNhdGlvbhIXCg9jb252ZXJzYXRpb25faWQYASABKAkSDQoFdGl0bGUYAiABKAkSHQoVY29udmVyc2F0aW9uX293bmVyX2lkGAMgASgJEjMKD2xhc3RfdXBkYXRlZF9hdBgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiLAobQ3JlYXRlQUlDb252ZXJzYXRpb25SZXF1ZXN0Eg0KBXRpdGxlGAEgASgJIkgKHENyZWF0ZUFJQ29udmVyc2F0aW9uUmVzcG9uc2USKAoMY29udmVyc2F0aW9uGAEgASgLMhIudjEuQUlDb252ZXJzYXRpb24iMwoYR2V0QUlDb252ZXJzYXRpb25SZXF1ZXN0EhcKD2NvbnZlcnNhdGlvbl9pZBgBIAEoCSJlChlHZXRBSUNvbnZlcnNhdGlvblJlc3BvbnNlEigKDGNvbnZlcnNhdGlvbhgBIAEoCzISLnYxLkFJQ29udmVyc2F0aW9uEh4KFnB5ZGFudGljX21lc3NhZ2VzX2pzb24YAiADKAkiHAoaTGlzdEFJQ29udmVyc2F0aW9uc1JlcXVlc3QiSAobTGlzdEFJQ29udmVyc2F0aW9uc1Jlc3BvbnNlEikKDWNvbnZlcnNhdGlvbnMYASADKAsyEi52MS5BSUNvbnZlcnNhdGlvbiJFChtVcGRhdGVBSUNvbnZlcnNhdGlvblJlcXVlc3QSFwoPY29udmVyc2F0aW9uX2lkGAEgASgJEg0KBXRpdGxlGAIgASgJIjYKG0RlbGV0ZUFJQ29udmVyc2F0aW9uUmVxdWVzdBIXCg9jb252ZXJzYXRpb25faWQYASABKAkylwQKE0NvbnZlcnNhdGlvblNlcnZpY2USWQoUQ3JlYXRlQUlDb252ZXJzYXRpb24SHy52MS5DcmVhdGVBSUNvbnZlcnNhdGlvblJlcXVlc3QaIC52MS5DcmVhdGVBSUNvbnZlcnNhdGlvblJlc3BvbnNlElAKEUdldEFJQ29udmVyc2F0aW9uEhwudjEuR2V0QUlDb252ZXJzYXRpb25SZXF1ZXN0Gh0udjEuR2V0QUlDb252ZXJzYXRpb25SZXNwb25zZRJWChNMaXN0QUlDb252ZXJzYXRpb25zEh4udjEuTGlzdEFJQ29udmVyc2F0aW9uc1JlcXVlc3QaHy52MS5MaXN0QUlDb252ZXJzYXRpb25zUmVzcG9uc2USSwoUVXBkYXRlQUlDb252ZXJzYXRpb24SHy52MS5VcGRhdGVBSUNvbnZlcnNhdGlvblJlcXVlc3QaEi52MS5BSUNvbnZlcnNhdGlvbhJPChREZWxldGVBSUNvbnZlcnNhdGlvbhIfLnYxLkRlbGV0ZUFJQ29udmVyc2F0aW9uUmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRJdChBTZW5kQWdlbnRNZXNzYWdlEhsudjEuU2VuZEFnZW50TWVzc2FnZVJlcXVlc3QaKi52MS5pbnRlci5hZ2VudF9ydW50aW1lLlN0cmVhbUNoYXRSZXNwb25zZTABQh5aHHZ5bmZvLmNvbS92eW5mby9nZW4vcHJvdG8vdjFiBnByb3RvMw", [file_google_protobuf_empty, file_google_protobuf_timestamp, file_proto_v1_inter_agent_runtime_chat]);
+  fileDesc("Chtwcm90by92MS9jb252ZXJzYXRpb24ucHJvdG8SAnYxIh4KC1VzZXJNZXNzYWdlEg8KB2NvbnRlbnQYASABKAkiHwoMQWdlbnRNZXNzYWdlEg8KB2NvbnRlbnQYASABKAkiWQoXU2VuZEFnZW50TWVzc2FnZVJlcXVlc3QSDwoHY29udGVudBgBIAEoCRIUCgx3b3Jrc3BhY2VfaWQYAiABKAkSFwoPY29udmVyc2F0aW9uX2lkGAMgASgJIqEBCg5BSUNvbnZlcnNhdGlvbhIXCg9jb252ZXJzYXRpb25faWQYASABKAkSDQoFdGl0bGUYAiABKAkSHQoVY29udmVyc2F0aW9uX293bmVyX2lkGAMgASgJEhMKC2lzX2FyY2hpdmVkGAQgASgIEjMKD2xhc3RfdXBkYXRlZF9hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiUgobQ3JlYXRlQUlDb252ZXJzYXRpb25SZXF1ZXN0Eg0KBXRpdGxlGAEgASgJEhYKCWNsaWVudF9pZBgCIAEoCUgAiAEBQgwKCl9jbGllbnRfaWQiSAocQ3JlYXRlQUlDb252ZXJzYXRpb25SZXNwb25zZRIoCgxjb252ZXJzYXRpb24YASABKAsyEi52MS5BSUNvbnZlcnNhdGlvbiIzChhHZXRBSUNvbnZlcnNhdGlvblJlcXVlc3QSFwoPY29udmVyc2F0aW9uX2lkGAEgASgJIkUKGUdldEFJQ29udmVyc2F0aW9uUmVzcG9uc2USKAoMY29udmVyc2F0aW9uGAEgASgLMhIudjEuQUlDb252ZXJzYXRpb24iHAoaTGlzdEFJQ29udmVyc2F0aW9uc1JlcXVlc3QiSAobTGlzdEFJQ29udmVyc2F0aW9uc1Jlc3BvbnNlEikKDWNvbnZlcnNhdGlvbnMYASADKAsyEi52MS5BSUNvbnZlcnNhdGlvbiJdChtVcGRhdGVBSUNvbnZlcnNhdGlvblJlcXVlc3QSFwoPY29udmVyc2F0aW9uX2lkGAEgASgJEg0KBXRpdGxlGAIgASgJEhYKDmFyY2hpdmVfc3RhdHVzGAMgASgIIjYKG0RlbGV0ZUFJQ29udmVyc2F0aW9uUmVxdWVzdBIXCg9jb252ZXJzYXRpb25faWQYASABKAkiPAohTGlzdEFJQ29udmVyc2F0aW9uTWVzc2FnZXNSZXF1ZXN0EhcKD2NvbnZlcnNhdGlvbl9pZBgBIAEoCSI5CiJMaXN0QUlDb252ZXJzYXRpb25NZXNzYWdlc1Jlc3BvbnNlEhMKC3VpX21lc3NhZ2VzGAEgAygJMvUFChNDb252ZXJzYXRpb25TZXJ2aWNlElkKFENyZWF0ZUFJQ29udmVyc2F0aW9uEh8udjEuQ3JlYXRlQUlDb252ZXJzYXRpb25SZXF1ZXN0GiAudjEuQ3JlYXRlQUlDb252ZXJzYXRpb25SZXNwb25zZRJQChFHZXRBSUNvbnZlcnNhdGlvbhIcLnYxLkdldEFJQ29udmVyc2F0aW9uUmVxdWVzdBodLnYxLkdldEFJQ29udmVyc2F0aW9uUmVzcG9uc2USVgoTTGlzdEFJQ29udmVyc2F0aW9ucxIeLnYxLkxpc3RBSUNvbnZlcnNhdGlvbnNSZXF1ZXN0Gh8udjEuTGlzdEFJQ29udmVyc2F0aW9uc1Jlc3BvbnNlEksKFFVwZGF0ZUFJQ29udmVyc2F0aW9uEh8udjEuVXBkYXRlQUlDb252ZXJzYXRpb25SZXF1ZXN0GhIudjEuQUlDb252ZXJzYXRpb24STwoURGVsZXRlQUlDb252ZXJzYXRpb24SHy52MS5EZWxldGVBSUNvbnZlcnNhdGlvblJlcXVlc3QaFi5nb29nbGUucHJvdG9idWYuRW1wdHkSawoaTGlzdEFJQ29udmVyc2F0aW9uTWVzc2FnZXMSJS52MS5MaXN0QUlDb252ZXJzYXRpb25NZXNzYWdlc1JlcXVlc3QaJi52MS5MaXN0QUlDb252ZXJzYXRpb25NZXNzYWdlc1Jlc3BvbnNlEl0KEFNlbmRBZ2VudE1lc3NhZ2USGy52MS5TZW5kQWdlbnRNZXNzYWdlUmVxdWVzdBoqLnYxLmludGVyLmFnZW50X3J1bnRpbWUuU3RyZWFtQ2hhdFJlc3BvbnNlMAESbwoQR2VuZXJhdGVOZXdUaXRsZRIsLnYxLmludGVyLmFnZW50X3J1bnRpbWUuR2VuZXJhdGVUaXRsZVJlcXVlc3QaLS52MS5pbnRlci5hZ2VudF9ydW50aW1lLkdlbmVyYXRlVGl0bGVSZXNwb25zZUIeWhx2eW5mby5jb20vdnluZm8vZ2VuL3Byb3RvL3YxYgZwcm90bzM", [file_google_protobuf_empty, file_google_protobuf_timestamp, file_proto_v1_inter_agent_runtime_chat]);
 
 /**
  * @generated from message v1.UserMessage
@@ -97,7 +97,12 @@ export type AIConversation = Message<"v1.AIConversation"> & {
   conversationOwnerId: string;
 
   /**
-   * @generated from field: google.protobuf.Timestamp last_updated_at = 4;
+   * @generated from field: bool is_archived = 4;
+   */
+  isArchived: boolean;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp last_updated_at = 5;
    */
   lastUpdatedAt?: Timestamp;
 };
@@ -117,6 +122,15 @@ export type CreateAIConversationRequest = Message<"v1.CreateAIConversationReques
    * @generated from field: string title = 1;
    */
   title: string;
+
+  /**
+   * you can optionally use a unique client id
+   * for the conversation to enforce idempotency
+   * on thread initialization
+   *
+   * @generated from field: optional string client_id = 2;
+   */
+  clientId?: string;
 };
 
 /**
@@ -168,11 +182,6 @@ export type GetAIConversationResponse = Message<"v1.GetAIConversationResponse"> 
    * @generated from field: v1.AIConversation conversation = 1;
    */
   conversation?: AIConversation;
-
-  /**
-   * @generated from field: repeated string pydantic_messages_json = 2;
-   */
-  pydanticMessagesJson: string[];
 };
 
 /**
@@ -225,6 +234,11 @@ export type UpdateAIConversationRequest = Message<"v1.UpdateAIConversationReques
    * @generated from field: string title = 2;
    */
   title: string;
+
+  /**
+   * @generated from field: bool archive_status = 3;
+   */
+  archiveStatus: boolean;
 };
 
 /**
@@ -250,6 +264,40 @@ export type DeleteAIConversationRequest = Message<"v1.DeleteAIConversationReques
  */
 export const DeleteAIConversationRequestSchema: GenMessage<DeleteAIConversationRequest> = /*@__PURE__*/
   messageDesc(file_proto_v1_conversation, 11);
+
+/**
+ * @generated from message v1.ListAIConversationMessagesRequest
+ */
+export type ListAIConversationMessagesRequest = Message<"v1.ListAIConversationMessagesRequest"> & {
+  /**
+   * @generated from field: string conversation_id = 1;
+   */
+  conversationId: string;
+};
+
+/**
+ * Describes the message v1.ListAIConversationMessagesRequest.
+ * Use `create(ListAIConversationMessagesRequestSchema)` to create a new message.
+ */
+export const ListAIConversationMessagesRequestSchema: GenMessage<ListAIConversationMessagesRequest> = /*@__PURE__*/
+  messageDesc(file_proto_v1_conversation, 12);
+
+/**
+ * @generated from message v1.ListAIConversationMessagesResponse
+ */
+export type ListAIConversationMessagesResponse = Message<"v1.ListAIConversationMessagesResponse"> & {
+  /**
+   * @generated from field: repeated string ui_messages = 1;
+   */
+  uiMessages: string[];
+};
+
+/**
+ * Describes the message v1.ListAIConversationMessagesResponse.
+ * Use `create(ListAIConversationMessagesResponseSchema)` to create a new message.
+ */
+export const ListAIConversationMessagesResponseSchema: GenMessage<ListAIConversationMessagesResponse> = /*@__PURE__*/
+  messageDesc(file_proto_v1_conversation, 13);
 
 /**
  * @generated from service v1.ConversationService
@@ -296,12 +344,28 @@ export const ConversationService: GenService<{
     output: typeof EmptySchema;
   },
   /**
+   * @generated from rpc v1.ConversationService.ListAIConversationMessages
+   */
+  listAIConversationMessages: {
+    methodKind: "unary";
+    input: typeof ListAIConversationMessagesRequestSchema;
+    output: typeof ListAIConversationMessagesResponseSchema;
+  },
+  /**
    * @generated from rpc v1.ConversationService.SendAgentMessage
    */
   sendAgentMessage: {
     methodKind: "server_streaming";
     input: typeof SendAgentMessageRequestSchema;
     output: typeof StreamChatResponseSchema;
+  },
+  /**
+   * @generated from rpc v1.ConversationService.GenerateNewTitle
+   */
+  generateNewTitle: {
+    methodKind: "unary";
+    input: typeof GenerateTitleRequestSchema;
+    output: typeof GenerateTitleResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_proto_v1_conversation, 0);

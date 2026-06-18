@@ -177,7 +177,8 @@ type AIConversation struct {
 	ConversationId      string                 `protobuf:"bytes,1,opt,name=conversation_id,json=conversationId,proto3" json:"conversation_id,omitempty"`
 	Title               string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	ConversationOwnerId string                 `protobuf:"bytes,3,opt,name=conversation_owner_id,json=conversationOwnerId,proto3" json:"conversation_owner_id,omitempty"`
-	LastUpdatedAt       *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=last_updated_at,json=lastUpdatedAt,proto3" json:"last_updated_at,omitempty"`
+	IsArchived          bool                   `protobuf:"varint,4,opt,name=is_archived,json=isArchived,proto3" json:"is_archived,omitempty"`
+	LastUpdatedAt       *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=last_updated_at,json=lastUpdatedAt,proto3" json:"last_updated_at,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -233,6 +234,13 @@ func (x *AIConversation) GetConversationOwnerId() string {
 	return ""
 }
 
+func (x *AIConversation) GetIsArchived() bool {
+	if x != nil {
+		return x.IsArchived
+	}
+	return false
+}
+
 func (x *AIConversation) GetLastUpdatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.LastUpdatedAt
@@ -241,8 +249,12 @@ func (x *AIConversation) GetLastUpdatedAt() *timestamppb.Timestamp {
 }
 
 type CreateAIConversationRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Title string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	// you can optionally use a unique client id
+	// for the conversation to enforce idempotency
+	// on thread initialization
+	ClientId      *string `protobuf:"bytes,2,opt,name=client_id,json=clientId,proto3,oneof" json:"client_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -280,6 +292,13 @@ func (*CreateAIConversationRequest) Descriptor() ([]byte, []int) {
 func (x *CreateAIConversationRequest) GetTitle() string {
 	if x != nil {
 		return x.Title
+	}
+	return ""
+}
+
+func (x *CreateAIConversationRequest) GetClientId() string {
+	if x != nil && x.ClientId != nil {
+		return *x.ClientId
 	}
 	return ""
 }
@@ -373,11 +392,10 @@ func (x *GetAIConversationRequest) GetConversationId() string {
 }
 
 type GetAIConversationResponse struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	Conversation         *AIConversation        `protobuf:"bytes,1,opt,name=conversation,proto3" json:"conversation,omitempty"`
-	PydanticMessagesJson []string               `protobuf:"bytes,2,rep,name=pydantic_messages_json,json=pydanticMessagesJson,proto3" json:"pydantic_messages_json,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Conversation  *AIConversation        `protobuf:"bytes,1,opt,name=conversation,proto3" json:"conversation,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetAIConversationResponse) Reset() {
@@ -413,13 +431,6 @@ func (*GetAIConversationResponse) Descriptor() ([]byte, []int) {
 func (x *GetAIConversationResponse) GetConversation() *AIConversation {
 	if x != nil {
 		return x.Conversation
-	}
-	return nil
-}
-
-func (x *GetAIConversationResponse) GetPydanticMessagesJson() []string {
-	if x != nil {
-		return x.PydanticMessagesJson
 	}
 	return nil
 }
@@ -508,6 +519,7 @@ type UpdateAIConversationRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	ConversationId string                 `protobuf:"bytes,1,opt,name=conversation_id,json=conversationId,proto3" json:"conversation_id,omitempty"`
 	Title          string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	ArchiveStatus  bool                   `protobuf:"varint,3,opt,name=archive_status,json=archiveStatus,proto3" json:"archive_status,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -556,6 +568,13 @@ func (x *UpdateAIConversationRequest) GetTitle() string {
 	return ""
 }
 
+func (x *UpdateAIConversationRequest) GetArchiveStatus() bool {
+	if x != nil {
+		return x.ArchiveStatus
+	}
+	return false
+}
+
 type DeleteAIConversationRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	ConversationId string                 `protobuf:"bytes,1,opt,name=conversation_id,json=conversationId,proto3" json:"conversation_id,omitempty"`
@@ -600,6 +619,94 @@ func (x *DeleteAIConversationRequest) GetConversationId() string {
 	return ""
 }
 
+type ListAIConversationMessagesRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ConversationId string                 `protobuf:"bytes,1,opt,name=conversation_id,json=conversationId,proto3" json:"conversation_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *ListAIConversationMessagesRequest) Reset() {
+	*x = ListAIConversationMessagesRequest{}
+	mi := &file_proto_v1_conversation_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAIConversationMessagesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAIConversationMessagesRequest) ProtoMessage() {}
+
+func (x *ListAIConversationMessagesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_conversation_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAIConversationMessagesRequest.ProtoReflect.Descriptor instead.
+func (*ListAIConversationMessagesRequest) Descriptor() ([]byte, []int) {
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *ListAIConversationMessagesRequest) GetConversationId() string {
+	if x != nil {
+		return x.ConversationId
+	}
+	return ""
+}
+
+type ListAIConversationMessagesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UiMessages    []string               `protobuf:"bytes,1,rep,name=ui_messages,json=uiMessages,proto3" json:"ui_messages,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAIConversationMessagesResponse) Reset() {
+	*x = ListAIConversationMessagesResponse{}
+	mi := &file_proto_v1_conversation_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAIConversationMessagesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAIConversationMessagesResponse) ProtoMessage() {}
+
+func (x *ListAIConversationMessagesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_conversation_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAIConversationMessagesResponse.ProtoReflect.Descriptor instead.
+func (*ListAIConversationMessagesResponse) Descriptor() ([]byte, []int) {
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *ListAIConversationMessagesResponse) GetUiMessages() []string {
+	if x != nil {
+		return x.UiMessages
+	}
+	return nil
+}
+
 var File_proto_v1_conversation_proto protoreflect.FileDescriptor
 
 const file_proto_v1_conversation_proto_rawDesc = "" +
@@ -612,36 +719,48 @@ const file_proto_v1_conversation_proto_rawDesc = "" +
 	"\x17SendAgentMessageRequest\x12\x18\n" +
 	"\acontent\x18\x01 \x01(\tR\acontent\x12!\n" +
 	"\fworkspace_id\x18\x02 \x01(\tR\vworkspaceId\x12'\n" +
-	"\x0fconversation_id\x18\x03 \x01(\tR\x0econversationId\"\xc7\x01\n" +
+	"\x0fconversation_id\x18\x03 \x01(\tR\x0econversationId\"\xe8\x01\n" +
 	"\x0eAIConversation\x12'\n" +
 	"\x0fconversation_id\x18\x01 \x01(\tR\x0econversationId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x122\n" +
-	"\x15conversation_owner_id\x18\x03 \x01(\tR\x13conversationOwnerId\x12B\n" +
-	"\x0flast_updated_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\rlastUpdatedAt\"3\n" +
+	"\x15conversation_owner_id\x18\x03 \x01(\tR\x13conversationOwnerId\x12\x1f\n" +
+	"\vis_archived\x18\x04 \x01(\bR\n" +
+	"isArchived\x12B\n" +
+	"\x0flast_updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\rlastUpdatedAt\"c\n" +
 	"\x1bCreateAIConversationRequest\x12\x14\n" +
-	"\x05title\x18\x01 \x01(\tR\x05title\"V\n" +
+	"\x05title\x18\x01 \x01(\tR\x05title\x12 \n" +
+	"\tclient_id\x18\x02 \x01(\tH\x00R\bclientId\x88\x01\x01B\f\n" +
+	"\n" +
+	"_client_id\"V\n" +
 	"\x1cCreateAIConversationResponse\x126\n" +
 	"\fconversation\x18\x01 \x01(\v2\x12.v1.AIConversationR\fconversation\"C\n" +
 	"\x18GetAIConversationRequest\x12'\n" +
-	"\x0fconversation_id\x18\x01 \x01(\tR\x0econversationId\"\x89\x01\n" +
+	"\x0fconversation_id\x18\x01 \x01(\tR\x0econversationId\"S\n" +
 	"\x19GetAIConversationResponse\x126\n" +
-	"\fconversation\x18\x01 \x01(\v2\x12.v1.AIConversationR\fconversation\x124\n" +
-	"\x16pydantic_messages_json\x18\x02 \x03(\tR\x14pydanticMessagesJson\"\x1c\n" +
+	"\fconversation\x18\x01 \x01(\v2\x12.v1.AIConversationR\fconversation\"\x1c\n" +
 	"\x1aListAIConversationsRequest\"W\n" +
 	"\x1bListAIConversationsResponse\x128\n" +
-	"\rconversations\x18\x01 \x03(\v2\x12.v1.AIConversationR\rconversations\"\\\n" +
+	"\rconversations\x18\x01 \x03(\v2\x12.v1.AIConversationR\rconversations\"\x83\x01\n" +
 	"\x1bUpdateAIConversationRequest\x12'\n" +
 	"\x0fconversation_id\x18\x01 \x01(\tR\x0econversationId\x12\x14\n" +
-	"\x05title\x18\x02 \x01(\tR\x05title\"F\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12%\n" +
+	"\x0earchive_status\x18\x03 \x01(\bR\rarchiveStatus\"F\n" +
 	"\x1bDeleteAIConversationRequest\x12'\n" +
-	"\x0fconversation_id\x18\x01 \x01(\tR\x0econversationId2\x97\x04\n" +
+	"\x0fconversation_id\x18\x01 \x01(\tR\x0econversationId\"L\n" +
+	"!ListAIConversationMessagesRequest\x12'\n" +
+	"\x0fconversation_id\x18\x01 \x01(\tR\x0econversationId\"E\n" +
+	"\"ListAIConversationMessagesResponse\x12\x1f\n" +
+	"\vui_messages\x18\x01 \x03(\tR\n" +
+	"uiMessages2\xf5\x05\n" +
 	"\x13ConversationService\x12Y\n" +
 	"\x14CreateAIConversation\x12\x1f.v1.CreateAIConversationRequest\x1a .v1.CreateAIConversationResponse\x12P\n" +
 	"\x11GetAIConversation\x12\x1c.v1.GetAIConversationRequest\x1a\x1d.v1.GetAIConversationResponse\x12V\n" +
 	"\x13ListAIConversations\x12\x1e.v1.ListAIConversationsRequest\x1a\x1f.v1.ListAIConversationsResponse\x12K\n" +
 	"\x14UpdateAIConversation\x12\x1f.v1.UpdateAIConversationRequest\x1a\x12.v1.AIConversation\x12O\n" +
-	"\x14DeleteAIConversation\x12\x1f.v1.DeleteAIConversationRequest\x1a\x16.google.protobuf.Empty\x12]\n" +
-	"\x10SendAgentMessage\x12\x1b.v1.SendAgentMessageRequest\x1a*.v1.inter.agent_runtime.StreamChatResponse0\x01B\x1eZ\x1cvynfo.com/vynfo/gen/proto/v1b\x06proto3"
+	"\x14DeleteAIConversation\x12\x1f.v1.DeleteAIConversationRequest\x1a\x16.google.protobuf.Empty\x12k\n" +
+	"\x1aListAIConversationMessages\x12%.v1.ListAIConversationMessagesRequest\x1a&.v1.ListAIConversationMessagesResponse\x12]\n" +
+	"\x10SendAgentMessage\x12\x1b.v1.SendAgentMessageRequest\x1a*.v1.inter.agent_runtime.StreamChatResponse0\x01\x12o\n" +
+	"\x10GenerateNewTitle\x12,.v1.inter.agent_runtime.GenerateTitleRequest\x1a-.v1.inter.agent_runtime.GenerateTitleResponseB\x1eZ\x1cvynfo.com/vynfo/gen/proto/v1b\x06proto3"
 
 var (
 	file_proto_v1_conversation_proto_rawDescOnce sync.Once
@@ -655,26 +774,30 @@ func file_proto_v1_conversation_proto_rawDescGZIP() []byte {
 	return file_proto_v1_conversation_proto_rawDescData
 }
 
-var file_proto_v1_conversation_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_proto_v1_conversation_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_proto_v1_conversation_proto_goTypes = []any{
-	(*UserMessage)(nil),                      // 0: v1.UserMessage
-	(*AgentMessage)(nil),                     // 1: v1.AgentMessage
-	(*SendAgentMessageRequest)(nil),          // 2: v1.SendAgentMessageRequest
-	(*AIConversation)(nil),                   // 3: v1.AIConversation
-	(*CreateAIConversationRequest)(nil),      // 4: v1.CreateAIConversationRequest
-	(*CreateAIConversationResponse)(nil),     // 5: v1.CreateAIConversationResponse
-	(*GetAIConversationRequest)(nil),         // 6: v1.GetAIConversationRequest
-	(*GetAIConversationResponse)(nil),        // 7: v1.GetAIConversationResponse
-	(*ListAIConversationsRequest)(nil),       // 8: v1.ListAIConversationsRequest
-	(*ListAIConversationsResponse)(nil),      // 9: v1.ListAIConversationsResponse
-	(*UpdateAIConversationRequest)(nil),      // 10: v1.UpdateAIConversationRequest
-	(*DeleteAIConversationRequest)(nil),      // 11: v1.DeleteAIConversationRequest
-	(*timestamppb.Timestamp)(nil),            // 12: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),                    // 13: google.protobuf.Empty
-	(*agent_runtime.StreamChatResponse)(nil), // 14: v1.inter.agent_runtime.StreamChatResponse
+	(*UserMessage)(nil),                         // 0: v1.UserMessage
+	(*AgentMessage)(nil),                        // 1: v1.AgentMessage
+	(*SendAgentMessageRequest)(nil),             // 2: v1.SendAgentMessageRequest
+	(*AIConversation)(nil),                      // 3: v1.AIConversation
+	(*CreateAIConversationRequest)(nil),         // 4: v1.CreateAIConversationRequest
+	(*CreateAIConversationResponse)(nil),        // 5: v1.CreateAIConversationResponse
+	(*GetAIConversationRequest)(nil),            // 6: v1.GetAIConversationRequest
+	(*GetAIConversationResponse)(nil),           // 7: v1.GetAIConversationResponse
+	(*ListAIConversationsRequest)(nil),          // 8: v1.ListAIConversationsRequest
+	(*ListAIConversationsResponse)(nil),         // 9: v1.ListAIConversationsResponse
+	(*UpdateAIConversationRequest)(nil),         // 10: v1.UpdateAIConversationRequest
+	(*DeleteAIConversationRequest)(nil),         // 11: v1.DeleteAIConversationRequest
+	(*ListAIConversationMessagesRequest)(nil),   // 12: v1.ListAIConversationMessagesRequest
+	(*ListAIConversationMessagesResponse)(nil),  // 13: v1.ListAIConversationMessagesResponse
+	(*timestamppb.Timestamp)(nil),               // 14: google.protobuf.Timestamp
+	(*agent_runtime.GenerateTitleRequest)(nil),  // 15: v1.inter.agent_runtime.GenerateTitleRequest
+	(*emptypb.Empty)(nil),                       // 16: google.protobuf.Empty
+	(*agent_runtime.StreamChatResponse)(nil),    // 17: v1.inter.agent_runtime.StreamChatResponse
+	(*agent_runtime.GenerateTitleResponse)(nil), // 18: v1.inter.agent_runtime.GenerateTitleResponse
 }
 var file_proto_v1_conversation_proto_depIdxs = []int32{
-	12, // 0: v1.AIConversation.last_updated_at:type_name -> google.protobuf.Timestamp
+	14, // 0: v1.AIConversation.last_updated_at:type_name -> google.protobuf.Timestamp
 	3,  // 1: v1.CreateAIConversationResponse.conversation:type_name -> v1.AIConversation
 	3,  // 2: v1.GetAIConversationResponse.conversation:type_name -> v1.AIConversation
 	3,  // 3: v1.ListAIConversationsResponse.conversations:type_name -> v1.AIConversation
@@ -683,15 +806,19 @@ var file_proto_v1_conversation_proto_depIdxs = []int32{
 	8,  // 6: v1.ConversationService.ListAIConversations:input_type -> v1.ListAIConversationsRequest
 	10, // 7: v1.ConversationService.UpdateAIConversation:input_type -> v1.UpdateAIConversationRequest
 	11, // 8: v1.ConversationService.DeleteAIConversation:input_type -> v1.DeleteAIConversationRequest
-	2,  // 9: v1.ConversationService.SendAgentMessage:input_type -> v1.SendAgentMessageRequest
-	5,  // 10: v1.ConversationService.CreateAIConversation:output_type -> v1.CreateAIConversationResponse
-	7,  // 11: v1.ConversationService.GetAIConversation:output_type -> v1.GetAIConversationResponse
-	9,  // 12: v1.ConversationService.ListAIConversations:output_type -> v1.ListAIConversationsResponse
-	3,  // 13: v1.ConversationService.UpdateAIConversation:output_type -> v1.AIConversation
-	13, // 14: v1.ConversationService.DeleteAIConversation:output_type -> google.protobuf.Empty
-	14, // 15: v1.ConversationService.SendAgentMessage:output_type -> v1.inter.agent_runtime.StreamChatResponse
-	10, // [10:16] is the sub-list for method output_type
-	4,  // [4:10] is the sub-list for method input_type
+	12, // 9: v1.ConversationService.ListAIConversationMessages:input_type -> v1.ListAIConversationMessagesRequest
+	2,  // 10: v1.ConversationService.SendAgentMessage:input_type -> v1.SendAgentMessageRequest
+	15, // 11: v1.ConversationService.GenerateNewTitle:input_type -> v1.inter.agent_runtime.GenerateTitleRequest
+	5,  // 12: v1.ConversationService.CreateAIConversation:output_type -> v1.CreateAIConversationResponse
+	7,  // 13: v1.ConversationService.GetAIConversation:output_type -> v1.GetAIConversationResponse
+	9,  // 14: v1.ConversationService.ListAIConversations:output_type -> v1.ListAIConversationsResponse
+	3,  // 15: v1.ConversationService.UpdateAIConversation:output_type -> v1.AIConversation
+	16, // 16: v1.ConversationService.DeleteAIConversation:output_type -> google.protobuf.Empty
+	13, // 17: v1.ConversationService.ListAIConversationMessages:output_type -> v1.ListAIConversationMessagesResponse
+	17, // 18: v1.ConversationService.SendAgentMessage:output_type -> v1.inter.agent_runtime.StreamChatResponse
+	18, // 19: v1.ConversationService.GenerateNewTitle:output_type -> v1.inter.agent_runtime.GenerateTitleResponse
+	12, // [12:20] is the sub-list for method output_type
+	4,  // [4:12] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name
 	4,  // [4:4] is the sub-list for extension extendee
 	0,  // [0:4] is the sub-list for field type_name
@@ -702,13 +829,14 @@ func file_proto_v1_conversation_proto_init() {
 	if File_proto_v1_conversation_proto != nil {
 		return
 	}
+	file_proto_v1_conversation_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_v1_conversation_proto_rawDesc), len(file_proto_v1_conversation_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

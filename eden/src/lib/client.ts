@@ -7,6 +7,7 @@ import { UsersService } from "../gen/proto/v1/users_pb";
 import { FileService } from "../gen/proto/v1/vfs_pb";
 import { WorkspacesService } from "../gen/proto/v1/workspaces_pb";
 import { auth } from "@/firebase";
+import { ConversationService } from "@/gen/proto/v1/conversation_pb";
 
 const baseUrl = import.meta.env.DEV ? "http://localhost:8080" : "/api";
 
@@ -36,6 +37,7 @@ export const spacesClient = createClient(SpacesService, transport);
 export const usersClient = createClient(UsersService, transport);
 export const filesClient = createClient(FileService, transport);
 export const workspacesClient = createClient(WorkspacesService, transport);
+export const conversationClient = createClient(ConversationService, transport);
 
 export function createSpacesClient(idToken: string) {
   // Web workers do not share the main thread Firebase auth instance, so the

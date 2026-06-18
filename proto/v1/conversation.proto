@@ -26,11 +26,16 @@ message AIConversation {
     string conversation_id = 1;
     string title = 2;
     string conversation_owner_id = 3;
-    google.protobuf.Timestamp last_updated_at = 4;
+    bool is_archived = 4;
+    google.protobuf.Timestamp last_updated_at = 5;
 }
 
 message CreateAIConversationRequest {
     string title = 1;
+    // you can optionally use a unique client id
+    // for the conversation to enforce idempotency
+    // on thread initialization
+    optional string client_id = 2;
 }
 
 message CreateAIConversationResponse {
@@ -43,7 +48,6 @@ message GetAIConversationRequest {
 
 message GetAIConversationResponse {
     AIConversation conversation = 1;
-    repeated string pydantic_messages_json = 2;
 }
 
 message ListAIConversationsRequest {
@@ -56,10 +60,19 @@ message ListAIConversationsResponse {
 message UpdateAIConversationRequest {
     string conversation_id = 1;
     string title = 2;
+    bool archive_status = 3;
 }
 
 message DeleteAIConversationRequest {
     string conversation_id = 1;
+}
+
+message ListAIConversationMessagesRequest {
+    string conversation_id = 1;
+}
+
+message ListAIConversationMessagesResponse {
+    repeated string ui_messages = 1;
 }
 
 service ConversationService {
@@ -68,5 +81,7 @@ service ConversationService {
     rpc ListAIConversations(ListAIConversationsRequest) returns (ListAIConversationsResponse);
     rpc UpdateAIConversation(UpdateAIConversationRequest) returns (AIConversation);
     rpc DeleteAIConversation(DeleteAIConversationRequest) returns (google.protobuf.Empty);
+    rpc ListAIConversationMessages(ListAIConversationMessagesRequest) returns (ListAIConversationMessagesResponse);
     rpc SendAgentMessage(SendAgentMessageRequest) returns (stream v1.inter.agent_runtime.StreamChatResponse);
+    rpc GenerateNewTitle(v1.inter.agent_runtime.GenerateTitleRequest) returns (v1.inter.agent_runtime.GenerateTitleResponse);
 }

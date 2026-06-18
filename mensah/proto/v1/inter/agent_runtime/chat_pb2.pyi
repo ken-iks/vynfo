@@ -73,12 +73,12 @@ class RunMetadata(_message.Message):
     def __init__(self, input_tokens: _Optional[int] = ..., output_tokens: _Optional[int] = ..., reasoning_tokens: _Optional[int] = ..., num_provider_requests: _Optional[int] = ..., num_tool_calls: _Optional[int] = ...) -> None: ...
 
 class Finished(_message.Message):
-    __slots__ = ("pydantic_new_messages_json", "run_metadata")
-    PYDANTIC_NEW_MESSAGES_JSON_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("ui_messages_new", "run_metadata")
+    UI_MESSAGES_NEW_FIELD_NUMBER: _ClassVar[int]
     RUN_METADATA_FIELD_NUMBER: _ClassVar[int]
-    pydantic_new_messages_json: _containers.RepeatedScalarFieldContainer[str]
+    ui_messages_new: _containers.RepeatedScalarFieldContainer[str]
     run_metadata: RunMetadata
-    def __init__(self, pydantic_new_messages_json: _Optional[_Iterable[str]] = ..., run_metadata: _Optional[_Union[RunMetadata, _Mapping]] = ...) -> None: ...
+    def __init__(self, ui_messages_new: _Optional[_Iterable[str]] = ..., run_metadata: _Optional[_Union[RunMetadata, _Mapping]] = ...) -> None: ...
 
 class ToolCall(_message.Message):
     __slots__ = ("status", "web_search", "page_fetch")

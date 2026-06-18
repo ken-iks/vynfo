@@ -436,12 +436,12 @@ func (x *RunMetadata) GetNumToolCalls() uint32 {
 type Finished struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// we return each completed new message as json string
-	// that can be marshalled back into the pydantic message
-	// types
-	PydanticNewMessagesJson []string     `protobuf:"bytes,1,rep,name=pydantic_new_messages_json,json=pydanticNewMessagesJson,proto3" json:"pydantic_new_messages_json,omitempty"`
-	RunMetadata             *RunMetadata `protobuf:"bytes,2,opt,name=run_metadata,json=runMetadata,proto3" json:"run_metadata,omitempty"`
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	// that can be marshalled from vercel UIMessage bytes
+	// into whatever type they are needed to be
+	UiMessagesNew []string     `protobuf:"bytes,1,rep,name=ui_messages_new,json=uiMessagesNew,proto3" json:"ui_messages_new,omitempty"`
+	RunMetadata   *RunMetadata `protobuf:"bytes,2,opt,name=run_metadata,json=runMetadata,proto3" json:"run_metadata,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Finished) Reset() {
@@ -474,9 +474,9 @@ func (*Finished) Descriptor() ([]byte, []int) {
 	return file_proto_v1_inter_agent_runtime_chat_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *Finished) GetPydanticNewMessagesJson() []string {
+func (x *Finished) GetUiMessagesNew() []string {
 	if x != nil {
-		return x.PydanticNewMessagesJson
+		return x.UiMessagesNew
 	}
 	return nil
 }
@@ -781,9 +781,9 @@ const file_proto_v1_inter_agent_runtime_chat_proto_rawDesc = "" +
 	"\routput_tokens\x18\x02 \x01(\rR\foutputTokens\x12)\n" +
 	"\x10reasoning_tokens\x18\x03 \x01(\rR\x0freasoningTokens\x122\n" +
 	"\x15num_provider_requests\x18\x04 \x01(\rR\x13numProviderRequests\x12$\n" +
-	"\x0enum_tool_calls\x18\x05 \x01(\rR\fnumToolCalls\"\x8f\x01\n" +
-	"\bFinished\x12;\n" +
-	"\x1apydantic_new_messages_json\x18\x01 \x03(\tR\x17pydanticNewMessagesJson\x12F\n" +
+	"\x0enum_tool_calls\x18\x05 \x01(\rR\fnumToolCalls\"z\n" +
+	"\bFinished\x12&\n" +
+	"\x0fui_messages_new\x18\x01 \x03(\tR\ruiMessagesNew\x12F\n" +
 	"\frun_metadata\x18\x02 \x01(\v2#.v1.inter.agent_runtime.RunMetadataR\vrunMetadata\"\xe5\x01\n" +
 	"\bToolCall\x12>\n" +
 	"\x06status\x18\x01 \x01(\x0e2&.v1.inter.agent_runtime.ToolCallStatusR\x06status\x12F\n" +

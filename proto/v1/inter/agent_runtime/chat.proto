@@ -44,9 +44,9 @@ message RunMetadata {
 
 message Finished {
     // we return each completed new message as json string
-    // that can be marshalled back into the pydantic message
-    // types
-    repeated string pydantic_new_messages_json = 1;
+    // that can be marshalled from vercel UIMessage bytes
+    // into whatever type they are needed to be
+    repeated string ui_messages_new = 1;
     RunMetadata run_metadata = 2;
 }
 

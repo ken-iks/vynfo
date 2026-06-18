@@ -95,7 +95,7 @@ func (c *ConversationServiceServer) SendAgentMessage(
 				slog.Error("error creating new run")
 				return connect.NewError(connect.CodeInternal, err)
 			}
-			for _, message := range finished.GetPydanticNewMessagesJson() {
+			for _, message := range finished.GetUiMessagesNew() {
 				_, err := p.AddAIConversationMessage(ctx, db.AddAIConversationMessageParams{
 					ConversationID:           conversationUUID,
 					RunID:                    run.ID,

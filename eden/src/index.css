@@ -3,6 +3,7 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/jetbrains-mono";
 @import "@fontsource-variable/inter";
+@import "tw-shimmer";
 
 @custom-variant dark (&:is(.dark *));
 /* Restores default prose styling (headings, lists, code blocks, etc.) for rendered HTML content via the "prose" class */
