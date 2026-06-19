@@ -2,10 +2,21 @@
 // @generated from file proto/v1/workspaces.proto (package v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type {
+  GenFile,
+  GenMessage,
+  GenService,
+} from "@bufbuild/protobuf/codegenv2";
+import {
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from "@bufbuild/protobuf/codegenv2";
 import type { EmptySchema, Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_empty, file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
+import {
+  file_google_protobuf_empty,
+  file_google_protobuf_timestamp,
+} from "@bufbuild/protobuf/wkt";
 import type { User } from "./users_pb";
 import { file_proto_v1_users } from "./users_pb";
 import type { Message } from "@bufbuild/protobuf";
@@ -13,8 +24,16 @@ import type { Message } from "@bufbuild/protobuf";
 /**
  * Describes the file proto/v1/workspaces.proto.
  */
-export const file_proto_v1_workspaces: GenFile = /*@__PURE__*/
-  fileDesc("Chlwcm90by92MS93b3Jrc3BhY2VzLnByb3RvEgJ2MSJ4CglXb3Jrc3BhY2USFAoMd29ya3NwYWNlX2lkGAEgASgJEgwKBG5hbWUYAiABKAkSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASFwoFdXNlcnMYBCADKAsyCC52MS5Vc2VyIiYKFkNyZWF0ZVdvcmtzcGFjZVJlcXVlc3QSDAoEbmFtZRgBIAEoCSIvChdDcmVhdGVXb3Jrc3BhY2VSZXNwb25zZRIUCgx3b3Jrc3BhY2VfaWQYASABKAkiKwoTR2V0V29ya3NwYWNlUmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkiOAoUR2V0V29ya3NwYWNlUmVzcG9uc2USIAoJd29ya3NwYWNlGAEgASgLMg0udjEuV29ya3NwYWNlIhcKFUxpc3RXb3Jrc3BhY2VzUmVxdWVzdCI7ChZMaXN0V29ya3NwYWNlc1Jlc3BvbnNlEiEKCndvcmtzcGFjZXMYASADKAsyDS52MS5Xb3Jrc3BhY2UiQAoXQWRkV29ya3NwYWNlVXNlclJlcXVlc3QSFAoMd29ya3NwYWNlX2lkGAEgASgJEg8KB3VzZXJfaWQYAiABKAkytAIKEVdvcmtzcGFjZXNTZXJ2aWNlEkoKD0NyZWF0ZVdvcmtzcGFjZRIaLnYxLkNyZWF0ZVdvcmtzcGFjZVJlcXVlc3QaGy52MS5DcmVhdGVXb3Jrc3BhY2VSZXNwb25zZRJBCgxHZXRXb3Jrc3BhY2USFy52MS5HZXRXb3Jrc3BhY2VSZXF1ZXN0GhgudjEuR2V0V29ya3NwYWNlUmVzcG9uc2USRwoOTGlzdFdvcmtzcGFjZXMSGS52MS5MaXN0V29ya3NwYWNlc1JlcXVlc3QaGi52MS5MaXN0V29ya3NwYWNlc1Jlc3BvbnNlEkcKEEFkZFdvcmtzcGFjZVVzZXISGy52MS5BZGRXb3Jrc3BhY2VVc2VyUmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eUIeWhx2eW5mby5jb20vdnluZm8vZ2VuL3Byb3RvL3YxYgZwcm90bzM", [file_google_protobuf_empty, file_google_protobuf_timestamp, file_proto_v1_users]);
+export const file_proto_v1_workspaces: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    "Chlwcm90by92MS93b3Jrc3BhY2VzLnByb3RvEgJ2MSJ4CglXb3Jrc3BhY2USFAoMd29ya3NwYWNlX2lkGAEgASgJEgwKBG5hbWUYAiABKAkSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASFwoFdXNlcnMYBCADKAsyCC52MS5Vc2VyIiYKFkNyZWF0ZVdvcmtzcGFjZVJlcXVlc3QSDAoEbmFtZRgBIAEoCSIvChdDcmVhdGVXb3Jrc3BhY2VSZXNwb25zZRIUCgx3b3Jrc3BhY2VfaWQYASABKAkiKwoTR2V0V29ya3NwYWNlUmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkiOAoUR2V0V29ya3NwYWNlUmVzcG9uc2USIAoJd29ya3NwYWNlGAEgASgLMg0udjEuV29ya3NwYWNlIhcKFUxpc3RXb3Jrc3BhY2VzUmVxdWVzdCI7ChZMaXN0V29ya3NwYWNlc1Jlc3BvbnNlEiEKCndvcmtzcGFjZXMYASADKAsyDS52MS5Xb3Jrc3BhY2UiQAoXQWRkV29ya3NwYWNlVXNlclJlcXVlc3QSFAoMd29ya3NwYWNlX2lkGAEgASgJEg8KB3VzZXJfaWQYAiABKAkytAIKEVdvcmtzcGFjZXNTZXJ2aWNlEkoKD0NyZWF0ZVdvcmtzcGFjZRIaLnYxLkNyZWF0ZVdvcmtzcGFjZVJlcXVlc3QaGy52MS5DcmVhdGVXb3Jrc3BhY2VSZXNwb25zZRJBCgxHZXRXb3Jrc3BhY2USFy52MS5HZXRXb3Jrc3BhY2VSZXF1ZXN0GhgudjEuR2V0V29ya3NwYWNlUmVzcG9uc2USRwoOTGlzdFdvcmtzcGFjZXMSGS52MS5MaXN0V29ya3NwYWNlc1JlcXVlc3QaGi52MS5MaXN0V29ya3NwYWNlc1Jlc3BvbnNlEkcKEEFkZFdvcmtzcGFjZVVzZXISGy52MS5BZGRXb3Jrc3BhY2VVc2VyUmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eUIeWhx2eW5mby5jb20vdnluZm8vZ2VuL3Byb3RvL3YxYgZwcm90bzM",
+    [
+      file_google_protobuf_empty,
+      file_google_protobuf_timestamp,
+      file_proto_v1_users,
+    ],
+  );
 
 /**
  * @generated from message v1.Workspace
@@ -45,7 +64,8 @@ export type Workspace = Message<"v1.Workspace"> & {
  * Describes the message v1.Workspace.
  * Use `create(WorkspaceSchema)` to create a new message.
  */
-export const WorkspaceSchema: GenMessage<Workspace> = /*@__PURE__*/
+export const WorkspaceSchema: GenMessage<Workspace> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_workspaces, 0);
 
 /**
@@ -62,7 +82,8 @@ export type CreateWorkspaceRequest = Message<"v1.CreateWorkspaceRequest"> & {
  * Describes the message v1.CreateWorkspaceRequest.
  * Use `create(CreateWorkspaceRequestSchema)` to create a new message.
  */
-export const CreateWorkspaceRequestSchema: GenMessage<CreateWorkspaceRequest> = /*@__PURE__*/
+export const CreateWorkspaceRequestSchema: GenMessage<CreateWorkspaceRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_workspaces, 1);
 
 /**
@@ -79,7 +100,8 @@ export type CreateWorkspaceResponse = Message<"v1.CreateWorkspaceResponse"> & {
  * Describes the message v1.CreateWorkspaceResponse.
  * Use `create(CreateWorkspaceResponseSchema)` to create a new message.
  */
-export const CreateWorkspaceResponseSchema: GenMessage<CreateWorkspaceResponse> = /*@__PURE__*/
+export const CreateWorkspaceResponseSchema: GenMessage<CreateWorkspaceResponse> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_workspaces, 2);
 
 /**
@@ -96,7 +118,8 @@ export type GetWorkspaceRequest = Message<"v1.GetWorkspaceRequest"> & {
  * Describes the message v1.GetWorkspaceRequest.
  * Use `create(GetWorkspaceRequestSchema)` to create a new message.
  */
-export const GetWorkspaceRequestSchema: GenMessage<GetWorkspaceRequest> = /*@__PURE__*/
+export const GetWorkspaceRequestSchema: GenMessage<GetWorkspaceRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_workspaces, 3);
 
 /**
@@ -113,20 +136,21 @@ export type GetWorkspaceResponse = Message<"v1.GetWorkspaceResponse"> & {
  * Describes the message v1.GetWorkspaceResponse.
  * Use `create(GetWorkspaceResponseSchema)` to create a new message.
  */
-export const GetWorkspaceResponseSchema: GenMessage<GetWorkspaceResponse> = /*@__PURE__*/
+export const GetWorkspaceResponseSchema: GenMessage<GetWorkspaceResponse> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_workspaces, 4);
 
 /**
  * @generated from message v1.ListWorkspacesRequest
  */
-export type ListWorkspacesRequest = Message<"v1.ListWorkspacesRequest"> & {
-};
+export type ListWorkspacesRequest = Message<"v1.ListWorkspacesRequest"> & {};
 
 /**
  * Describes the message v1.ListWorkspacesRequest.
  * Use `create(ListWorkspacesRequestSchema)` to create a new message.
  */
-export const ListWorkspacesRequestSchema: GenMessage<ListWorkspacesRequest> = /*@__PURE__*/
+export const ListWorkspacesRequestSchema: GenMessage<ListWorkspacesRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_workspaces, 5);
 
 /**
@@ -143,7 +167,8 @@ export type ListWorkspacesResponse = Message<"v1.ListWorkspacesResponse"> & {
  * Describes the message v1.ListWorkspacesResponse.
  * Use `create(ListWorkspacesResponseSchema)` to create a new message.
  */
-export const ListWorkspacesResponseSchema: GenMessage<ListWorkspacesResponse> = /*@__PURE__*/
+export const ListWorkspacesResponseSchema: GenMessage<ListWorkspacesResponse> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_workspaces, 6);
 
 /**
@@ -165,7 +190,8 @@ export type AddWorkspaceUserRequest = Message<"v1.AddWorkspaceUserRequest"> & {
  * Describes the message v1.AddWorkspaceUserRequest.
  * Use `create(AddWorkspaceUserRequestSchema)` to create a new message.
  */
-export const AddWorkspaceUserRequestSchema: GenMessage<AddWorkspaceUserRequest> = /*@__PURE__*/
+export const AddWorkspaceUserRequestSchema: GenMessage<AddWorkspaceUserRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_workspaces, 7);
 
 /**
@@ -179,7 +205,7 @@ export const WorkspacesService: GenService<{
     methodKind: "unary";
     input: typeof CreateWorkspaceRequestSchema;
     output: typeof CreateWorkspaceResponseSchema;
-  },
+  };
   /**
    * @generated from rpc v1.WorkspacesService.GetWorkspace
    */
@@ -187,7 +213,7 @@ export const WorkspacesService: GenService<{
     methodKind: "unary";
     input: typeof GetWorkspaceRequestSchema;
     output: typeof GetWorkspaceResponseSchema;
-  },
+  };
   /**
    * @generated from rpc v1.WorkspacesService.ListWorkspaces
    */
@@ -195,7 +221,7 @@ export const WorkspacesService: GenService<{
     methodKind: "unary";
     input: typeof ListWorkspacesRequestSchema;
     output: typeof ListWorkspacesResponseSchema;
-  },
+  };
   /**
    * @generated from rpc v1.WorkspacesService.AddWorkspaceUser
    */
@@ -203,7 +229,5 @@ export const WorkspacesService: GenService<{
     methodKind: "unary";
     input: typeof AddWorkspaceUserRequestSchema;
     output: typeof EmptySchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_proto_v1_workspaces, 0);
-
+  };
+}> = /*@__PURE__*/ serviceDesc(file_proto_v1_workspaces, 0);

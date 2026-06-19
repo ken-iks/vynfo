@@ -49,7 +49,10 @@ SELECT EXISTS (
 );
 
 -- name: CreateAiConversationRun :one
-INSERT INTO ai_conversation_runs (conversation_id, input_tokens, output_tokens, reasoning_tokens, num_provider_requests, num_tool_calls) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;
+INSERT INTO ai_conversation_runs (conversation_id, input_tokens, output_tokens, reasoning_tokens, num_provider_requests, num_tool_calls, run_messages) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
+
+-- name: ListAIConversationRuns :many
+SELECT * FROM ai_conversation_runs WHERE conversation_id = $1 ORDER BY completed_at DESC, id DESC LIMIT $2;
 
 -- name: ListAIConversationMessages :many
 SELECT *
@@ -66,7 +69,7 @@ ORDER BY sent_at, id;
 
 -- name: AddAIConversationMessage :one
 WITH new_message AS (
-    INSERT INTO ai_conversation_messages (conversation_id, run_id, message_content_json_string) VALUES ($1, $2, $3) RETURNING *
+    INSERT INTO ai_conversation_messages (conversation_id, run_id, message_content_as_json) VALUES ($1, $2, $3) RETURNING *
 ), bump_conversation AS (
     UPDATE ai_conversations SET last_updated_at = (SELECT sent_at FROM new_message) WHERE id = $1
 )

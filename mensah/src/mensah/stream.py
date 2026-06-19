@@ -1,4 +1,4 @@
-from typing import Any, AsyncIterator
+from typing import AsyncIterator
 from pydantic_ai import (
     AgentRunResult,
     AgentRunResultEvent,
@@ -13,23 +13,21 @@ from pydantic_ai import (
     ThinkingPart,
     ThinkingPartDelta,
     ToolCallPart,
+    ToolResultEvent,
 )
 
-from mensah.agent import FetchPageArgs, WebSearchArgs
-from mensah.history import model_messages_to_ui_json_str
+from mensah.run import parse_finished_run
+from mensah.tools import resolve_tool_call, resolve_tool_result_status
 from proto.v1.inter.agent_runtime import chat_pb2
 
 
 async def parse_agent_stream_event(
-    message_id: str, event: AgentStreamEvent | AgentRunResultEvent
+    message_id: str,
+    event: AgentStreamEvent | AgentRunResultEvent,
+    tool_calls: dict[str, chat_pb2.ToolCall],
 ) -> AsyncIterator[chat_pb2.StreamChatResponse]:
     if isinstance(event, AgentRunResultEvent):
         event_result: AgentRunResult = event.result
-        # on finish, we list all of the new model messages (this includes the
-        # sent message) as json strings, we can be re marshalled on load
-        new_messages_json_strs = model_messages_to_ui_json_str(
-            event_result.new_messages()
-        )
         usage = chat_pb2.RunMetadata(
             input_tokens=event_result.usage.input_tokens,
             output_tokens=event_result.usage.output_tokens,
@@ -40,7 +38,10 @@ async def parse_agent_stream_event(
         yield chat_pb2.StreamChatResponse(
             message_id=message_id,
             finished=chat_pb2.Finished(
-                ui_messages_new=new_messages_json_strs, run_metadata=usage
+                new_messages=parse_finished_run(event_result),
+                run_metadata=usage,
+                runtime_convertable_json_string=event_result.new_messages_json()
+                .decode(),
             ),
         )
     else:
@@ -76,25 +77,24 @@ async def parse_agent_stream_event(
                 tool_call = resolve_tool_call(
                     final_event_part.tool_name,
                     final_event_part.args_as_dict(raise_if_invalid=True),
-                    chat_pb2.TOOL_CALL_STATUS_REQUESTED,
                 )
+                tool_calls[final_event_part.tool_call_id] = tool_call
                 yield chat_pb2.StreamChatResponse(
-                    message_id=message_id, tool_call=tool_call
+                    message_id=message_id,
+                    tool_call=chat_pb2.StreamingToolCall(
+                        status=chat_pb2.TOOL_CALL_STATUS_REQUESTED,
+                        call=tool_call,
+                    ),
                 )
+        elif isinstance(event, ToolResultEvent):
+            tool_call = tool_calls.pop(event.tool_call_id, None)
+            if tool_call is None:
+                raise ValueError(f"Missing streamed tool call {event.tool_call_id!r}")
 
-
-def resolve_tool_call(
-    name: str, args_as_dict: dict[str, Any], status: chat_pb2.ToolCallStatus
-) -> chat_pb2.ToolCall:
-    if name == "web_search":
-        args = WebSearchArgs.model_validate(args_as_dict)
-        return chat_pb2.ToolCall(
-            status=status, web_search=chat_pb2.ToolWebSearch(query=args.query)
-        )
-    elif name == "fetch_page":
-        args = FetchPageArgs.model_validate(args_as_dict)
-        return chat_pb2.ToolCall(
-            status=status, page_fetch=chat_pb2.ToolFetchWebPage(urls=args.urls)
-        )
-    else:
-        raise ValueError(f"Unknown tool called: {name} with args {args_as_dict}")
+            yield chat_pb2.StreamChatResponse(
+                message_id=message_id,
+                tool_call=chat_pb2.StreamingToolCall(
+                    status=resolve_tool_result_status(event),
+                    call=tool_call,
+                ),
+            )

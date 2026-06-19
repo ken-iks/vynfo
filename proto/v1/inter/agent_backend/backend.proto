@@ -16,4 +16,6 @@ message AuthenticateUserAndPromptResponse {
 
 service AgentBackendService {
     rpc AuthenticateUserAndPrompt(AuthenticateUserAndPromptRequest) returns (AuthenticateUserAndPromptResponse);
+    //TODO: expose a url signer
+    //TODO:
 }

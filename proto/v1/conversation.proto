@@ -8,13 +8,17 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "proto/v1/inter/agent_runtime/chat.proto";
 
-message UserMessage {
-    string content = 1;
+service ConversationService {
+    rpc CreateAIConversation(CreateAIConversationRequest) returns (CreateAIConversationResponse);
+    rpc GetAIConversation(GetAIConversationRequest) returns (GetAIConversationResponse);
+    rpc ListAIConversations(ListAIConversationsRequest) returns (ListAIConversationsResponse);
+    rpc UpdateAIConversation(UpdateAIConversationRequest) returns (AIConversation);
+    rpc DeleteAIConversation(DeleteAIConversationRequest) returns (google.protobuf.Empty);
+    rpc ListAIConversationMessages(ListAIConversationMessagesRequest) returns (ListAIConversationMessagesResponse);
+    rpc SendAgentMessage(SendAgentMessageRequest) returns (stream v1.inter.agent_runtime.StreamChatResponse);
+    rpc GenerateNewTitle(v1.inter.agent_runtime.GenerateTitleRequest) returns (v1.inter.agent_runtime.GenerateTitleResponse);
 }
 
-message AgentMessage {
-    string content = 1;
-}
 
 message SendAgentMessageRequest {
     string content = 1;
@@ -72,16 +76,6 @@ message ListAIConversationMessagesRequest {
 }
 
 message ListAIConversationMessagesResponse {
-    repeated string ui_messages = 1;
+    repeated v1.inter.agent_runtime.CompletedRunMessage messages = 1;
 }
 
-service ConversationService {
-    rpc CreateAIConversation(CreateAIConversationRequest) returns (CreateAIConversationResponse);
-    rpc GetAIConversation(GetAIConversationRequest) returns (GetAIConversationResponse);
-    rpc ListAIConversations(ListAIConversationsRequest) returns (ListAIConversationsResponse);
-    rpc UpdateAIConversation(UpdateAIConversationRequest) returns (AIConversation);
-    rpc DeleteAIConversation(DeleteAIConversationRequest) returns (google.protobuf.Empty);
-    rpc ListAIConversationMessages(ListAIConversationMessagesRequest) returns (ListAIConversationMessagesResponse);
-    rpc SendAgentMessage(SendAgentMessageRequest) returns (stream v1.inter.agent_runtime.StreamChatResponse);
-    rpc GenerateNewTitle(v1.inter.agent_runtime.GenerateTitleRequest) returns (v1.inter.agent_runtime.GenerateTitleResponse);
-}

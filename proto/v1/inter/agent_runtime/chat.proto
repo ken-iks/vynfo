@@ -4,12 +4,19 @@ package v1.inter.agent_runtime;
 
 option go_package = "vynfo.com/vynfo/gen/proto/v1/inter/agent_runtime";
 
+
+service ChatService {
+    rpc StreamChat(StreamChatRequest) returns (stream StreamChatResponse);
+    rpc GenerateTitle(GenerateTitleRequest) returns (GenerateTitleResponse);
+}
+
 message StreamChatRequest {
     string prompt = 1;
 
-    // previous conversation messages are a json string that can be
-    // parsed into the pydantic-ai message history array
-    repeated string previous_conversation_messages = 2;
+    // previous conversation runs are a json strings that are
+    // converted into the runtime message history for the agent run
+    // NOTE: these are the same objects that are returned on Finish
+    repeated string previous_conversation_runs = 2;
 
     // only whitelisted users are able to send agent messages for now
     string user_id = 3;
@@ -21,11 +28,21 @@ message StreamChatResponse {
     oneof body {
         TextDelta text = 2;
         ReasoningDelta reasoning = 3;
-        ToolCall tool_call = 4;
+        StreamingToolCall tool_call = 4;
         Finished finished = 5;
     }
 }
 
+// Inference endpoint is exposed for conversation title generation
+// by the agent
+message GenerateTitleRequest {
+    string prompt = 1;
+}
+message GenerateTitleResponse {
+    string title = 2;
+}
+
+// ====== STREAMING types ======== //
 message TextDelta {
     string content = 1;
 }
@@ -43,11 +60,57 @@ message RunMetadata {
 }
 
 message Finished {
-    // we return each completed new message as json string
-    // that can be marshalled from vercel UIMessage bytes
-    // into whatever type they are needed to be
-    repeated string ui_messages_new = 1;
+    repeated CompletedRunMessage new_messages = 1;
     RunMetadata run_metadata = 2;
+
+    // on Finish, the agent runtime will return a json
+    // string along with its results. An array of these
+    // can be used as the message history when sending a
+    // streamchat request
+    string runtime_convertable_json_string = 3;
+}
+
+// ======== LOAD types ======== //
+message UserMessage {
+    string content = 1;
+}
+
+message AssistantMessagePart {
+    oneof content {
+        string text_regular = 1;
+        string text_reasoning = 2;
+        // image url must be signed!
+        string image_url = 3;
+        CompletedToolCall tool_call = 4;
+    }
+}
+
+message AssistantMessage {
+    repeated AssistantMessagePart parts = 1;
+}
+
+message CompletedRunMessage {
+    oneof kind {
+        UserMessage user = 1;
+        AssistantMessage assistant = 2;
+    }
+}
+
+// ======= Tool Call Definitions ======= //
+message ToolWebSearch {
+    string query = 1;
+}
+
+message ToolFetchWebPage {
+    repeated string urls = 2;
+}
+
+// ========= Tool Call Types =========== //
+message ToolCall {
+    oneof kind {
+        ToolWebSearch web_search = 1;
+        ToolFetchWebPage page_fetch = 2;
+    }
 }
 
 enum ToolCallStatus {
@@ -58,31 +121,12 @@ enum ToolCallStatus {
     TOOL_CALL_STATUS_ERRORED = 4;
 }
 
-message ToolCall {
+message StreamingToolCall {
     ToolCallStatus status = 1;
-    oneof call {
-        ToolWebSearch web_search = 2;
-        ToolFetchWebPage page_fetch = 3;
-    }
+    ToolCall call = 2;
 }
 
-message ToolWebSearch {
-    string query = 1;
-}
-
-message ToolFetchWebPage {
-    repeated string urls = 2;
-}
-
-message GenerateTitleRequest {
-    string prompt = 1;
-}
-
-message GenerateTitleResponse {
-    string title = 2;
-}
-
-service ChatService {
-    rpc StreamChat(StreamChatRequest) returns (stream StreamChatResponse);
-    rpc GenerateTitle(GenerateTitleRequest) returns (GenerateTitleResponse);
+message CompletedToolCall {
+    ToolCall call = 1;
+    string call_return_json = 2;
 }

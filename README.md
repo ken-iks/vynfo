@@ -44,6 +44,7 @@ Chichi commands:
 Generate chichi sql models:
 Requirement: `go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest`
 Run: `sqlc generate`
+If you get command not found for the above, try this: `export PATH="$(go env GOPATH)/bin:$PATH"` then re run
 
 Spin up the local postgres volume:
 `docker compose up -d`

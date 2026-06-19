@@ -30,14 +30,20 @@ func (c *ConversationServiceServer) UpdateAIConversation(
 	}
 	title := strings.TrimSpace(req.Msg.GetTitle())
 	if title == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("conversation title is required"))
+		return nil, connect.NewError(
+			connect.CodeInvalidArgument,
+			errors.New("conversation title is required"),
+		)
 	}
 
-	conversation, err := c.queries.UpdateAIConversationTitle(ctx, db.UpdateAIConversationTitleParams{
-		Title:               title,
-		ID:                  conversationID,
-		ConversationOwnerID: user.ID,
-	})
+	conversation, err := c.queries.UpdateAIConversationTitle(
+		ctx,
+		db.UpdateAIConversationTitleParams{
+			Title:               title,
+			ID:                  conversationID,
+			ConversationOwnerID: user.ID,
+		},
+	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)

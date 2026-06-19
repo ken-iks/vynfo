@@ -1,11 +1,10 @@
 from uuid import uuid4
 from grpc.aio import ServicerContext
 from pydantic_ai import Agent
-from tavily import TavilyClient
-from mensah.events import parse_agent_stream_event
+from mensah.stream import parse_agent_stream_event
 from mensah.clients import Clients
 from mensah.agent import VynfoAgentDeps, get_vynfo_agent
-from mensah.history import ui_json_str_to_model_messages
+from mensah.run_parse_helpers import serialize_run_messages
 from proto.v1.inter.agent_backend.backend_pb2 import AuthenticateUserAndPromptRequest
 from proto.v1.inter.agent_runtime import chat_pb2_grpc, chat_pb2
 
@@ -33,15 +32,18 @@ class AgentRuntimeServicer(chat_pb2_grpc.ChatServiceServicer):
 
         message_id = str(uuid4())
         if request.prompt is not None:
+            tool_calls: dict[str, chat_pb2.ToolCall] = {}
             async with get_vynfo_agent().run_stream_events(
                 request.prompt,
-                message_history=ui_json_str_to_model_messages(
-                    request.previous_conversation_messages
+                message_history=serialize_run_messages(
+                    request.previous_conversation_runs
                 ),
                 deps=self.deps,
             ) as stream:
                 async for event in stream:
-                    async for response in parse_agent_stream_event(message_id, event):
+                    async for response in parse_agent_stream_event(
+                        message_id, event, tool_calls
+                    ):
                         yield response
 
     async def GenerateTitle(

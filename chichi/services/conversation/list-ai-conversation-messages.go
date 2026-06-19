@@ -8,8 +8,10 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/encoding/protojson"
 	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
+	"vynfo.com/vynfo/gen/proto/v1/inter/agent_runtime"
 	"vynfo.com/vynfo/internal/db"
 )
 
@@ -44,12 +46,15 @@ func (c *ConversationServiceServer) ListAIConversationMessages(
 		slog.Error("error fetching ai conversation messages", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
-	messages := make([]string, 0, len(rows))
-	for _, row := range rows {
-		messages = append(messages, row.MessageContentJsonString)
+	messages := make([]*agent_runtime.CompletedRunMessage, 0, len(rows))
+	for i, row := range rows {
+		if err := protojson.Unmarshal(row.MessageContentAsJson, messages[i]); err != nil {
+			slog.Error("error parsing message in db")
+			return nil, connect.NewError(connect.CodeInternal, err)
+		}
 	}
 
 	return connect.NewResponse(&v1.ListAIConversationMessagesResponse{
-		UiMessages: messages,
+		Messages: messages,
 	}), nil
 }

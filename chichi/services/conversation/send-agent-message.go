@@ -6,6 +6,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/encoding/protojson"
 	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/gen/proto/v1/inter/agent_runtime"
@@ -42,26 +43,25 @@ func (c *ConversationServiceServer) SendAgentMessage(
 	if !resp {
 		return connect.NewError(connect.CodeUnauthenticated, err)
 	}
-
-	// TODO: can use a smarter form of compaction probably
-	conversationHistory, err := c.queries.ListAIConversationMessages(
+	previousRuns, err := c.queries.ListAIConversationRuns(
 		ctx,
-		db.ListAIConversationMessagesParams{
+		db.ListAIConversationRunsParams{
 			ConversationID: conversationUUID,
 			Limit:          100,
 		},
 	)
-	conversationMessages := []string{}
-	for _, c := range conversationHistory {
-		conversationMessages = append(conversationMessages, c.MessageContentJsonString)
+
+	runMessages := []string{}
+	for _, run := range previousRuns {
+		runMessages = append(runMessages, run.RunMessages)
 	}
 
 	// TODO: can maybe add the prompt auth to this path too
 	responseStream, err := c.mensahClient.StreamChat(ctx, &agent_runtime.StreamChatRequest{
-		Prompt:                       req.Msg.GetContent(),
-		UserId:                       userId,
-		WorkspaceId:                  req.Msg.GetWorkspaceId(),
-		PreviousConversationMessages: conversationMessages,
+		Prompt:                   req.Msg.GetContent(),
+		UserId:                   userId,
+		WorkspaceId:              req.Msg.GetWorkspaceId(),
+		PreviousConversationRuns: runMessages,
 	})
 
 	if err != nil {
@@ -90,16 +90,21 @@ func (c *ConversationServiceServer) SendAgentMessage(
 				ReasoningTokens:     int64(runMeta.ReasoningTokens),
 				NumProviderRequests: int64(runMeta.NumProviderRequests),
 				NumToolCalls:        int64(runMeta.NumToolCalls),
+				RunMessages:         finished.GetRuntimeConvertableJsonString(),
 			})
 			if err != nil {
 				slog.Error("error creating new run")
 				return connect.NewError(connect.CodeInternal, err)
 			}
-			for _, message := range finished.GetUiMessagesNew() {
-				_, err := p.AddAIConversationMessage(ctx, db.AddAIConversationMessageParams{
-					ConversationID:           conversationUUID,
-					RunID:                    run.ID,
-					MessageContentJsonString: message,
+			for _, message := range finished.GetNewMessages() {
+				messageJson, err := protojson.Marshal(message)
+				if err != nil {
+					return connect.NewError(connect.CodeInternal, err)
+				}
+				_, err = p.AddAIConversationMessage(ctx, db.AddAIConversationMessageParams{
+					ConversationID:       conversationUUID,
+					RunID:                run.ID,
+					MessageContentAsJson: messageJson,
 				})
 				if err != nil {
 					slog.Error("error adding new message to ai messages table")

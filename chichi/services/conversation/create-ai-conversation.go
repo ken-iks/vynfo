@@ -24,18 +24,24 @@ func (c *ConversationServiceServer) CreateAIConversation(
 	}
 	title := strings.TrimSpace(req.Msg.GetTitle())
 	if title == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("conversation title is required"))
+		return nil, connect.NewError(
+			connect.CodeInvalidArgument,
+			errors.New("conversation title is required"),
+		)
 	}
 	clientID := req.Msg.GetClientId()
 
-	conversation, err := c.queries.GetOrCreateAIConversation(ctx, db.GetOrCreateAIConversationParams{
-		Title:               title,
-		ConversationOwnerID: user.ID,
-		ClientID: sql.NullString{
-			String: clientID,
-			Valid: clientID != "",
+	conversation, err := c.queries.GetOrCreateAIConversation(
+		ctx,
+		db.GetOrCreateAIConversationParams{
+			Title:               title,
+			ConversationOwnerID: user.ID,
+			ClientID: sql.NullString{
+				String: clientID,
+				Valid:  clientID != "",
+			},
 		},
-	})
+	)
 	if err != nil {
 		slog.Error("error creating ai conversation", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)

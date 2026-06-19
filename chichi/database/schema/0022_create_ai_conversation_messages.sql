@@ -3,7 +3,7 @@ CREATE TABLE ai_conversation_messages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     conversation_id UUID NOT NULL REFERENCES ai_conversations(id) ON DELETE CASCADE,
     run_id UUID NOT NULL REFERENCES ai_conversation_runs(id) ON DELETE CASCADE,
-    message_content_json_string TEXT NOT NULL,
+    message_content_as_json JSONB NOT NULL,
     sent_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

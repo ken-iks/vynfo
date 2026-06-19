@@ -25,7 +25,9 @@ class AgentBackendServiceServicer:
     """Missing associated documentation comment in .proto file."""
 
     def AuthenticateUserAndPrompt(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """TODO: expose a url signer
+        TODO:
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')

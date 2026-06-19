@@ -40,16 +40,6 @@ func (c *ConversationServiceServer) GetAIConversation(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	rows, err := c.queries.ListAIConversationMessagesForConversation(ctx, conversationID)
-	if err != nil {
-		slog.Error("error fetching ai conversation messages", "error", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-	messages := make([]string, 0, len(rows))
-	for _, row := range rows {
-		messages = append(messages, row.MessageContentJsonString)
-	}
-
 	return connect.NewResponse(&v1.GetAIConversationResponse{
 		Conversation: &v1.AIConversation{
 			ConversationId:      conversation.ID.String(),
@@ -57,6 +47,5 @@ func (c *ConversationServiceServer) GetAIConversation(
 			ConversationOwnerId: conversation.ConversationOwnerID.String(),
 			LastUpdatedAt:       timestamppb.New(conversation.LastUpdatedAt),
 		},
-		PydanticMessagesJson: messages,
 	}), nil
 }

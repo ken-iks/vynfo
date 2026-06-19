@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'proto/v1/inter/agent_runtime/chat.proto\x12\x16v1.inter.agent_runtime\"\xad\x01\n\x11StreamChatRequest\x12\x16\n\x06prompt\x18\x01 \x01(\tR\x06prompt\x12\x44\n\x1eprevious_conversation_messages\x18\x02 \x03(\tR\x1cpreviousConversationMessages\x12\x17\n\x07user_id\x18\x03 \x01(\tR\x06userId\x12!\n\x0cworkspace_id\x18\x04 \x01(\tR\x0bworkspaceId\"\xbd\x02\n\x12StreamChatResponse\x12\x1d\n\nmessage_id\x18\x01 \x01(\tR\tmessageId\x12\x37\n\x04text\x18\x02 \x01(\x0b\x32!.v1.inter.agent_runtime.TextDeltaH\x00R\x04text\x12\x46\n\treasoning\x18\x03 \x01(\x0b\x32&.v1.inter.agent_runtime.ReasoningDeltaH\x00R\treasoning\x12?\n\ttool_call\x18\x04 \x01(\x0b\x32 .v1.inter.agent_runtime.ToolCallH\x00R\x08toolCall\x12>\n\x08\x66inished\x18\x05 \x01(\x0b\x32 .v1.inter.agent_runtime.FinishedH\x00R\x08\x66inishedB\x06\n\x04\x62ody\"%\n\tTextDelta\x12\x18\n\x07\x63ontent\x18\x01 \x01(\tR\x07\x63ontent\"*\n\x0eReasoningDelta\x12\x18\n\x07\x63ontent\x18\x01 \x01(\tR\x07\x63ontent\"\xda\x01\n\x0bRunMetadata\x12!\n\x0cinput_tokens\x18\x01 \x01(\rR\x0binputTokens\x12#\n\routput_tokens\x18\x02 \x01(\rR\x0coutputTokens\x12)\n\x10reasoning_tokens\x18\x03 \x01(\rR\x0freasoningTokens\x12\x32\n\x15num_provider_requests\x18\x04 \x01(\rR\x13numProviderRequests\x12$\n\x0enum_tool_calls\x18\x05 \x01(\rR\x0cnumToolCalls\"z\n\x08\x46inished\x12&\n\x0fui_messages_new\x18\x01 \x03(\tR\ruiMessagesNew\x12\x46\n\x0crun_metadata\x18\x02 \x01(\x0b\x32#.v1.inter.agent_runtime.RunMetadataR\x0brunMetadata\"\xe5\x01\n\x08ToolCall\x12>\n\x06status\x18\x01 \x01(\x0e\x32&.v1.inter.agent_runtime.ToolCallStatusR\x06status\x12\x46\n\nweb_search\x18\x02 \x01(\x0b\x32%.v1.inter.agent_runtime.ToolWebSearchH\x00R\twebSearch\x12I\n\npage_fetch\x18\x03 \x01(\x0b\x32(.v1.inter.agent_runtime.ToolFetchWebPageH\x00R\tpageFetchB\x06\n\x04\x63\x61ll\"%\n\rToolWebSearch\x12\x14\n\x05query\x18\x01 \x01(\tR\x05query\"&\n\x10ToolFetchWebPage\x12\x12\n\x04urls\x18\x02 \x03(\tR\x04urls\".\n\x14GenerateTitleRequest\x12\x16\n\x06prompt\x18\x01 \x01(\tR\x06prompt\"-\n\x15GenerateTitleResponse\x12\x14\n\x05title\x18\x02 \x01(\tR\x05title*\xac\x01\n\x0eToolCallStatus\x12 \n\x1cTOOL_CALL_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n\x1aTOOL_CALL_STATUS_REQUESTED\x10\x01\x12\x1d\n\x19TOOL_CALL_STATUS_COMPLETE\x10\x02\x12\x1b\n\x17TOOL_CALL_STATUS_DENIED\x10\x03\x12\x1c\n\x18TOOL_CALL_STATUS_ERRORED\x10\x04\x32\xe2\x01\n\x0b\x43hatService\x12\x65\n\nStreamChat\x12).v1.inter.agent_runtime.StreamChatRequest\x1a*.v1.inter.agent_runtime.StreamChatResponse0\x01\x12l\n\rGenerateTitle\x12,.v1.inter.agent_runtime.GenerateTitleRequest\x1a-.v1.inter.agent_runtime.GenerateTitleResponseB2Z0vynfo.com/vynfo/gen/proto/v1/inter/agent_runtimeb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'proto/v1/inter/agent_runtime/chat.proto\x12\x16v1.inter.agent_runtime\"\xa5\x01\n\x11StreamChatRequest\x12\x16\n\x06prompt\x18\x01 \x01(\tR\x06prompt\x12<\n\x1aprevious_conversation_runs\x18\x02 \x03(\tR\x18previousConversationRuns\x12\x17\n\x07user_id\x18\x03 \x01(\tR\x06userId\x12!\n\x0cworkspace_id\x18\x04 \x01(\tR\x0bworkspaceId\"\xc6\x02\n\x12StreamChatResponse\x12\x1d\n\nmessage_id\x18\x01 \x01(\tR\tmessageId\x12\x37\n\x04text\x18\x02 \x01(\x0b\x32!.v1.inter.agent_runtime.TextDeltaH\x00R\x04text\x12\x46\n\treasoning\x18\x03 \x01(\x0b\x32&.v1.inter.agent_runtime.ReasoningDeltaH\x00R\treasoning\x12H\n\ttool_call\x18\x04 \x01(\x0b\x32).v1.inter.agent_runtime.StreamingToolCallH\x00R\x08toolCall\x12>\n\x08\x66inished\x18\x05 \x01(\x0b\x32 .v1.inter.agent_runtime.FinishedH\x00R\x08\x66inishedB\x06\n\x04\x62ody\".\n\x14GenerateTitleRequest\x12\x16\n\x06prompt\x18\x01 \x01(\tR\x06prompt\"-\n\x15GenerateTitleResponse\x12\x14\n\x05title\x18\x02 \x01(\tR\x05title\"%\n\tTextDelta\x12\x18\n\x07\x63ontent\x18\x01 \x01(\tR\x07\x63ontent\"*\n\x0eReasoningDelta\x12\x18\n\x07\x63ontent\x18\x01 \x01(\tR\x07\x63ontent\"\xda\x01\n\x0bRunMetadata\x12!\n\x0cinput_tokens\x18\x01 \x01(\rR\x0binputTokens\x12#\n\routput_tokens\x18\x02 \x01(\rR\x0coutputTokens\x12)\n\x10reasoning_tokens\x18\x03 \x01(\rR\x0freasoningTokens\x12\x32\n\x15num_provider_requests\x18\x04 \x01(\rR\x13numProviderRequests\x12$\n\x0enum_tool_calls\x18\x05 \x01(\rR\x0cnumToolCalls\"\xe9\x01\n\x08\x46inished\x12N\n\x0cnew_messages\x18\x01 \x03(\x0b\x32+.v1.inter.agent_runtime.CompletedRunMessageR\x0bnewMessages\x12\x46\n\x0crun_metadata\x18\x02 \x01(\x0b\x32#.v1.inter.agent_runtime.RunMetadataR\x0brunMetadata\x12\x45\n\x1fruntime_convertable_json_string\x18\x03 \x01(\tR\x1cruntimeConvertableJsonString\"\'\n\x0bUserMessage\x12\x18\n\x07\x63ontent\x18\x01 \x01(\tR\x07\x63ontent\"\xd8\x01\n\x14\x41ssistantMessagePart\x12#\n\x0ctext_regular\x18\x01 \x01(\tH\x00R\x0btextRegular\x12\'\n\x0etext_reasoning\x18\x02 \x01(\tH\x00R\rtextReasoning\x12\x1d\n\timage_url\x18\x03 \x01(\tH\x00R\x08imageUrl\x12H\n\ttool_call\x18\x04 \x01(\x0b\x32).v1.inter.agent_runtime.CompletedToolCallH\x00R\x08toolCallB\t\n\x07\x63ontent\"V\n\x10\x41ssistantMessage\x12\x42\n\x05parts\x18\x01 \x03(\x0b\x32,.v1.inter.agent_runtime.AssistantMessagePartR\x05parts\"\xa2\x01\n\x13\x43ompletedRunMessage\x12\x39\n\x04user\x18\x01 \x01(\x0b\x32#.v1.inter.agent_runtime.UserMessageH\x00R\x04user\x12H\n\tassistant\x18\x02 \x01(\x0b\x32(.v1.inter.agent_runtime.AssistantMessageH\x00R\tassistantB\x06\n\x04kind\"%\n\rToolWebSearch\x12\x14\n\x05query\x18\x01 \x01(\tR\x05query\"&\n\x10ToolFetchWebPage\x12\x12\n\x04urls\x18\x02 \x03(\tR\x04urls\"\xa5\x01\n\x08ToolCall\x12\x46\n\nweb_search\x18\x01 \x01(\x0b\x32%.v1.inter.agent_runtime.ToolWebSearchH\x00R\twebSearch\x12I\n\npage_fetch\x18\x02 \x01(\x0b\x32(.v1.inter.agent_runtime.ToolFetchWebPageH\x00R\tpageFetchB\x06\n\x04kind\"\x89\x01\n\x11StreamingToolCall\x12>\n\x06status\x18\x01 \x01(\x0e\x32&.v1.inter.agent_runtime.ToolCallStatusR\x06status\x12\x34\n\x04\x63\x61ll\x18\x02 \x01(\x0b\x32 .v1.inter.agent_runtime.ToolCallR\x04\x63\x61ll\"s\n\x11\x43ompletedToolCall\x12\x34\n\x04\x63\x61ll\x18\x01 \x01(\x0b\x32 .v1.inter.agent_runtime.ToolCallR\x04\x63\x61ll\x12(\n\x10\x63\x61ll_return_json\x18\x02 \x01(\tR\x0e\x63\x61llReturnJson*\xac\x01\n\x0eToolCallStatus\x12 \n\x1cTOOL_CALL_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n\x1aTOOL_CALL_STATUS_REQUESTED\x10\x01\x12\x1d\n\x19TOOL_CALL_STATUS_COMPLETE\x10\x02\x12\x1b\n\x17TOOL_CALL_STATUS_DENIED\x10\x03\x12\x1c\n\x18TOOL_CALL_STATUS_ERRORED\x10\x04\x32\xe2\x01\n\x0b\x43hatService\x12\x65\n\nStreamChat\x12).v1.inter.agent_runtime.StreamChatRequest\x1a*.v1.inter.agent_runtime.StreamChatResponse0\x01\x12l\n\rGenerateTitle\x12,.v1.inter.agent_runtime.GenerateTitleRequest\x1a-.v1.inter.agent_runtime.GenerateTitleResponseB2Z0vynfo.com/vynfo/gen/proto/v1/inter/agent_runtimeb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,30 +32,42 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'proto.v1.inter.agent_runtim
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z0vynfo.com/vynfo/gen/proto/v1/inter/agent_runtime'
-  _globals['_TOOLCALLSTATUS']._serialized_start=1398
-  _globals['_TOOLCALLSTATUS']._serialized_end=1570
+  _globals['_TOOLCALLSTATUS']._serialized_start=2217
+  _globals['_TOOLCALLSTATUS']._serialized_end=2389
   _globals['_STREAMCHATREQUEST']._serialized_start=68
-  _globals['_STREAMCHATREQUEST']._serialized_end=241
-  _globals['_STREAMCHATRESPONSE']._serialized_start=244
-  _globals['_STREAMCHATRESPONSE']._serialized_end=561
-  _globals['_TEXTDELTA']._serialized_start=563
-  _globals['_TEXTDELTA']._serialized_end=600
-  _globals['_REASONINGDELTA']._serialized_start=602
-  _globals['_REASONINGDELTA']._serialized_end=644
-  _globals['_RUNMETADATA']._serialized_start=647
-  _globals['_RUNMETADATA']._serialized_end=865
-  _globals['_FINISHED']._serialized_start=867
-  _globals['_FINISHED']._serialized_end=989
-  _globals['_TOOLCALL']._serialized_start=992
-  _globals['_TOOLCALL']._serialized_end=1221
-  _globals['_TOOLWEBSEARCH']._serialized_start=1223
-  _globals['_TOOLWEBSEARCH']._serialized_end=1260
-  _globals['_TOOLFETCHWEBPAGE']._serialized_start=1262
-  _globals['_TOOLFETCHWEBPAGE']._serialized_end=1300
-  _globals['_GENERATETITLEREQUEST']._serialized_start=1302
-  _globals['_GENERATETITLEREQUEST']._serialized_end=1348
-  _globals['_GENERATETITLERESPONSE']._serialized_start=1350
-  _globals['_GENERATETITLERESPONSE']._serialized_end=1395
-  _globals['_CHATSERVICE']._serialized_start=1573
-  _globals['_CHATSERVICE']._serialized_end=1799
+  _globals['_STREAMCHATREQUEST']._serialized_end=233
+  _globals['_STREAMCHATRESPONSE']._serialized_start=236
+  _globals['_STREAMCHATRESPONSE']._serialized_end=562
+  _globals['_GENERATETITLEREQUEST']._serialized_start=564
+  _globals['_GENERATETITLEREQUEST']._serialized_end=610
+  _globals['_GENERATETITLERESPONSE']._serialized_start=612
+  _globals['_GENERATETITLERESPONSE']._serialized_end=657
+  _globals['_TEXTDELTA']._serialized_start=659
+  _globals['_TEXTDELTA']._serialized_end=696
+  _globals['_REASONINGDELTA']._serialized_start=698
+  _globals['_REASONINGDELTA']._serialized_end=740
+  _globals['_RUNMETADATA']._serialized_start=743
+  _globals['_RUNMETADATA']._serialized_end=961
+  _globals['_FINISHED']._serialized_start=964
+  _globals['_FINISHED']._serialized_end=1197
+  _globals['_USERMESSAGE']._serialized_start=1199
+  _globals['_USERMESSAGE']._serialized_end=1238
+  _globals['_ASSISTANTMESSAGEPART']._serialized_start=1241
+  _globals['_ASSISTANTMESSAGEPART']._serialized_end=1457
+  _globals['_ASSISTANTMESSAGE']._serialized_start=1459
+  _globals['_ASSISTANTMESSAGE']._serialized_end=1545
+  _globals['_COMPLETEDRUNMESSAGE']._serialized_start=1548
+  _globals['_COMPLETEDRUNMESSAGE']._serialized_end=1710
+  _globals['_TOOLWEBSEARCH']._serialized_start=1712
+  _globals['_TOOLWEBSEARCH']._serialized_end=1749
+  _globals['_TOOLFETCHWEBPAGE']._serialized_start=1751
+  _globals['_TOOLFETCHWEBPAGE']._serialized_end=1789
+  _globals['_TOOLCALL']._serialized_start=1792
+  _globals['_TOOLCALL']._serialized_end=1957
+  _globals['_STREAMINGTOOLCALL']._serialized_start=1960
+  _globals['_STREAMINGTOOLCALL']._serialized_end=2097
+  _globals['_COMPLETEDTOOLCALL']._serialized_start=2099
+  _globals['_COMPLETEDTOOLCALL']._serialized_end=2214
+  _globals['_CHATSERVICE']._serialized_start=2392
+  _globals['_CHATSERVICE']._serialized_end=2618
 # @@protoc_insertion_point(module_scope)
