@@ -20,7 +20,7 @@ export function AgentChatPage() {
             <div className="flex h-[calc(100vh-3rem)] min-h-0 overflow-hidden">
                 <AgentChatList />
                 <div className="h-full min-h-0 min-w-0 flex-1">
-                    <Thread />
+                    <Thread allowAttachments={false} allowBranching={false} />
                 </div>
             </div>
         </AgentRunTimeProvider>
