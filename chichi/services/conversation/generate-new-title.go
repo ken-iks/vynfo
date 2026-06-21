@@ -8,7 +8,7 @@ import (
 	"vynfo.com/vynfo/gen/proto/v1/inter/agent_runtime"
 )
 
-func (c *ConversationServiceServer) GenerateNewTite(
+func (c *ConversationServiceServer) GenerateNewTitle(
 	ctx context.Context,
 	req *connect.Request[agent_runtime.GenerateTitleRequest],
 ) (*connect.Response[agent_runtime.GenerateTitleResponse], error) {

@@ -1,11 +1,13 @@
 import { conversationClient } from "@/lib/client";
-import { useRemoteThreadListRuntime, type RemoteThreadListAdapter, type ThreadMessage } from "@assistant-ui/react";
+import { AssistantRuntimeProvider, useRemoteThreadListRuntime, type AssistantRuntime, type RemoteThreadListAdapter, type ThreadMessage } from "@assistant-ui/react";
 import { timestampDate } from "@bufbuild/protobuf/wkt";
 import { createAssistantStream } from "assistant-stream";
+import { useMemo, type ReactNode } from "react";
+import { ThreadHistoryProvider } from "./ThreadHistoryProvider";
 
-const adapter: RemoteThreadListAdapter = {
-    unstable_Provider: 
-
+function createAdapter(onInitialize?: (conversationId: string) => void): RemoteThreadListAdapter {
+    return {
+    unstable_Provider: ThreadHistoryProvider,
     async list() {
         const { conversations } = await conversationClient.listAIConversations({});
         if (!conversations) {
@@ -43,6 +45,7 @@ const adapter: RemoteThreadListAdapter = {
         if (!conversation) {
             throw new Error()
         }
+        onInitialize?.(conversation.conversationId);
         return { remoteId: conversation.conversationId, externalId: undefined }
     },
     async rename(remoteId: string, newTitle: string) {
@@ -82,10 +85,24 @@ const adapter: RemoteThreadListAdapter = {
             conversationId: remoteId
         })
     },
+    }
 }
 
-export function ThreadProvider({ children }: { children: React.ReactNode }) {
+type ThreadProviderProps = {
+    children: ReactNode;
+    runtimeHook: () => AssistantRuntime;
+    onInitialize?: (conversationId: string) => void;
+};
+
+export function ThreadProvider({ children, runtimeHook, onInitialize }: ThreadProviderProps) {
+    const adapter = useMemo(() => createAdapter(onInitialize), [onInitialize]);
     const runtime = useRemoteThreadListRuntime({
-        runtimeHook: () => 
+        adapter,
+        runtimeHook
     })
+    return (
+        <AssistantRuntimeProvider runtime={runtime}>
+            {children}
+        </AssistantRuntimeProvider>
+    )
 }

@@ -124,9 +124,12 @@ enum ToolCallStatus {
 message StreamingToolCall {
     ToolCallStatus status = 1;
     ToolCall call = 2;
+    optional string call_return_json = 3;
+    string tool_call_id = 4;
 }
 
 message CompletedToolCall {
     ToolCall call = 1;
     string call_return_json = 2;
+    string tool_call_id = 3;
 }

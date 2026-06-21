@@ -75,4 +75,5 @@ def parse_completed_tool_call(
             part.tool_name, part.args_as_dict(raise_if_invalid=True)
         ),
         call_return_json=pydantic_core.to_json(tool_return.content).decode(),
+        tool_call_id=part.tool_call_id,
     )

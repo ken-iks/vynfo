@@ -1,8 +1,8 @@
-from concurrent import futures
+import asyncio
 import os
 
 from dotenv import load_dotenv
-import grpc
+import grpc.aio
 from tavily import TavilyClient
 
 from mensah.agent import VynfoAgentDeps
@@ -11,14 +11,14 @@ from proto.v1.inter.agent_runtime import chat_pb2_grpc
 from mensah.servicer import AgentRuntimeServicer
 
 
-def main():
+async def run_server():
     load_dotenv()
 
     mensah_addr = os.environ.get("MENSAH_GRPC_ADDR", "[::]:50051")
     chichi_addr = os.environ.get("CHICHI_GRPC_ADDR", "localhost:50052")
 
     clients = Clients(chichi_addr)
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    server = grpc.aio.server()
     deps = VynfoAgentDeps(search_client=TavilyClient())
 
     chat_pb2_grpc.add_ChatServiceServicer_to_server(
@@ -27,12 +27,17 @@ def main():
     )
 
     server.add_insecure_port(mensah_addr)
-    server.start()
+    await server.start()
+    print(f"Mensah gRPC service listening on {mensah_addr}", flush=True)
 
     try:
-        server.wait_for_termination()
+        await server.wait_for_termination()
     finally:
         clients.close()
+
+
+def main():
+    asyncio.run(run_server())
 
 
 if __name__ == "__main__":

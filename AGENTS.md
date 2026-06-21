@@ -102,11 +102,11 @@ window.prompt as a quick client-side input without being asked to touch UI.
 feature to be usable, call that out before implementing it.
 ```
 
-### 4. Do not delete files just to change file types
+### 4. Do not move or delete files for renames, moves, or file type changes
 
-If a file only needs its extension or file type changed, do not delete and recreate it. Ask the user to rename or change the file type instead, then continue from the renamed file.
+If a file needs to be renamed, moved, or have its extension/file type changed, do not do it yourself. Ask the user to rename, move, or change the file type instead, then continue from the updated file path.
 
-Deleting and recreating loses editor continuity and can surprise the user, even when the final contents look similar.
+Moving, deleting, and recreating files loses editor continuity and can surprise the user, even when the final contents look similar.
 
 **Example:**
 
@@ -114,6 +114,12 @@ Deleting and recreating loses editor continuity and can surprise the user, even 
 ❌ BAD — deleting `SpaceView.ts` and creating `SpaceView.tsx` because JSX was added.
 
 ✅ GOOD — ask the user to change `SpaceView.ts` to `SpaceView.tsx`, then continue editing the renamed file.
+```
+
+```text
+❌ BAD — moving `main.py` into `src/mensah/main.py` directly.
+
+✅ GOOD — tell the user that `main.py` should move into `src/mensah/main.py`, wait for them to move it, then continue from the new path.
 ```
 
 ### 5. Prefer shared helpers for repeated logic

@@ -1048,11 +1048,13 @@ func (*ToolCall_WebSearch) isToolCall_Kind() {}
 func (*ToolCall_PageFetch) isToolCall_Kind() {}
 
 type StreamingToolCall struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        ToolCallStatus         `protobuf:"varint,1,opt,name=status,proto3,enum=v1.inter.agent_runtime.ToolCallStatus" json:"status,omitempty"`
-	Call          *ToolCall              `protobuf:"bytes,2,opt,name=call,proto3" json:"call,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Status         ToolCallStatus         `protobuf:"varint,1,opt,name=status,proto3,enum=v1.inter.agent_runtime.ToolCallStatus" json:"status,omitempty"`
+	Call           *ToolCall              `protobuf:"bytes,2,opt,name=call,proto3" json:"call,omitempty"`
+	CallReturnJson *string                `protobuf:"bytes,3,opt,name=call_return_json,json=callReturnJson,proto3,oneof" json:"call_return_json,omitempty"`
+	ToolCallId     string                 `protobuf:"bytes,4,opt,name=tool_call_id,json=toolCallId,proto3" json:"tool_call_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *StreamingToolCall) Reset() {
@@ -1099,10 +1101,25 @@ func (x *StreamingToolCall) GetCall() *ToolCall {
 	return nil
 }
 
+func (x *StreamingToolCall) GetCallReturnJson() string {
+	if x != nil && x.CallReturnJson != nil {
+		return *x.CallReturnJson
+	}
+	return ""
+}
+
+func (x *StreamingToolCall) GetToolCallId() string {
+	if x != nil {
+		return x.ToolCallId
+	}
+	return ""
+}
+
 type CompletedToolCall struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Call           *ToolCall              `protobuf:"bytes,1,opt,name=call,proto3" json:"call,omitempty"`
 	CallReturnJson string                 `protobuf:"bytes,2,opt,name=call_return_json,json=callReturnJson,proto3" json:"call_return_json,omitempty"`
+	ToolCallId     string                 `protobuf:"bytes,3,opt,name=tool_call_id,json=toolCallId,proto3" json:"tool_call_id,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -1147,6 +1164,13 @@ func (x *CompletedToolCall) GetCall() *ToolCall {
 func (x *CompletedToolCall) GetCallReturnJson() string {
 	if x != nil {
 		return x.CallReturnJson
+	}
+	return ""
+}
+
+func (x *CompletedToolCall) GetToolCallId() string {
+	if x != nil {
+		return x.ToolCallId
 	}
 	return ""
 }
@@ -1210,13 +1234,19 @@ const file_proto_v1_inter_agent_runtime_chat_proto_rawDesc = "" +
 	"web_search\x18\x01 \x01(\v2%.v1.inter.agent_runtime.ToolWebSearchH\x00R\twebSearch\x12I\n" +
 	"\n" +
 	"page_fetch\x18\x02 \x01(\v2(.v1.inter.agent_runtime.ToolFetchWebPageH\x00R\tpageFetchB\x06\n" +
-	"\x04kind\"\x89\x01\n" +
+	"\x04kind\"\xef\x01\n" +
 	"\x11StreamingToolCall\x12>\n" +
 	"\x06status\x18\x01 \x01(\x0e2&.v1.inter.agent_runtime.ToolCallStatusR\x06status\x124\n" +
-	"\x04call\x18\x02 \x01(\v2 .v1.inter.agent_runtime.ToolCallR\x04call\"s\n" +
+	"\x04call\x18\x02 \x01(\v2 .v1.inter.agent_runtime.ToolCallR\x04call\x12-\n" +
+	"\x10call_return_json\x18\x03 \x01(\tH\x00R\x0ecallReturnJson\x88\x01\x01\x12 \n" +
+	"\ftool_call_id\x18\x04 \x01(\tR\n" +
+	"toolCallIdB\x13\n" +
+	"\x11_call_return_json\"\x95\x01\n" +
 	"\x11CompletedToolCall\x124\n" +
 	"\x04call\x18\x01 \x01(\v2 .v1.inter.agent_runtime.ToolCallR\x04call\x12(\n" +
-	"\x10call_return_json\x18\x02 \x01(\tR\x0ecallReturnJson*\xac\x01\n" +
+	"\x10call_return_json\x18\x02 \x01(\tR\x0ecallReturnJson\x12 \n" +
+	"\ftool_call_id\x18\x03 \x01(\tR\n" +
+	"toolCallId*\xac\x01\n" +
 	"\x0eToolCallStatus\x12 \n" +
 	"\x1cTOOL_CALL_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aTOOL_CALL_STATUS_REQUESTED\x10\x01\x12\x1d\n" +
@@ -1314,6 +1344,7 @@ func file_proto_v1_inter_agent_runtime_chat_proto_init() {
 		(*ToolCall_WebSearch)(nil),
 		(*ToolCall_PageFetch)(nil),
 	}
+	file_proto_v1_inter_agent_runtime_chat_proto_msgTypes[15].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

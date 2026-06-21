@@ -47,11 +47,13 @@ func (c *ConversationServiceServer) ListAIConversationMessages(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	messages := make([]*agent_runtime.CompletedRunMessage, 0, len(rows))
-	for i, row := range rows {
-		if err := protojson.Unmarshal(row.MessageContentAsJson, messages[i]); err != nil {
+	for _, row := range rows {
+		message := &agent_runtime.CompletedRunMessage{}
+		if err := protojson.Unmarshal(row.MessageContentAsJson, message); err != nil {
 			slog.Error("error parsing message in db")
 			return nil, connect.NewError(connect.CodeInternal, err)
 		}
+		messages = append(messages, message)
 	}
 
 	return connect.NewResponse(&v1.ListAIConversationMessagesResponse{

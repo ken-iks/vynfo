@@ -1,6 +1,7 @@
 import { ProjectRoute, Projects } from "./projects/Projects";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { AppLayout } from "./AppLayout.tsx";
+import { AgentChatPage } from "./agent/AgentChatPage.tsx";
 import { CompleteOnboarding } from "./auth/CompleteOnboarding";
 import { SignIn } from "./auth/SignIn";
 import { AuthProvider, useAuthContext } from "./providers/AuthProvider";
@@ -81,6 +82,7 @@ function AppShell() {
             <Route path="/spaces" element={<Spaces />} />
             <Route path="/spaces/:spaceId" element={<SpaceRoute />} />
             <Route path="/vfs" element={<Vfs />} />
+            <Route path="/murch" element={<AgentChatPage />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/projects" replace />} />
           </Route>

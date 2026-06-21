@@ -60,5 +60,5 @@ class AgentRuntimeServicer(chat_pb2_grpc.ChatServiceServicer):
             + " that captures the essence of the prompt input. DO NOT respond"
             + " to the prompt or add any extra commentary",
         )
-        res = agent.run_sync(request.prompt)
+        res = await agent.run(request.prompt)
         return chat_pb2.GenerateTitleResponse(title=res.output)

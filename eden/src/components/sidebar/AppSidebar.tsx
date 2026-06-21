@@ -45,7 +45,7 @@ const sidebarRoutes: SidebarRoute[] = [
     title: "Ask Murch",
     icon: "/icons/agent-icon.svg",
     path: "/murch",
-    disabled: true,
+    disabled: false,
   },
 ];
 

@@ -6,15 +6,11 @@ from pydantic_ai import (
     ModelResponse,
     NativeToolCallPart,
     NativeToolReturnPart,
-    NativeToolSearchCallPart,
-    NativeToolSearchReturnPart,
     RetryPromptPart,
     SystemPromptPart,
     TextPart,
     ThinkingPart,
     ToolCallPart,
-    ToolSearchCallPart,
-    ToolSearchReturnPart,
     ToolReturnPart,
     UserPromptPart,
 )
@@ -55,8 +51,6 @@ def _parse_model_request(
             )
         elif isinstance(part, SystemPromptPart):
             pass
-        elif isinstance(part, ToolSearchReturnPart):
-            pass
         elif isinstance(part, ToolReturnPart):
             pass
         elif isinstance(part, RetryPromptPart):
@@ -90,13 +84,7 @@ def _parse_model_response(
                     tool_call=parse_completed_tool_call(part, tool_returns)
                 )
             )
-        elif isinstance(part, ToolSearchCallPart):
-            pass
-        elif isinstance(part, NativeToolSearchCallPart):
-            pass
         elif isinstance(part, NativeToolCallPart):
-            pass
-        elif isinstance(part, NativeToolSearchReturnPart):
             pass
         elif isinstance(part, NativeToolReturnPart):
             pass

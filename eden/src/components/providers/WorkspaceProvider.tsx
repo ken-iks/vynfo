@@ -25,7 +25,7 @@ const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
 export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState("");
-  const [loadingWorkspaces, setLoadingWorkspaces] = useState(false);
+  const [loadingWorkspaces, setLoadingWorkspaces] = useState(true);
 
   const refreshWorkspaces = useCallback(async () => {
     setLoadingWorkspaces(true);

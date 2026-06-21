@@ -147,17 +147,23 @@ class ToolCall(_message.Message):
     def __init__(self, web_search: _Optional[_Union[ToolWebSearch, _Mapping]] = ..., page_fetch: _Optional[_Union[ToolFetchWebPage, _Mapping]] = ...) -> None: ...
 
 class StreamingToolCall(_message.Message):
-    __slots__ = ("status", "call")
+    __slots__ = ("status", "call", "call_return_json", "tool_call_id")
     STATUS_FIELD_NUMBER: _ClassVar[int]
     CALL_FIELD_NUMBER: _ClassVar[int]
+    CALL_RETURN_JSON_FIELD_NUMBER: _ClassVar[int]
+    TOOL_CALL_ID_FIELD_NUMBER: _ClassVar[int]
     status: ToolCallStatus
     call: ToolCall
-    def __init__(self, status: _Optional[_Union[ToolCallStatus, str]] = ..., call: _Optional[_Union[ToolCall, _Mapping]] = ...) -> None: ...
+    call_return_json: str
+    tool_call_id: str
+    def __init__(self, status: _Optional[_Union[ToolCallStatus, str]] = ..., call: _Optional[_Union[ToolCall, _Mapping]] = ..., call_return_json: _Optional[str] = ..., tool_call_id: _Optional[str] = ...) -> None: ...
 
 class CompletedToolCall(_message.Message):
-    __slots__ = ("call", "call_return_json")
+    __slots__ = ("call", "call_return_json", "tool_call_id")
     CALL_FIELD_NUMBER: _ClassVar[int]
     CALL_RETURN_JSON_FIELD_NUMBER: _ClassVar[int]
+    TOOL_CALL_ID_FIELD_NUMBER: _ClassVar[int]
     call: ToolCall
     call_return_json: str
-    def __init__(self, call: _Optional[_Union[ToolCall, _Mapping]] = ..., call_return_json: _Optional[str] = ...) -> None: ...
+    tool_call_id: str
+    def __init__(self, call: _Optional[_Union[ToolCall, _Mapping]] = ..., call_return_json: _Optional[str] = ..., tool_call_id: _Optional[str] = ...) -> None: ...

@@ -17,7 +17,11 @@ from pydantic_ai import (
 )
 
 from mensah.run import parse_finished_run
-from mensah.tools import resolve_tool_call, resolve_tool_result_status
+from mensah.tools import (
+    resolve_tool_call,
+    resolve_tool_result_json,
+    resolve_tool_result_status,
+)
 from proto.v1.inter.agent_runtime import chat_pb2
 
 
@@ -84,6 +88,7 @@ async def parse_agent_stream_event(
                     tool_call=chat_pb2.StreamingToolCall(
                         status=chat_pb2.TOOL_CALL_STATUS_REQUESTED,
                         call=tool_call,
+                        tool_call_id=final_event_part.tool_call_id,
                     ),
                 )
         elif isinstance(event, ToolResultEvent):
@@ -96,5 +101,7 @@ async def parse_agent_stream_event(
                 tool_call=chat_pb2.StreamingToolCall(
                     status=resolve_tool_result_status(event),
                     call=tool_call,
+                    call_return_json=resolve_tool_result_json(event),
+                    tool_call_id=event.tool_call_id,
                 ),
             )

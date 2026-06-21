@@ -1,6 +1,7 @@
 from typing import Any
 
 from pydantic_ai import ToolResultEvent, ToolReturnPart
+import pydantic_core
 
 from mensah.agent import FetchPageArgs, WebSearchArgs
 from proto.v1.inter.agent_runtime import chat_pb2
@@ -26,3 +27,9 @@ def resolve_tool_result_status(event: ToolResultEvent) -> chat_pb2.ToolCallStatu
         if event.part.outcome == "denied":
             return chat_pb2.TOOL_CALL_STATUS_DENIED
     return chat_pb2.TOOL_CALL_STATUS_ERRORED
+
+
+def resolve_tool_result_json(event: ToolResultEvent) -> str:
+    if isinstance(event.part, ToolReturnPart):
+        return pydantic_core.to_json(event.part.content).decode()
+    return ""

@@ -2,6 +2,7 @@ package conversations
 
 import (
 	"context"
+	"io"
 	"log/slog"
 
 	"connectrpc.com/connect"
@@ -71,6 +72,9 @@ func (c *ConversationServiceServer) SendAgentMessage(
 	for {
 		message, err := responseStream.Recv()
 		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
 			return err
 		}
 		// when finished, write the full run to the db
