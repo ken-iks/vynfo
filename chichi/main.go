@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 
 	"cloud.google.com/go/storage"
 	"connectrpc.com/connect"
@@ -72,13 +73,55 @@ func mountConnectHandler(mux *http.ServeMux, path string, handler http.Handler) 
 	mux.Handle("/api"+path, http.StripPrefix("/api", handler))
 }
 
+// =========  request logging ====== //
+
+type statusResponseWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func (w *statusResponseWriter) WriteHeader(statusCode int) {
+	w.statusCode = statusCode
+	w.ResponseWriter.WriteHeader(statusCode)
+}
+
+// all http requests take a middleware wrapping for structured logs
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodOptions {
+			next.ServeHTTP(w, r)
+			return
+		}
+		startedAt := time.Now()
+		rw := &statusResponseWriter{ResponseWriter: w, statusCode: http.StatusOK}
+		logger := slog.Default().With(
+			"method", r.Method,
+			"path", r.URL.Path,
+			"remote_addr", r.RemoteAddr,
+		)
+
+		next.ServeHTTP(rw, r)
+		logger.InfoContext(
+			r.Context(),
+			"request completed",
+			"status",
+			rw.statusCode,
+			"duration_ms",
+			time.Since(startedAt).Milliseconds(),
+		)
+	})
+}
+
 func main() {
 	godotenv.Load()
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
 	db, err := runMigrations()
 	if err != nil {
 		slog.Info("error running db migration", "error", err)
 		os.Exit(1)
 	}
+
 	slog.Info("migrations, sucessful - starting up app")
 	//slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})))
 	ctx := context.Background()
@@ -170,6 +213,6 @@ func main() {
 
 	http.ListenAndServe(
 		address,
-		cors.AllowAll().Handler(mux),
+		loggingMiddleware(cors.AllowAll().Handler(mux)),
 	)
 }

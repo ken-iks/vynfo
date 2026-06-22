@@ -19,17 +19,23 @@ func (c *ConversationServiceServer) SendAgentMessage(
 	req *connect.Request[v1.SendAgentMessageRequest],
 	stream *connect.ServerStream[agent_runtime.StreamChatResponse],
 ) error {
+	logger := slog.Default().
+		With("conversation_id", req.Msg.GetConversationId(), "workspace_id", req.Msg.GetWorkspaceId())
 	onboardedUser, err := auth.RequireOnboardedUser(ctx, c.queries)
 	if err != nil {
+		logger.Error("error: unauthenticated user", "error", err)
 		return connect.NewError(connect.CodeUnauthenticated, err)
 	}
 	userId := onboardedUser.ID.String()
+	logger = logger.With("user_id", userId)
 	userUUID, err := uuid.Parse(userId)
 	if err != nil {
+		logger.Error("unable to parse user id", "error", err)
 		return connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	conversationUUID, err := uuid.Parse(req.Msg.GetConversationId())
 	if err != nil {
+		logger.Error("unable to parse conversation id", "error", err)
 		return connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
@@ -39,9 +45,11 @@ func (c *ConversationServiceServer) SendAgentMessage(
 	})
 
 	if err != nil {
+		logger.Error("conversation not found", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	if !resp {
+		logger.Error("user does not have access to conversation", "error", err)
 		return connect.NewError(connect.CodeUnauthenticated, err)
 	}
 	persistanceOptions := req.Msg.GetPersistanceOptions()
@@ -55,6 +63,15 @@ func (c *ConversationServiceServer) SendAgentMessage(
 			},
 		)
 		if err != nil {
+			logger.Error(
+				"could not find parent id for message",
+				"message_client_id",
+				persistanceOptions.ClientId,
+				"parent_message_client_id",
+				persistanceOptions.ParentClientId,
+				"error",
+				err,
+			)
 			return connect.NewError(connect.CodeInvalidArgument, err)
 		}
 		parentID = uuid.NullUUID{UUID: parentMessage.ID, Valid: true}
@@ -69,8 +86,24 @@ func (c *ConversationServiceServer) SendAgentMessage(
 			},
 		)
 		if err != nil {
+			logger.Error(
+				"could not get parent messages for path",
+				"parent_message_id",
+				parentID.UUID.String(),
+				"error",
+				err,
+			)
 			return connect.NewError(connect.CodeInternal, err)
 		}
+		latest_run := previousRuns[len(previousRuns)-1]
+		latest_token_count := latest_run.InputTokens + latest_run.OutputTokens + latest_run.ReasoningTokens
+		logger.Info(
+			"previous messages retrieved",
+			"message_count",
+			len(previousRuns),
+			"latest_token_count",
+			latest_token_count,
+		)
 		for _, run := range previousRuns {
 			runMessages = append(runMessages, run.RunMessages)
 		}
@@ -85,7 +118,8 @@ func (c *ConversationServiceServer) SendAgentMessage(
 	})
 
 	if err != nil {
-		return err
+		logger.Error("error initializing streamchat stream", "error", err)
+		return connect.NewError(connect.CodeInternal, err)
 	}
 
 	for {
@@ -94,13 +128,14 @@ func (c *ConversationServiceServer) SendAgentMessage(
 			if err == io.EOF {
 				return nil
 			}
-			return err
+			logger.Error("message stream error", "error", err)
+			return connect.NewError(connect.CodeAborted, err)
 		}
 		// when finished, write the full run to the db
 		if finished := message.GetFinished(); finished != nil {
 			tx, err := c.db.BeginTx(ctx, nil)
 			if err != nil {
-				slog.Error("error beginning transaction")
+				logger.Error("error beginning transaction for message persistance", "error", err)
 				return connect.NewError(connect.CodeInternal, err)
 			}
 			defer tx.Rollback()
@@ -116,7 +151,7 @@ func (c *ConversationServiceServer) SendAgentMessage(
 				RunMessages:         finished.GetRuntimeConvertableJsonString(),
 			})
 			if err != nil {
-				slog.Error("error creating new run")
+				logger.Error("error creating new run", "error", err)
 				return connect.NewError(connect.CodeInternal, err)
 			}
 			newMessages := finished.GetNewMessages()
@@ -124,6 +159,7 @@ func (c *ConversationServiceServer) SendAgentMessage(
 			for i, message := range newMessages {
 				messageJson, err := protojson.Marshal(message)
 				if err != nil {
+					logger.Error("error marshalling new messages into json", "error", err)
 					return connect.NewError(connect.CodeInternal, err)
 				}
 				clientID := uuid.NewString()
@@ -145,7 +181,7 @@ func (c *ConversationServiceServer) SendAgentMessage(
 					},
 				)
 				if err != nil {
-					slog.Error("error resolving ai message position")
+					logger.Error("error resolving ai message position", "error", err)
 					return connect.NewError(connect.CodeInternal, err)
 				}
 				insertedMessage, err := p.AddAIConversationMessage(
@@ -160,7 +196,15 @@ func (c *ConversationServiceServer) SendAgentMessage(
 					},
 				)
 				if err != nil {
-					slog.Error("error adding new message to ai messages table")
+					logger.Error(
+						"error adding new message to ai messages table",
+						"parent_id",
+						currentParentID,
+						"run_id",
+						run.ID.String(),
+						"error",
+						err,
+					)
 					return connect.NewError(connect.CodeInternal, err)
 				}
 				currentParentID = uuid.NullUUID{
@@ -169,10 +213,12 @@ func (c *ConversationServiceServer) SendAgentMessage(
 				}
 			}
 			if err := tx.Commit(); err != nil {
-				slog.Error("error commiting db transaction", "error", err)
+				logger.Error("error commiting db transaction", "error", err)
+				return connect.NewError(connect.CodeInternal, err)
 			}
 		}
 		if err := stream.Send(message); err != nil {
+			logger.Error("error sending message chunk", "error", err)
 			return err
 		}
 	}
