@@ -11,19 +11,24 @@ import (
 	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
+	"vynfo.com/vynfo/shared"
 )
 
 func (f *FileServiceServer) CreateDirectory(
 	ctx context.Context,
 	req *connect.Request[v1.CreateDirectoryRequest],
 ) (*connect.Response[v1.CreateDirectoryResponse], error) {
-	if _, err := auth.RequireOnboardedUser(ctx, f.queries); err != nil {
+	user, err := auth.RequireOnboardedUser(ctx, f.queries)
+	if err != nil {
 		return nil, err
 	}
-	workspaceId, err := uuid.Parse(req.Msg.GetWorkspaceId())
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"workspace_id", req.Msg.GetWorkspaceId(),
+	)
+	workspaceId, err := shared.ParseUUID(ctx, logger, "workspace_id", req.Msg.GetWorkspaceId())
 	if err != nil {
-		slog.Error("error parsing workspace id")
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 	if err := auth.AssertUserInWorkspace(ctx, workspaceId, f.queries); err != nil {
 		return nil, connect.NewError(connect.CodePermissionDenied, err)
@@ -32,17 +37,17 @@ func (f *FileServiceServer) CreateDirectory(
 	parentId := uuid.NullUUID{}
 	var siblingDirectories []db.Directory
 	if req.Msg.ParentDirectoryId != nil {
-		parsedParentId, err := uuid.Parse(req.Msg.GetParentDirectoryId())
+		parsedParentId, err := shared.ParseUUID(ctx, logger, "parent_directory_id", req.Msg.GetParentDirectoryId())
 		if err != nil {
-			slog.Error("error parsing parent directory id")
-			return nil, connect.NewError(connect.CodeInvalidArgument, err)
+			return nil, err
 		}
+		logger = logger.With("parent_directory_id", parsedParentId.String())
 		parentDirectory, err := f.queries.GetDirectoryById(ctx, parsedParentId)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return nil, connect.NewError(connect.CodeNotFound, err)
 			}
-			slog.Error("error fetching parent directory", "error", err)
+			logger.ErrorContext(ctx, "error fetching parent directory", "error", err)
 			return nil, connect.NewError(connect.CodeInternal, err)
 		}
 		if parentDirectory.WorkspaceID != workspaceId {
@@ -55,13 +60,13 @@ func (f *FileServiceServer) CreateDirectory(
 		}
 		siblingDirectories, err = f.queries.GetDirectoryChildren(ctx, parentId)
 		if err != nil {
-			slog.Error("error fetching sibling directories", "error", err)
+			logger.ErrorContext(ctx, "error fetching sibling directories", "error", err)
 			return nil, connect.NewError(connect.CodeInternal, err)
 		}
 	} else {
 		siblingDirectories, err = f.queries.GetRootDirectories(ctx, workspaceId)
 		if err != nil {
-			slog.Error("error fetching root sibling directories", "error", err)
+			logger.ErrorContext(ctx, "error fetching root sibling directories", "error", err)
 			return nil, connect.NewError(connect.CodeInternal, err)
 		}
 	}
@@ -79,9 +84,10 @@ func (f *FileServiceServer) CreateDirectory(
 		ParentID:    parentId,
 	})
 	if err != nil {
-		slog.Error("error creating directory", "error", err)
+		logger.ErrorContext(ctx, "error creating directory", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "directory created", "directory_id", directory.ID.String())
 
 	return connect.NewResponse(&v1.CreateDirectoryResponse{
 		CreatedDirectoryId: directory.ID.String(),

@@ -17,18 +17,24 @@ func (p *ProjectServiceServer) RemoveProjectAsset(
 	ctx context.Context,
 	req *connect.Request[v1.RemoveProjectAssetRequest],
 ) (*connect.Response[emptypb.Empty], error) {
-	if _, err := auth.RequireOnboardedUser(ctx, p.queries); err != nil {
+	user, err := auth.RequireOnboardedUser(ctx, p.queries)
+	if err != nil {
 		return nil, err
 	}
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"project_id", req.Msg.GetProjectId(),
+		"asset_id", req.Msg.GetAssetId(),
+	)
 
 	projectId, err := uuid.Parse(req.Msg.GetProjectId())
 	if err != nil {
-		slog.Error("error parsing project id", "error", err)
+		logger.ErrorContext(ctx, "error parsing project id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	assetId, err := uuid.Parse(req.Msg.GetAssetId())
 	if err != nil {
-		slog.Error("error parsing asset id", "error", err)
+		logger.ErrorContext(ctx, "error parsing asset id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
@@ -36,9 +42,10 @@ func (p *ProjectServiceServer) RemoveProjectAsset(
 		ProjectID: projectId,
 		AssetID:   assetId,
 	}); err != nil {
-		slog.Error("error removing project asset", "error", err)
+		logger.ErrorContext(ctx, "error removing project asset", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "project asset removed")
 
 	return connect.NewResponse(&emptypb.Empty{}), nil
 }

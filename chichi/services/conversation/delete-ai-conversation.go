@@ -21,23 +21,26 @@ func (c *ConversationServiceServer) DeleteAIConversation(
 	if err != nil {
 		return nil, err
 	}
+	logger := slog.Default().With("user_id", user.ID.String())
 	conversationID, err := uuid.Parse(req.Msg.GetConversationId())
 	if err != nil {
-		slog.Error("error parsing conversation id", "error", err)
+		logger.ErrorContext(ctx, "error parsing conversation id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
+	logger = logger.With("conversation_id", conversationID.String())
 
 	deletedRows, err := c.queries.DeleteAIConversation(ctx, db.DeleteAIConversationParams{
 		ID:                  conversationID,
 		ConversationOwnerID: user.ID,
 	})
 	if err != nil {
-		slog.Error("error deleting ai conversation", "error", err)
+		logger.ErrorContext(ctx, "error deleting ai conversation", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if deletedRows == 0 {
 		return nil, connect.NewError(connect.CodeNotFound, sql.ErrNoRows)
 	}
+	logger.InfoContext(ctx, "ai conversation deleted")
 
 	return connect.NewResponse(&emptypb.Empty{}), nil
 }

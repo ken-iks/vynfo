@@ -22,6 +22,7 @@ func (c *ConversationServiceServer) CreateAIConversation(
 	if err != nil {
 		return nil, err
 	}
+	logger := slog.Default().With("user_id", user.ID.String())
 	title := strings.TrimSpace(req.Msg.GetTitle())
 	if title == "" {
 		return nil, connect.NewError(
@@ -43,9 +44,17 @@ func (c *ConversationServiceServer) CreateAIConversation(
 		},
 	)
 	if err != nil {
-		slog.Error("error creating ai conversation", "error", err)
+		logger.ErrorContext(ctx, "error creating ai conversation", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(
+		ctx,
+		"ai conversation created",
+		"conversation_id",
+		conversation.ID.String(),
+		"has_client_id",
+		clientID != "",
+	)
 
 	return connect.NewResponse(&v1.CreateAIConversationResponse{
 		Conversation: &v1.AIConversation{

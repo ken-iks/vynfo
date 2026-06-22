@@ -22,9 +22,10 @@ func (p *ProjectServiceServer) GetManifest(w http.ResponseWriter, r *http.Reques
 	audioId := r.URL.Query().Get("audioId")
 	isAudio := r.URL.Query().Get("audio") == "1"
 	userId := r.URL.Query().Get("userId")
+	logger := slog.Default().With("user_id", userId)
 
 	if userId == "" {
-		slog.Error("cannot view video without a user id")
+		logger.ErrorContext(r.Context(), "cannot view video without a user id")
 		http.Error(w, "missing user id", http.StatusBadRequest)
 		return
 	}
@@ -40,7 +41,8 @@ func (p *ProjectServiceServer) GetManifest(w http.ResponseWriter, r *http.Reques
 		kind = "audio"
 	}
 	if manifestId == "" {
-		slog.Warn(
+		logger.WarnContext(
+			r.Context(),
 			"GetManifest missing id",
 			"branchId",
 			branchId,
@@ -56,12 +58,13 @@ func (p *ProjectServiceServer) GetManifest(w http.ResponseWriter, r *http.Reques
 		manifestId = fmt.Sprintf("%s-audio", branchId)
 		cacheKind = video.ManifestKindAudio
 	}
+	logger = logger.With("manifest_kind", kind, "manifest_id", manifestId, "cache_kind", cacheKind)
 	bucket := p.storageClient.Bucket("vedit-v1")
-	slog.Info("GetManifest request", "kind", kind, "manifestId", manifestId)
+	logger.InfoContext(r.Context(), "manifest requested")
 	if kind == "branch" {
 		manifest, okay := p.manifestCache.Find(userId, branchId, cacheKind)
 		if okay {
-			slog.Info("cache hit!", "userId", userId, "branchId", branchId)
+			logger.DebugContext(r.Context(), "manifest cache hit", "branch_id", branchId)
 			serveManifest(w, manifest)
 			return
 		}
@@ -69,29 +72,29 @@ func (p *ProjectServiceServer) GetManifest(w http.ResponseWriter, r *http.Reques
 	path := fmt.Sprintf("manifests/%s.m3u8", manifestId)
 	reader, err := bucket.Object(path).NewReader(ctx)
 	if err != nil {
-		slog.Error("GetManifest failed to open manifest", "path", path, "error", err)
+		logger.ErrorContext(r.Context(), "GetManifest failed to open manifest", "path", path, "error", err)
 		http.Error(w, "invalid manifest id", http.StatusBadRequest)
 		return
 	}
 	defer reader.Close()
 	raw, err := io.ReadAll(reader)
 	if err != nil {
-		slog.Error("GetManifest failed to read manifest", "path", path, "error", err)
+		logger.ErrorContext(r.Context(), "GetManifest failed to read manifest", "path", path, "error", err)
 		http.Error(w, "failed to read manifest", http.StatusInternalServerError)
 		return
 	}
-	slog.Debug("GetManifest raw manifest", "path", path, "body", string(raw))
+	logger.DebugContext(r.Context(), "GetManifest raw manifest", "path", path, "body", string(raw))
 	expiry := time.Now().Add(15 * time.Minute)
 	manifest := string(raw)
 	signed, err := video.SignManifest(bucket, manifest, expiry)
 	if err != nil {
-		slog.Error("GetManifest failed to sign manifest", "path", path, "error", err)
+		logger.ErrorContext(r.Context(), "GetManifest failed to sign manifest", "path", path, "error", err)
 		http.Error(w, "failed to sign manifest", http.StatusInternalServerError)
 		return
 	}
 	if kind == "branch" {
 		p.manifestCache.Add(userId, branchId, cacheKind, signed, time.Until(expiry))
-		slog.Info("added branch to manifest cache", "userId", userId, "branch", branchId)
+		logger.DebugContext(r.Context(), "manifest cached", "branch_id", branchId)
 	}
 	serveManifest(w, signed)
 }

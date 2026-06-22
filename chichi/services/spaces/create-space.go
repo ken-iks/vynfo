@@ -21,9 +21,13 @@ func (s *SpacesServiceServer) CreateSpace(
 	if err != nil {
 		return nil, err
 	}
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"workspace_id", req.Msg.GetWorkspaceId(),
+	)
 	workspaceId, err := uuid.Parse(req.Msg.GetWorkspaceId())
 	if err != nil {
-		slog.Error("error parsing workspace id", "error", err)
+		logger.ErrorContext(ctx, "error parsing workspace id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	name := strings.TrimSpace(req.Msg.GetName())
@@ -36,7 +40,7 @@ func (s *SpacesServiceServer) CreateSpace(
 
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		slog.Error("error beginning transaction", "error", err)
+		logger.ErrorContext(ctx, "error beginning transaction", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	defer tx.Rollback()
@@ -48,20 +52,22 @@ func (s *SpacesServiceServer) CreateSpace(
 		Name:        name,
 	})
 	if err != nil {
-		slog.Error("error creating space row", "error", err)
+		logger.ErrorContext(ctx, "error creating space row", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger = logger.With("space_id", space.ID.String())
 	if err := q.AddSpaceMember(ctx, db.AddSpaceMemberParams{
 		SpaceID:  space.ID,
 		MemberID: user.ID,
 	}); err != nil {
-		slog.Error("error adding admin as space member", "error", err)
+		logger.ErrorContext(ctx, "error adding admin as space member", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if err := tx.Commit(); err != nil {
-		slog.Error("error committing db transaction", "error", err)
+		logger.ErrorContext(ctx, "error committing db transaction", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "space created")
 
 	return connect.NewResponse(&v1.CreateSpaceResponse{
 		CreatedSpaceId: space.ID.String(),

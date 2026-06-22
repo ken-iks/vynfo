@@ -21,15 +21,20 @@ func (w *WorkspacesServiceServer) AddWorkspaceUser(
 	if err != nil {
 		return nil, err
 	}
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"workspace_id", req.Msg.GetWorkspaceId(),
+		"added_user_id", req.Msg.GetUserId(),
+	)
 
 	workspaceID, err := uuid.Parse(req.Msg.GetWorkspaceId())
 	if err != nil {
-		slog.Error("error parsing workspace id", "error", err)
+		logger.ErrorContext(ctx, "error parsing workspace id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	userID, err := uuid.Parse(req.Msg.GetUserId())
 	if err != nil {
-		slog.Error("error parsing user id", "error", err)
+		logger.ErrorContext(ctx, "error parsing user id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
@@ -38,7 +43,7 @@ func (w *WorkspacesServiceServer) AddWorkspaceUser(
 		MemberID:    user.ID,
 	})
 	if err != nil {
-		slog.Error("error checking workspace membership", "error", err)
+		logger.ErrorContext(ctx, "error checking workspace membership", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if !isMember {
@@ -49,9 +54,10 @@ func (w *WorkspacesServiceServer) AddWorkspaceUser(
 		WorkspaceID: workspaceID,
 		MemberID:    userID,
 	}); err != nil {
-		slog.Error("error adding workspace member", "error", err)
+		logger.ErrorContext(ctx, "error adding workspace member", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "workspace member added")
 
 	return connect.NewResponse(&emptypb.Empty{}), nil
 }

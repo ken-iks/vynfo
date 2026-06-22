@@ -12,27 +12,32 @@ import (
 	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
+	"vynfo.com/vynfo/shared"
 )
 
 func (f *FileServiceServer) RenameDirectory(
 	ctx context.Context,
 	req *connect.Request[v1.RenameDirectoryRequest],
 ) (*connect.Response[emptypb.Empty], error) {
-	if _, err := auth.RequireOnboardedUser(ctx, f.queries); err != nil {
+	user, err := auth.RequireOnboardedUser(ctx, f.queries)
+	if err != nil {
 		return nil, err
 	}
-	workspaceID, err := uuid.Parse(req.Msg.GetWorkspaceId())
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"workspace_id", req.Msg.GetWorkspaceId(),
+		"directory_id", req.Msg.GetDirectoryId(),
+	)
+	workspaceID, err := shared.ParseUUID(ctx, logger, "workspace_id", req.Msg.GetWorkspaceId())
 	if err != nil {
-		slog.Error("error parsing workspace id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 	if err := auth.AssertUserInWorkspace(ctx, workspaceID, f.queries); err != nil {
 		return nil, connect.NewError(connect.CodePermissionDenied, err)
 	}
-	directoryID, err := uuid.Parse(req.Msg.GetDirectoryId())
+	directoryID, err := shared.ParseUUID(ctx, logger, "directory_id", req.Msg.GetDirectoryId())
 	if err != nil {
-		slog.Error("error parsing directory id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 
 	directory, err := f.queries.GetDirectoryById(ctx, directoryID)
@@ -40,7 +45,7 @@ func (f *FileServiceServer) RenameDirectory(
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
-		slog.Error("error fetching directory", "error", err)
+		logger.ErrorContext(ctx, "error fetching directory", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if directory.WorkspaceID != workspaceID {
@@ -61,9 +66,10 @@ func (f *FileServiceServer) RenameDirectory(
 		ID:          directoryID,
 		DisplayName: req.Msg.GetName(),
 	}); err != nil {
-		slog.Error("error renaming directory", "error", err)
+		logger.ErrorContext(ctx, "error renaming directory", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "directory renamed")
 
 	return connect.NewResponse(&emptypb.Empty{}), nil
 }

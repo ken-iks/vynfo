@@ -7,32 +7,36 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
+	"vynfo.com/vynfo/shared"
 )
 
 func (f *FileServiceServer) MoveAsset(
 	ctx context.Context,
 	req *connect.Request[v1.MoveAssetRequest],
 ) (*connect.Response[emptypb.Empty], error) {
-	if _, err := auth.RequireOnboardedUser(ctx, f.queries); err != nil {
+	user, err := auth.RequireOnboardedUser(ctx, f.queries)
+	if err != nil {
 		return nil, err
 	}
-	workspaceID, err := uuid.Parse(req.Msg.GetWorkspaceId())
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"workspace_id", req.Msg.GetWorkspaceId(),
+		"asset_id", req.Msg.GetAssetId(),
+	)
+	workspaceID, err := shared.ParseUUID(ctx, logger, "workspace_id", req.Msg.GetWorkspaceId())
 	if err != nil {
-		slog.Error("error parsing workspace id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 	if err := auth.AssertUserInWorkspace(ctx, workspaceID, f.queries); err != nil {
 		return nil, connect.NewError(connect.CodePermissionDenied, err)
 	}
-	assetID, err := uuid.Parse(req.Msg.GetAssetId())
+	assetID, err := shared.ParseUUID(ctx, logger, "asset_id", req.Msg.GetAssetId())
 	if err != nil {
-		slog.Error("error parsing asset id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 
 	asset, err := f.queries.GetAssetById(ctx, assetID)
@@ -40,7 +44,7 @@ func (f *FileServiceServer) MoveAsset(
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
-		slog.Error("error fetching asset", "error", err)
+		logger.ErrorContext(ctx, "error fetching asset", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if asset.WorkspaceID != workspaceID {
@@ -65,9 +69,13 @@ func (f *FileServiceServer) MoveAsset(
 		ID:          assetID,
 		DirectoryID: directoryID,
 	}); err != nil {
-		slog.Error("error moving asset", "error", err)
+		logger.ErrorContext(ctx, "error moving asset", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	if directoryID.Valid {
+		logger = logger.With("new_directory_id", directoryID.UUID.String())
+	}
+	logger.InfoContext(ctx, "asset moved")
 
 	return connect.NewResponse(&emptypb.Empty{}), nil
 }

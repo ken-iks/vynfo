@@ -28,10 +28,16 @@ func (s *SpacesServiceServer) SendSpaceMessage(
 	if err != nil {
 		return nil, err
 	}
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"space_id", req.Msg.GetSpaceId(),
+		"has_parent_message",
+		req.Msg.GetParentMessageId() != "",
+	)
 
 	spaceId, err := uuid.Parse(req.Msg.GetSpaceId())
 	if err != nil {
-		slog.Error("error parsing space id", "error", err)
+		logger.ErrorContext(ctx, "error parsing space id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
@@ -39,15 +45,16 @@ func (s *SpacesServiceServer) SendSpaceMessage(
 	if raw := req.Msg.GetParentMessageId(); raw != "" {
 		parsed, err := uuid.Parse(raw)
 		if err != nil {
-			slog.Error("error parsing parent message id", "error", err)
+			logger.ErrorContext(ctx, "error parsing parent message id", "error", err)
 			return nil, connect.NewError(connect.CodeInvalidArgument, err)
 		}
 		parentId = uuid.NullUUID{UUID: parsed, Valid: true}
+		logger = logger.With("parent_message_id", parsed.String())
 	}
 
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		slog.Error("error beginning transaction", "error", err)
+		logger.ErrorContext(ctx, "error beginning transaction", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	defer tx.Rollback()
@@ -62,7 +69,7 @@ func (s *SpacesServiceServer) SendSpaceMessage(
 			ParentID: parentId,
 		})
 		if err != nil {
-			slog.Error("error inserting branched message", "error", err)
+			logger.ErrorContext(ctx, "error inserting branched message", "error", err)
 			return nil, connect.NewError(connect.CodeInternal, err)
 		}
 		sentMessageId = row.ID
@@ -73,24 +80,25 @@ func (s *SpacesServiceServer) SendSpaceMessage(
 			Body:     spaceMessage.GetContent(),
 		})
 		if err != nil {
-			slog.Error("error inserting message", "error", err)
+			logger.ErrorContext(ctx, "error inserting message", "error", err)
 			return nil, connect.NewError(connect.CodeInternal, err)
 		}
 		sentMessageId = row.ID
 	}
 
 	if err := q.TouchSpace(ctx, spaceId); err != nil {
-		slog.Error("error touching space updated_at", "error", err)
+		logger.ErrorContext(ctx, "error touching space updated_at", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if err := q.TriggerSpaceNotification(ctx, spaceId.String()); err != nil {
-		slog.Error("error triggering space notification", "error", err)
+		logger.ErrorContext(ctx, "error triggering space notification", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if err := tx.Commit(); err != nil {
-		slog.Error("error committing db transaction", "error", err)
+		logger.ErrorContext(ctx, "error committing db transaction", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "space message sent", "message_id", sentMessageId.String())
 
 	return connect.NewResponse(&v1.SendSpaceMessageResponse{
 		SentMessageId: sentMessageId.String(),

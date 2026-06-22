@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"connectrpc.com/connect"
-	"github.com/google/uuid"
 
 	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
@@ -27,13 +26,19 @@ func (f *FileServiceServer) UploadVideo(
 	req *connect.Request[v1.UploadVideoRequest],
 	stream *connect.ServerStream[v1.UploadVideoResponse],
 ) error {
-	if _, err := auth.RequireOnboardedUser(ctx, f.queries); err != nil {
+	user, err := auth.RequireOnboardedUser(ctx, f.queries)
+	if err != nil {
 		return err
 	}
-	workspaceID, err := uuid.Parse(req.Msg.GetWorkspaceId())
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"workspace_id", req.Msg.GetWorkspaceId(),
+		"media_type", "video",
+		"content_length_bytes", len(req.Msg.GetContent()),
+	)
+	workspaceID, err := shared.ParseUUID(ctx, logger, "workspace_id", req.Msg.GetWorkspaceId())
 	if err != nil {
-		slog.Error("error parsing workspace id", "error", err)
-		return connect.NewError(connect.CodeInvalidArgument, err)
+		return err
 	}
 
 	if err := auth.AssertUserInWorkspace(ctx, workspaceID, f.queries); err != nil {
@@ -46,34 +51,44 @@ func (f *FileServiceServer) UploadVideo(
 	if err := f.ensureUniqueSiblingAssetName(ctx, workspaceID, directoryID, req.Msg.GetTitle()); err != nil {
 		return err
 	}
+	if directoryID.Valid {
+		logger = logger.With("directory_id", directoryID.UUID.String())
+	}
+	logger.InfoContext(ctx, "media upload started")
 
 	content := req.Msg.GetContent()
 	tmpFile, err := os.CreateTemp("", "temp-*.mp4")
 	if err != nil {
-		slog.Error("error opening up temporary file for writing", "error", err)
+		logger.ErrorContext(ctx, "error opening up temporary file for writing", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	defer os.Remove(tmpFile.Name())
 	defer tmpFile.Close()
 	_, err = tmpFile.Write(content)
 	if err != nil {
-		slog.Error("error writing video to temp file", "error", err)
+		logger.ErrorContext(ctx, "error writing video to temp file", "error", err)
 		return connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	videoDuration, err := vid.ProbeDuration(tmpFile.Name())
 	if err != nil {
-		slog.Error("could not dertermine video length", "error", err)
+		logger.ErrorContext(ctx, "could not dertermine video length", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	hasAudio, err := vid.ProbeHasAudio(tmpFile.Name())
 	if err != nil {
-		slog.Error("could not determine whether video has audio", "error", err)
+		logger.ErrorContext(ctx, "could not determine whether video has audio", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	totalSegments := int(math.Ceil(videoDuration / float64(uploadSegmentLength)))
 	if totalSegments < 1 {
 		totalSegments = 1
 	}
+	logger = logger.With(
+		"duration_seconds", videoDuration,
+		"has_audio", hasAudio,
+		"segment_count", totalSegments,
+	)
+	logger.InfoContext(ctx, "media metadata probed")
 
 	asset, err := f.queries.CreateAsset(ctx, db.CreateAssetParams{
 		WorkspaceID: workspaceID,
@@ -82,24 +97,26 @@ func (f *FileServiceServer) UploadVideo(
 		DirectoryID: directoryID,
 	})
 	if err != nil {
-		slog.Error("error creating asset", "error", err)
+		logger.ErrorContext(ctx, "error creating asset", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
+	logger = logger.With("asset_id", asset.ID.String())
 	video, err := f.queries.CreateVideo(ctx, db.CreateVideoParams{
 		AssetID:  asset.ID,
 		Duration: videoDuration,
 		HasAudio: hasAudio,
 	})
 	if err != nil {
-		slog.Error("error creating video", "error", err)
+		logger.ErrorContext(ctx, "error creating video", "error", err)
 		f.cleanupFailedMediaUpload(ctx, asset.ID, nil, "video")
 		return connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "media asset created")
 
 	originalUploadErr := make(chan error, 1)
 	originalUploadFp, err := shared.GetUploadPath(video.AssetID.String(), "video")
 	if err != nil {
-		slog.Error("error resolving original video upload path", "error", err)
+		logger.ErrorContext(ctx, "error resolving original video upload path", "error", err)
 		f.cleanupFailedMediaUpload(ctx, asset.ID, nil, "video")
 		return connect.NewError(connect.CodeInternal, err)
 	}
@@ -119,7 +136,7 @@ func (f *FileServiceServer) UploadVideo(
 		videoDuration,
 	)
 	if err != nil {
-		slog.Error("error initializing segemnter", "error", err)
+		logger.ErrorContext(ctx, "error initializing segemnter", "error", err)
 		<-originalUploadErr
 		f.cleanupFailedMediaUpload(ctx, asset.ID, []string{originalUploadFp}, "video")
 		return connect.NewError(connect.CodeInternal, err)
@@ -151,6 +168,7 @@ func (f *FileServiceServer) UploadVideo(
 	)
 	if err != nil {
 		<-originalUploadErr
+		logger.ErrorContext(ctx, "error uploading video segments", "uploaded_object_count", len(uploadedObjects), "error", err)
 		f.cleanupFailedMediaUpload(
 			ctx,
 			asset.ID,
@@ -161,7 +179,7 @@ func (f *FileServiceServer) UploadVideo(
 	}
 
 	if err := <-originalUploadErr; err != nil {
-		slog.Error("error uploading original video file", "error", err)
+		logger.ErrorContext(ctx, "error uploading original video file", "error", err)
 		f.cleanupFailedMediaUpload(
 			ctx,
 			asset.ID,
@@ -170,11 +188,12 @@ func (f *FileServiceServer) UploadVideo(
 		)
 		return connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "original media uploaded")
 
 	err = manifest.FinishUpload(ctx)
 	manifestPath := fmt.Sprintf("manifests/%s.m3u8", video.AssetID.String())
 	if err != nil {
-		slog.Error("error uploading manifest", "error", err)
+		logger.ErrorContext(ctx, "error uploading manifest", "error", err)
 		f.cleanupFailedMediaUpload(
 			ctx,
 			asset.ID,
@@ -183,6 +202,12 @@ func (f *FileServiceServer) UploadVideo(
 		)
 		return connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(
+		ctx,
+		"media manifest uploaded",
+		"uploaded_object_count",
+		len(uploadedObjects),
+	)
 
 	msg := &v1.UploadVideoResponse{
 		UploadStatus: &v1.UploadVideoResponse_Finished{
@@ -192,6 +217,7 @@ func (f *FileServiceServer) UploadVideo(
 		},
 	}
 	if err := stream.Send(msg); err != nil {
+		logger.ErrorContext(ctx, "error sending upload finished message", "error", err)
 		f.cleanupFailedMediaUpload(
 			ctx,
 			asset.ID,
@@ -200,5 +226,6 @@ func (f *FileServiceServer) UploadVideo(
 		)
 		return err
 	}
+	logger.InfoContext(ctx, "media upload completed")
 	return nil
 }

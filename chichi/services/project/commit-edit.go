@@ -19,24 +19,38 @@ func (p *ProjectServiceServer) CommitEdit(
 	req *connect.Request[v1.CommitEditRequest],
 ) (*connect.Response[v1.CommitEditResponse], error) {
 	projectId, err := uuid.Parse(req.Msg.GetProjectId())
+	logger := slog.Default().With(
+		"project_id", req.Msg.GetProjectId(),
+		"branch_name", req.Msg.GetBranchName(),
+	)
 	if err != nil {
-		slog.Error("error parsing project id", "error", err)
+		logger.ErrorContext(ctx, "error parsing project id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	user, err := auth.RequireOnboardedUser(ctx, p.queries)
 	if err != nil {
 		return nil, err
 	}
+	logger = logger.With("user_id", user.ID.String())
 	currBranch, err := p.queries.GetBranchByName(ctx, db.GetBranchByNameParams{
 		ProjectID: projectId,
 		Name:      req.Msg.GetBranchName(),
 	})
 	if err != nil {
-		slog.Error("error retrieve branch", "error", err)
+		logger.ErrorContext(ctx, "error retrieve branch", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
+	logger = logger.With("branch_id", currBranch.ID.String())
 	prevCommitID := req.Msg.GetPreviousCommitId()
 	if prevCommitID != "" && prevCommitID != currBranch.TipCommitID.UUID.String() {
+		logger.WarnContext(
+			ctx,
+			"stale branch commit rejected",
+			"assumed_commit_id",
+			req.Msg.GetPreviousCommitId(),
+			"current_commit_id",
+			currBranch.TipCommitID.UUID.String(),
+		)
 		return connect.NewResponse(&v1.CommitEditResponse{
 			Response: &v1.CommitEditResponse_Err{
 				Err: &v1.CommitEditError{
@@ -54,14 +68,15 @@ func (p *ProjectServiceServer) CommitEdit(
 	state := req.Msg.GetCommitState()
 	manifest, err := video.ParsePlaybackStateToHLS(ctx, p.queries, state)
 	if err != nil {
-		slog.Error("unable to parse playback state", "error", err)
+		logger.ErrorContext(ctx, "unable to parse playback state", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	err = video.UploadBranchManifestToCloud(ctx, p.storageClient, manifest, currBranch.ID.String())
 	if err != nil {
-		slog.Error("unable to write manifest to cloud", "error", err)
+		logger.ErrorContext(ctx, "unable to write manifest to cloud", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "branch video manifest uploaded")
 	if len(state.GetAudioSections()) > 0 {
 		audioManifest, err := video.ParseAudioSectionsToHLS(
 			ctx,
@@ -69,7 +84,7 @@ func (p *ProjectServiceServer) CommitEdit(
 			state.GetAudioSections(),
 		)
 		if err != nil {
-			slog.Error("unable to parse audio playback state", "error", err)
+			logger.ErrorContext(ctx, "unable to parse audio playback state", "error", err)
 			return nil, connect.NewError(connect.CodeInternal, err)
 		}
 		err = video.UploadBranchAudioManifestToCloud(
@@ -79,20 +94,21 @@ func (p *ProjectServiceServer) CommitEdit(
 			currBranch.ID.String(),
 		)
 		if err != nil {
-			slog.Error("unable to write audio manifest to cloud", "error", err)
+			logger.ErrorContext(ctx, "unable to write audio manifest to cloud", "error", err)
 			return nil, connect.NewError(connect.CodeInternal, err)
 		}
+		logger.InfoContext(ctx, "branch audio manifest uploaded")
 	}
 	stateJson, err := protojson.Marshal(&v1.CommitEditRequest{
 		CommitState: state,
 	})
 	if err != nil {
-		slog.Error("error serializing state to json", "error", err)
+		logger.ErrorContext(ctx, "error serializing state to json", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
-		slog.Error("error starting transaction")
+		logger.ErrorContext(ctx, "error starting transaction", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	defer tx.Rollback()
@@ -107,13 +123,14 @@ func (p *ProjectServiceServer) CommitEdit(
 		},
 	})
 	if err != nil {
-		slog.Error("error creating commit", "error", err)
+		logger.ErrorContext(ctx, "error creating commit", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger = logger.With("commit_id", commit.ID.String())
 	if prevCommitID != "" {
 		previousCommitID, err := uuid.Parse(prevCommitID)
 		if err != nil {
-			slog.Error("error parsing previous commit id", "error", err)
+			logger.ErrorContext(ctx, "error parsing previous commit id", "error", err)
 			return nil, connect.NewError(connect.CodeInvalidArgument, err)
 		}
 		_, err = q.CreateCommitParent(ctx, db.CreateCommitParentParams{
@@ -121,7 +138,7 @@ func (p *ProjectServiceServer) CommitEdit(
 			ParentID: previousCommitID,
 		})
 		if err != nil {
-			slog.Error("error creating commit parent", "error", err)
+			logger.ErrorContext(ctx, "error creating commit parent", "error", err)
 			return nil, connect.NewError(connect.CodeInternal, err)
 		}
 	}
@@ -130,14 +147,15 @@ func (p *ProjectServiceServer) CommitEdit(
 		ID:          currBranch.ID,
 	})
 	if err != nil {
-		slog.Error("error updating branch to new commit", "error", err)
+		logger.ErrorContext(ctx, "error updating branch to new commit", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if err := tx.Commit(); err != nil {
-		slog.Error("error commiting db transaction", "error", err)
+		logger.ErrorContext(ctx, "error commiting db transaction", "error", err)
 	}
 
 	p.manifestCache.DropBranch(user.ID.String(), currBranch.ID.String())
+	logger.InfoContext(ctx, "project commit created", "has_parent_commit", prevCommitID != "")
 	return connect.NewResponse(&v1.CommitEditResponse{
 		Response: &v1.CommitEditResponse_NewCommitId{
 			NewCommitId: updatedBranch.TipCommitID.UUID.String(),

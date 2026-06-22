@@ -7,32 +7,36 @@ import (
 	"log/slog"
 
 	"connectrpc.com/connect"
-	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
+	"vynfo.com/vynfo/shared"
 )
 
 func (f *FileServiceServer) DeleteAsset(
 	ctx context.Context,
 	req *connect.Request[v1.DeleteAssetRequest],
 ) (*connect.Response[emptypb.Empty], error) {
-	if _, err := auth.RequireOnboardedUser(ctx, f.queries); err != nil {
+	user, err := auth.RequireOnboardedUser(ctx, f.queries)
+	if err != nil {
 		return nil, err
 	}
-	workspaceID, err := uuid.Parse(req.Msg.GetWorkspaceId())
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"workspace_id", req.Msg.GetWorkspaceId(),
+		"asset_id", req.Msg.GetAssetId(),
+	)
+	workspaceID, err := shared.ParseUUID(ctx, logger, "workspace_id", req.Msg.GetWorkspaceId())
 	if err != nil {
-		slog.Error("error parsing workspace id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 	if err := auth.AssertUserInWorkspace(ctx, workspaceID, f.queries); err != nil {
 		return nil, connect.NewError(connect.CodePermissionDenied, err)
 	}
-	assetID, err := uuid.Parse(req.Msg.GetAssetId())
+	assetID, err := shared.ParseUUID(ctx, logger, "asset_id", req.Msg.GetAssetId())
 	if err != nil {
-		slog.Error("error parsing asset id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 
 	asset, err := f.queries.GetAssetById(ctx, assetID)
@@ -40,7 +44,7 @@ func (f *FileServiceServer) DeleteAsset(
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
-		slog.Error("error fetching asset", "error", err)
+		logger.ErrorContext(ctx, "error fetching asset", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if asset.WorkspaceID != workspaceID {
@@ -49,17 +53,19 @@ func (f *FileServiceServer) DeleteAsset(
 
 	usages, err := f.inUseAssetUsages(ctx, []db.Asset{asset})
 	if err != nil {
-		slog.Error("error checking asset usage", "error", err)
+		logger.ErrorContext(ctx, "error checking asset usage", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if len(usages) > 0 {
+		logger.WarnContext(ctx, "asset delete blocked by project usage", "usage_count", len(usages))
 		return nil, deleteInUseAssetsError(workspaceID, usages)
 	}
 
 	if err := f.queries.DeleteAsset(ctx, assetID); err != nil {
-		slog.Error("error deleting asset", "error", err)
+		logger.ErrorContext(ctx, "error deleting asset", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "asset deleted")
 
 	return connect.NewResponse(&emptypb.Empty{}), nil
 }

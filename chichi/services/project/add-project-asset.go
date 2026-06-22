@@ -18,18 +18,24 @@ func (p *ProjectServiceServer) AddProjectAsset(
 	ctx context.Context,
 	req *connect.Request[v1.AddProjectAssetRequest],
 ) (*connect.Response[emptypb.Empty], error) {
-	if _, err := auth.RequireOnboardedUser(ctx, p.queries); err != nil {
+	user, err := auth.RequireOnboardedUser(ctx, p.queries)
+	if err != nil {
 		return nil, err
 	}
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"project_id", req.Msg.GetProjectId(),
+		"asset_id", req.Msg.GetAssetId(),
+	)
 
 	projectID, err := uuid.Parse(req.Msg.GetProjectId())
 	if err != nil {
-		slog.Error("error parsing project id", "error", err)
+		logger.ErrorContext(ctx, "error parsing project id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	assetID, err := uuid.Parse(req.Msg.GetAssetId())
 	if err != nil {
-		slog.Error("error parsing asset id", "error", err)
+		logger.ErrorContext(ctx, "error parsing asset id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
@@ -38,7 +44,7 @@ func (p *ProjectServiceServer) AddProjectAsset(
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
-		slog.Error("error fetching project", "error", err)
+		logger.ErrorContext(ctx, "error fetching project", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if err := auth.AssertUserInWorkspace(ctx, project.WorkspaceID, p.queries); err != nil {
@@ -50,7 +56,7 @@ func (p *ProjectServiceServer) AddProjectAsset(
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
-		slog.Error("error fetching asset", "error", err)
+		logger.ErrorContext(ctx, "error fetching asset", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if asset.WorkspaceID != project.WorkspaceID {
@@ -61,9 +67,10 @@ func (p *ProjectServiceServer) AddProjectAsset(
 		ProjectID: projectID,
 		AssetID:   assetID,
 	}); err != nil {
-		slog.Error("error adding project asset", "error", err)
+		logger.ErrorContext(ctx, "error adding project asset", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "project asset added")
 
 	return connect.NewResponse(&emptypb.Empty{}), nil
 }

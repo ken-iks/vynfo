@@ -29,6 +29,7 @@ func (s *UsersServiceServer) CompleteOnboarding(
 	if !ok {
 		return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 	}
+	logger := slog.Default().With("firebase_uid", authUser.FirebaseUID)
 
 	if authUser.Email == "" {
 		return nil, connect.NewError(connect.CodeUnauthenticated, nil)
@@ -56,22 +57,23 @@ func (s *UsersServiceServer) CompleteOnboarding(
 		Email:       authUser.Email,
 	})
 	if err != nil {
-		slog.Error("error getting or creating firebase user", "error", err)
+		logger.ErrorContext(ctx, "error getting or creating firebase user", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger = logger.With("user_id", user.ID.String())
 
 	objectPath := displayPhotoObjectPath(user.ID.String())
 	bucket := s.storageClient.Bucket("vedit-v1")
 	writer := bucket.Object(objectPath).NewWriter(ctx)
 	writer.ContentType = contentType
 	if _, err := shared.UploadBytes(writer, bytes.NewReader(displayPhoto), objectPath, nil); err != nil {
-		slog.Error("error uploading display photo", "user_id", user.ID, "error", err)
+		logger.ErrorContext(ctx, "error uploading display photo", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		slog.Error("error beginning onboarding transaction", "error", err)
+		logger.ErrorContext(ctx, "error beginning onboarding transaction", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	defer tx.Rollback()
@@ -93,33 +95,37 @@ func (s *UsersServiceServer) CompleteOnboarding(
 		ID: user.ID,
 	})
 	if err != nil {
-		slog.Error("error finishing user onboarding", "user_id", user.ID, "error", err)
+		logger.ErrorContext(ctx, "error finishing user onboarding", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	workspace, err := q.CreateWorkspace(ctx, fmt.Sprintf("%s's workspace", displayName))
 	if err != nil {
-		slog.Error("error creating default workspace", "user_id", user.ID, "error", err)
+		logger.ErrorContext(ctx, "error creating default workspace", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger = logger.With("workspace_id", workspace.ID.String())
 	if err := q.AddWorkspaceMember(ctx, dbgen.AddWorkspaceMemberParams{
 		WorkspaceID: workspace.ID,
 		MemberID:    user.ID,
 	}); err != nil {
-		slog.Error(
+		logger.ErrorContext(
+			ctx,
 			"error adding user to default workspace",
-			"user_id",
-			user.ID,
-			"workspace_id",
-			workspace.ID,
 			"error",
 			err,
 		)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if err := tx.Commit(); err != nil {
-		slog.Error("error committing onboarding transaction", "user_id", user.ID, "error", err)
+		logger.ErrorContext(ctx, "error committing onboarding transaction", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(
+		ctx,
+		"user onboarding completed",
+		"display_photo_content_type",
+		contentType,
+	)
 
 	responseUser, err := s.userResponse(
 		updatedUser.ID.String(),

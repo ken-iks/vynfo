@@ -20,22 +20,25 @@ func (c *ConversationServiceServer) SendAgentMessage(
 	stream *connect.ServerStream[agent_runtime.StreamChatResponse],
 ) error {
 	logger := slog.Default().
-		With("conversation_id", req.Msg.GetConversationId(), "workspace_id", req.Msg.GetWorkspaceId())
+		With(
+			"conversation_id", req.Msg.GetConversationId(),
+			"workspace_id", req.Msg.GetWorkspaceId(),
+		)
 	onboardedUser, err := auth.RequireOnboardedUser(ctx, c.queries)
 	if err != nil {
-		logger.Error("error: unauthenticated user", "error", err)
+		logger.ErrorContext(ctx, "error authenticating agent message sender", "error", err)
 		return connect.NewError(connect.CodeUnauthenticated, err)
 	}
 	userId := onboardedUser.ID.String()
 	logger = logger.With("user_id", userId)
 	userUUID, err := uuid.Parse(userId)
 	if err != nil {
-		logger.Error("unable to parse user id", "error", err)
+		logger.ErrorContext(ctx, "unable to parse user id", "error", err)
 		return connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	conversationUUID, err := uuid.Parse(req.Msg.GetConversationId())
 	if err != nil {
-		logger.Error("unable to parse conversation id", "error", err)
+		logger.ErrorContext(ctx, "unable to parse conversation id", "error", err)
 		return connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
@@ -45,11 +48,11 @@ func (c *ConversationServiceServer) SendAgentMessage(
 	})
 
 	if err != nil {
-		logger.Error("conversation not found", "error", err)
+		logger.ErrorContext(ctx, "conversation not found", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	if !resp {
-		logger.Error("user does not have access to conversation", "error", err)
+		logger.WarnContext(ctx, "user does not have access to conversation")
 		return connect.NewError(connect.CodeUnauthenticated, err)
 	}
 	persistanceOptions := req.Msg.GetPersistanceOptions()
@@ -63,7 +66,8 @@ func (c *ConversationServiceServer) SendAgentMessage(
 			},
 		)
 		if err != nil {
-			logger.Error(
+			logger.ErrorContext(
+				ctx,
 				"could not find parent id for message",
 				"message_client_id",
 				persistanceOptions.ClientId,
@@ -86,7 +90,8 @@ func (c *ConversationServiceServer) SendAgentMessage(
 			},
 		)
 		if err != nil {
-			logger.Error(
+			logger.ErrorContext(
+				ctx,
 				"could not get parent messages for path",
 				"parent_message_id",
 				parentID.UUID.String(),
@@ -97,7 +102,8 @@ func (c *ConversationServiceServer) SendAgentMessage(
 		}
 		latest_run := previousRuns[len(previousRuns)-1]
 		latest_token_count := latest_run.InputTokens + latest_run.OutputTokens + latest_run.ReasoningTokens
-		logger.Info(
+		logger.InfoContext(
+			ctx,
 			"previous messages retrieved",
 			"message_count",
 			len(previousRuns),
@@ -118,24 +124,31 @@ func (c *ConversationServiceServer) SendAgentMessage(
 	})
 
 	if err != nil {
-		logger.Error("error initializing streamchat stream", "error", err)
+		logger.ErrorContext(ctx, "error initializing streamchat stream", "error", err)
 		return connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(
+		ctx,
+		"agent message stream opened",
+		"previous_run_count",
+		len(runMessages),
+	)
 
 	for {
 		message, err := responseStream.Recv()
 		if err != nil {
 			if err == io.EOF {
+				logger.InfoContext(ctx, "agent message stream completed")
 				return nil
 			}
-			logger.Error("message stream error", "error", err)
+			logger.ErrorContext(ctx, "message stream error", "error", err)
 			return connect.NewError(connect.CodeAborted, err)
 		}
 		// when finished, write the full run to the db
 		if finished := message.GetFinished(); finished != nil {
 			tx, err := c.db.BeginTx(ctx, nil)
 			if err != nil {
-				logger.Error("error beginning transaction for message persistance", "error", err)
+				logger.ErrorContext(ctx, "error beginning transaction for message persistance", "error", err)
 				return connect.NewError(connect.CodeInternal, err)
 			}
 			defer tx.Rollback()
@@ -151,15 +164,28 @@ func (c *ConversationServiceServer) SendAgentMessage(
 				RunMessages:         finished.GetRuntimeConvertableJsonString(),
 			})
 			if err != nil {
-				logger.Error("error creating new run", "error", err)
+				logger.ErrorContext(ctx, "error creating new run", "error", err)
 				return connect.NewError(connect.CodeInternal, err)
 			}
+			logger = logger.With("run_id", run.ID.String())
+			logger.InfoContext(
+				ctx,
+				"agent run persisted",
+				"input_tokens",
+				runMeta.InputTokens,
+				"output_tokens",
+				runMeta.OutputTokens,
+				"reasoning_tokens",
+				runMeta.ReasoningTokens,
+				"num_tool_calls",
+				runMeta.NumToolCalls,
+			)
 			newMessages := finished.GetNewMessages()
 			currentParentID := parentID
 			for i, message := range newMessages {
 				messageJson, err := protojson.Marshal(message)
 				if err != nil {
-					logger.Error("error marshalling new messages into json", "error", err)
+					logger.ErrorContext(ctx, "error marshalling new messages into json", "error", err)
 					return connect.NewError(connect.CodeInternal, err)
 				}
 				clientID := uuid.NewString()
@@ -181,7 +207,7 @@ func (c *ConversationServiceServer) SendAgentMessage(
 					},
 				)
 				if err != nil {
-					logger.Error("error resolving ai message position", "error", err)
+					logger.ErrorContext(ctx, "error resolving ai message position", "error", err)
 					return connect.NewError(connect.CodeInternal, err)
 				}
 				insertedMessage, err := p.AddAIConversationMessage(
@@ -196,7 +222,8 @@ func (c *ConversationServiceServer) SendAgentMessage(
 					},
 				)
 				if err != nil {
-					logger.Error(
+					logger.ErrorContext(
+						ctx,
 						"error adding new message to ai messages table",
 						"parent_id",
 						currentParentID,
@@ -213,12 +240,13 @@ func (c *ConversationServiceServer) SendAgentMessage(
 				}
 			}
 			if err := tx.Commit(); err != nil {
-				logger.Error("error commiting db transaction", "error", err)
+				logger.ErrorContext(ctx, "error commiting db transaction", "error", err)
 				return connect.NewError(connect.CodeInternal, err)
 			}
+			logger.InfoContext(ctx, "agent messages persisted", "new_message_count", len(newMessages))
 		}
 		if err := stream.Send(message); err != nil {
-			logger.Error("error sending message chunk", "error", err)
+			logger.ErrorContext(ctx, "error sending message chunk", "error", err)
 			return err
 		}
 	}

@@ -23,11 +23,13 @@ func (c *ConversationServiceServer) UpdateAIConversation(
 	if err != nil {
 		return nil, err
 	}
+	logger := slog.Default().With("user_id", user.ID.String())
 	conversationID, err := uuid.Parse(req.Msg.GetConversationId())
 	if err != nil {
-		slog.Error("error parsing conversation id", "error", err)
+		logger.ErrorContext(ctx, "error parsing conversation id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
+	logger = logger.With("conversation_id", conversationID.String())
 	title := strings.TrimSpace(req.Msg.GetTitle())
 	if title == "" {
 		return nil, connect.NewError(
@@ -48,9 +50,10 @@ func (c *ConversationServiceServer) UpdateAIConversation(
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
 		}
-		slog.Error("error updating ai conversation", "error", err)
+		logger.ErrorContext(ctx, "error updating ai conversation", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "ai conversation updated")
 
 	return connect.NewResponse(&v1.AIConversation{
 		ConversationId:      conversation.ID.String(),

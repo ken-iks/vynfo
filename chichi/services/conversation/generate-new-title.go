@@ -2,6 +2,7 @@ package conversations
 
 import (
 	"context"
+	"log/slog"
 
 	"connectrpc.com/connect"
 	"vynfo.com/vynfo/auth"
@@ -12,13 +13,19 @@ func (c *ConversationServiceServer) GenerateNewTitle(
 	ctx context.Context,
 	req *connect.Request[agent_runtime.GenerateTitleRequest],
 ) (*connect.Response[agent_runtime.GenerateTitleResponse], error) {
-	_, err := auth.RequireOnboardedUser(ctx, c.queries)
+	user, err := auth.RequireOnboardedUser(ctx, c.queries)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeUnauthenticated, err)
 	}
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"prompt_length", len(req.Msg.GetPrompt()),
+	)
 	title, err := c.mensahClient.GenerateTitle(ctx, req.Msg)
 	if err != nil {
+		logger.ErrorContext(ctx, "error generating ai conversation title", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "ai conversation title generated")
 	return connect.NewResponse(title), nil
 }

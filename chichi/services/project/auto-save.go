@@ -22,28 +22,33 @@ func (p *ProjectServiceServer) AutoSave(
 	if err != nil {
 		return nil, err
 	}
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"project_id", req.Msg.GetProjectId(),
+		"branch_id", req.Msg.GetBranchId(),
+	)
 	_, err = uuid.Parse(req.Msg.GetProjectId())
 	if err != nil {
-		slog.Error("error parsing project id", "error", err)
+		logger.ErrorContext(ctx, "error parsing project id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	branchID, err := uuid.Parse(req.Msg.GetBranchId())
 	if err != nil {
-		slog.Error("error parsing branch id", "error", err)
+		logger.ErrorContext(ctx, "error parsing branch id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
 	state := req.Msg.GetAutoSaveState()
 	manifest, err := video.ParsePlaybackStateToHLS(ctx, p.queries, state)
 	if err != nil {
-		slog.Error("unable to parse playback state", "error", err)
+		logger.ErrorContext(ctx, "unable to parse playback state", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	expiry := time.Now().Add(15 * time.Minute)
 	signed, err := video.SignManifest(p.storageClient.Bucket("vedit-v1"), manifest, expiry)
 	if err != nil {
-		slog.Error("unable to sign generated manifest", "error", err)
+		logger.ErrorContext(ctx, "unable to sign generated manifest", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	p.manifestCache.Add(
@@ -55,11 +60,12 @@ func (p *ProjectServiceServer) AutoSave(
 	)
 	if len(state.GetAudioSections()) == 0 {
 		p.manifestCache.Drop(user.ID.String(), branchID.String(), video.ManifestKindAudio)
+		logger.DebugContext(ctx, "autosave manifest cached", "has_audio", false)
 		return connect.NewResponse(&emptypb.Empty{}), nil
 	}
 	audioManifest, err := video.ParseAudioSectionsToHLS(ctx, p.queries, state.GetAudioSections())
 	if err != nil {
-		slog.Error("unable to parse audio playback state", "error", err)
+		logger.ErrorContext(ctx, "unable to parse audio playback state", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	signedAudio, err := video.SignManifest(
@@ -68,7 +74,7 @@ func (p *ProjectServiceServer) AutoSave(
 		expiry,
 	)
 	if err != nil {
-		slog.Error("unable to sign generated audio manifest", "error", err)
+		logger.ErrorContext(ctx, "unable to sign generated audio manifest", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	p.manifestCache.Add(
@@ -78,5 +84,6 @@ func (p *ProjectServiceServer) AutoSave(
 		signedAudio,
 		time.Until(expiry),
 	)
+	logger.DebugContext(ctx, "autosave manifest cached", "has_audio", true)
 	return connect.NewResponse(&emptypb.Empty{}), nil
 }

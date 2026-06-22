@@ -2,6 +2,7 @@ package spaces
 
 import (
 	"context"
+	"log/slog"
 
 	"connectrpc.com/connect"
 	"vynfo.com/vynfo/auth"
@@ -17,9 +18,17 @@ func (s *SpacesServiceServer) OpenSpace(
 	if err != nil {
 		return err
 	}
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"space_id", req.Msg.GetSpaceId(),
+	)
+	logger.InfoContext(ctx, "space stream opened")
 
 	ch, unsubscribe := s.observer.Subscribe(user.ID.String(), req.Msg.GetSpaceId())
-	defer unsubscribe()
+	defer func() {
+		unsubscribe()
+		logger.InfoContext(ctx, "space stream closed")
+	}()
 
 	for {
 		select {
@@ -29,6 +38,7 @@ func (s *SpacesServiceServer) OpenSpace(
 			if err := stream.Send(&v1.OpenSpaceResponse{
 				NewMessageAlert: true,
 			}); err != nil {
+				logger.ErrorContext(ctx, "error sending space stream notification", "error", err)
 				return err
 			}
 		}

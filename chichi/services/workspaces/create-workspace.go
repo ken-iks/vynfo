@@ -20,6 +20,7 @@ func (w *WorkspacesServiceServer) CreateWorkspace(
 	if err != nil {
 		return nil, err
 	}
+	logger := slog.Default().With("user_id", user.ID.String())
 	name := strings.TrimSpace(req.Msg.GetName())
 	if name == "" {
 		return nil, connect.NewError(
@@ -30,7 +31,7 @@ func (w *WorkspacesServiceServer) CreateWorkspace(
 
 	tx, err := w.db.BeginTx(ctx, nil)
 	if err != nil {
-		slog.Error("error beginning transaction", "error", err)
+		logger.ErrorContext(ctx, "error beginning transaction", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	defer tx.Rollback()
@@ -38,20 +39,22 @@ func (w *WorkspacesServiceServer) CreateWorkspace(
 
 	workspace, err := q.CreateWorkspace(ctx, name)
 	if err != nil {
-		slog.Error("error creating workspace", "error", err)
+		logger.ErrorContext(ctx, "error creating workspace", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger = logger.With("workspace_id", workspace.ID.String())
 	if err := q.AddWorkspaceMember(ctx, db.AddWorkspaceMemberParams{
 		WorkspaceID: workspace.ID,
 		MemberID:    user.ID,
 	}); err != nil {
-		slog.Error("error adding creator as workspace member", "error", err)
+		logger.ErrorContext(ctx, "error adding creator as workspace member", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if err := tx.Commit(); err != nil {
-		slog.Error("error committing workspace create", "error", err)
+		logger.ErrorContext(ctx, "error committing workspace create", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "workspace created")
 
 	return connect.NewResponse(&v1.CreateWorkspaceResponse{
 		WorkspaceId: workspace.ID.String(),

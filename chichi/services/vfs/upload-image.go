@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"connectrpc.com/connect"
-	"github.com/google/uuid"
 
 	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
@@ -25,13 +24,19 @@ func (f *FileServiceServer) UploadImage(
 	ctx context.Context,
 	req *connect.Request[v1.UploadImageRequest],
 ) (*connect.Response[v1.UploadImageResponse], error) {
-	if _, err := auth.RequireOnboardedUser(ctx, f.queries); err != nil {
+	user, err := auth.RequireOnboardedUser(ctx, f.queries)
+	if err != nil {
 		return nil, err
 	}
-	workspaceID, err := uuid.Parse(req.Msg.GetWorkspaceId())
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"workspace_id", req.Msg.GetWorkspaceId(),
+		"media_type", "image",
+		"content_length_bytes", len(req.Msg.GetContent()),
+	)
+	workspaceID, err := shared.ParseUUID(ctx, logger, "workspace_id", req.Msg.GetWorkspaceId())
 	if err != nil {
-		slog.Error("error parsing workspace id", "error", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, err
 	}
 
 	if err := auth.AssertUserInWorkspace(ctx, workspaceID, f.queries); err != nil {
@@ -44,6 +49,10 @@ func (f *FileServiceServer) UploadImage(
 	if err := f.ensureUniqueSiblingAssetName(ctx, workspaceID, directoryID, req.Msg.GetTitle()); err != nil {
 		return nil, err
 	}
+	if directoryID.Valid {
+		logger = logger.With("directory_id", directoryID.UUID.String())
+	}
+	logger.InfoContext(ctx, "media upload started")
 
 	content := req.Msg.GetContent()
 	contentType := http.DetectContentType(content)
@@ -53,6 +62,7 @@ func (f *FileServiceServer) UploadImage(
 			fmt.Errorf("content type %s is not an image", contentType),
 		)
 	}
+	logger = logger.With("content_type", contentType)
 
 	asset, err := f.queries.CreateAsset(ctx, db.CreateAssetParams{
 		WorkspaceID: workspaceID,
@@ -61,16 +71,17 @@ func (f *FileServiceServer) UploadImage(
 		DirectoryID: directoryID,
 	})
 	if err != nil {
-		slog.Error("error creating asset", "error", err)
+		logger.ErrorContext(ctx, "error creating asset", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger = logger.With("asset_id", asset.ID.String())
 
 	objectPath := imageObjectPath(asset.ID.String())
 	bucket := f.storageClient.Bucket("vedit-v1")
 	writer := bucket.Object(objectPath).NewWriter(ctx)
 	writer.ContentType = contentType
 	if _, err := shared.UploadBytes(writer, bytes.NewReader(content), objectPath, nil); err != nil {
-		slog.Error("error uploading image", "asset_id", asset.ID, "error", err)
+		logger.ErrorContext(ctx, "error uploading image", "error", err)
 		f.cleanupFailedMediaUpload(ctx, asset.ID, []string{objectPath}, "image")
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -80,10 +91,11 @@ func (f *FileServiceServer) UploadImage(
 		ContentType: contentType,
 	})
 	if err != nil {
-		slog.Error("error creating image metadata", "asset_id", asset.ID, "error", err)
+		logger.ErrorContext(ctx, "error creating image metadata", "error", err)
 		f.cleanupFailedMediaUpload(ctx, asset.ID, []string{objectPath}, "image")
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "media upload completed")
 
 	return connect.NewResponse(&v1.UploadImageResponse{
 		UploadedAssetId: asset.ID.String(),

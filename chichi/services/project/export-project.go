@@ -21,25 +21,32 @@ func (p *ProjectServiceServer) ExportProject(
 	ctx context.Context,
 	req *connect.Request[v1.ExportProjectRequest],
 ) (*connect.Response[v1.ExportProjectResponse], error) {
-	_, err := auth.RequireOnboardedUser(ctx, p.queries)
+	user, err := auth.RequireOnboardedUser(ctx, p.queries)
 	if err != nil {
 		return nil, err
 	}
+	logger := slog.Default().With(
+		"user_id", user.ID.String(),
+		"workspace_id", req.Msg.GetWorkspaceId(),
+		"project_id", req.Msg.GetProjectId(),
+		"commit_id", req.Msg.GetCommitId(),
+	)
 
 	workspaceID, err := uuid.Parse(req.Msg.GetWorkspaceId())
 	if err != nil {
-		slog.Error("error parsing workspace id", "error", err)
+		logger.ErrorContext(ctx, "error parsing workspace id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 	projectID, err := uuid.Parse(req.Msg.GetProjectId())
 	if err != nil {
-		slog.Error("error parsing project id", "error", err)
+		logger.ErrorContext(ctx, "error parsing project id", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
+	logger.InfoContext(ctx, "project export started")
 
 	project, err := p.queries.GetProject(ctx, projectID)
 	if err != nil {
-		slog.Error("error fetching project", "error", err)
+		logger.ErrorContext(ctx, "error fetching project", "error", err)
 		return nil, connect.NewError(connect.CodeNotFound, err)
 	}
 	if project.WorkspaceID != workspaceID {
@@ -56,37 +63,40 @@ func (p *ProjectServiceServer) ExportProject(
 
 	var state v1.CommitEditRequest
 	if err := protojson.Unmarshal(commit.State, &state); err != nil {
-		slog.Error("error unmarshalling commit state", "error", err)
+		logger.ErrorContext(ctx, "error unmarshalling commit state", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger = logger.With("commit_id", commit.ID.String())
 
 	builder, err := video.PrepareExporter(state.GetCommitState(), p.storageClient, "output.mp4")
 	if err != nil {
-		slog.Error("error preparing exporter", "error", err)
+		logger.ErrorContext(ctx, "error preparing exporter", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	cmd, err := builder.BuildExportCommand()
 	if err != nil {
-		slog.Error("error building export command", "error", err)
+		logger.ErrorContext(ctx, "error building export command", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	tempDir, err := os.MkdirTemp("", "vynfo-export-*")
 	if err != nil {
-		slog.Error("error creating export temp dir", "error", err)
+		logger.ErrorContext(ctx, "error creating export temp dir", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	defer os.RemoveAll(tempDir)
 
 	cmd.Dir = tempDir
+	logger.InfoContext(ctx, "project export command started")
 	if output, err := cmd.CombinedOutput(); err != nil {
-		slog.Error("error running export command", "error", err, "output", string(output))
+		logger.ErrorContext(ctx, "error running export command", "error", err, "output", string(output))
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "project export command completed")
 
 	exportFile, err := os.Open(filepath.Join(tempDir, "output.mp4"))
 	if err != nil {
-		slog.Error("error opening export output", "error", err)
+		logger.ErrorContext(ctx, "error opening export output", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	defer exportFile.Close()
@@ -102,9 +112,10 @@ func (p *ProjectServiceServer) ExportProject(
 	writer.ContentType = "video/mp4"
 	signedURL, err := shared.UploadBytes(writer, exportFile, objectPath, bucket)
 	if err != nil {
-		slog.Error("error uploading export", "error", err)
+		logger.ErrorContext(ctx, "error uploading export", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
+	logger.InfoContext(ctx, "project export completed", "object_path", objectPath)
 
 	return connect.NewResponse(&v1.ExportProjectResponse{
 		SignedUrlForDownload: signedURL,
