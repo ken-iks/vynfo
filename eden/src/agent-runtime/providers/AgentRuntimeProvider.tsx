@@ -1,5 +1,5 @@
 import { useWorkspaceContext } from "@/components/providers/WorkspaceProvider";
-import { conversationClient } from "@/lib/client";
+import { conversationStreamingClient } from "@/lib/client";
 import { type ChatModelAdapter, useLocalRuntime } from "@assistant-ui/react";
 import { useCallback, useRef, type ReactNode } from "react";
 import { toThreadStream } from "../serde/toThreadStream";
@@ -43,7 +43,7 @@ export function AgentRunTimeProvider({ children }: { children: ReactNode }) {
       );
       const parentMessage =
         responseParentIndex > 0 ? messages[responseParentIndex - 1] : undefined;
-      const stream = conversationClient.sendAgentMessage(
+      const stream = conversationStreamingClient.sendAgentMessage(
         {
           content: part.text,
           workspaceId: currentWorkspaceId,
