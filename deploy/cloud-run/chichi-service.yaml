@@ -1,0 +1,94 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  annotations:
+    run.googleapis.com/ingress: all
+    run.googleapis.com/ingress-status: all
+    run.googleapis.com/invoker-iam-disabled: 'true'
+    run.googleapis.com/maxScale: '20'
+    run.googleapis.com/urls: '["https://chichi-802623478784.us-central1.run.app","https://chichi-au4jmn2axq-uc.a.run.app"]'
+  labels:
+    cloud.googleapis.com/location: us-central1
+    commit-sha: 98a278855b05fc516a659372dd448fe3e8227f3c
+    gcb-build-id: c1205288-ca48-4eb5-9284-a95913b81a6e
+    gcb-trigger-id: 20a54630-a08f-4f54-9560-7dc58fbd2afa
+    gcb-trigger-region: global
+    managed-by: gcp-cloud-build-deploy-cloud-run
+  name: chichi
+  namespace: '802623478784'
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: '20'
+        run.googleapis.com/container-dependencies: '{"chichi":["mensah"]}'
+        run.googleapis.com/client-name: gcloud
+        run.googleapis.com/client-version: 571.0.0
+        run.googleapis.com/cloudsql-instances: vinfoinc:us-central1:vynfo
+        run.googleapis.com/startup-cpu-boost: 'true'
+      labels:
+        client.knative.dev/nonce: DEPLOY_NONCE
+        commit-sha: 98a278855b05fc516a659372dd448fe3e8227f3c
+        gcb-build-id: c1205288-ca48-4eb5-9284-a95913b81a6e
+        gcb-trigger-id: 20a54630-a08f-4f54-9560-7dc58fbd2afa
+        gcb-trigger-region: global
+        managed-by: gcp-cloud-build-deploy-cloud-run
+        run.googleapis.com/startupProbeType: Default
+    spec:
+      containerConcurrency: 80
+      containers:
+      - env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: DATABASE_URL
+        - name: MENSAH_GRPC_ADDR
+          value: localhost:50051
+        image: CHICHI_IMAGE
+        name: chichi
+        ports:
+        - containerPort: 8080
+          name: http1
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        startupProbe:
+          failureThreshold: 1
+          periodSeconds: 240
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 240
+      - env:
+        - name: MENSAH_GRPC_ADDR
+          value: '[::]:50051'
+        - name: CHICHI_GRPC_ADDR
+          value: localhost:50052
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: OPENAI_API_KEY
+        - name: TAVILY_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: TAVILY_API_KEY
+        image: MENSAH_IMAGE
+        name: mensah
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        startupProbe:
+          failureThreshold: 1
+          periodSeconds: 240
+          tcpSocket:
+            port: 50051
+          timeoutSeconds: 240
+      serviceAccountName: 802623478784-compute@developer.gserviceaccount.com
+      timeoutSeconds: 300
+  traffic:
+  - latestRevision: true
+    percent: 100
