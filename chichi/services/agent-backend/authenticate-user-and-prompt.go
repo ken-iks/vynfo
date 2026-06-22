@@ -31,6 +31,10 @@ func (s *AgentBackendServiceServer) AuthenticateUserAndPrompt(
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid user id")
 	}
+	user, err := s.queries.GetUser(ctx, userId)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "user not in db")
+	}
 	membership, err := s.queries.IsWorkspaceMember(ctx, db.IsWorkspaceMemberParams{
 		WorkspaceID: workspaceId,
 		MemberID:    userId,
@@ -40,6 +44,9 @@ func (s *AgentBackendServiceServer) AuthenticateUserAndPrompt(
 	}
 	if !membership {
 		return nil, status.Error(codes.PermissionDenied, "user is not member of workspace")
+	}
+	if !strings.Contains(user.Email, "kenikeji1") {
+		return nil, status.Error(codes.PermissionDenied, "current access to Murch agent is limited")
 	}
 	return &agentbackendpb.AuthenticateUserAndPromptResponse{
 		Valid: true,

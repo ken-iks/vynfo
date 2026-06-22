@@ -77,7 +77,8 @@ def _parse_model_response(
         if isinstance(part, TextPart):
             parts.append(chat_pb2.AssistantMessagePart(text_regular=part.content))
         elif isinstance(part, ThinkingPart):
-            parts.append(chat_pb2.AssistantMessagePart(text_reasoning=part.content))
+            if part.content:
+                parts.append(chat_pb2.AssistantMessagePart(text_reasoning=part.content))
         elif isinstance(part, ToolCallPart):
             parts.append(
                 chat_pb2.AssistantMessagePart(
@@ -98,6 +99,3 @@ def _parse_model_response(
     return chat_pb2.CompletedRunMessage(
         assistant=chat_pb2.AssistantMessage(parts=parts)
     )
-
-
-

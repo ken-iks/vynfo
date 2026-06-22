@@ -27,6 +27,10 @@ type AiConversationMessage struct {
 	RunID                uuid.UUID
 	MessageContentAsJson json.RawMessage
 	SentAt               time.Time
+	ClientID             string
+	ParentID             uuid.NullUUID
+	Position             int32
+	Ordinal              sql.NullInt64
 }
 
 type AiConversationRun struct {

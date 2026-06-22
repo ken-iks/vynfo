@@ -25,12 +25,13 @@ const (
 )
 
 type SendAgentMessageRequest struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Content        string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
-	WorkspaceId    string                 `protobuf:"bytes,2,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
-	ConversationId string                 `protobuf:"bytes,3,opt,name=conversation_id,json=conversationId,proto3" json:"conversation_id,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state              protoimpl.MessageState         `protogen:"open.v1"`
+	Content            string                         `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
+	WorkspaceId        string                         `protobuf:"bytes,2,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	ConversationId     string                         `protobuf:"bytes,3,opt,name=conversation_id,json=conversationId,proto3" json:"conversation_id,omitempty"`
+	PersistanceOptions *SendMessagePersistanceOptions `protobuf:"bytes,4,opt,name=persistance_options,json=persistanceOptions,proto3" json:"persistance_options,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *SendAgentMessageRequest) Reset() {
@@ -84,6 +85,83 @@ func (x *SendAgentMessageRequest) GetConversationId() string {
 	return ""
 }
 
+func (x *SendAgentMessageRequest) GetPersistanceOptions() *SendMessagePersistanceOptions {
+	if x != nil {
+		return x.PersistanceOptions
+	}
+	return nil
+}
+
+type SendMessagePersistanceOptions struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The client-side id of the existing message this new user message replies to.
+	// Chichi validates this id belongs to the conversation and stores the new user
+	// message as its child. This is a message id, not an ai_conversation_runs id.
+	ParentClientId *string `protobuf:"bytes,1,opt,name=parent_client_id,json=parentClientId,proto3,oneof" json:"parent_client_id,omitempty"`
+	// The client-side id assistant-ui already assigned to the user message being
+	// sent. Chichi persists the matching user message row with this id so the
+	// message can be referenced before and after reload.
+	ClientId string `protobuf:"bytes,2,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
+	// The client-side id assistant-ui assigned to the live generated assistant
+	// response. A Mensah run can contain intermediate persisted messages, but
+	// this id belongs only to the final assistant message represented by the
+	// streamed response in assistant-ui. This is not an ai_conversation_runs id.
+	ResponseClientId *string `protobuf:"bytes,3,opt,name=response_client_id,json=responseClientId,proto3,oneof" json:"response_client_id,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *SendMessagePersistanceOptions) Reset() {
+	*x = SendMessagePersistanceOptions{}
+	mi := &file_proto_v1_conversation_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SendMessagePersistanceOptions) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendMessagePersistanceOptions) ProtoMessage() {}
+
+func (x *SendMessagePersistanceOptions) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_conversation_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendMessagePersistanceOptions.ProtoReflect.Descriptor instead.
+func (*SendMessagePersistanceOptions) Descriptor() ([]byte, []int) {
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *SendMessagePersistanceOptions) GetParentClientId() string {
+	if x != nil && x.ParentClientId != nil {
+		return *x.ParentClientId
+	}
+	return ""
+}
+
+func (x *SendMessagePersistanceOptions) GetClientId() string {
+	if x != nil {
+		return x.ClientId
+	}
+	return ""
+}
+
+func (x *SendMessagePersistanceOptions) GetResponseClientId() string {
+	if x != nil && x.ResponseClientId != nil {
+		return *x.ResponseClientId
+	}
+	return ""
+}
+
 type AIConversation struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	ConversationId      string                 `protobuf:"bytes,1,opt,name=conversation_id,json=conversationId,proto3" json:"conversation_id,omitempty"`
@@ -97,7 +175,7 @@ type AIConversation struct {
 
 func (x *AIConversation) Reset() {
 	*x = AIConversation{}
-	mi := &file_proto_v1_conversation_proto_msgTypes[1]
+	mi := &file_proto_v1_conversation_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -109,7 +187,7 @@ func (x *AIConversation) String() string {
 func (*AIConversation) ProtoMessage() {}
 
 func (x *AIConversation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_conversation_proto_msgTypes[1]
+	mi := &file_proto_v1_conversation_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -122,7 +200,7 @@ func (x *AIConversation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AIConversation.ProtoReflect.Descriptor instead.
 func (*AIConversation) Descriptor() ([]byte, []int) {
-	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{1}
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AIConversation) GetConversationId() string {
@@ -173,7 +251,7 @@ type CreateAIConversationRequest struct {
 
 func (x *CreateAIConversationRequest) Reset() {
 	*x = CreateAIConversationRequest{}
-	mi := &file_proto_v1_conversation_proto_msgTypes[2]
+	mi := &file_proto_v1_conversation_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -185,7 +263,7 @@ func (x *CreateAIConversationRequest) String() string {
 func (*CreateAIConversationRequest) ProtoMessage() {}
 
 func (x *CreateAIConversationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_conversation_proto_msgTypes[2]
+	mi := &file_proto_v1_conversation_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -198,7 +276,7 @@ func (x *CreateAIConversationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAIConversationRequest.ProtoReflect.Descriptor instead.
 func (*CreateAIConversationRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{2}
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CreateAIConversationRequest) GetTitle() string {
@@ -224,7 +302,7 @@ type CreateAIConversationResponse struct {
 
 func (x *CreateAIConversationResponse) Reset() {
 	*x = CreateAIConversationResponse{}
-	mi := &file_proto_v1_conversation_proto_msgTypes[3]
+	mi := &file_proto_v1_conversation_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -236,7 +314,7 @@ func (x *CreateAIConversationResponse) String() string {
 func (*CreateAIConversationResponse) ProtoMessage() {}
 
 func (x *CreateAIConversationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_conversation_proto_msgTypes[3]
+	mi := &file_proto_v1_conversation_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -249,7 +327,7 @@ func (x *CreateAIConversationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAIConversationResponse.ProtoReflect.Descriptor instead.
 func (*CreateAIConversationResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{3}
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CreateAIConversationResponse) GetConversation() *AIConversation {
@@ -268,7 +346,7 @@ type GetAIConversationRequest struct {
 
 func (x *GetAIConversationRequest) Reset() {
 	*x = GetAIConversationRequest{}
-	mi := &file_proto_v1_conversation_proto_msgTypes[4]
+	mi := &file_proto_v1_conversation_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -280,7 +358,7 @@ func (x *GetAIConversationRequest) String() string {
 func (*GetAIConversationRequest) ProtoMessage() {}
 
 func (x *GetAIConversationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_conversation_proto_msgTypes[4]
+	mi := &file_proto_v1_conversation_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -293,7 +371,7 @@ func (x *GetAIConversationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAIConversationRequest.ProtoReflect.Descriptor instead.
 func (*GetAIConversationRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{4}
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetAIConversationRequest) GetConversationId() string {
@@ -312,7 +390,7 @@ type GetAIConversationResponse struct {
 
 func (x *GetAIConversationResponse) Reset() {
 	*x = GetAIConversationResponse{}
-	mi := &file_proto_v1_conversation_proto_msgTypes[5]
+	mi := &file_proto_v1_conversation_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -324,7 +402,7 @@ func (x *GetAIConversationResponse) String() string {
 func (*GetAIConversationResponse) ProtoMessage() {}
 
 func (x *GetAIConversationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_conversation_proto_msgTypes[5]
+	mi := &file_proto_v1_conversation_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -337,7 +415,7 @@ func (x *GetAIConversationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAIConversationResponse.ProtoReflect.Descriptor instead.
 func (*GetAIConversationResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{5}
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetAIConversationResponse) GetConversation() *AIConversation {
@@ -355,7 +433,7 @@ type ListAIConversationsRequest struct {
 
 func (x *ListAIConversationsRequest) Reset() {
 	*x = ListAIConversationsRequest{}
-	mi := &file_proto_v1_conversation_proto_msgTypes[6]
+	mi := &file_proto_v1_conversation_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -367,7 +445,7 @@ func (x *ListAIConversationsRequest) String() string {
 func (*ListAIConversationsRequest) ProtoMessage() {}
 
 func (x *ListAIConversationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_conversation_proto_msgTypes[6]
+	mi := &file_proto_v1_conversation_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -380,7 +458,7 @@ func (x *ListAIConversationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAIConversationsRequest.ProtoReflect.Descriptor instead.
 func (*ListAIConversationsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{6}
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{7}
 }
 
 type ListAIConversationsResponse struct {
@@ -392,7 +470,7 @@ type ListAIConversationsResponse struct {
 
 func (x *ListAIConversationsResponse) Reset() {
 	*x = ListAIConversationsResponse{}
-	mi := &file_proto_v1_conversation_proto_msgTypes[7]
+	mi := &file_proto_v1_conversation_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -404,7 +482,7 @@ func (x *ListAIConversationsResponse) String() string {
 func (*ListAIConversationsResponse) ProtoMessage() {}
 
 func (x *ListAIConversationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_conversation_proto_msgTypes[7]
+	mi := &file_proto_v1_conversation_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -417,7 +495,7 @@ func (x *ListAIConversationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAIConversationsResponse.ProtoReflect.Descriptor instead.
 func (*ListAIConversationsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{7}
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListAIConversationsResponse) GetConversations() []*AIConversation {
@@ -438,7 +516,7 @@ type UpdateAIConversationRequest struct {
 
 func (x *UpdateAIConversationRequest) Reset() {
 	*x = UpdateAIConversationRequest{}
-	mi := &file_proto_v1_conversation_proto_msgTypes[8]
+	mi := &file_proto_v1_conversation_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -450,7 +528,7 @@ func (x *UpdateAIConversationRequest) String() string {
 func (*UpdateAIConversationRequest) ProtoMessage() {}
 
 func (x *UpdateAIConversationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_conversation_proto_msgTypes[8]
+	mi := &file_proto_v1_conversation_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -463,7 +541,7 @@ func (x *UpdateAIConversationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAIConversationRequest.ProtoReflect.Descriptor instead.
 func (*UpdateAIConversationRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{8}
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *UpdateAIConversationRequest) GetConversationId() string {
@@ -496,7 +574,7 @@ type DeleteAIConversationRequest struct {
 
 func (x *DeleteAIConversationRequest) Reset() {
 	*x = DeleteAIConversationRequest{}
-	mi := &file_proto_v1_conversation_proto_msgTypes[9]
+	mi := &file_proto_v1_conversation_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -508,7 +586,7 @@ func (x *DeleteAIConversationRequest) String() string {
 func (*DeleteAIConversationRequest) ProtoMessage() {}
 
 func (x *DeleteAIConversationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_conversation_proto_msgTypes[9]
+	mi := &file_proto_v1_conversation_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -521,7 +599,7 @@ func (x *DeleteAIConversationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAIConversationRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAIConversationRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{9}
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *DeleteAIConversationRequest) GetConversationId() string {
@@ -540,7 +618,7 @@ type ListAIConversationMessagesRequest struct {
 
 func (x *ListAIConversationMessagesRequest) Reset() {
 	*x = ListAIConversationMessagesRequest{}
-	mi := &file_proto_v1_conversation_proto_msgTypes[10]
+	mi := &file_proto_v1_conversation_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -552,7 +630,7 @@ func (x *ListAIConversationMessagesRequest) String() string {
 func (*ListAIConversationMessagesRequest) ProtoMessage() {}
 
 func (x *ListAIConversationMessagesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_conversation_proto_msgTypes[10]
+	mi := &file_proto_v1_conversation_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -565,7 +643,7 @@ func (x *ListAIConversationMessagesRequest) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use ListAIConversationMessagesRequest.ProtoReflect.Descriptor instead.
 func (*ListAIConversationMessagesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{10}
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ListAIConversationMessagesRequest) GetConversationId() string {
@@ -576,15 +654,15 @@ func (x *ListAIConversationMessagesRequest) GetConversationId() string {
 }
 
 type ListAIConversationMessagesResponse struct {
-	state         protoimpl.MessageState               `protogen:"open.v1"`
-	Messages      []*agent_runtime.CompletedRunMessage `protobuf:"bytes,1,rep,name=messages,proto3" json:"messages,omitempty"`
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	Messages      []*AIConversationMessageNode `protobuf:"bytes,1,rep,name=messages,proto3" json:"messages,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListAIConversationMessagesResponse) Reset() {
 	*x = ListAIConversationMessagesResponse{}
-	mi := &file_proto_v1_conversation_proto_msgTypes[11]
+	mi := &file_proto_v1_conversation_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -596,7 +674,7 @@ func (x *ListAIConversationMessagesResponse) String() string {
 func (*ListAIConversationMessagesResponse) ProtoMessage() {}
 
 func (x *ListAIConversationMessagesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_conversation_proto_msgTypes[11]
+	mi := &file_proto_v1_conversation_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -609,12 +687,74 @@ func (x *ListAIConversationMessagesResponse) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use ListAIConversationMessagesResponse.ProtoReflect.Descriptor instead.
 func (*ListAIConversationMessagesResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{11}
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *ListAIConversationMessagesResponse) GetMessages() []*agent_runtime.CompletedRunMessage {
+func (x *ListAIConversationMessagesResponse) GetMessages() []*AIConversationMessageNode {
 	if x != nil {
 		return x.Messages
+	}
+	return nil
+}
+
+type AIConversationMessageNode struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Stable message id used by the frontend runtime.
+	ClientId string `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
+	// Stable client id of this message's parent, if any.
+	ParentClientId *string                            `protobuf:"bytes,2,opt,name=parent_client_id,json=parentClientId,proto3,oneof" json:"parent_client_id,omitempty"`
+	Message        *agent_runtime.CompletedRunMessage `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *AIConversationMessageNode) Reset() {
+	*x = AIConversationMessageNode{}
+	mi := &file_proto_v1_conversation_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AIConversationMessageNode) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AIConversationMessageNode) ProtoMessage() {}
+
+func (x *AIConversationMessageNode) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_conversation_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AIConversationMessageNode.ProtoReflect.Descriptor instead.
+func (*AIConversationMessageNode) Descriptor() ([]byte, []int) {
+	return file_proto_v1_conversation_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *AIConversationMessageNode) GetClientId() string {
+	if x != nil {
+		return x.ClientId
+	}
+	return ""
+}
+
+func (x *AIConversationMessageNode) GetParentClientId() string {
+	if x != nil && x.ParentClientId != nil {
+		return *x.ParentClientId
+	}
+	return ""
+}
+
+func (x *AIConversationMessageNode) GetMessage() *agent_runtime.CompletedRunMessage {
+	if x != nil {
+		return x.Message
 	}
 	return nil
 }
@@ -623,11 +763,18 @@ var File_proto_v1_conversation_proto protoreflect.FileDescriptor
 
 const file_proto_v1_conversation_proto_rawDesc = "" +
 	"\n" +
-	"\x1bproto/v1/conversation.proto\x12\x02v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a'proto/v1/inter/agent_runtime/chat.proto\"\x7f\n" +
+	"\x1bproto/v1/conversation.proto\x12\x02v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a'proto/v1/inter/agent_runtime/chat.proto\"\xd3\x01\n" +
 	"\x17SendAgentMessageRequest\x12\x18\n" +
 	"\acontent\x18\x01 \x01(\tR\acontent\x12!\n" +
 	"\fworkspace_id\x18\x02 \x01(\tR\vworkspaceId\x12'\n" +
-	"\x0fconversation_id\x18\x03 \x01(\tR\x0econversationId\"\xe8\x01\n" +
+	"\x0fconversation_id\x18\x03 \x01(\tR\x0econversationId\x12R\n" +
+	"\x13persistance_options\x18\x04 \x01(\v2!.v1.SendMessagePersistanceOptionsR\x12persistanceOptions\"\xca\x01\n" +
+	"\x1dSendMessagePersistanceOptions\x12-\n" +
+	"\x10parent_client_id\x18\x01 \x01(\tH\x00R\x0eparentClientId\x88\x01\x01\x12\x1b\n" +
+	"\tclient_id\x18\x02 \x01(\tR\bclientId\x121\n" +
+	"\x12response_client_id\x18\x03 \x01(\tH\x01R\x10responseClientId\x88\x01\x01B\x13\n" +
+	"\x11_parent_client_idB\x15\n" +
+	"\x13_response_client_id\"\xe8\x01\n" +
 	"\x0eAIConversation\x12'\n" +
 	"\x0fconversation_id\x18\x01 \x01(\tR\x0econversationId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x122\n" +
@@ -656,9 +803,14 @@ const file_proto_v1_conversation_proto_rawDesc = "" +
 	"\x1bDeleteAIConversationRequest\x12'\n" +
 	"\x0fconversation_id\x18\x01 \x01(\tR\x0econversationId\"L\n" +
 	"!ListAIConversationMessagesRequest\x12'\n" +
-	"\x0fconversation_id\x18\x01 \x01(\tR\x0econversationId\"m\n" +
-	"\"ListAIConversationMessagesResponse\x12G\n" +
-	"\bmessages\x18\x01 \x03(\v2+.v1.inter.agent_runtime.CompletedRunMessageR\bmessages2\xf5\x05\n" +
+	"\x0fconversation_id\x18\x01 \x01(\tR\x0econversationId\"_\n" +
+	"\"ListAIConversationMessagesResponse\x129\n" +
+	"\bmessages\x18\x01 \x03(\v2\x1d.v1.AIConversationMessageNodeR\bmessages\"\xc3\x01\n" +
+	"\x19AIConversationMessageNode\x12\x1b\n" +
+	"\tclient_id\x18\x01 \x01(\tR\bclientId\x12-\n" +
+	"\x10parent_client_id\x18\x02 \x01(\tH\x00R\x0eparentClientId\x88\x01\x01\x12E\n" +
+	"\amessage\x18\x03 \x01(\v2+.v1.inter.agent_runtime.CompletedRunMessageR\amessageB\x13\n" +
+	"\x11_parent_client_id2\xf5\x05\n" +
 	"\x13ConversationService\x12Y\n" +
 	"\x14CreateAIConversation\x12\x1f.v1.CreateAIConversationRequest\x1a .v1.CreateAIConversationResponse\x12P\n" +
 	"\x11GetAIConversation\x12\x1c.v1.GetAIConversationRequest\x1a\x1d.v1.GetAIConversationResponse\x12V\n" +
@@ -681,54 +833,58 @@ func file_proto_v1_conversation_proto_rawDescGZIP() []byte {
 	return file_proto_v1_conversation_proto_rawDescData
 }
 
-var file_proto_v1_conversation_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_proto_v1_conversation_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_proto_v1_conversation_proto_goTypes = []any{
 	(*SendAgentMessageRequest)(nil),             // 0: v1.SendAgentMessageRequest
-	(*AIConversation)(nil),                      // 1: v1.AIConversation
-	(*CreateAIConversationRequest)(nil),         // 2: v1.CreateAIConversationRequest
-	(*CreateAIConversationResponse)(nil),        // 3: v1.CreateAIConversationResponse
-	(*GetAIConversationRequest)(nil),            // 4: v1.GetAIConversationRequest
-	(*GetAIConversationResponse)(nil),           // 5: v1.GetAIConversationResponse
-	(*ListAIConversationsRequest)(nil),          // 6: v1.ListAIConversationsRequest
-	(*ListAIConversationsResponse)(nil),         // 7: v1.ListAIConversationsResponse
-	(*UpdateAIConversationRequest)(nil),         // 8: v1.UpdateAIConversationRequest
-	(*DeleteAIConversationRequest)(nil),         // 9: v1.DeleteAIConversationRequest
-	(*ListAIConversationMessagesRequest)(nil),   // 10: v1.ListAIConversationMessagesRequest
-	(*ListAIConversationMessagesResponse)(nil),  // 11: v1.ListAIConversationMessagesResponse
-	(*timestamppb.Timestamp)(nil),               // 12: google.protobuf.Timestamp
-	(*agent_runtime.CompletedRunMessage)(nil),   // 13: v1.inter.agent_runtime.CompletedRunMessage
-	(*agent_runtime.GenerateTitleRequest)(nil),  // 14: v1.inter.agent_runtime.GenerateTitleRequest
-	(*emptypb.Empty)(nil),                       // 15: google.protobuf.Empty
-	(*agent_runtime.StreamChatResponse)(nil),    // 16: v1.inter.agent_runtime.StreamChatResponse
-	(*agent_runtime.GenerateTitleResponse)(nil), // 17: v1.inter.agent_runtime.GenerateTitleResponse
+	(*SendMessagePersistanceOptions)(nil),       // 1: v1.SendMessagePersistanceOptions
+	(*AIConversation)(nil),                      // 2: v1.AIConversation
+	(*CreateAIConversationRequest)(nil),         // 3: v1.CreateAIConversationRequest
+	(*CreateAIConversationResponse)(nil),        // 4: v1.CreateAIConversationResponse
+	(*GetAIConversationRequest)(nil),            // 5: v1.GetAIConversationRequest
+	(*GetAIConversationResponse)(nil),           // 6: v1.GetAIConversationResponse
+	(*ListAIConversationsRequest)(nil),          // 7: v1.ListAIConversationsRequest
+	(*ListAIConversationsResponse)(nil),         // 8: v1.ListAIConversationsResponse
+	(*UpdateAIConversationRequest)(nil),         // 9: v1.UpdateAIConversationRequest
+	(*DeleteAIConversationRequest)(nil),         // 10: v1.DeleteAIConversationRequest
+	(*ListAIConversationMessagesRequest)(nil),   // 11: v1.ListAIConversationMessagesRequest
+	(*ListAIConversationMessagesResponse)(nil),  // 12: v1.ListAIConversationMessagesResponse
+	(*AIConversationMessageNode)(nil),           // 13: v1.AIConversationMessageNode
+	(*timestamppb.Timestamp)(nil),               // 14: google.protobuf.Timestamp
+	(*agent_runtime.CompletedRunMessage)(nil),   // 15: v1.inter.agent_runtime.CompletedRunMessage
+	(*agent_runtime.GenerateTitleRequest)(nil),  // 16: v1.inter.agent_runtime.GenerateTitleRequest
+	(*emptypb.Empty)(nil),                       // 17: google.protobuf.Empty
+	(*agent_runtime.StreamChatResponse)(nil),    // 18: v1.inter.agent_runtime.StreamChatResponse
+	(*agent_runtime.GenerateTitleResponse)(nil), // 19: v1.inter.agent_runtime.GenerateTitleResponse
 }
 var file_proto_v1_conversation_proto_depIdxs = []int32{
-	12, // 0: v1.AIConversation.last_updated_at:type_name -> google.protobuf.Timestamp
-	1,  // 1: v1.CreateAIConversationResponse.conversation:type_name -> v1.AIConversation
-	1,  // 2: v1.GetAIConversationResponse.conversation:type_name -> v1.AIConversation
-	1,  // 3: v1.ListAIConversationsResponse.conversations:type_name -> v1.AIConversation
-	13, // 4: v1.ListAIConversationMessagesResponse.messages:type_name -> v1.inter.agent_runtime.CompletedRunMessage
-	2,  // 5: v1.ConversationService.CreateAIConversation:input_type -> v1.CreateAIConversationRequest
-	4,  // 6: v1.ConversationService.GetAIConversation:input_type -> v1.GetAIConversationRequest
-	6,  // 7: v1.ConversationService.ListAIConversations:input_type -> v1.ListAIConversationsRequest
-	8,  // 8: v1.ConversationService.UpdateAIConversation:input_type -> v1.UpdateAIConversationRequest
-	9,  // 9: v1.ConversationService.DeleteAIConversation:input_type -> v1.DeleteAIConversationRequest
-	10, // 10: v1.ConversationService.ListAIConversationMessages:input_type -> v1.ListAIConversationMessagesRequest
-	0,  // 11: v1.ConversationService.SendAgentMessage:input_type -> v1.SendAgentMessageRequest
-	14, // 12: v1.ConversationService.GenerateNewTitle:input_type -> v1.inter.agent_runtime.GenerateTitleRequest
-	3,  // 13: v1.ConversationService.CreateAIConversation:output_type -> v1.CreateAIConversationResponse
-	5,  // 14: v1.ConversationService.GetAIConversation:output_type -> v1.GetAIConversationResponse
-	7,  // 15: v1.ConversationService.ListAIConversations:output_type -> v1.ListAIConversationsResponse
-	1,  // 16: v1.ConversationService.UpdateAIConversation:output_type -> v1.AIConversation
-	15, // 17: v1.ConversationService.DeleteAIConversation:output_type -> google.protobuf.Empty
-	11, // 18: v1.ConversationService.ListAIConversationMessages:output_type -> v1.ListAIConversationMessagesResponse
-	16, // 19: v1.ConversationService.SendAgentMessage:output_type -> v1.inter.agent_runtime.StreamChatResponse
-	17, // 20: v1.ConversationService.GenerateNewTitle:output_type -> v1.inter.agent_runtime.GenerateTitleResponse
-	13, // [13:21] is the sub-list for method output_type
-	5,  // [5:13] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	1,  // 0: v1.SendAgentMessageRequest.persistance_options:type_name -> v1.SendMessagePersistanceOptions
+	14, // 1: v1.AIConversation.last_updated_at:type_name -> google.protobuf.Timestamp
+	2,  // 2: v1.CreateAIConversationResponse.conversation:type_name -> v1.AIConversation
+	2,  // 3: v1.GetAIConversationResponse.conversation:type_name -> v1.AIConversation
+	2,  // 4: v1.ListAIConversationsResponse.conversations:type_name -> v1.AIConversation
+	13, // 5: v1.ListAIConversationMessagesResponse.messages:type_name -> v1.AIConversationMessageNode
+	15, // 6: v1.AIConversationMessageNode.message:type_name -> v1.inter.agent_runtime.CompletedRunMessage
+	3,  // 7: v1.ConversationService.CreateAIConversation:input_type -> v1.CreateAIConversationRequest
+	5,  // 8: v1.ConversationService.GetAIConversation:input_type -> v1.GetAIConversationRequest
+	7,  // 9: v1.ConversationService.ListAIConversations:input_type -> v1.ListAIConversationsRequest
+	9,  // 10: v1.ConversationService.UpdateAIConversation:input_type -> v1.UpdateAIConversationRequest
+	10, // 11: v1.ConversationService.DeleteAIConversation:input_type -> v1.DeleteAIConversationRequest
+	11, // 12: v1.ConversationService.ListAIConversationMessages:input_type -> v1.ListAIConversationMessagesRequest
+	0,  // 13: v1.ConversationService.SendAgentMessage:input_type -> v1.SendAgentMessageRequest
+	16, // 14: v1.ConversationService.GenerateNewTitle:input_type -> v1.inter.agent_runtime.GenerateTitleRequest
+	4,  // 15: v1.ConversationService.CreateAIConversation:output_type -> v1.CreateAIConversationResponse
+	6,  // 16: v1.ConversationService.GetAIConversation:output_type -> v1.GetAIConversationResponse
+	8,  // 17: v1.ConversationService.ListAIConversations:output_type -> v1.ListAIConversationsResponse
+	2,  // 18: v1.ConversationService.UpdateAIConversation:output_type -> v1.AIConversation
+	17, // 19: v1.ConversationService.DeleteAIConversation:output_type -> google.protobuf.Empty
+	12, // 20: v1.ConversationService.ListAIConversationMessages:output_type -> v1.ListAIConversationMessagesResponse
+	18, // 21: v1.ConversationService.SendAgentMessage:output_type -> v1.inter.agent_runtime.StreamChatResponse
+	19, // 22: v1.ConversationService.GenerateNewTitle:output_type -> v1.inter.agent_runtime.GenerateTitleResponse
+	15, // [15:23] is the sub-list for method output_type
+	7,  // [7:15] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_proto_v1_conversation_proto_init() }
@@ -736,14 +892,16 @@ func file_proto_v1_conversation_proto_init() {
 	if File_proto_v1_conversation_proto != nil {
 		return
 	}
-	file_proto_v1_conversation_proto_msgTypes[2].OneofWrappers = []any{}
+	file_proto_v1_conversation_proto_msgTypes[1].OneofWrappers = []any{}
+	file_proto_v1_conversation_proto_msgTypes[3].OneofWrappers = []any{}
+	file_proto_v1_conversation_proto_msgTypes[13].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_v1_conversation_proto_rawDesc), len(file_proto_v1_conversation_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

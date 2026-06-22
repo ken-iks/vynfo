@@ -81,7 +81,6 @@ export type ThreadComponents = {
 export type ThreadProps = {
   components?: ThreadComponents | undefined;
   allowAttachments?: boolean | undefined;
-  allowBranching?: boolean | undefined;
 };
 
 const EMPTY_COMPONENTS: ThreadComponents = {};
@@ -98,17 +97,12 @@ const isNewChatView = (s: AssistantState) =>
 export const Thread: FC<ThreadProps> = ({
   components = EMPTY_COMPONENTS,
   allowAttachments = true,
-  allowBranching = true,
 }) => {
   const isEmpty = useAuiState(isNewChatView);
 
   return (
     <ThreadComponentsContext.Provider value={components}>
-      <ThreadRoot
-        isEmpty={isEmpty}
-        allowAttachments={allowAttachments}
-        allowBranching={allowBranching}
-      />
+      <ThreadRoot isEmpty={isEmpty} allowAttachments={allowAttachments} />
     </ThreadComponentsContext.Provider>
   );
 };
@@ -116,8 +110,7 @@ export const Thread: FC<ThreadProps> = ({
 const ThreadRoot: FC<{
   isEmpty: boolean;
   allowAttachments: boolean;
-  allowBranching: boolean;
-}> = ({ isEmpty, allowAttachments, allowBranching }) => {
+}> = ({ isEmpty, allowAttachments }) => {
   const { Welcome = ThreadWelcome } = useContext(ThreadComponentsContext);
 
   return (
@@ -151,7 +144,7 @@ const ThreadRoot: FC<{
             className="mb-14 flex flex-col gap-y-6 empty:hidden"
           >
             <ThreadPrimitive.Messages>
-              {() => <ThreadMessage allowBranching={allowBranching} />}
+              {() => <ThreadMessage />}
             </ThreadPrimitive.Messages>
           </div>
 
@@ -174,15 +167,15 @@ const ThreadRoot: FC<{
   );
 };
 
-const ThreadMessage: FC<{ allowBranching: boolean }> = ({ allowBranching }) => {
+const ThreadMessage: FC = () => {
   const { AssistantMessage: AssistantMessageComponent = AssistantMessage } =
     useContext(ThreadComponentsContext);
   const role = useAuiState((s) => s.message.role);
   const isEditing = useAuiState((s) => s.message.composer.isEditing);
 
   if (isEditing) return <EditComposer />;
-  if (role === "user") return <UserMessage allowBranching={allowBranching} />;
-  return <AssistantMessageComponent allowBranching={allowBranching} />;
+  if (role === "user") return <UserMessage />;
+  return <AssistantMessageComponent />;
 };
 
 const ThreadScrollToBottom: FC = () => {
@@ -340,9 +333,7 @@ const MessageError: FC = () => {
   );
 };
 
-const AssistantMessage: FC<{ allowBranching: boolean }> = ({
-  allowBranching,
-}) => {
+const AssistantMessage: FC = () => {
   const {
     ToolFallback: ToolFallbackComponent = ToolFallback,
     ToolGroup,
@@ -436,7 +427,7 @@ const AssistantMessage: FC<{ allowBranching: boolean }> = ({
         data-slot="aui_assistant-message-footer"
         className={cn("ms-2 flex items-center", ACTION_BAR_HEIGHT)}
       >
-        {allowBranching && <BranchPicker />}
+        <BranchPicker />
         <AssistantActionBar />
       </div>
     </MessagePrimitive.Root>
@@ -492,7 +483,7 @@ const AssistantActionBar: FC = () => {
   );
 };
 
-const UserMessage: FC<{ allowBranching: boolean }> = ({ allowBranching }) => {
+const UserMessage: FC = () => {
   return (
     <MessagePrimitive.Root
       data-slot="aui_user-message-root"
@@ -505,19 +496,15 @@ const UserMessage: FC<{ allowBranching: boolean }> = ({ allowBranching }) => {
         <div className="aui-user-message-content peer bg-muted text-foreground rounded-xl px-4 py-2 wrap-break-word empty:hidden">
           <MessagePrimitive.Parts />
         </div>
-        {allowBranching && (
-          <div className="aui-user-action-bar-wrapper absolute start-0 top-1/2 -translate-x-full -translate-y-1/2 pe-2 peer-empty:hidden rtl:translate-x-full">
-            <UserActionBar />
-          </div>
-        )}
+        <div className="aui-user-action-bar-wrapper absolute start-0 top-1/2 -translate-x-full -translate-y-1/2 pe-2 peer-empty:hidden rtl:translate-x-full">
+          <UserActionBar />
+        </div>
       </div>
 
-      {allowBranching && (
-        <BranchPicker
-          data-slot="aui_user-branch-picker"
-          className="col-span-full col-start-1 row-start-3 -me-1 justify-end"
-        />
-      )}
+      <BranchPicker
+        data-slot="aui_user-branch-picker"
+        className="col-span-full col-start-1 row-start-3 -me-1 justify-end"
+      />
     </MessagePrimitive.Root>
   );
 };

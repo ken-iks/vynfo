@@ -44,8 +44,7 @@ async def parse_agent_stream_event(
             finished=chat_pb2.Finished(
                 new_messages=parse_finished_run(event_result),
                 run_metadata=usage,
-                runtime_convertable_json_string=event_result.new_messages_json()
-                .decode(),
+                runtime_convertable_json_string=event_result.new_messages_json().decode(),
             ),
         )
     else:
@@ -57,10 +56,11 @@ async def parse_agent_stream_event(
                     text=chat_pb2.TextDelta(content=event_part.content),
                 )
             elif isinstance(event_part, ThinkingPart):
-                yield chat_pb2.StreamChatResponse(
-                    message_id=message_id,
-                    reasoning=chat_pb2.ReasoningDelta(content=event_part.content),
-                )
+                if event_part.content:
+                    yield chat_pb2.StreamChatResponse(
+                        message_id=message_id,
+                        reasoning=chat_pb2.ReasoningDelta(content=event_part.content),
+                    )
         elif isinstance(event, PartDeltaEvent):
             event_delta: ModelResponsePartDelta = event.delta
             if isinstance(event_delta, TextPartDelta):
@@ -69,12 +69,13 @@ async def parse_agent_stream_event(
                     text=chat_pb2.TextDelta(content=event_delta.content_delta),
                 )
             elif isinstance(event_delta, ThinkingPartDelta):
-                yield chat_pb2.StreamChatResponse(
-                    message_id=message_id,
-                    reasoning=chat_pb2.ReasoningDelta(
-                        content=event_delta.content_delta
-                    ),
-                )
+                if event_delta.content_delta:
+                    yield chat_pb2.StreamChatResponse(
+                        message_id=message_id,
+                        reasoning=chat_pb2.ReasoningDelta(
+                            content=event_delta.content_delta
+                        ),
+                    )
         elif isinstance(event, PartEndEvent):
             final_event_part: ModelResponsePart = event.part
             if isinstance(final_event_part, ToolCallPart):

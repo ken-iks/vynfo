@@ -2,98 +2,120 @@
 // @generated from file proto/v1/inter/agent_runtime/chat.proto (package v1.inter.agent_runtime, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type {
+  GenEnum,
+  GenFile,
+  GenMessage,
+  GenService,
+} from "@bufbuild/protobuf/codegenv2";
+import {
+  enumDesc,
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file proto/v1/inter/agent_runtime/chat.proto.
  */
-export const file_proto_v1_inter_agent_runtime_chat: GenFile = /*@__PURE__*/
-  fileDesc("Cidwcm90by92MS9pbnRlci9hZ2VudF9ydW50aW1lL2NoYXQucHJvdG8SFnYxLmludGVyLmFnZW50X3J1bnRpbWUibgoRU3RyZWFtQ2hhdFJlcXVlc3QSDgoGcHJvbXB0GAEgASgJEiIKGnByZXZpb3VzX2NvbnZlcnNhdGlvbl9ydW5zGAIgAygJEg8KB3VzZXJfaWQYAyABKAkSFAoMd29ya3NwYWNlX2lkGAQgASgJIpYCChJTdHJlYW1DaGF0UmVzcG9uc2USEgoKbWVzc2FnZV9pZBgBIAEoCRIxCgR0ZXh0GAIgASgLMiEudjEuaW50ZXIuYWdlbnRfcnVudGltZS5UZXh0RGVsdGFIABI7CglyZWFzb25pbmcYAyABKAsyJi52MS5pbnRlci5hZ2VudF9ydW50aW1lLlJlYXNvbmluZ0RlbHRhSAASPgoJdG9vbF9jYWxsGAQgASgLMikudjEuaW50ZXIuYWdlbnRfcnVudGltZS5TdHJlYW1pbmdUb29sQ2FsbEgAEjQKCGZpbmlzaGVkGAUgASgLMiAudjEuaW50ZXIuYWdlbnRfcnVudGltZS5GaW5pc2hlZEgAQgYKBGJvZHkiJgoUR2VuZXJhdGVUaXRsZVJlcXVlc3QSDgoGcHJvbXB0GAEgASgJIiYKFUdlbmVyYXRlVGl0bGVSZXNwb25zZRINCgV0aXRsZRgCIAEoCSIcCglUZXh0RGVsdGESDwoHY29udGVudBgBIAEoCSIhCg5SZWFzb25pbmdEZWx0YRIPCgdjb250ZW50GAEgASgJIosBCgtSdW5NZXRhZGF0YRIUCgxpbnB1dF90b2tlbnMYASABKA0SFQoNb3V0cHV0X3Rva2VucxgCIAEoDRIYChByZWFzb25pbmdfdG9rZW5zGAMgASgNEh0KFW51bV9wcm92aWRlcl9yZXF1ZXN0cxgEIAEoDRIWCg5udW1fdG9vbF9jYWxscxgFIAEoDSKxAQoIRmluaXNoZWQSQQoMbmV3X21lc3NhZ2VzGAEgAygLMisudjEuaW50ZXIuYWdlbnRfcnVudGltZS5Db21wbGV0ZWRSdW5NZXNzYWdlEjkKDHJ1bl9tZXRhZGF0YRgCIAEoCzIjLnYxLmludGVyLmFnZW50X3J1bnRpbWUuUnVuTWV0YWRhdGESJwofcnVudGltZV9jb252ZXJ0YWJsZV9qc29uX3N0cmluZxgDIAEoCSIeCgtVc2VyTWVzc2FnZRIPCgdjb250ZW50GAEgASgJIqgBChRBc3Npc3RhbnRNZXNzYWdlUGFydBIWCgx0ZXh0X3JlZ3VsYXIYASABKAlIABIYCg50ZXh0X3JlYXNvbmluZxgCIAEoCUgAEhMKCWltYWdlX3VybBgDIAEoCUgAEj4KCXRvb2xfY2FsbBgEIAEoCzIpLnYxLmludGVyLmFnZW50X3J1bnRpbWUuQ29tcGxldGVkVG9vbENhbGxIAEIJCgdjb250ZW50Ik8KEEFzc2lzdGFudE1lc3NhZ2USOwoFcGFydHMYASADKAsyLC52MS5pbnRlci5hZ2VudF9ydW50aW1lLkFzc2lzdGFudE1lc3NhZ2VQYXJ0IpEBChNDb21wbGV0ZWRSdW5NZXNzYWdlEjMKBHVzZXIYASABKAsyIy52MS5pbnRlci5hZ2VudF9ydW50aW1lLlVzZXJNZXNzYWdlSAASPQoJYXNzaXN0YW50GAIgASgLMigudjEuaW50ZXIuYWdlbnRfcnVudGltZS5Bc3Npc3RhbnRNZXNzYWdlSABCBgoEa2luZCIeCg1Ub29sV2ViU2VhcmNoEg0KBXF1ZXJ5GAEgASgJIiAKEFRvb2xGZXRjaFdlYlBhZ2USDAoEdXJscxgCIAMoCSKPAQoIVG9vbENhbGwSOwoKd2ViX3NlYXJjaBgBIAEoCzIlLnYxLmludGVyLmFnZW50X3J1bnRpbWUuVG9vbFdlYlNlYXJjaEgAEj4KCnBhZ2VfZmV0Y2gYAiABKAsyKC52MS5pbnRlci5hZ2VudF9ydW50aW1lLlRvb2xGZXRjaFdlYlBhZ2VIAEIGCgRraW5kIsUBChFTdHJlYW1pbmdUb29sQ2FsbBI2CgZzdGF0dXMYASABKA4yJi52MS5pbnRlci5hZ2VudF9ydW50aW1lLlRvb2xDYWxsU3RhdHVzEi4KBGNhbGwYAiABKAsyIC52MS5pbnRlci5hZ2VudF9ydW50aW1lLlRvb2xDYWxsEh0KEGNhbGxfcmV0dXJuX2pzb24YAyABKAlIAIgBARIUCgx0b29sX2NhbGxfaWQYBCABKAlCEwoRX2NhbGxfcmV0dXJuX2pzb24icwoRQ29tcGxldGVkVG9vbENhbGwSLgoEY2FsbBgBIAEoCzIgLnYxLmludGVyLmFnZW50X3J1bnRpbWUuVG9vbENhbGwSGAoQY2FsbF9yZXR1cm5fanNvbhgCIAEoCRIUCgx0b29sX2NhbGxfaWQYAyABKAkqrAEKDlRvb2xDYWxsU3RhdHVzEiAKHFRPT0xfQ0FMTF9TVEFUVVNfVU5TUEVDSUZJRUQQABIeChpUT09MX0NBTExfU1RBVFVTX1JFUVVFU1RFRBABEh0KGVRPT0xfQ0FMTF9TVEFUVVNfQ09NUExFVEUQAhIbChdUT09MX0NBTExfU1RBVFVTX0RFTklFRBADEhwKGFRPT0xfQ0FMTF9TVEFUVVNfRVJST1JFRBAEMuIBCgtDaGF0U2VydmljZRJlCgpTdHJlYW1DaGF0EikudjEuaW50ZXIuYWdlbnRfcnVudGltZS5TdHJlYW1DaGF0UmVxdWVzdBoqLnYxLmludGVyLmFnZW50X3J1bnRpbWUuU3RyZWFtQ2hhdFJlc3BvbnNlMAESbAoNR2VuZXJhdGVUaXRsZRIsLnYxLmludGVyLmFnZW50X3J1bnRpbWUuR2VuZXJhdGVUaXRsZVJlcXVlc3QaLS52MS5pbnRlci5hZ2VudF9ydW50aW1lLkdlbmVyYXRlVGl0bGVSZXNwb25zZUIyWjB2eW5mby5jb20vdnluZm8vZ2VuL3Byb3RvL3YxL2ludGVyL2FnZW50X3J1bnRpbWViBnByb3RvMw");
+export const file_proto_v1_inter_agent_runtime_chat: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    "Cidwcm90by92MS9pbnRlci9hZ2VudF9ydW50aW1lL2NoYXQucHJvdG8SFnYxLmludGVyLmFnZW50X3J1bnRpbWUibgoRU3RyZWFtQ2hhdFJlcXVlc3QSDgoGcHJvbXB0GAEgASgJEiIKGnByZXZpb3VzX2NvbnZlcnNhdGlvbl9ydW5zGAIgAygJEg8KB3VzZXJfaWQYAyABKAkSFAoMd29ya3NwYWNlX2lkGAQgASgJIpYCChJTdHJlYW1DaGF0UmVzcG9uc2USEgoKbWVzc2FnZV9pZBgBIAEoCRIxCgR0ZXh0GAIgASgLMiEudjEuaW50ZXIuYWdlbnRfcnVudGltZS5UZXh0RGVsdGFIABI7CglyZWFzb25pbmcYAyABKAsyJi52MS5pbnRlci5hZ2VudF9ydW50aW1lLlJlYXNvbmluZ0RlbHRhSAASPgoJdG9vbF9jYWxsGAQgASgLMikudjEuaW50ZXIuYWdlbnRfcnVudGltZS5TdHJlYW1pbmdUb29sQ2FsbEgAEjQKCGZpbmlzaGVkGAUgASgLMiAudjEuaW50ZXIuYWdlbnRfcnVudGltZS5GaW5pc2hlZEgAQgYKBGJvZHkiJgoUR2VuZXJhdGVUaXRsZVJlcXVlc3QSDgoGcHJvbXB0GAEgASgJIiYKFUdlbmVyYXRlVGl0bGVSZXNwb25zZRINCgV0aXRsZRgCIAEoCSIcCglUZXh0RGVsdGESDwoHY29udGVudBgBIAEoCSIhCg5SZWFzb25pbmdEZWx0YRIPCgdjb250ZW50GAEgASgJIosBCgtSdW5NZXRhZGF0YRIUCgxpbnB1dF90b2tlbnMYASABKA0SFQoNb3V0cHV0X3Rva2VucxgCIAEoDRIYChByZWFzb25pbmdfdG9rZW5zGAMgASgNEh0KFW51bV9wcm92aWRlcl9yZXF1ZXN0cxgEIAEoDRIWCg5udW1fdG9vbF9jYWxscxgFIAEoDSKxAQoIRmluaXNoZWQSQQoMbmV3X21lc3NhZ2VzGAEgAygLMisudjEuaW50ZXIuYWdlbnRfcnVudGltZS5Db21wbGV0ZWRSdW5NZXNzYWdlEjkKDHJ1bl9tZXRhZGF0YRgCIAEoCzIjLnYxLmludGVyLmFnZW50X3J1bnRpbWUuUnVuTWV0YWRhdGESJwofcnVudGltZV9jb252ZXJ0YWJsZV9qc29uX3N0cmluZxgDIAEoCSIeCgtVc2VyTWVzc2FnZRIPCgdjb250ZW50GAEgASgJIqgBChRBc3Npc3RhbnRNZXNzYWdlUGFydBIWCgx0ZXh0X3JlZ3VsYXIYASABKAlIABIYCg50ZXh0X3JlYXNvbmluZxgCIAEoCUgAEhMKCWltYWdlX3VybBgDIAEoCUgAEj4KCXRvb2xfY2FsbBgEIAEoCzIpLnYxLmludGVyLmFnZW50X3J1bnRpbWUuQ29tcGxldGVkVG9vbENhbGxIAEIJCgdjb250ZW50Ik8KEEFzc2lzdGFudE1lc3NhZ2USOwoFcGFydHMYASADKAsyLC52MS5pbnRlci5hZ2VudF9ydW50aW1lLkFzc2lzdGFudE1lc3NhZ2VQYXJ0IpEBChNDb21wbGV0ZWRSdW5NZXNzYWdlEjMKBHVzZXIYASABKAsyIy52MS5pbnRlci5hZ2VudF9ydW50aW1lLlVzZXJNZXNzYWdlSAASPQoJYXNzaXN0YW50GAIgASgLMigudjEuaW50ZXIuYWdlbnRfcnVudGltZS5Bc3Npc3RhbnRNZXNzYWdlSABCBgoEa2luZCIeCg1Ub29sV2ViU2VhcmNoEg0KBXF1ZXJ5GAEgASgJIiAKEFRvb2xGZXRjaFdlYlBhZ2USDAoEdXJscxgCIAMoCSKPAQoIVG9vbENhbGwSOwoKd2ViX3NlYXJjaBgBIAEoCzIlLnYxLmludGVyLmFnZW50X3J1bnRpbWUuVG9vbFdlYlNlYXJjaEgAEj4KCnBhZ2VfZmV0Y2gYAiABKAsyKC52MS5pbnRlci5hZ2VudF9ydW50aW1lLlRvb2xGZXRjaFdlYlBhZ2VIAEIGCgRraW5kIsUBChFTdHJlYW1pbmdUb29sQ2FsbBI2CgZzdGF0dXMYASABKA4yJi52MS5pbnRlci5hZ2VudF9ydW50aW1lLlRvb2xDYWxsU3RhdHVzEi4KBGNhbGwYAiABKAsyIC52MS5pbnRlci5hZ2VudF9ydW50aW1lLlRvb2xDYWxsEh0KEGNhbGxfcmV0dXJuX2pzb24YAyABKAlIAIgBARIUCgx0b29sX2NhbGxfaWQYBCABKAlCEwoRX2NhbGxfcmV0dXJuX2pzb24icwoRQ29tcGxldGVkVG9vbENhbGwSLgoEY2FsbBgBIAEoCzIgLnYxLmludGVyLmFnZW50X3J1bnRpbWUuVG9vbENhbGwSGAoQY2FsbF9yZXR1cm5fanNvbhgCIAEoCRIUCgx0b29sX2NhbGxfaWQYAyABKAkqrAEKDlRvb2xDYWxsU3RhdHVzEiAKHFRPT0xfQ0FMTF9TVEFUVVNfVU5TUEVDSUZJRUQQABIeChpUT09MX0NBTExfU1RBVFVTX1JFUVVFU1RFRBABEh0KGVRPT0xfQ0FMTF9TVEFUVVNfQ09NUExFVEUQAhIbChdUT09MX0NBTExfU1RBVFVTX0RFTklFRBADEhwKGFRPT0xfQ0FMTF9TVEFUVVNfRVJST1JFRBAEMuIBCgtDaGF0U2VydmljZRJlCgpTdHJlYW1DaGF0EikudjEuaW50ZXIuYWdlbnRfcnVudGltZS5TdHJlYW1DaGF0UmVxdWVzdBoqLnYxLmludGVyLmFnZW50X3J1bnRpbWUuU3RyZWFtQ2hhdFJlc3BvbnNlMAESbAoNR2VuZXJhdGVUaXRsZRIsLnYxLmludGVyLmFnZW50X3J1bnRpbWUuR2VuZXJhdGVUaXRsZVJlcXVlc3QaLS52MS5pbnRlci5hZ2VudF9ydW50aW1lLkdlbmVyYXRlVGl0bGVSZXNwb25zZUIyWjB2eW5mby5jb20vdnluZm8vZ2VuL3Byb3RvL3YxL2ludGVyL2FnZW50X3J1bnRpbWViBnByb3RvMw",
+  );
 
 /**
  * @generated from message v1.inter.agent_runtime.StreamChatRequest
  */
-export type StreamChatRequest = Message<"v1.inter.agent_runtime.StreamChatRequest"> & {
-  /**
-   * @generated from field: string prompt = 1;
-   */
-  prompt: string;
+export type StreamChatRequest =
+  Message<"v1.inter.agent_runtime.StreamChatRequest"> & {
+    /**
+     * @generated from field: string prompt = 1;
+     */
+    prompt: string;
 
-  /**
-   * previous conversation runs are a json strings that are
-   * converted into the runtime message history for the agent run
-   * NOTE: these are the same objects that are returned on Finish
-   *
-   * @generated from field: repeated string previous_conversation_runs = 2;
-   */
-  previousConversationRuns: string[];
+    /**
+     * previous conversation runs are a json strings that are
+     * converted into the runtime message history for the agent run
+     * NOTE: these are the same objects that are returned on Finish
+     *
+     * @generated from field: repeated string previous_conversation_runs = 2;
+     */
+    previousConversationRuns: string[];
 
-  /**
-   * only whitelisted users are able to send agent messages for now
-   *
-   * @generated from field: string user_id = 3;
-   */
-  userId: string;
+    /**
+     * only whitelisted users are able to send agent messages for now
+     *
+     * @generated from field: string user_id = 3;
+     */
+    userId: string;
 
-  /**
-   * @generated from field: string workspace_id = 4;
-   */
-  workspaceId: string;
-};
+    /**
+     * @generated from field: string workspace_id = 4;
+     */
+    workspaceId: string;
+  };
 
 /**
  * Describes the message v1.inter.agent_runtime.StreamChatRequest.
  * Use `create(StreamChatRequestSchema)` to create a new message.
  */
-export const StreamChatRequestSchema: GenMessage<StreamChatRequest> = /*@__PURE__*/
+export const StreamChatRequestSchema: GenMessage<StreamChatRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 0);
 
 /**
  * @generated from message v1.inter.agent_runtime.StreamChatResponse
  */
-export type StreamChatResponse = Message<"v1.inter.agent_runtime.StreamChatResponse"> & {
-  /**
-   * @generated from field: string message_id = 1;
-   */
-  messageId: string;
+export type StreamChatResponse =
+  Message<"v1.inter.agent_runtime.StreamChatResponse"> & {
+    /**
+     * @generated from field: string message_id = 1;
+     */
+    messageId: string;
 
-  /**
-   * @generated from oneof v1.inter.agent_runtime.StreamChatResponse.body
-   */
-  body: {
     /**
-     * @generated from field: v1.inter.agent_runtime.TextDelta text = 2;
+     * @generated from oneof v1.inter.agent_runtime.StreamChatResponse.body
      */
-    value: TextDelta;
-    case: "text";
-  } | {
-    /**
-     * @generated from field: v1.inter.agent_runtime.ReasoningDelta reasoning = 3;
-     */
-    value: ReasoningDelta;
-    case: "reasoning";
-  } | {
-    /**
-     * @generated from field: v1.inter.agent_runtime.StreamingToolCall tool_call = 4;
-     */
-    value: StreamingToolCall;
-    case: "toolCall";
-  } | {
-    /**
-     * @generated from field: v1.inter.agent_runtime.Finished finished = 5;
-     */
-    value: Finished;
-    case: "finished";
-  } | { case: undefined; value?: undefined };
-};
+    body:
+      | {
+          /**
+           * @generated from field: v1.inter.agent_runtime.TextDelta text = 2;
+           */
+          value: TextDelta;
+          case: "text";
+        }
+      | {
+          /**
+           * @generated from field: v1.inter.agent_runtime.ReasoningDelta reasoning = 3;
+           */
+          value: ReasoningDelta;
+          case: "reasoning";
+        }
+      | {
+          /**
+           * @generated from field: v1.inter.agent_runtime.StreamingToolCall tool_call = 4;
+           */
+          value: StreamingToolCall;
+          case: "toolCall";
+        }
+      | {
+          /**
+           * @generated from field: v1.inter.agent_runtime.Finished finished = 5;
+           */
+          value: Finished;
+          case: "finished";
+        }
+      | { case: undefined; value?: undefined };
+  };
 
 /**
  * Describes the message v1.inter.agent_runtime.StreamChatResponse.
  * Use `create(StreamChatResponseSchema)` to create a new message.
  */
-export const StreamChatResponseSchema: GenMessage<StreamChatResponse> = /*@__PURE__*/
+export const StreamChatResponseSchema: GenMessage<StreamChatResponse> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 1);
 
 /**
@@ -102,35 +124,39 @@ export const StreamChatResponseSchema: GenMessage<StreamChatResponse> = /*@__PUR
  *
  * @generated from message v1.inter.agent_runtime.GenerateTitleRequest
  */
-export type GenerateTitleRequest = Message<"v1.inter.agent_runtime.GenerateTitleRequest"> & {
-  /**
-   * @generated from field: string prompt = 1;
-   */
-  prompt: string;
-};
+export type GenerateTitleRequest =
+  Message<"v1.inter.agent_runtime.GenerateTitleRequest"> & {
+    /**
+     * @generated from field: string prompt = 1;
+     */
+    prompt: string;
+  };
 
 /**
  * Describes the message v1.inter.agent_runtime.GenerateTitleRequest.
  * Use `create(GenerateTitleRequestSchema)` to create a new message.
  */
-export const GenerateTitleRequestSchema: GenMessage<GenerateTitleRequest> = /*@__PURE__*/
+export const GenerateTitleRequestSchema: GenMessage<GenerateTitleRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 2);
 
 /**
  * @generated from message v1.inter.agent_runtime.GenerateTitleResponse
  */
-export type GenerateTitleResponse = Message<"v1.inter.agent_runtime.GenerateTitleResponse"> & {
-  /**
-   * @generated from field: string title = 2;
-   */
-  title: string;
-};
+export type GenerateTitleResponse =
+  Message<"v1.inter.agent_runtime.GenerateTitleResponse"> & {
+    /**
+     * @generated from field: string title = 2;
+     */
+    title: string;
+  };
 
 /**
  * Describes the message v1.inter.agent_runtime.GenerateTitleResponse.
  * Use `create(GenerateTitleResponseSchema)` to create a new message.
  */
-export const GenerateTitleResponseSchema: GenMessage<GenerateTitleResponse> = /*@__PURE__*/
+export const GenerateTitleResponseSchema: GenMessage<GenerateTitleResponse> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 3);
 
 /**
@@ -149,24 +175,27 @@ export type TextDelta = Message<"v1.inter.agent_runtime.TextDelta"> & {
  * Describes the message v1.inter.agent_runtime.TextDelta.
  * Use `create(TextDeltaSchema)` to create a new message.
  */
-export const TextDeltaSchema: GenMessage<TextDelta> = /*@__PURE__*/
+export const TextDeltaSchema: GenMessage<TextDelta> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 4);
 
 /**
  * @generated from message v1.inter.agent_runtime.ReasoningDelta
  */
-export type ReasoningDelta = Message<"v1.inter.agent_runtime.ReasoningDelta"> & {
-  /**
-   * @generated from field: string content = 1;
-   */
-  content: string;
-};
+export type ReasoningDelta =
+  Message<"v1.inter.agent_runtime.ReasoningDelta"> & {
+    /**
+     * @generated from field: string content = 1;
+     */
+    content: string;
+  };
 
 /**
  * Describes the message v1.inter.agent_runtime.ReasoningDelta.
  * Use `create(ReasoningDeltaSchema)` to create a new message.
  */
-export const ReasoningDeltaSchema: GenMessage<ReasoningDelta> = /*@__PURE__*/
+export const ReasoningDeltaSchema: GenMessage<ReasoningDelta> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 5);
 
 /**
@@ -203,7 +232,8 @@ export type RunMetadata = Message<"v1.inter.agent_runtime.RunMetadata"> & {
  * Describes the message v1.inter.agent_runtime.RunMetadata.
  * Use `create(RunMetadataSchema)` to create a new message.
  */
-export const RunMetadataSchema: GenMessage<RunMetadata> = /*@__PURE__*/
+export const RunMetadataSchema: GenMessage<RunMetadata> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 6);
 
 /**
@@ -235,7 +265,8 @@ export type Finished = Message<"v1.inter.agent_runtime.Finished"> & {
  * Describes the message v1.inter.agent_runtime.Finished.
  * Use `create(FinishedSchema)` to create a new message.
  */
-export const FinishedSchema: GenMessage<Finished> = /*@__PURE__*/
+export const FinishedSchema: GenMessage<Finished> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 7);
 
 /**
@@ -254,96 +285,111 @@ export type UserMessage = Message<"v1.inter.agent_runtime.UserMessage"> & {
  * Describes the message v1.inter.agent_runtime.UserMessage.
  * Use `create(UserMessageSchema)` to create a new message.
  */
-export const UserMessageSchema: GenMessage<UserMessage> = /*@__PURE__*/
+export const UserMessageSchema: GenMessage<UserMessage> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 8);
 
 /**
  * @generated from message v1.inter.agent_runtime.AssistantMessagePart
  */
-export type AssistantMessagePart = Message<"v1.inter.agent_runtime.AssistantMessagePart"> & {
-  /**
-   * @generated from oneof v1.inter.agent_runtime.AssistantMessagePart.content
-   */
-  content: {
+export type AssistantMessagePart =
+  Message<"v1.inter.agent_runtime.AssistantMessagePart"> & {
     /**
-     * @generated from field: string text_regular = 1;
+     * @generated from oneof v1.inter.agent_runtime.AssistantMessagePart.content
      */
-    value: string;
-    case: "textRegular";
-  } | {
-    /**
-     * @generated from field: string text_reasoning = 2;
-     */
-    value: string;
-    case: "textReasoning";
-  } | {
-    /**
-     * image url must be signed!
-     *
-     * @generated from field: string image_url = 3;
-     */
-    value: string;
-    case: "imageUrl";
-  } | {
-    /**
-     * @generated from field: v1.inter.agent_runtime.CompletedToolCall tool_call = 4;
-     */
-    value: CompletedToolCall;
-    case: "toolCall";
-  } | { case: undefined; value?: undefined };
-};
+    content:
+      | {
+          /**
+           * @generated from field: string text_regular = 1;
+           */
+          value: string;
+          case: "textRegular";
+        }
+      | {
+          /**
+           * @generated from field: string text_reasoning = 2;
+           */
+          value: string;
+          case: "textReasoning";
+        }
+      | {
+          /**
+           * image url must be signed!
+           *
+           * @generated from field: string image_url = 3;
+           */
+          value: string;
+          case: "imageUrl";
+        }
+      | {
+          /**
+           * @generated from field: v1.inter.agent_runtime.CompletedToolCall tool_call = 4;
+           */
+          value: CompletedToolCall;
+          case: "toolCall";
+        }
+      | { case: undefined; value?: undefined };
+  };
 
 /**
  * Describes the message v1.inter.agent_runtime.AssistantMessagePart.
  * Use `create(AssistantMessagePartSchema)` to create a new message.
  */
-export const AssistantMessagePartSchema: GenMessage<AssistantMessagePart> = /*@__PURE__*/
+export const AssistantMessagePartSchema: GenMessage<AssistantMessagePart> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 9);
 
 /**
  * @generated from message v1.inter.agent_runtime.AssistantMessage
  */
-export type AssistantMessage = Message<"v1.inter.agent_runtime.AssistantMessage"> & {
-  /**
-   * @generated from field: repeated v1.inter.agent_runtime.AssistantMessagePart parts = 1;
-   */
-  parts: AssistantMessagePart[];
-};
+export type AssistantMessage =
+  Message<"v1.inter.agent_runtime.AssistantMessage"> & {
+    /**
+     * @generated from field: repeated v1.inter.agent_runtime.AssistantMessagePart parts = 1;
+     */
+    parts: AssistantMessagePart[];
+  };
 
 /**
  * Describes the message v1.inter.agent_runtime.AssistantMessage.
  * Use `create(AssistantMessageSchema)` to create a new message.
  */
-export const AssistantMessageSchema: GenMessage<AssistantMessage> = /*@__PURE__*/
+export const AssistantMessageSchema: GenMessage<AssistantMessage> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 10);
 
 /**
  * @generated from message v1.inter.agent_runtime.CompletedRunMessage
  */
-export type CompletedRunMessage = Message<"v1.inter.agent_runtime.CompletedRunMessage"> & {
-  /**
-   * @generated from oneof v1.inter.agent_runtime.CompletedRunMessage.kind
-   */
-  kind: {
+export type CompletedRunMessage =
+  Message<"v1.inter.agent_runtime.CompletedRunMessage"> & {
     /**
-     * @generated from field: v1.inter.agent_runtime.UserMessage user = 1;
+     * @generated from oneof v1.inter.agent_runtime.CompletedRunMessage.kind
      */
-    value: UserMessage;
-    case: "user";
-  } | {
-    /**
-     * @generated from field: v1.inter.agent_runtime.AssistantMessage assistant = 2;
-     */
-    value: AssistantMessage;
-    case: "assistant";
-  } | { case: undefined; value?: undefined };
-};
+    kind:
+      | {
+          /**
+           * @generated from field: v1.inter.agent_runtime.UserMessage user = 1;
+           */
+          value: UserMessage;
+          case: "user";
+        }
+      | {
+          /**
+           * @generated from field: v1.inter.agent_runtime.AssistantMessage assistant = 2;
+           */
+          value: AssistantMessage;
+          case: "assistant";
+        }
+      | { case: undefined; value?: undefined };
+  };
 
 /**
  * Describes the message v1.inter.agent_runtime.CompletedRunMessage.
  * Use `create(CompletedRunMessageSchema)` to create a new message.
  */
-export const CompletedRunMessageSchema: GenMessage<CompletedRunMessage> = /*@__PURE__*/
+export const CompletedRunMessageSchema: GenMessage<CompletedRunMessage> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 11);
 
 /**
@@ -362,24 +408,27 @@ export type ToolWebSearch = Message<"v1.inter.agent_runtime.ToolWebSearch"> & {
  * Describes the message v1.inter.agent_runtime.ToolWebSearch.
  * Use `create(ToolWebSearchSchema)` to create a new message.
  */
-export const ToolWebSearchSchema: GenMessage<ToolWebSearch> = /*@__PURE__*/
+export const ToolWebSearchSchema: GenMessage<ToolWebSearch> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 12);
 
 /**
  * @generated from message v1.inter.agent_runtime.ToolFetchWebPage
  */
-export type ToolFetchWebPage = Message<"v1.inter.agent_runtime.ToolFetchWebPage"> & {
-  /**
-   * @generated from field: repeated string urls = 2;
-   */
-  urls: string[];
-};
+export type ToolFetchWebPage =
+  Message<"v1.inter.agent_runtime.ToolFetchWebPage"> & {
+    /**
+     * @generated from field: repeated string urls = 2;
+     */
+    urls: string[];
+  };
 
 /**
  * Describes the message v1.inter.agent_runtime.ToolFetchWebPage.
  * Use `create(ToolFetchWebPageSchema)` to create a new message.
  */
-export const ToolFetchWebPageSchema: GenMessage<ToolFetchWebPage> = /*@__PURE__*/
+export const ToolFetchWebPageSchema: GenMessage<ToolFetchWebPage> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 13);
 
 /**
@@ -391,85 +440,93 @@ export type ToolCall = Message<"v1.inter.agent_runtime.ToolCall"> & {
   /**
    * @generated from oneof v1.inter.agent_runtime.ToolCall.kind
    */
-  kind: {
-    /**
-     * @generated from field: v1.inter.agent_runtime.ToolWebSearch web_search = 1;
-     */
-    value: ToolWebSearch;
-    case: "webSearch";
-  } | {
-    /**
-     * @generated from field: v1.inter.agent_runtime.ToolFetchWebPage page_fetch = 2;
-     */
-    value: ToolFetchWebPage;
-    case: "pageFetch";
-  } | { case: undefined; value?: undefined };
+  kind:
+    | {
+        /**
+         * @generated from field: v1.inter.agent_runtime.ToolWebSearch web_search = 1;
+         */
+        value: ToolWebSearch;
+        case: "webSearch";
+      }
+    | {
+        /**
+         * @generated from field: v1.inter.agent_runtime.ToolFetchWebPage page_fetch = 2;
+         */
+        value: ToolFetchWebPage;
+        case: "pageFetch";
+      }
+    | { case: undefined; value?: undefined };
 };
 
 /**
  * Describes the message v1.inter.agent_runtime.ToolCall.
  * Use `create(ToolCallSchema)` to create a new message.
  */
-export const ToolCallSchema: GenMessage<ToolCall> = /*@__PURE__*/
+export const ToolCallSchema: GenMessage<ToolCall> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 14);
 
 /**
  * @generated from message v1.inter.agent_runtime.StreamingToolCall
  */
-export type StreamingToolCall = Message<"v1.inter.agent_runtime.StreamingToolCall"> & {
-  /**
-   * @generated from field: v1.inter.agent_runtime.ToolCallStatus status = 1;
-   */
-  status: ToolCallStatus;
+export type StreamingToolCall =
+  Message<"v1.inter.agent_runtime.StreamingToolCall"> & {
+    /**
+     * @generated from field: v1.inter.agent_runtime.ToolCallStatus status = 1;
+     */
+    status: ToolCallStatus;
 
-  /**
-   * @generated from field: v1.inter.agent_runtime.ToolCall call = 2;
-   */
-  call?: ToolCall;
+    /**
+     * @generated from field: v1.inter.agent_runtime.ToolCall call = 2;
+     */
+    call?: ToolCall;
 
-  /**
-   * @generated from field: optional string call_return_json = 3;
-   */
-  callReturnJson?: string;
+    /**
+     * @generated from field: optional string call_return_json = 3;
+     */
+    callReturnJson?: string;
 
-  /**
-   * @generated from field: string tool_call_id = 4;
-   */
-  toolCallId: string;
-};
+    /**
+     * @generated from field: string tool_call_id = 4;
+     */
+    toolCallId: string;
+  };
 
 /**
  * Describes the message v1.inter.agent_runtime.StreamingToolCall.
  * Use `create(StreamingToolCallSchema)` to create a new message.
  */
-export const StreamingToolCallSchema: GenMessage<StreamingToolCall> = /*@__PURE__*/
+export const StreamingToolCallSchema: GenMessage<StreamingToolCall> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 15);
 
 /**
  * @generated from message v1.inter.agent_runtime.CompletedToolCall
  */
-export type CompletedToolCall = Message<"v1.inter.agent_runtime.CompletedToolCall"> & {
-  /**
-   * @generated from field: v1.inter.agent_runtime.ToolCall call = 1;
-   */
-  call?: ToolCall;
+export type CompletedToolCall =
+  Message<"v1.inter.agent_runtime.CompletedToolCall"> & {
+    /**
+     * @generated from field: v1.inter.agent_runtime.ToolCall call = 1;
+     */
+    call?: ToolCall;
 
-  /**
-   * @generated from field: string call_return_json = 2;
-   */
-  callReturnJson: string;
+    /**
+     * @generated from field: string call_return_json = 2;
+     */
+    callReturnJson: string;
 
-  /**
-   * @generated from field: string tool_call_id = 3;
-   */
-  toolCallId: string;
-};
+    /**
+     * @generated from field: string tool_call_id = 3;
+     */
+    toolCallId: string;
+  };
 
 /**
  * Describes the message v1.inter.agent_runtime.CompletedToolCall.
  * Use `create(CompletedToolCallSchema)` to create a new message.
  */
-export const CompletedToolCallSchema: GenMessage<CompletedToolCall> = /*@__PURE__*/
+export const CompletedToolCallSchema: GenMessage<CompletedToolCall> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_inter_agent_runtime_chat, 16);
 
 /**
@@ -505,7 +562,8 @@ export enum ToolCallStatus {
 /**
  * Describes the enum v1.inter.agent_runtime.ToolCallStatus.
  */
-export const ToolCallStatusSchema: GenEnum<ToolCallStatus> = /*@__PURE__*/
+export const ToolCallStatusSchema: GenEnum<ToolCallStatus> =
+  /*@__PURE__*/
   enumDesc(file_proto_v1_inter_agent_runtime_chat, 0);
 
 /**
@@ -519,7 +577,7 @@ export const ChatService: GenService<{
     methodKind: "server_streaming";
     input: typeof StreamChatRequestSchema;
     output: typeof StreamChatResponseSchema;
-  },
+  };
   /**
    * @generated from rpc v1.inter.agent_runtime.ChatService.GenerateTitle
    */
@@ -527,7 +585,5 @@ export const ChatService: GenService<{
     methodKind: "unary";
     input: typeof GenerateTitleRequestSchema;
     output: typeof GenerateTitleResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_proto_v1_inter_agent_runtime_chat, 0);
-
+  };
+}> = /*@__PURE__*/ serviceDesc(file_proto_v1_inter_agent_runtime_chat, 0);

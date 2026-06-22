@@ -1,20 +1,28 @@
 from dotenv import load_dotenv
 import pytest
 from tavily import TavilyClient
+from unittest.mock import Mock
 
 from mensah.agent import VynfoAgentDeps
 from tests.stubs import FakeServicerContext
 from mensah.clients import Clients
 from mensah.servicer import AgentRuntimeServicer
+from proto.v1.inter.agent_backend.backend_pb2 import AuthenticateUserAndPromptResponse
 from proto.v1.inter.agent_runtime.chat_pb2 import StreamChatRequest
 
 
 @pytest.fixture
-def servicer():
+def servicer(monkeypatch: pytest.MonkeyPatch):
     load_dotenv()
-    return AgentRuntimeServicer(
-        clients=Clients("localhost:50052"), deps=VynfoAgentDeps(TavilyClient())
+    clients = Clients("localhost:50052")
+    # we patch auth so that we can run the service uninterrupted without
+    # a live user
+    monkeypatch.setattr(
+        clients.agent_backend_service,
+        "AuthenticateUserAndPrompt",
+        Mock(return_value=AuthenticateUserAndPromptResponse(valid=True)),
     )
+    return AgentRuntimeServicer(clients=clients, deps=VynfoAgentDeps(TavilyClient()))
 
 
 @pytest.fixture

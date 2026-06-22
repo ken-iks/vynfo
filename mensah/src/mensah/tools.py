@@ -13,9 +13,7 @@ def resolve_tool_call(name: str, args_as_dict: dict[str, Any]) -> chat_pb2.ToolC
         return chat_pb2.ToolCall(web_search=chat_pb2.ToolWebSearch(query=args.query))
     elif name == "fetch_page":
         args = FetchPageArgs.model_validate(args_as_dict)
-        return chat_pb2.ToolCall(
-            page_fetch=chat_pb2.ToolFetchWebPage(urls=args.urls)
-        )
+        return chat_pb2.ToolCall(page_fetch=chat_pb2.ToolFetchWebPage(urls=args.urls))
     else:
         raise ValueError(f"Unknown tool called: {name} with args {args_as_dict}")
 

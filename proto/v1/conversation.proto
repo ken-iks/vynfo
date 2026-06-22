@@ -24,6 +24,25 @@ message SendAgentMessageRequest {
     string content = 1;
     string workspace_id = 2;
     string conversation_id = 3;
+    SendMessagePersistanceOptions persistance_options = 4;
+}
+
+message SendMessagePersistanceOptions {
+    // The client-side id of the existing message this new user message replies to.
+    // Chichi validates this id belongs to the conversation and stores the new user
+    // message as its child.
+    optional string parent_client_id = 1;
+
+    // The client-side id assistant-ui already assigned to the user message being
+    // sent. Chichi persists the matching user message row with this id so the
+    // message can be referenced before and after reload.
+    string client_id = 2;
+
+    // The client-side id assistant-ui assigned to the live generated assistant
+    // response. A Mensah run can contain intermediate persisted messages, but
+    // this id belongs only to the final assistant message represented by the
+    // streamed response in assistant-ui.
+    optional string response_client_id = 3;
 }
 
 message AIConversation {
@@ -76,6 +95,14 @@ message ListAIConversationMessagesRequest {
 }
 
 message ListAIConversationMessagesResponse {
-    repeated v1.inter.agent_runtime.CompletedRunMessage messages = 1;
+    repeated AIConversationMessageNode messages = 1;
+}
+
+message AIConversationMessageNode {
+    // Stable message id used by the frontend runtime.
+    string client_id = 1;
+    // Stable client id of this message's parent, if any.
+    optional string parent_client_id = 2;
+    v1.inter.agent_runtime.CompletedRunMessage message = 3;
 }
 

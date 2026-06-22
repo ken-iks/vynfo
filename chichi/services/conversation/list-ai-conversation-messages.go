@@ -46,14 +46,22 @@ func (c *ConversationServiceServer) ListAIConversationMessages(
 		slog.Error("error fetching ai conversation messages", "error", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
-	messages := make([]*agent_runtime.CompletedRunMessage, 0, len(rows))
+	messages := make([]*v1.AIConversationMessageNode, 0, len(rows))
 	for _, row := range rows {
 		message := &agent_runtime.CompletedRunMessage{}
 		if err := protojson.Unmarshal(row.MessageContentAsJson, message); err != nil {
 			slog.Error("error parsing message in db")
 			return nil, connect.NewError(connect.CodeInternal, err)
 		}
-		messages = append(messages, message)
+		node := &v1.AIConversationMessageNode{
+			ClientId: row.ClientID,
+			Message:  message,
+		}
+		if row.ParentClientID.Valid {
+			parentID := row.ParentClientID.String
+			node.ParentClientId = &parentID
+		}
+		messages = append(messages, node)
 	}
 
 	return connect.NewResponse(&v1.ListAIConversationMessagesResponse{

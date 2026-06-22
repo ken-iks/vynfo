@@ -4,3 +4,6 @@
 chichi/external/
 chichi/segments/
 .DS_Store
+
+__pycache__/
+*.py[cod]

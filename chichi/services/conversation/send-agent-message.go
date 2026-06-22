@@ -44,17 +44,36 @@ func (c *ConversationServiceServer) SendAgentMessage(
 	if !resp {
 		return connect.NewError(connect.CodeUnauthenticated, err)
 	}
-	previousRuns, err := c.queries.ListAIConversationRuns(
-		ctx,
-		db.ListAIConversationRunsParams{
-			ConversationID: conversationUUID,
-			Limit:          100,
-		},
-	)
-
+	persistanceOptions := req.Msg.GetPersistanceOptions()
+	parentID := uuid.NullUUID{}
+	if persistanceOptions != nil && persistanceOptions.ParentClientId != nil {
+		parentMessage, err := c.queries.GetAIConversationMessageForConversation(
+			ctx,
+			db.GetAIConversationMessageForConversationParams{
+				ClientID:       persistanceOptions.GetParentClientId(),
+				ConversationID: conversationUUID,
+			},
+		)
+		if err != nil {
+			return connect.NewError(connect.CodeInvalidArgument, err)
+		}
+		parentID = uuid.NullUUID{UUID: parentMessage.ID, Valid: true}
+	}
 	runMessages := []string{}
-	for _, run := range previousRuns {
-		runMessages = append(runMessages, run.RunMessages)
+	if parentID.Valid {
+		previousRuns, err := c.queries.ListAIConversationRunsForMessagePath(
+			ctx,
+			db.ListAIConversationRunsForMessagePathParams{
+				ID:             parentID.UUID,
+				ConversationID: conversationUUID,
+			},
+		)
+		if err != nil {
+			return connect.NewError(connect.CodeInternal, err)
+		}
+		for _, run := range previousRuns {
+			runMessages = append(runMessages, run.RunMessages)
+		}
 	}
 
 	// TODO: can maybe add the prompt auth to this path too
@@ -100,19 +119,53 @@ func (c *ConversationServiceServer) SendAgentMessage(
 				slog.Error("error creating new run")
 				return connect.NewError(connect.CodeInternal, err)
 			}
-			for _, message := range finished.GetNewMessages() {
+			newMessages := finished.GetNewMessages()
+			currentParentID := parentID
+			for i, message := range newMessages {
 				messageJson, err := protojson.Marshal(message)
 				if err != nil {
 					return connect.NewError(connect.CodeInternal, err)
 				}
-				_, err = p.AddAIConversationMessage(ctx, db.AddAIConversationMessageParams{
-					ConversationID:       conversationUUID,
-					RunID:                run.ID,
-					MessageContentAsJson: messageJson,
-				})
+				clientID := uuid.NewString()
+				if message.GetUser() != nil && persistanceOptions != nil &&
+					persistanceOptions.GetClientId() != "" {
+					clientID = persistanceOptions.GetClientId()
+				}
+				if message.GetAssistant() != nil && i == len(newMessages)-1 &&
+					persistanceOptions != nil &&
+					persistanceOptions.ResponseClientId != nil &&
+					persistanceOptions.GetResponseClientId() != "" {
+					clientID = persistanceOptions.GetResponseClientId()
+				}
+				position, err := p.NextAIConversationMessagePosition(
+					ctx,
+					db.NextAIConversationMessagePositionParams{
+						ConversationID: conversationUUID,
+						ParentID:       currentParentID,
+					},
+				)
+				if err != nil {
+					slog.Error("error resolving ai message position")
+					return connect.NewError(connect.CodeInternal, err)
+				}
+				insertedMessage, err := p.AddAIConversationMessage(
+					ctx,
+					db.AddAIConversationMessageParams{
+						ConversationID:       conversationUUID,
+						RunID:                run.ID,
+						MessageContentAsJson: messageJson,
+						ClientID:             clientID,
+						ParentID:             currentParentID,
+						Position:             position,
+					},
+				)
 				if err != nil {
 					slog.Error("error adding new message to ai messages table")
 					return connect.NewError(connect.CodeInternal, err)
+				}
+				currentParentID = uuid.NullUUID{
+					UUID:  insertedMessage.ID,
+					Valid: true,
 				}
 			}
 			if err := tx.Commit(); err != nil {

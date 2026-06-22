@@ -1,6 +1,13 @@
 from typing import Sequence
 
-from pydantic_ai import ModelMessage, ModelMessagesTypeAdapter, ModelRequest, ModelResponse, ToolCallPart, ToolReturnPart
+from pydantic_ai import (
+    ModelMessage,
+    ModelMessagesTypeAdapter,
+    ModelRequest,
+    ModelResponse,
+    ToolCallPart,
+    ToolReturnPart,
+)
 import pydantic_core
 
 from mensah.tools import resolve_tool_call
@@ -8,6 +15,7 @@ from proto.v1.inter.agent_runtime import chat_pb2
 
 ### Run parsers assist with parsing an agent run (Sequence[ModelMessage])
 ### for its various use cases within our harness
+
 
 def serialize_run_messages(runs: Sequence[str]) -> list[ModelMessage]:
     """
@@ -20,6 +28,7 @@ def serialize_run_messages(runs: Sequence[str]) -> list[ModelMessage]:
         for run in runs
         for message in ModelMessagesTypeAdapter.validate_json(run)
     ]
+
 
 def tool_returns_by_call_id(
     messages: Sequence[ModelMessage],
@@ -36,7 +45,9 @@ def tool_returns_by_call_id(
             for part in message.parts:
                 if isinstance(part, ToolCallPart):
                     if part.tool_call_id in tool_call_ids:
-                        raise ValueError(f"Duplicate tool call id: {part.tool_call_id!r}")
+                        raise ValueError(
+                            f"Duplicate tool call id: {part.tool_call_id!r}"
+                        )
                     tool_call_ids.add(part.tool_call_id)
         elif isinstance(message, ModelRequest):
             for part in message.parts:
@@ -52,6 +63,7 @@ def tool_returns_by_call_id(
             raise ValueError(f"Orphaned tool return for tool call {tool_call_id!r}")
 
     return tool_returns
+
 
 def parse_completed_tool_call(
     part: ToolCallPart, tool_returns: dict[str, ToolReturnPart]

@@ -1,4 +1,5 @@
 from uuid import uuid4
+import grpc
 from grpc.aio import ServicerContext
 from pydantic_ai import Agent
 from mensah.stream import parse_agent_stream_event
@@ -21,7 +22,6 @@ class AgentRuntimeServicer(chat_pb2_grpc.ChatServiceServicer):
             chat_pb2.StreamChatRequest, chat_pb2.StreamChatResponse
         ],
     ):
-        # TODO: assert we can send the prompt:
         is_valid = self.clients.agent_backend_service.AuthenticateUserAndPrompt(
             request=AuthenticateUserAndPromptRequest(
                 user_id=request.user_id,
@@ -29,6 +29,8 @@ class AgentRuntimeServicer(chat_pb2_grpc.ChatServiceServicer):
                 prompt=request.prompt,
             )
         )
+        if not is_valid:
+            await context.abort(grpc.StatusCode.UNAUTHENTICATED, "unauthenticated")
 
         message_id = str(uuid4())
         if request.prompt is not None:

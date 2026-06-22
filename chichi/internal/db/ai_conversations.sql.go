@@ -16,17 +16,20 @@ import (
 
 const addAIConversationMessage = `-- name: AddAIConversationMessage :one
 WITH new_message AS (
-    INSERT INTO ai_conversation_messages (conversation_id, run_id, message_content_as_json) VALUES ($1, $2, $3) RETURNING id, conversation_id, run_id, message_content_as_json, sent_at
+    INSERT INTO ai_conversation_messages (conversation_id, run_id, message_content_as_json, client_id, parent_id, position) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, conversation_id, run_id, message_content_as_json, sent_at, client_id, parent_id, position, ordinal
 ), bump_conversation AS (
     UPDATE ai_conversations SET last_updated_at = (SELECT sent_at FROM new_message) WHERE id = $1
 )
-SELECT id, conversation_id, run_id, message_content_as_json, sent_at FROM new_message
+SELECT id, conversation_id, run_id, message_content_as_json, sent_at, client_id, parent_id, position, ordinal FROM new_message
 `
 
 type AddAIConversationMessageParams struct {
 	ConversationID       uuid.UUID
 	RunID                uuid.UUID
 	MessageContentAsJson json.RawMessage
+	ClientID             string
+	ParentID             uuid.NullUUID
+	Position             int32
 }
 
 type AddAIConversationMessageRow struct {
@@ -35,10 +38,21 @@ type AddAIConversationMessageRow struct {
 	RunID                uuid.UUID
 	MessageContentAsJson json.RawMessage
 	SentAt               time.Time
+	ClientID             string
+	ParentID             uuid.NullUUID
+	Position             int32
+	Ordinal              sql.NullInt64
 }
 
 func (q *Queries) AddAIConversationMessage(ctx context.Context, arg AddAIConversationMessageParams) (AddAIConversationMessageRow, error) {
-	row := q.db.QueryRowContext(ctx, addAIConversationMessage, arg.ConversationID, arg.RunID, arg.MessageContentAsJson)
+	row := q.db.QueryRowContext(ctx, addAIConversationMessage,
+		arg.ConversationID,
+		arg.RunID,
+		arg.MessageContentAsJson,
+		arg.ClientID,
+		arg.ParentID,
+		arg.Position,
+	)
 	var i AddAIConversationMessageRow
 	err := row.Scan(
 		&i.ID,
@@ -46,6 +60,10 @@ func (q *Queries) AddAIConversationMessage(ctx context.Context, arg AddAIConvers
 		&i.RunID,
 		&i.MessageContentAsJson,
 		&i.SentAt,
+		&i.ClientID,
+		&i.ParentID,
+		&i.Position,
+		&i.Ordinal,
 	)
 	return i, err
 }
@@ -177,6 +195,34 @@ func (q *Queries) GetAIConversationByClientID(ctx context.Context, arg GetAIConv
 	return i, err
 }
 
+const getAIConversationMessageForConversation = `-- name: GetAIConversationMessageForConversation :one
+SELECT id, conversation_id, run_id, message_content_as_json, sent_at, client_id, parent_id, position, ordinal
+FROM ai_conversation_messages
+WHERE client_id = $1 AND conversation_id = $2
+`
+
+type GetAIConversationMessageForConversationParams struct {
+	ClientID       string
+	ConversationID uuid.UUID
+}
+
+func (q *Queries) GetAIConversationMessageForConversation(ctx context.Context, arg GetAIConversationMessageForConversationParams) (AiConversationMessage, error) {
+	row := q.db.QueryRowContext(ctx, getAIConversationMessageForConversation, arg.ClientID, arg.ConversationID)
+	var i AiConversationMessage
+	err := row.Scan(
+		&i.ID,
+		&i.ConversationID,
+		&i.RunID,
+		&i.MessageContentAsJson,
+		&i.SentAt,
+		&i.ClientID,
+		&i.ParentID,
+		&i.Position,
+		&i.Ordinal,
+	)
+	return i, err
+}
+
 const getOrCreateAIConversation = `-- name: GetOrCreateAIConversation :one
 INSERT INTO ai_conversations (title, conversation_owner_id, client_id) 
 VALUES ($1, $2, $3) 
@@ -230,10 +276,11 @@ func (q *Queries) GetUserAIConversation(ctx context.Context, arg GetUserAIConver
 }
 
 const listAIConversationMessages = `-- name: ListAIConversationMessages :many
-SELECT id, conversation_id, run_id, message_content_as_json, sent_at
-FROM ai_conversation_messages
-WHERE conversation_id = $1
-ORDER BY sent_at DESC, id DESC
+SELECT child.id, child.conversation_id, child.run_id, child.message_content_as_json, child.sent_at, child.client_id, child.parent_id, child.position, child.ordinal, parent.client_id parent_client_id
+FROM ai_conversation_messages child
+LEFT JOIN ai_conversation_messages parent ON parent.id = child.parent_id
+WHERE child.conversation_id = $1
+ORDER BY child.ordinal DESC
 LIMIT $2
 `
 
@@ -242,21 +289,39 @@ type ListAIConversationMessagesParams struct {
 	Limit          int32
 }
 
-func (q *Queries) ListAIConversationMessages(ctx context.Context, arg ListAIConversationMessagesParams) ([]AiConversationMessage, error) {
+type ListAIConversationMessagesRow struct {
+	ID                   uuid.UUID
+	ConversationID       uuid.UUID
+	RunID                uuid.UUID
+	MessageContentAsJson json.RawMessage
+	SentAt               time.Time
+	ClientID             string
+	ParentID             uuid.NullUUID
+	Position             int32
+	Ordinal              sql.NullInt64
+	ParentClientID       sql.NullString
+}
+
+func (q *Queries) ListAIConversationMessages(ctx context.Context, arg ListAIConversationMessagesParams) ([]ListAIConversationMessagesRow, error) {
 	rows, err := q.db.QueryContext(ctx, listAIConversationMessages, arg.ConversationID, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []AiConversationMessage
+	var items []ListAIConversationMessagesRow
 	for rows.Next() {
-		var i AiConversationMessage
+		var i ListAIConversationMessagesRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.ConversationID,
 			&i.RunID,
 			&i.MessageContentAsJson,
 			&i.SentAt,
+			&i.ClientID,
+			&i.ParentID,
+			&i.Position,
+			&i.Ordinal,
+			&i.ParentClientID,
 		); err != nil {
 			return nil, err
 		}
@@ -272,27 +337,46 @@ func (q *Queries) ListAIConversationMessages(ctx context.Context, arg ListAIConv
 }
 
 const listAIConversationMessagesForConversation = `-- name: ListAIConversationMessagesForConversation :many
-SELECT id, conversation_id, run_id, message_content_as_json, sent_at
-FROM ai_conversation_messages
-WHERE conversation_id = $1
-ORDER BY sent_at, id
+SELECT child.id, child.conversation_id, child.run_id, child.message_content_as_json, child.sent_at, child.client_id, child.parent_id, child.position, child.ordinal, parent.client_id parent_client_id
+FROM ai_conversation_messages child
+LEFT JOIN ai_conversation_messages parent ON parent.id = child.parent_id
+WHERE child.conversation_id = $1
+ORDER BY child.ordinal
 `
 
-func (q *Queries) ListAIConversationMessagesForConversation(ctx context.Context, conversationID uuid.UUID) ([]AiConversationMessage, error) {
+type ListAIConversationMessagesForConversationRow struct {
+	ID                   uuid.UUID
+	ConversationID       uuid.UUID
+	RunID                uuid.UUID
+	MessageContentAsJson json.RawMessage
+	SentAt               time.Time
+	ClientID             string
+	ParentID             uuid.NullUUID
+	Position             int32
+	Ordinal              sql.NullInt64
+	ParentClientID       sql.NullString
+}
+
+func (q *Queries) ListAIConversationMessagesForConversation(ctx context.Context, conversationID uuid.UUID) ([]ListAIConversationMessagesForConversationRow, error) {
 	rows, err := q.db.QueryContext(ctx, listAIConversationMessagesForConversation, conversationID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []AiConversationMessage
+	var items []ListAIConversationMessagesForConversationRow
 	for rows.Next() {
-		var i AiConversationMessage
+		var i ListAIConversationMessagesForConversationRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.ConversationID,
 			&i.RunID,
 			&i.MessageContentAsJson,
 			&i.SentAt,
+			&i.ClientID,
+			&i.ParentID,
+			&i.Position,
+			&i.Ordinal,
+			&i.ParentClientID,
 		); err != nil {
 			return nil, err
 		}
@@ -318,6 +402,64 @@ type ListAIConversationRunsParams struct {
 
 func (q *Queries) ListAIConversationRuns(ctx context.Context, arg ListAIConversationRunsParams) ([]AiConversationRun, error) {
 	rows, err := q.db.QueryContext(ctx, listAIConversationRuns, arg.ConversationID, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AiConversationRun
+	for rows.Next() {
+		var i AiConversationRun
+		if err := rows.Scan(
+			&i.ID,
+			&i.ConversationID,
+			&i.InputTokens,
+			&i.OutputTokens,
+			&i.ReasoningTokens,
+			&i.NumProviderRequests,
+			&i.NumToolCalls,
+			&i.CompletedAt,
+			&i.RunMessages,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listAIConversationRunsForMessagePath = `-- name: ListAIConversationRunsForMessagePath :many
+WITH RECURSIVE message_path AS (
+    SELECT ai_conversation_messages.id, ai_conversation_messages.parent_id, ai_conversation_messages.run_id
+    FROM ai_conversation_messages
+    WHERE ai_conversation_messages.id = $1 AND ai_conversation_messages.conversation_id = $2
+    UNION ALL
+    SELECT parent.id, parent.parent_id, parent.run_id
+    FROM ai_conversation_messages parent
+    JOIN message_path child ON child.parent_id = parent.id
+    WHERE parent.conversation_id = $2
+), path_runs AS (
+    SELECT DISTINCT run_id
+    FROM message_path
+)
+SELECT ai_conversation_runs.id, ai_conversation_runs.conversation_id, ai_conversation_runs.input_tokens, ai_conversation_runs.output_tokens, ai_conversation_runs.reasoning_tokens, ai_conversation_runs.num_provider_requests, ai_conversation_runs.num_tool_calls, ai_conversation_runs.completed_at, ai_conversation_runs.run_messages
+FROM ai_conversation_runs
+JOIN path_runs ON path_runs.run_id = ai_conversation_runs.id
+ORDER BY ai_conversation_runs.completed_at, ai_conversation_runs.id
+`
+
+type ListAIConversationRunsForMessagePathParams struct {
+	ID             uuid.UUID
+	ConversationID uuid.UUID
+}
+
+func (q *Queries) ListAIConversationRunsForMessagePath(ctx context.Context, arg ListAIConversationRunsForMessagePathParams) ([]AiConversationRun, error) {
+	rows, err := q.db.QueryContext(ctx, listAIConversationRunsForMessagePath, arg.ID, arg.ConversationID)
 	if err != nil {
 		return nil, err
 	}
@@ -384,6 +526,25 @@ func (q *Queries) ListUserAIConversations(ctx context.Context, conversationOwner
 		return nil, err
 	}
 	return items, nil
+}
+
+const nextAIConversationMessagePosition = `-- name: NextAIConversationMessagePosition :one
+SELECT COALESCE(MAX(position), -1) + 1
+FROM ai_conversation_messages
+WHERE conversation_id = $1
+  AND parent_id IS NOT DISTINCT FROM $2
+`
+
+type NextAIConversationMessagePositionParams struct {
+	ConversationID uuid.UUID
+	ParentID       uuid.NullUUID
+}
+
+func (q *Queries) NextAIConversationMessagePosition(ctx context.Context, arg NextAIConversationMessagePositionParams) (int32, error) {
+	row := q.db.QueryRowContext(ctx, nextAIConversationMessagePosition, arg.ConversationID, arg.ParentID)
+	var column_1 int32
+	err := row.Scan(&column_1)
+	return column_1, err
 }
 
 const unArchiveAIConversation = `-- name: UnArchiveAIConversation :one
