@@ -1,4 +1,5 @@
 from typing import AsyncIterator
+from structlog.stdlib import BoundLogger
 from pydantic_ai import (
     AgentRunResult,
     AgentRunResultEvent,
@@ -29,6 +30,7 @@ async def parse_agent_stream_event(
     message_id: str,
     event: AgentStreamEvent | AgentRunResultEvent,
     tool_calls: dict[str, chat_pb2.ToolCall],
+    logger: BoundLogger,
 ) -> AsyncIterator[chat_pb2.StreamChatResponse]:
     if isinstance(event, AgentRunResultEvent):
         event_result: AgentRunResult = event.result
@@ -38,6 +40,12 @@ async def parse_agent_stream_event(
             reasoning_tokens=event_result.usage.details["reasoning_tokens"],
             num_provider_requests=event_result.usage.requests,
             num_tool_calls=event_result.usage.tool_calls,
+        )
+        logger.info(
+            "agent run completed",
+            message_id=message_id,
+            input_tokens=usage.input_tokens,
+            output_tokens=usage.output_tokens,
         )
         yield chat_pb2.StreamChatResponse(
             message_id=message_id,
@@ -79,6 +87,9 @@ async def parse_agent_stream_event(
         elif isinstance(event, PartEndEvent):
             final_event_part: ModelResponsePart = event.part
             if isinstance(final_event_part, ToolCallPart):
+                logger.info(
+                    "tool call request made", tool_name=final_event_part.tool_name
+                )
                 tool_call = resolve_tool_call(
                     final_event_part.tool_name,
                     final_event_part.args_as_dict(raise_if_invalid=True),
@@ -95,12 +106,21 @@ async def parse_agent_stream_event(
         elif isinstance(event, ToolResultEvent):
             tool_call = tool_calls.pop(event.tool_call_id, None)
             if tool_call is None:
+                logger.error(
+                    "received a tool result event without its corresponding tool call",
+                    tool_name=event.part.tool_name,
+                )
                 raise ValueError(f"Missing streamed tool call {event.tool_call_id!r}")
-
+            tool_call_status = resolve_tool_result_status(event)
+            logger.info(
+                "tool result provided",
+                status=chat_pb2.ToolCallStatus.Name(tool_call_status),
+                tool_name=event.part.tool_name,
+            )
             yield chat_pb2.StreamChatResponse(
                 message_id=message_id,
                 tool_call=chat_pb2.StreamingToolCall(
-                    status=resolve_tool_result_status(event),
+                    status=tool_call_status,
                     call=tool_call,
                     call_return_json=resolve_tool_result_json(event),
                     tool_call_id=event.tool_call_id,
