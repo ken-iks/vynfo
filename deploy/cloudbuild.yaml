@@ -40,3 +40,6 @@ steps:
 images:
   - us-central1-docker.pkg.dev/vinfoinc/cloud-run-source-deploy/vynfo/chichi:$COMMIT_SHA
   - us-central1-docker.pkg.dev/vinfoinc/cloud-run-source-deploy/vynfo/mensah:$COMMIT_SHA
+
+options:
+  logging: CLOUD_LOGGING_ONLY
