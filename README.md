@@ -1,5 +1,5 @@
 ## Vynfo project
-#### Hopefully will be a pretty cool video editor once I can get it to work
+#### Hopefully will be a pretty cool ai video editor once I can get it to work
 
 #### Deployed architecture
 
