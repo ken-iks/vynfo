@@ -1,6 +1,28 @@
 ## Vynfo project
 #### Hopefully will be a pretty cool video editor once I can get it to work
 
+#### Deployed architecture
+
+As currently constructed, the service backend is deployed on Google Cloud Run (see `deploy/cloud-run/chichi-service.yaml`).
+There are 2 backend processes that run on the chichi service:
+1. `chichi/` - which is the core `golang` backend service on `:8080` that does the app heavy lifting, and owns the app data model
+2. `mensah/` - which is a `python` sidecar internal service on `:5052` that owns our agent runtime and harness implementation
+
+The frontend service (`eden/`) is a `vite` single page web application written in `typescript` (react). This app is hosted on Google Firebase (see `eden/firebase.json`) and firebase also acts as our auth layer too.
+
+All requests are made to `vynfo.com` and are routed in this manner:
+```
+Client => Cloudflare Proxy => Firebase => Cloudrun
+```
+
+BUT streaming requests are made through the subdomain `stream.vynfo.com` so that they can bypass firebase:
+```
+Client => Cloudflare Proxy => Cloudrun
+```
+
+There is a world where we take Firebase hosting out of the loop the whole way - but for now this architecture allows us to
+be protected from web scrapers running up the cloud bill and also have solid observability for the site.
+
 #### Getting set up
 
 
