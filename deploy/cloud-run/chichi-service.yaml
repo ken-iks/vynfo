@@ -25,7 +25,6 @@ spec:
         run.googleapis.com/container-dependencies: '{"chichi":["mensah"]}'
         run.googleapis.com/client-name: gcloud
         run.googleapis.com/client-version: 571.0.0
-        run.googleapis.com/cloudsql-instances: vinfoinc:us-central1:vynfo
         run.googleapis.com/startup-cpu-boost: 'true'
       labels:
         client.knative.dev/nonce: DEPLOY_NONCE
