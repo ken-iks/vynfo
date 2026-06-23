@@ -8,20 +8,21 @@ There are 2 backend processes that run on the chichi service:
 1. `chichi/` - which is the core `golang` backend service on `:8080` that does the app heavy lifting, and owns the app data model
 2. `mensah/` - which is a `python` sidecar internal service on `:5052` that owns our agent runtime and harness implementation
 
-The frontend service (`eden/`) is a `vite` single page web application written in `typescript` (react). This app is hosted on Google Firebase (see `eden/firebase.json`) and firebase also acts as our auth layer too.
+The frontend service (`eden/`) is a `vite` single page web application written in `typescript` (react). This app is hosted on Google Firebase (see `eden/firebase.json`) and firebase also acts as our auth layer too. Firebase Hosting only serves the static SPA and falls back to `index.html`; it does not proxy backend API traffic.
 
-All requests are made to `vynfo.com` and are routed in this manner:
+Frontend traffic is routed in this manner:
 ```
-Client => Cloudflare Proxy => Firebase => Cloudrun
-```
-
-BUT streaming requests are made through the subdomain `stream.vynfo.com` so that they can bypass firebase:
-```
-Client => Cloudflare Proxy => Cloudrun
+Client => Cloudflare Proxy => Firebase Hosting
 ```
 
-There is a world where we take Firebase hosting out of the loop the whole way - but for now this architecture allows us to
-be protected from web scrapers running up the cloud bill and also have solid observability for the site.
+Backend traffic is routed through `api.vynfo.com`:
+```
+Client => Cloudflare Proxy => Cloud Run
+```
+
+This keeps Firebase Hosting out of the API path, which avoids Firebase buffering streamed responses. `eden` reads the backend origin from `VITE_CHICHI_BASE_URL`; production should set this to `https://api.vynfo.com`.
+
+The Cloud Run service disables its default `run.app` URL and caps max scale at 1. Public backend access should go through Cloudflare-managed custom domains, with `api.vynfo.com` mapped to Cloud Run by a proxied `CNAME api -> ghs.googlehosted.com` DNS record.
 
 #### Getting set up
 

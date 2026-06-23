@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSnapshot } from "valtio";
 import { Card, CardContent } from "../ui/card";
 import { useAuth } from "../providers/AuthProvider";
-import { client } from "@/lib/client";
+import { chichiUrl, client } from "@/lib/client";
 import type {
   BranchMetadata,
   MediaAudioMetadata,
@@ -61,6 +61,17 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
   );
   const isVideoReadyToPlay =
     currVideoPlayingSrc !== "" && readyVideoSrc === currVideoPlayingSrc;
+  const branchVideoUrl = useCallback(
+    (branchId: string, params: Record<string, string>) => {
+      const searchParams = new URLSearchParams({
+        branchId,
+        userId,
+        ...params,
+      });
+      return chichiUrl(`/video?${searchParams.toString()}`);
+    },
+    [userId],
+  );
   const handleVideoReadyToPlay = useCallback(() => {
     setReadyVideoSrc(currVideoPlayingSrc);
   }, [currVideoPlayingSrc]);
@@ -152,10 +163,10 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
         branchId: branch.id,
       });
       editorStore.loadState(commit.commitState);
-      setCurrVideoPlayingSrc(`/video?branchId=${branch.id}&userId=${userId}`);
+      setCurrVideoPlayingSrc(branchVideoUrl(branch.id, {}));
       setCurrAudioPlayingSrc(
         commit.commitState?.audioSections.length
-          ? `/video?branchId=${branch.id}&userId=${userId}&audio=1`
+          ? branchVideoUrl(branch.id, { audio: "1" })
           : "",
       );
     } else {
@@ -230,11 +241,14 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
         .then(() => {
           if (branch) {
             setCurrVideoPlayingSrc(
-              `/video?branchId=${branch.id}&userId=${userId}&v=autosave-${revision}`,
+              branchVideoUrl(branch.id, { v: `autosave-${revision}` }),
             );
             setCurrAudioPlayingSrc(
               editorStore.audioSections.length
-                ? `/video?branchId=${branch.id}&userId=${userId}&audio=1&v=autosave-${revision}`
+                ? branchVideoUrl(branch.id, {
+                    audio: "1",
+                    v: `autosave-${revision}`,
+                  })
                 : "",
             );
           }
@@ -252,12 +266,10 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
     );
     const branch = branches.find((b) => b.name === selectedBranch);
     if (branch) {
-      setCurrVideoPlayingSrc(
-        `/video?branchId=${branch.id}&userId=${userId}&v=${newCommitId}`,
-      );
+      setCurrVideoPlayingSrc(branchVideoUrl(branch.id, { v: newCommitId }));
       setCurrAudioPlayingSrc(
         editorStore.audioSections.length
-          ? `/video?branchId=${branch.id}&userId=${userId}&audio=1&v=${newCommitId}`
+          ? branchVideoUrl(branch.id, { audio: "1", v: newCommitId })
           : "",
       );
     }

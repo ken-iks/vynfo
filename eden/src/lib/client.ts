@@ -9,15 +9,16 @@ import { WorkspacesService } from "../gen/proto/v1/workspaces_pb";
 import { auth } from "@/firebase";
 import { ConversationService } from "@/gen/proto/v1/conversation_pb";
 
-const baseUrl = import.meta.env.DEV ? "http://localhost:8080" : "/api";
-// Firebase Hosting rewrites buffer streamed responses, so agent streaming calls
-// use the Cloud Run service directly in production instead of the /api proxy.
-const streamingBaseUrl = import.meta.env.DEV
-  ? baseUrl
-  : import.meta.env.VITE_CHICHI_STREAMING_BASE_URL;
+export const chichiBaseUrl = import.meta.env.DEV
+  ? "http://localhost:8080"
+  : import.meta.env.VITE_CHICHI_BASE_URL;
 
-if (!streamingBaseUrl) {
-  throw new Error("missing VITE_CHICHI_STREAMING_BASE_URL");
+if (!chichiBaseUrl) {
+  throw new Error("missing VITE_CHICHI_BASE_URL");
+}
+
+export function chichiUrl(path: string) {
+  return new URL(path, chichiBaseUrl).toString();
 }
 
 async function getCurrentIdToken() {
@@ -37,12 +38,12 @@ function authInterceptor(getToken: () => Promise<string>): Interceptor {
 }
 
 const transport = createConnectTransport({
-  baseUrl,
+  baseUrl: chichiBaseUrl,
   interceptors: [authInterceptor(getCurrentIdToken)],
 });
 
 const streamingTransport = createConnectTransport({
-  baseUrl: streamingBaseUrl,
+  baseUrl: chichiBaseUrl,
   interceptors: [authInterceptor(getCurrentIdToken)],
 });
 
@@ -61,7 +62,7 @@ export function createSpacesClient(idToken: string) {
   // Web workers do not share the main thread Firebase auth instance, so the
   // open-space worker gets a token from React code and builds its own client.
   const workerTransport = createConnectTransport({
-    baseUrl,
+    baseUrl: chichiBaseUrl,
     interceptors: [authInterceptor(async () => idToken)],
   });
   return createClient(SpacesService, workerTransport);
