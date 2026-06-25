@@ -74,7 +74,12 @@ export function VideoCanvas({ video }: { video: HTMLVideoElement | null }) {
       // playable frame lets hls.js/browser playback finish its startup path first.
       const buildSprite = () => {
         if (sprite) return;
-        sprite = new Sprite(Texture.from(video));
+        const videoTextureOptions = {
+          resource: video,
+          autoPlay: false,
+        };
+        sprite = new Sprite(Texture.from(videoTextureOptions, true));
+        video.pause();
         const { width, height } = measure();
         sprite.width = width;
         sprite.height = height;
