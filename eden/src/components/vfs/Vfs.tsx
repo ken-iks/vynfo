@@ -1,11 +1,10 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { useBreadcrumbs } from "@/components/Breadcrumbs";
 import { VfsDeleteDialogue } from "./VfsDeleteDialogue";
 import { VfsMoveDialog } from "./VfsMoveDialog";
 import { VfsNameDialog } from "./VfsNameDialog";
 import { VfsOperationErrorDialogue } from "./VfsOperationErrorDialogue";
 import { VfsToolbar } from "./VfsToolbar";
-import { VfsTree } from "./VfsTree";
+import { VfsGrid } from "./VfsGrid";
 import { VfsUploadDialog } from "./VfsUploadDialog";
 import { useVfs } from "./hooks/useVfs";
 
@@ -16,6 +15,9 @@ export function Vfs() {
     closeCreateFolder,
     closeUpload,
     createFolderOpen,
+    currentDirectoryId,
+    currentEntries,
+    currentPath,
     currentWorkspaceId,
     deleteEntry,
     handleCreateFolder,
@@ -24,51 +26,54 @@ export function Vfs() {
     handleRename,
     loading,
     moveEntry,
+    navigateRoot,
+    navigateTo,
     openCreateFolder,
+    openDirectory,
     openUpload,
     operationError,
     projects,
-    refreshVisibleDirectories,
+    refreshDirectory,
     renameEntry,
     setDeleteEntry,
     setMoveEntry,
     setOperationError,
     setRenameEntry,
-    toggleDirectory,
-    treeRows,
     uploadOpen,
     uploadParentDirectoryId,
   } = useVfs();
 
-  useBreadcrumbs([{ label: "Files" }]);
+  useBreadcrumbs([
+    { label: "Files", onClick: navigateRoot },
+    ...currentPath.map((segment, index) => ({
+      label: segment.name,
+      onClick: () => navigateTo(index),
+    })),
+  ]);
 
   return (
     <div className="space-y-4 px-12 pt-12">
       <VfsToolbar
         disabled={!currentWorkspaceId}
-        onCreateFolder={() => openCreateFolder(undefined)}
-        onUpload={() => openUpload(undefined)}
+        onCreateFolder={() => openCreateFolder(currentDirectoryId)}
+        onUpload={() => openUpload(currentDirectoryId)}
       />
 
-      <Card>
-        <CardContent>
-          <VfsTree
-            busyAction={busyAction}
-            loading={loading}
-            projects={projects}
-            rows={treeRows}
-            onAddToProject={(entry, projectId) =>
-              void addEntryToProject(entry, projectId)
-            }
-            onDelete={setDeleteEntry}
-            onMove={setMoveEntry}
-            onRename={setRenameEntry}
-            onCreateFolder={(entry) => openCreateFolder(entry.id)}
-            onUpload={(entry) => openUpload(entry.id)}
-            onToggleDirectory={(entry) => void toggleDirectory(entry)}
-          />
-        </CardContent>
-      </Card>
+      <VfsGrid
+        busyAction={busyAction}
+        loading={loading}
+        projects={projects}
+        entries={currentEntries}
+        onOpenDirectory={openDirectory}
+        onAddToProject={(entry, projectId) =>
+          void addEntryToProject(entry, projectId)
+        }
+        onDelete={setDeleteEntry}
+        onMove={setMoveEntry}
+        onRename={setRenameEntry}
+        onCreateFolder={(entry) => openCreateFolder(entry.id)}
+        onUpload={(entry) => openUpload(entry.id)}
+      />
 
       <VfsNameDialog
         open={createFolderOpen}
@@ -101,7 +106,7 @@ export function Vfs() {
         workspaceId={currentWorkspaceId}
         parentDirectoryId={uploadParentDirectoryId}
         onOpenChange={closeUpload}
-        onUploadCompleted={() => void refreshVisibleDirectories()}
+        onUploadCompleted={() => void refreshDirectory(uploadParentDirectoryId)}
       />
       <VfsDeleteDialogue
         entry={deleteEntry}

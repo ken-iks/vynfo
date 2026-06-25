@@ -8,7 +8,7 @@ import {
   snapshotEntries,
   type VfsDirectorySnapshot,
   type VfsEntry,
-  type VfsTreeRow,
+  type VfsPathSegment,
 } from "../vfsTypes";
 
 const errorMessage = (err: unknown) =>
@@ -19,10 +19,7 @@ export function useVfs() {
   const [snapshots, setSnapshots] = useState<
     Record<string, VfsDirectorySnapshot>
   >({});
-  const [expandedDirectoryIds, setExpandedDirectoryIds] = useState<string[]>(
-    [],
-  );
-  const [loadingDirectoryIds, setLoadingDirectoryIds] = useState<string[]>([]);
+  const [currentPath, setCurrentPath] = useState<VfsPathSegment[]>([]);
   const [projects, setProjects] = useState<ProjectMetadata[]>([]);
   const [loading, setLoading] = useState(false);
   const [operationError, setOperationError] = useState("");
@@ -37,34 +34,12 @@ export function useVfs() {
   const [deleteEntry, setDeleteEntry] = useState<VfsEntry>();
   const [busyAction, setBusyAction] = useState("");
 
-  const rootSnapshot = snapshots[directoryKey(undefined)];
-  const treeRows = useMemo(() => {
-    const buildRows = (
-      snapshot: VfsDirectorySnapshot | undefined,
-      depth: number,
-    ): VfsTreeRow[] => {
-      if (!snapshot) return [];
-
-      return snapshotEntries(snapshot).flatMap((entry) => {
-        const expanded =
-          entry.entryType === "directory" &&
-          expandedDirectoryIds.includes(entry.id);
-        const loading =
-          entry.entryType === "directory" &&
-          loadingDirectoryIds.includes(entry.id);
-        const row = { entry, depth, expanded, loading };
-
-        if (entry.entryType !== "directory" || !expanded) return [row];
-
-        return [
-          row,
-          ...buildRows(snapshots[directoryKey(entry.id)], depth + 1),
-        ];
-      });
-    };
-
-    return buildRows(rootSnapshot, 0);
-  }, [expandedDirectoryIds, loadingDirectoryIds, rootSnapshot, snapshots]);
+  const currentDirectoryId = currentPath.at(-1)?.id;
+  const currentSnapshot = snapshots[directoryKey(currentDirectoryId)];
+  const currentEntries = useMemo(
+    () => (currentSnapshot ? snapshotEntries(currentSnapshot) : []),
+    [currentSnapshot],
+  );
 
   const fetchDirectory = useCallback(
     async (directoryId: string | undefined) => {
@@ -92,30 +67,47 @@ export function useVfs() {
     [currentWorkspaceId],
   );
 
-  const refreshVisibleDirectories = useCallback(async () => {
-    setLoading(true);
-    try {
-      const directoryIds = [undefined, ...expandedDirectoryIds];
-      await Promise.all(
-        directoryIds.map((directoryId) => fetchDirectory(directoryId)),
-      );
-    } catch (err) {
-      setOperationError(errorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [expandedDirectoryIds, fetchDirectory]);
+  const refreshDirectory = useCallback(
+    async (directoryId: string | undefined) => {
+      try {
+        await fetchDirectory(directoryId);
+      } catch (err) {
+        setOperationError(errorMessage(err));
+      }
+    },
+    [fetchDirectory],
+  );
+
+  const refreshCurrentDirectory = useCallback(
+    () => refreshDirectory(currentDirectoryId),
+    [currentDirectoryId, refreshDirectory],
+  );
 
   useEffect(() => {
     setSnapshots({});
-    setExpandedDirectoryIds([]);
-    setLoadingDirectoryIds([]);
+    setCurrentPath([]);
   }, [currentWorkspaceId]);
 
   useEffect(() => {
     if (!currentWorkspaceId) return;
-    void refreshVisibleDirectories();
-  }, [currentWorkspaceId, refreshVisibleDirectories]);
+    if (snapshots[directoryKey(currentDirectoryId)]) return;
+
+    let ignore = false;
+    setLoading(true);
+    void (async () => {
+      try {
+        await fetchDirectory(currentDirectoryId);
+      } catch (err) {
+        if (!ignore) setOperationError(errorMessage(err));
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    })();
+
+    return () => {
+      ignore = true;
+    };
+  }, [currentWorkspaceId, currentDirectoryId, snapshots, fetchDirectory]);
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -131,33 +123,20 @@ export function useVfs() {
     void loadProjects();
   }, [currentWorkspaceId]);
 
-  const toggleDirectory = async (entry: VfsEntry) => {
+  const openDirectory = (entry: VfsEntry) => {
     if (entry.entryType !== "directory") return;
-    const expanded = expandedDirectoryIds.includes(entry.id);
-    if (expanded) {
-      setExpandedDirectoryIds((current) =>
-        current.filter((directoryId) => directoryId !== entry.id),
-      );
-      return;
-    }
+    setCurrentPath((current) => [
+      ...current,
+      { id: entry.id, name: entry.name },
+    ]);
+  };
 
-    setExpandedDirectoryIds((current) =>
-      current.includes(entry.id) ? current : [...current, entry.id],
-    );
-    if (snapshots[directoryKey(entry.id)]) return;
+  const navigateTo = (index: number) => {
+    setCurrentPath((current) => current.slice(0, index + 1));
+  };
 
-    setLoadingDirectoryIds((current) =>
-      current.includes(entry.id) ? current : [...current, entry.id],
-    );
-    try {
-      await fetchDirectory(entry.id);
-    } catch (err) {
-      setOperationError(errorMessage(err));
-    } finally {
-      setLoadingDirectoryIds((current) =>
-        current.filter((directoryId) => directoryId !== entry.id),
-      );
-    }
+  const navigateRoot = () => {
+    setCurrentPath([]);
   };
 
   const openCreateFolder = (parentDirectoryId: string | undefined) => {
@@ -249,7 +228,7 @@ export function useVfs() {
         parentDirectoryId: createFolderParentDirectoryId,
         name,
       });
-      await refreshVisibleDirectories();
+      await fetchDirectory(createFolderParentDirectoryId);
     });
   };
 
@@ -269,7 +248,7 @@ export function useVfs() {
           name,
         });
       }
-      await refreshVisibleDirectories();
+      await fetchDirectory(currentDirectoryId);
     });
   };
 
@@ -289,7 +268,7 @@ export function useVfs() {
           newParentDirectory: parentDirectoryId,
         });
       }
-      await refreshVisibleDirectories();
+      await fetchDirectory(currentDirectoryId);
     });
   };
 
@@ -308,7 +287,7 @@ export function useVfs() {
         });
       }
       setDeleteEntry(undefined);
-      await refreshVisibleDirectories();
+      await fetchDirectory(currentDirectoryId);
     });
   };
 
@@ -318,6 +297,9 @@ export function useVfs() {
     closeCreateFolder,
     closeUpload,
     createFolderOpen,
+    currentDirectoryId,
+    currentEntries,
+    currentPath,
     currentWorkspaceId,
     deleteEntry,
     handleCreateFolder,
@@ -326,19 +308,21 @@ export function useVfs() {
     handleRename,
     loading,
     moveEntry,
+    navigateRoot,
+    navigateTo,
     openCreateFolder,
+    openDirectory,
     openUpload,
     operationError,
     projects,
-    refreshVisibleDirectories,
+    refreshCurrentDirectory,
+    refreshDirectory,
     renameEntry,
     setDeleteEntry,
     setMoveEntry,
     setOperationError,
     setRenameEntry,
-    toggleDirectory,
-    treeRows,
-    uploadOpen,
     uploadParentDirectoryId,
+    uploadOpen,
   };
 }

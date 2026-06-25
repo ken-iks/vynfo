@@ -36,7 +36,7 @@ export function CreateSpaceDialogue({
         disabled={creating || disabled}
         onClick={() => onOpenChange(true)}
       >
-        Create Space
+        Create Review
       </Button>
       <DialogContent>
         <form onSubmit={onSubmit} className="flex flex-col gap-4">

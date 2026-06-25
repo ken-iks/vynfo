@@ -20,6 +20,7 @@ import {
 export interface Crumb {
   label: string;
   to?: string;
+  onClick?: () => void;
 }
 
 interface BreadcrumbContextValue {
@@ -70,9 +71,15 @@ export function HeaderBreadcrumbs() {
           return (
             <Fragment key={`${index}-${crumb.label}`}>
               <BreadcrumbItem>
-                {crumb.to && !isLast ? (
+                {!isLast && crumb.to ? (
                   <BreadcrumbLink asChild>
                     <Link to={crumb.to}>{crumb.label}</Link>
+                  </BreadcrumbLink>
+                ) : !isLast && crumb.onClick ? (
+                  <BreadcrumbLink asChild>
+                    <button type="button" onClick={crumb.onClick}>
+                      {crumb.label}
+                    </button>
                   </BreadcrumbLink>
                 ) : (
                   <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
