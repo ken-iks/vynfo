@@ -1,186 +1,102 @@
 import { Button } from "@/components/ui/button";
-import { LandingThemeToggle } from "./LandingThemeToggle";
 
 type LandingPageProps = {
   onSignIn: () => void;
 };
 
-const pillars = [
+const steps = [
   {
-    eyebrow: "Vynfo Editor",
-    title: "Bring the work into one creative timeline.",
-    body: "Build video projects with the editing primitives teams expect: tracks, cuts, audio, effects, and shared project state.",
+    title: "Set up your workspace",
+    body: "Spin up an isolated workspace and bring your team members in.",
   },
   {
-    eyebrow: "Vynfo Version Control",
-    title: "Branch, review, and merge media work.",
-    body: "VVC gives creative teams branches, RTMs, comments, change requests, and a final Vynfo LGTM before work lands on main.",
+    title: "Upload your assets",
+    body: "Upload raw files into Vynfo's native file system and pull them back out anytime. Use Vynfo as your team's cloud storage.",
   },
   {
-    eyebrow: "Vynfo Spaces",
-    title: "Keep project context beside the work.",
-    body: "Plan, coordinate, and talk through the work with teammates in shared spaces tied to your workspace.",
+    title: "Create a project",
+    body: "Start a project to share a timeline and its full version history.",
   },
   {
-    eyebrow: "Vynfo Agents",
-    title: "Delegate the boring parts.",
-    body: "Use VDAs (Vynfo Delegate Agents) to search workspace artifacts, surface useful clips, and help teams stay focused.",
+    title: "Edit on branches",
+    body: "Teammates edit on isolated branches and merge into main once the project owner approves.",
   },
-];
-
-const workflow = [
-  "Start a project",
-  "Branch the idea",
-  "Request to merge",
-  "Review the diff",
-  "Land the cut",
+  {
+    title: "Ask Murch",
+    body: "Spawn Murch agents onto their own isolated branches to delegate tasks, or to find and piece together interesting cuts you might have missed.",
+  },
+  {
+    title: "Export any version",
+    body: "Get a high-quality export of the final cut, or any earlier cut in the version history. Everything is stored and recoverable.",
+  },
 ];
 
 export function LandingPage({ onSignIn }: LandingPageProps) {
   return (
-    <main className="min-h-screen overflow-hidden bg-background text-foreground">
-      <section className="relative isolate px-6 py-8 sm:px-10 lg:px-16">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6">
+    <main className="dark min-h-screen overflow-hidden bg-background text-foreground">
+      <header className="px-6 py-6 sm:px-10 lg:px-16">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-6">
           <a href="/" className="flex items-center gap-4 text-lg font-semibold">
-            <span className="flex size-20 items-center justify-center overflow-hidden rounded-[1.75rem] border bg-card shadow-sm">
+            <span className="flex size-16 items-center justify-center overflow-hidden rounded-[1.5rem] border bg-card shadow-sm">
               <img
                 src="/vynfo-logo-new.png"
                 alt=""
-                className="size-32 max-w-none"
+                className="size-24 max-w-none"
               />
             </span>
             <span>Vynfo</span>
           </a>
-          <div className="flex items-center gap-2">
-            <LandingThemeToggle />
-            <Button onClick={onSignIn}>Sign in with Google</Button>
-          </div>
+          <Button onClick={onSignIn}>Sign in with Google</Button>
         </div>
+      </header>
 
-        <div className="mx-auto grid max-w-7xl gap-14 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-28">
-          <div>
-            <div className="mb-6 inline-flex rounded-full border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm">
-              Built for collaborative media work
-            </div>
-            <h1 className="max-w-5xl text-6xl font-semibold tracking-tight text-balance sm:text-7xl lg:text-8xl">
-              Collaborative media. Done the right way.
-            </h1>
-            <p className="mt-7 max-w-2xl text-xl leading-9 text-muted-foreground">
-              Vynfo gives media teams a shared place to create, collaborate,
-              review, and keep every version of the work moving with confidence.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" onClick={onSignIn}>
-                Sign in with Google
-              </Button>
-            </div>
-          </div>
-
-          <div className="rounded-[2rem] border bg-card/80 p-4 shadow-2xl backdrop-blur">
-            <div className="rounded-[1.5rem] border bg-background p-5">
-              <div className="flex items-center justify-between border-b pb-4">
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground">
-                    Vynfo workspace
-                  </p>
-                  <p className="mt-1 text-lg font-semibold">
-                    Launch cut review
-                  </p>
-                </div>
-                <div className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
-                  RTM open
-                </div>
-              </div>
-              <div className="grid gap-4 py-5">
-                {workflow.map((step, index) => (
-                  <div key={step} className="flex items-center gap-3">
-                    <div className="flex size-7 items-center justify-center rounded-full bg-secondary text-xs font-semibold">
-                      {index + 1}
-                    </div>
-                    <div className="h-2 flex-1 rounded-full bg-secondary">
-                      <div className="h-full w-2/3 rounded-full bg-foreground/70" />
-                    </div>
-                    <span className="w-28 text-right text-xs text-muted-foreground">
-                      {step}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border bg-card p-4">
-                  <p className="text-xs text-muted-foreground">Branch</p>
-                  <p className="mt-2 font-semibold">feature/color-pass</p>
-                </div>
-                <div className="rounded-2xl border bg-card p-4">
-                  <p className="text-xs text-muted-foreground">Review</p>
-                  <p className="mt-2 font-semibold">2 comments</p>
-                </div>
-                <div className="rounded-2xl border bg-card p-4">
-                  <p className="text-xs text-muted-foreground">Status</p>
-                  <p className="mt-2 font-semibold">LGTM pending</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-6 py-16 sm:px-10 lg:px-16">
-        <div className="mx-auto max-w-7xl">
-          <div className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">
-              Why Vynfo
-            </p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-5xl">
-              Media teams deserve the same collaboration discipline as software
-              teams.
-            </h2>
-            <p className="mt-5 text-base leading-7 text-muted-foreground">
-              Creative work gets messy when files, feedback, conversations, and
-              revisions drift apart. Vynfo makes the project itself the source
-              of truth, then layers collaboration on top.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-6 py-16 sm:px-10 lg:px-16">
-        <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {pillars.map((pillar) => (
-            <article
-              key={pillar.eyebrow}
-              className="rounded-3xl border bg-card p-6 shadow-sm"
-            >
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-                {pillar.eyebrow}
-              </p>
-              <h3 className="mt-4 text-xl font-semibold">{pillar.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                {pillar.body}
-              </p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="px-6 py-16 sm:px-10 lg:px-16">
-        <div className="mx-auto max-w-7xl rounded-[2rem] border bg-card p-8 shadow-sm sm:p-10">
-          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">
-                Get started
-              </p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-                Move creative work forward in Vynfo.
-              </h2>
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Start from the workspace, bring teammates into the process, and
-                keep every creative decision connected to the work.
-              </p>
-            </div>
+      <section className="px-6 sm:px-10 lg:px-16">
+        <div className="mx-auto max-w-4xl py-14 text-center lg:py-16">
+          <h1 className="text-5xl font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl">
+            Collaborative post production.
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
+            Vynfo lets editing teams move quickly and safely on one shared
+            timeline.
+          </p>
+          <div className="mt-7 flex justify-center">
             <Button size="lg" onClick={onSignIn}>
               Sign in with Google
             </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-6 py-10 sm:px-10 lg:px-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              How to use Vynfo
+            </h2>
+            <p className="mt-4 text-base leading-7 text-muted-foreground">
+              With a web-native video editor and integrated version
+              control/review, Vynfo was built from the ground up for{" "}
+              <span className="font-medium text-foreground">
+                collaborative post production
+              </span>
+              .
+            </p>
+          </div>
+          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {steps.map((step, index) => (
+              <article
+                key={step.title}
+                className="rounded-3xl border bg-card p-6 shadow-sm"
+              >
+                <div className="flex size-9 items-center justify-center rounded-full bg-secondary text-sm font-semibold">
+                  {index + 1}
+                </div>
+                <h3 className="mt-5 text-lg font-semibold">{step.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  {step.body}
+                </p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
