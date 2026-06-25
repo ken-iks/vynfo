@@ -16,9 +16,11 @@ import { Vfs } from "./vfs/Vfs";
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <AppShell />
-      </AuthProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppShell />
+        </AuthProvider>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }
@@ -73,21 +75,19 @@ function AppShell() {
 
   return (
     <WorkspaceProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<Navigate to="/projects" replace />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/projects/:projectId" element={<ProjectRoute />} />
-            <Route path="/spaces" element={<Spaces />} />
-            <Route path="/spaces/:spaceId" element={<SpaceRoute />} />
-            <Route path="/vfs" element={<Vfs />} />
-            <Route path="/murch" element={<AgentChatPage />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="*" element={<Navigate to="/projects" replace />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<Navigate to="/projects" replace />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:projectId" element={<ProjectRoute />} />
+          <Route path="/spaces" element={<Spaces />} />
+          <Route path="/spaces/:spaceId" element={<SpaceRoute />} />
+          <Route path="/vfs" element={<Vfs />} />
+          <Route path="/murch" element={<AgentChatPage />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="*" element={<Navigate to="/projects" replace />} />
+        </Route>
+      </Routes>
     </WorkspaceProvider>
   );
 }
