@@ -21,11 +21,31 @@ type KeyFrame struct {
 // NOTE: never directly manipulate this type - only add through addKeyframe
 type KeyFrameOffsets map[uint64]KeyFrame
 
-func (o KeyFrameOffsets) addKeyframe(ts uint64, offset uint64, size uint64) error {
-	if ts%500 != 0 {
-		return fmt.Errorf("key frame timestamp only valid when divisible by 500ms, got %d", ts)
+const (
+	keyFrameIntervalMs           uint64 = 500
+	keyFrameTimestampToleranceMs uint64 = 100
+)
+
+func normalizeKeyFrameTimestamp(ts uint64) (uint64, error) {
+	remainder := ts % keyFrameIntervalMs
+	if remainder == 0 {
+		return ts, nil
 	}
-	o[ts] = KeyFrame{offset, size}
+	if remainder <= keyFrameTimestampToleranceMs {
+		return ts - remainder, nil
+	}
+	if keyFrameIntervalMs-remainder <= keyFrameTimestampToleranceMs {
+		return ts + keyFrameIntervalMs - remainder, nil
+	}
+	return 0, fmt.Errorf("key frame timestamp only valid near a 500ms boundary, got %d", ts)
+}
+
+func (o KeyFrameOffsets) addKeyframe(ts uint64, offset uint64, size uint64) error {
+	normalizedTs, err := normalizeKeyFrameTimestamp(ts)
+	if err != nil {
+		return err
+	}
+	o[normalizedTs] = KeyFrame{offset, size}
 	return nil
 }
 
