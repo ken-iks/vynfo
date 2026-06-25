@@ -26,11 +26,17 @@ func (c *ConversationServiceServer) ListAIConversations(
 	}
 	conversations := make([]*v1.AIConversation, 0, len(rows))
 	for _, row := range rows {
+		var maybeProjectID *string
+		if row.ProjectID.Valid {
+			projectIDValue := row.ProjectID.UUID.String()
+			maybeProjectID = &projectIDValue
+		}
 		conversations = append(conversations, &v1.AIConversation{
 			ConversationId:      row.ID.String(),
 			Title:               row.Title,
 			ConversationOwnerId: row.ConversationOwnerID.String(),
 			LastUpdatedAt:       timestamppb.New(row.LastUpdatedAt),
+			ProjectId:           maybeProjectID,
 		})
 	}
 

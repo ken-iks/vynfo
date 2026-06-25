@@ -84,8 +84,9 @@ type StreamChatRequest struct {
 	// NOTE: these are the same objects that are returned on Finish
 	PreviousConversationRuns []string `protobuf:"bytes,2,rep,name=previous_conversation_runs,json=previousConversationRuns,proto3" json:"previous_conversation_runs,omitempty"`
 	// only whitelisted users are able to send agent messages for now
-	UserId        string `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	WorkspaceId   string `protobuf:"bytes,4,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	UserId        string  `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	WorkspaceId   string  `protobuf:"bytes,4,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	ProjectId     *string `protobuf:"bytes,5,opt,name=project_id,json=projectId,proto3,oneof" json:"project_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -144,6 +145,13 @@ func (x *StreamChatRequest) GetUserId() string {
 func (x *StreamChatRequest) GetWorkspaceId() string {
 	if x != nil {
 		return x.WorkspaceId
+	}
+	return ""
+}
+
+func (x *StreamChatRequest) GetProjectId() string {
+	if x != nil && x.ProjectId != nil {
+		return *x.ProjectId
 	}
 	return ""
 }
@@ -1179,12 +1187,15 @@ var File_proto_v1_inter_agent_runtime_chat_proto protoreflect.FileDescriptor
 
 const file_proto_v1_inter_agent_runtime_chat_proto_rawDesc = "" +
 	"\n" +
-	"'proto/v1/inter/agent_runtime/chat.proto\x12\x16v1.inter.agent_runtime\"\xa5\x01\n" +
+	"'proto/v1/inter/agent_runtime/chat.proto\x12\x16v1.inter.agent_runtime\"\xd8\x01\n" +
 	"\x11StreamChatRequest\x12\x16\n" +
 	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12<\n" +
 	"\x1aprevious_conversation_runs\x18\x02 \x03(\tR\x18previousConversationRuns\x12\x17\n" +
 	"\auser_id\x18\x03 \x01(\tR\x06userId\x12!\n" +
-	"\fworkspace_id\x18\x04 \x01(\tR\vworkspaceId\"\xc6\x02\n" +
+	"\fworkspace_id\x18\x04 \x01(\tR\vworkspaceId\x12\"\n" +
+	"\n" +
+	"project_id\x18\x05 \x01(\tH\x00R\tprojectId\x88\x01\x01B\r\n" +
+	"\v_project_id\"\xc6\x02\n" +
 	"\x12StreamChatResponse\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x01 \x01(\tR\tmessageId\x127\n" +
@@ -1324,6 +1335,7 @@ func file_proto_v1_inter_agent_runtime_chat_proto_init() {
 	if File_proto_v1_inter_agent_runtime_chat_proto != nil {
 		return
 	}
+	file_proto_v1_inter_agent_runtime_chat_proto_msgTypes[0].OneofWrappers = []any{}
 	file_proto_v1_inter_agent_runtime_chat_proto_msgTypes[1].OneofWrappers = []any{
 		(*StreamChatResponse_Text)(nil),
 		(*StreamChatResponse_Reasoning)(nil),

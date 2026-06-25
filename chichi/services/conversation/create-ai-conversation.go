@@ -8,10 +8,12 @@ import (
 	"strings"
 
 	"connectrpc.com/connect"
+	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"vynfo.com/vynfo/auth"
 	v1 "vynfo.com/vynfo/gen/proto/v1"
 	"vynfo.com/vynfo/internal/db"
+	"vynfo.com/vynfo/shared"
 )
 
 func (c *ConversationServiceServer) CreateAIConversation(
@@ -31,6 +33,19 @@ func (c *ConversationServiceServer) CreateAIConversation(
 		)
 	}
 	clientID := req.Msg.GetClientId()
+	projectId := req.Msg.GetProjectId()
+
+	projectIdPersisted := uuid.NullUUID{}
+	if projectId != "" {
+		projectUUID, err := shared.ParseUUID(ctx, logger, "projectId", projectId)
+		if err != nil {
+			return nil, err
+		}
+		projectIdPersisted = uuid.NullUUID{
+			UUID:  projectUUID,
+			Valid: true,
+		}
+	}
 
 	conversation, err := c.queries.GetOrCreateAIConversation(
 		ctx,
@@ -41,6 +56,7 @@ func (c *ConversationServiceServer) CreateAIConversation(
 				String: clientID,
 				Valid:  clientID != "",
 			},
+			ProjectID: projectIdPersisted,
 		},
 	)
 	if err != nil {
@@ -54,7 +70,15 @@ func (c *ConversationServiceServer) CreateAIConversation(
 		conversation.ID.String(),
 		"has_client_id",
 		clientID != "",
+		"has_project_id",
+		projectIdPersisted.Valid,
 	)
+
+	var maybeProjectID *string
+	if conversation.ProjectID.Valid {
+		projectIDValue := conversation.ProjectID.UUID.String()
+		maybeProjectID = &projectIDValue
+	}
 
 	return connect.NewResponse(&v1.CreateAIConversationResponse{
 		Conversation: &v1.AIConversation{
@@ -62,6 +86,7 @@ func (c *ConversationServiceServer) CreateAIConversation(
 			Title:               conversation.Title,
 			ConversationOwnerId: conversation.ConversationOwnerID.String(),
 			LastUpdatedAt:       timestamppb.New(conversation.LastUpdatedAt),
+			ProjectId:           maybeProjectID,
 		},
 	}), nil
 }

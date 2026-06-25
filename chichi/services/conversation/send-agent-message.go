@@ -148,7 +148,12 @@ func (c *ConversationServiceServer) SendAgentMessage(
 		if finished := message.GetFinished(); finished != nil {
 			tx, err := c.db.BeginTx(ctx, nil)
 			if err != nil {
-				logger.ErrorContext(ctx, "error beginning transaction for message persistance", "error", err)
+				logger.ErrorContext(
+					ctx,
+					"error beginning transaction for message persistance",
+					"error",
+					err,
+				)
 				return connect.NewError(connect.CodeInternal, err)
 			}
 			defer tx.Rollback()
@@ -185,7 +190,12 @@ func (c *ConversationServiceServer) SendAgentMessage(
 			for i, message := range newMessages {
 				messageJson, err := protojson.Marshal(message)
 				if err != nil {
-					logger.ErrorContext(ctx, "error marshalling new messages into json", "error", err)
+					logger.ErrorContext(
+						ctx,
+						"error marshalling new messages into json",
+						"error",
+						err,
+					)
 					return connect.NewError(connect.CodeInternal, err)
 				}
 				clientID := uuid.NewString()
@@ -243,7 +253,12 @@ func (c *ConversationServiceServer) SendAgentMessage(
 				logger.ErrorContext(ctx, "error commiting db transaction", "error", err)
 				return connect.NewError(connect.CodeInternal, err)
 			}
-			logger.InfoContext(ctx, "agent messages persisted", "new_message_count", len(newMessages))
+			logger.InfoContext(
+				ctx,
+				"agent messages persisted",
+				"new_message_count",
+				len(newMessages),
+			)
 		}
 		if err := stream.Send(message); err != nil {
 			logger.ErrorContext(ctx, "error sending message chunk", "error", err)

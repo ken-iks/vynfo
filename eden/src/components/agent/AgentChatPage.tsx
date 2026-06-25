@@ -3,7 +3,11 @@ import { Thread } from "@/components/assistant-ui/thread";
 import { useWorkspaceContext } from "@/components/providers/WorkspaceProvider";
 import { AgentChatList } from "./AgentChatList";
 
-export function AgentChatPage() {
+type AgentChatPageProps = {
+  projectId?: string;
+};
+
+export function AgentChatPage({ projectId }: AgentChatPageProps) {
   const { loadingWorkspaces } = useWorkspaceContext();
 
   if (loadingWorkspaces) {
@@ -15,7 +19,7 @@ export function AgentChatPage() {
   }
 
   return (
-    <AgentRunTimeProvider>
+    <AgentRunTimeProvider projectId={projectId}>
       <div className="flex h-[calc(100vh-3rem)] min-h-0 overflow-hidden">
         <AgentChatList />
         <div className="h-full min-h-0 min-w-0 flex-1">

@@ -39,7 +39,7 @@ def get_vynfo_agent() -> Agent[VynfoAgentDeps, str]:
     model_settings = OpenAIResponsesModelSettings(
         openai_reasoning_effort="medium",
         openai_reasoning_summary="detailed",
-        openai_text_verbosity="medium"
+        openai_text_verbosity="medium",
     )
     agent = Agent[VynfoAgentDeps, str](
         model,

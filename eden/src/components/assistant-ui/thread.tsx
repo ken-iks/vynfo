@@ -18,7 +18,22 @@ import {
   ToolGroupTrigger,
 } from "@/components/assistant-ui/tool-group";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
+import { useAgentThreadList } from "@/agent-runtime/providers/ThreadProvider";
+import { useWorkspaceProjects } from "@/components/projects/hooks/useWorkspaceProjects";
 import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import {
   ActionBarMorePrimitive,
@@ -39,6 +54,7 @@ import {
   ArrowDownIcon,
   ArrowUpIcon,
   CheckIcon,
+  ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   CopyIcon,
@@ -52,6 +68,7 @@ import {
 import {
   createContext,
   useContext,
+  useState,
   type ComponentType,
   type FC,
   type PropsWithChildren,
@@ -84,6 +101,7 @@ export type ThreadProps = {
 };
 
 const EMPTY_COMPONENTS: ThreadComponents = {};
+const HOME_PROJECT_VALUE = "__home__";
 
 const ThreadComponentsContext =
   createContext<ThreadComponents>(EMPTY_COMPONENTS);
@@ -247,6 +265,7 @@ const Composer: FC<{ allowAttachments: boolean }> = ({ allowAttachments }) => {
           <ComposerAction allowAttachments={allowAttachments} />
         </div>
       </ComposerPrimitive.AttachmentDropzone>
+      <ConversationScopeControl />
     </ComposerPrimitive.Root>
   );
 };
@@ -322,6 +341,100 @@ const ComposerAction: FC<{ allowAttachments: boolean }> = ({
     </div>
   );
 };
+
+const ConversationScopeControl: FC = () => {
+  const projects = useWorkspaceProjects();
+  const { prepareNewThread, preparedProjectId } = useAgentThreadList();
+  const [open, setOpen] = useState(false);
+  const isEmpty = useAuiState(isNewChatView);
+  const currentProjectId = useAuiState(getCurrentThreadProjectId);
+  const projectId = isEmpty ? preparedProjectId : currentProjectId;
+  const label = getProjectLabel(projectId, projects);
+  const selectedValue = projectId ?? HOME_PROJECT_VALUE;
+  const handleSelectProject = (value: string) => {
+    prepareNewThread(value === HOME_PROJECT_VALUE ? undefined : value);
+    setOpen(false);
+  };
+
+  if (!isEmpty) {
+    return (
+      <div className="mt-1 flex self-start px-2">
+        <div className="text-muted-foreground min-w-0 truncate text-xs">
+          In <span className="font-semibold text-foreground">{label}</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-1 flex self-start px-2">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground h-7 max-w-64 gap-1.5 px-2 text-xs font-normal"
+            aria-label="Conversation project"
+          >
+            <span className="truncate">
+              Starting in{" "}
+              <span className="font-semibold text-foreground">{label}</span>
+            </span>
+            <ChevronDownIcon className="size-3.5 shrink-0" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align="start" className="w-64 p-0">
+          <Command>
+            <CommandInput placeholder="Search projects..." />
+            <CommandList>
+              <CommandEmpty>No projects found.</CommandEmpty>
+              <CommandGroup>
+                <CommandItem
+                  value={HOME_PROJECT_VALUE}
+                  data-checked={selectedValue === HOME_PROJECT_VALUE}
+                  onSelect={handleSelectProject}
+                >
+                  Home
+                </CommandItem>
+                {projects.map((project) => (
+                  <CommandItem
+                    key={project.id}
+                    value={project.id}
+                    data-checked={selectedValue === project.id}
+                    onSelect={handleSelectProject}
+                  >
+                    {project.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+};
+
+function getCurrentThreadProjectId(state: AssistantState) {
+  const currentThread = state.threads.threadItems.find(
+    (threadItem) => threadItem.id === state.threads.mainThreadId,
+  );
+  const customProjectId = currentThread?.custom?.projectId;
+  if (currentThread?.externalId) return currentThread.externalId;
+  if (typeof customProjectId === "string") return customProjectId;
+  return undefined;
+}
+
+function getProjectLabel(
+  projectId: string | undefined,
+  projects: readonly { id: string; name: string }[],
+) {
+  if (!projectId) return "Home";
+  return (
+    projects.find((project) => project.id === projectId)?.name ?? projectId
+  );
+}
 
 const MessageError: FC = () => {
   return (

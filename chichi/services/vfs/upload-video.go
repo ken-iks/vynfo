@@ -168,7 +168,14 @@ func (f *FileServiceServer) UploadVideo(
 	)
 	if err != nil {
 		<-originalUploadErr
-		logger.ErrorContext(ctx, "error uploading video segments", "uploaded_object_count", len(uploadedObjects), "error", err)
+		logger.ErrorContext(
+			ctx,
+			"error uploading video segments",
+			"uploaded_object_count",
+			len(uploadedObjects),
+			"error",
+			err,
+		)
 		f.cleanupFailedMediaUpload(
 			ctx,
 			asset.ID,

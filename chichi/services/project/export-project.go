@@ -89,7 +89,14 @@ func (p *ProjectServiceServer) ExportProject(
 	cmd.Dir = tempDir
 	logger.InfoContext(ctx, "project export command started")
 	if output, err := cmd.CombinedOutput(); err != nil {
-		logger.ErrorContext(ctx, "error running export command", "error", err, "output", string(output))
+		logger.ErrorContext(
+			ctx,
+			"error running export command",
+			"error",
+			err,
+			"output",
+			string(output),
+		)
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	logger.InfoContext(ctx, "project export command completed")

@@ -72,14 +72,28 @@ func (p *ProjectServiceServer) GetManifest(w http.ResponseWriter, r *http.Reques
 	path := fmt.Sprintf("manifests/%s.m3u8", manifestId)
 	reader, err := bucket.Object(path).NewReader(ctx)
 	if err != nil {
-		logger.ErrorContext(r.Context(), "GetManifest failed to open manifest", "path", path, "error", err)
+		logger.ErrorContext(
+			r.Context(),
+			"GetManifest failed to open manifest",
+			"path",
+			path,
+			"error",
+			err,
+		)
 		http.Error(w, "invalid manifest id", http.StatusBadRequest)
 		return
 	}
 	defer reader.Close()
 	raw, err := io.ReadAll(reader)
 	if err != nil {
-		logger.ErrorContext(r.Context(), "GetManifest failed to read manifest", "path", path, "error", err)
+		logger.ErrorContext(
+			r.Context(),
+			"GetManifest failed to read manifest",
+			"path",
+			path,
+			"error",
+			err,
+		)
 		http.Error(w, "failed to read manifest", http.StatusInternalServerError)
 		return
 	}
@@ -88,7 +102,14 @@ func (p *ProjectServiceServer) GetManifest(w http.ResponseWriter, r *http.Reques
 	manifest := string(raw)
 	signed, err := video.SignManifest(bucket, manifest, expiry)
 	if err != nil {
-		logger.ErrorContext(r.Context(), "GetManifest failed to sign manifest", "path", path, "error", err)
+		logger.ErrorContext(
+			r.Context(),
+			"GetManifest failed to sign manifest",
+			"path",
+			path,
+			"error",
+			err,
+		)
 		http.Error(w, "failed to sign manifest", http.StatusInternalServerError)
 		return
 	}

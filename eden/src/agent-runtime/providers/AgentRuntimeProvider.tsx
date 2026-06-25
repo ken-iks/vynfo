@@ -5,7 +5,15 @@ import { useCallback, useRef, type ReactNode } from "react";
 import { toThreadStream } from "../serde/toThreadStream";
 import { ThreadProvider } from "./ThreadProvider";
 
-export function AgentRunTimeProvider({ children }: { children: ReactNode }) {
+type AgentRunTimeProviderProps = {
+  children: ReactNode;
+  projectId?: string;
+};
+
+export function AgentRunTimeProvider({
+  children,
+  projectId,
+}: AgentRunTimeProviderProps) {
   const { currentWorkspaceId } = useWorkspaceContext();
   const initializedConversationIdRef = useRef<string | undefined>(undefined);
   const handleInitialize = useCallback((conversationId: string) => {
@@ -65,7 +73,11 @@ export function AgentRunTimeProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ThreadProvider runtimeHook={RuntimeHook} onInitialize={handleInitialize}>
+    <ThreadProvider
+      runtimeHook={RuntimeHook}
+      onInitialize={handleInitialize}
+      projectId={projectId}
+    >
       {children}
     </ThreadProvider>
   );

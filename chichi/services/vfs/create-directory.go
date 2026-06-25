@@ -37,7 +37,12 @@ func (f *FileServiceServer) CreateDirectory(
 	parentId := uuid.NullUUID{}
 	var siblingDirectories []db.Directory
 	if req.Msg.ParentDirectoryId != nil {
-		parsedParentId, err := shared.ParseUUID(ctx, logger, "parent_directory_id", req.Msg.GetParentDirectoryId())
+		parsedParentId, err := shared.ParseUUID(
+			ctx,
+			logger,
+			"parent_directory_id",
+			req.Msg.GetParentDirectoryId(),
+		)
 		if err != nil {
 			return nil, err
 		}

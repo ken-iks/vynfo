@@ -62,7 +62,12 @@ func (f *FileServiceServer) DeleteDirectory(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	if len(usages) > 0 {
-		logger.WarnContext(ctx, "directory delete blocked by in-use assets", "usage_count", len(usages))
+		logger.WarnContext(
+			ctx,
+			"directory delete blocked by in-use assets",
+			"usage_count",
+			len(usages),
+		)
 		return nil, deleteInUseAssetsError(workspaceID, usages)
 	}
 

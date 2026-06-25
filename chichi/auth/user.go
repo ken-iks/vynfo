@@ -22,10 +22,22 @@ func RequireOnboardedUser(ctx context.Context, queries *dbgen.Queries) (dbgen.Us
 	user, err := queries.GetUserFromFirebase(ctx, authUser.FirebaseUID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			slog.WarnContext(ctx, "firebase user not found in db", "firebase_uid", authUser.FirebaseUID)
+			slog.WarnContext(
+				ctx,
+				"firebase user not found in db",
+				"firebase_uid",
+				authUser.FirebaseUID,
+			)
 			return dbgen.User{}, connect.NewError(connect.CodeUnauthenticated, err)
 		}
-		slog.ErrorContext(ctx, "error fetching firebase user", "firebase_uid", authUser.FirebaseUID, "error", err)
+		slog.ErrorContext(
+			ctx,
+			"error fetching firebase user",
+			"firebase_uid",
+			authUser.FirebaseUID,
+			"error",
+			err,
+		)
 		return dbgen.User{}, connect.NewError(connect.CodeInternal, err)
 	}
 

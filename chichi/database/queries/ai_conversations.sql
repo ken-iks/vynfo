@@ -1,6 +1,6 @@
 -- name: GetOrCreateAIConversation :one
-INSERT INTO ai_conversations (title, conversation_owner_id, client_id) 
-VALUES ($1, $2, $3) 
+INSERT INTO ai_conversations (title, conversation_owner_id, client_id, project_id) 
+VALUES ($1, $2, $3, $4) 
 ON CONFLICT (client_id) DO UPDATE SET last_updated_at = ai_conversations.last_updated_at 
 RETURNING *;
 

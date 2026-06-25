@@ -22,21 +22,30 @@ TOOL_CALL_STATUS_DENIED: ToolCallStatus
 TOOL_CALL_STATUS_ERRORED: ToolCallStatus
 
 class StreamChatRequest(_message.Message):
-    __slots__ = ("prompt", "previous_conversation_runs", "user_id", "workspace_id")
+    __slots__ = (
+        "prompt",
+        "previous_conversation_runs",
+        "user_id",
+        "workspace_id",
+        "project_id",
+    )
     PROMPT_FIELD_NUMBER: _ClassVar[int]
     PREVIOUS_CONVERSATION_RUNS_FIELD_NUMBER: _ClassVar[int]
     USER_ID_FIELD_NUMBER: _ClassVar[int]
     WORKSPACE_ID_FIELD_NUMBER: _ClassVar[int]
+    PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     prompt: str
     previous_conversation_runs: _containers.RepeatedScalarFieldContainer[str]
     user_id: str
     workspace_id: str
+    project_id: str
     def __init__(
         self,
         prompt: _Optional[str] = ...,
         previous_conversation_runs: _Optional[_Iterable[str]] = ...,
         user_id: _Optional[str] = ...,
         workspace_id: _Optional[str] = ...,
+        project_id: _Optional[str] = ...,
     ) -> None: ...
 
 class StreamChatResponse(_message.Message):

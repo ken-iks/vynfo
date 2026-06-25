@@ -21,6 +21,7 @@ message StreamChatRequest {
     // only whitelisted users are able to send agent messages for now
     string user_id = 3;
     string workspace_id = 4;
+    optional string project_id = 5;
 }
 
 message StreamChatResponse {

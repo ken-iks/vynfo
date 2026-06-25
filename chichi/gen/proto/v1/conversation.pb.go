@@ -96,7 +96,7 @@ type SendMessagePersistanceOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The client-side id of the existing message this new user message replies to.
 	// Chichi validates this id belongs to the conversation and stores the new user
-	// message as its child. This is a message id, not an ai_conversation_runs id.
+	// message as its child.
 	ParentClientId *string `protobuf:"bytes,1,opt,name=parent_client_id,json=parentClientId,proto3,oneof" json:"parent_client_id,omitempty"`
 	// The client-side id assistant-ui already assigned to the user message being
 	// sent. Chichi persists the matching user message row with this id so the
@@ -105,7 +105,7 @@ type SendMessagePersistanceOptions struct {
 	// The client-side id assistant-ui assigned to the live generated assistant
 	// response. A Mensah run can contain intermediate persisted messages, but
 	// this id belongs only to the final assistant message represented by the
-	// streamed response in assistant-ui. This is not an ai_conversation_runs id.
+	// streamed response in assistant-ui.
 	ResponseClientId *string `protobuf:"bytes,3,opt,name=response_client_id,json=responseClientId,proto3,oneof" json:"response_client_id,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -169,6 +169,7 @@ type AIConversation struct {
 	ConversationOwnerId string                 `protobuf:"bytes,3,opt,name=conversation_owner_id,json=conversationOwnerId,proto3" json:"conversation_owner_id,omitempty"`
 	IsArchived          bool                   `protobuf:"varint,4,opt,name=is_archived,json=isArchived,proto3" json:"is_archived,omitempty"`
 	LastUpdatedAt       *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=last_updated_at,json=lastUpdatedAt,proto3" json:"last_updated_at,omitempty"`
+	ProjectId           *string                `protobuf:"bytes,6,opt,name=project_id,json=projectId,proto3,oneof" json:"project_id,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -238,13 +239,29 @@ func (x *AIConversation) GetLastUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *AIConversation) GetProjectId() string {
+	if x != nil && x.ProjectId != nil {
+		return *x.ProjectId
+	}
+	return ""
+}
+
+// Creates a new conversation thread for AI chats
+//
+// Creating a converesation with a coupled project
+// id allows you to scope the agent context to that
+// project in the same way you would have a conversation
+// thread tied to a repository for a coding agent
 type CreateAIConversationRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Title string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	// you can optionally use a unique client id
 	// for the conversation to enforce idempotency
 	// on thread initialization
-	ClientId      *string `protobuf:"bytes,2,opt,name=client_id,json=clientId,proto3,oneof" json:"client_id,omitempty"`
+	ClientId *string `protobuf:"bytes,2,opt,name=client_id,json=clientId,proto3,oneof" json:"client_id,omitempty"`
+	// NOTE: scoping a conversation to a project id cannot
+	// be undone
+	ProjectId     *string `protobuf:"bytes,3,opt,name=project_id,json=projectId,proto3,oneof" json:"project_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -289,6 +306,13 @@ func (x *CreateAIConversationRequest) GetTitle() string {
 func (x *CreateAIConversationRequest) GetClientId() string {
 	if x != nil && x.ClientId != nil {
 		return *x.ClientId
+	}
+	return ""
+}
+
+func (x *CreateAIConversationRequest) GetProjectId() string {
+	if x != nil && x.ProjectId != nil {
+		return *x.ProjectId
 	}
 	return ""
 }
@@ -774,19 +798,25 @@ const file_proto_v1_conversation_proto_rawDesc = "" +
 	"\tclient_id\x18\x02 \x01(\tR\bclientId\x121\n" +
 	"\x12response_client_id\x18\x03 \x01(\tH\x01R\x10responseClientId\x88\x01\x01B\x13\n" +
 	"\x11_parent_client_idB\x15\n" +
-	"\x13_response_client_id\"\xe8\x01\n" +
+	"\x13_response_client_id\"\x9b\x02\n" +
 	"\x0eAIConversation\x12'\n" +
 	"\x0fconversation_id\x18\x01 \x01(\tR\x0econversationId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x122\n" +
 	"\x15conversation_owner_id\x18\x03 \x01(\tR\x13conversationOwnerId\x12\x1f\n" +
 	"\vis_archived\x18\x04 \x01(\bR\n" +
 	"isArchived\x12B\n" +
-	"\x0flast_updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\rlastUpdatedAt\"c\n" +
+	"\x0flast_updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\rlastUpdatedAt\x12\"\n" +
+	"\n" +
+	"project_id\x18\x06 \x01(\tH\x00R\tprojectId\x88\x01\x01B\r\n" +
+	"\v_project_id\"\x96\x01\n" +
 	"\x1bCreateAIConversationRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12 \n" +
-	"\tclient_id\x18\x02 \x01(\tH\x00R\bclientId\x88\x01\x01B\f\n" +
+	"\tclient_id\x18\x02 \x01(\tH\x00R\bclientId\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"_client_id\"V\n" +
+	"project_id\x18\x03 \x01(\tH\x01R\tprojectId\x88\x01\x01B\f\n" +
+	"\n" +
+	"_client_idB\r\n" +
+	"\v_project_id\"V\n" +
 	"\x1cCreateAIConversationResponse\x126\n" +
 	"\fconversation\x18\x01 \x01(\v2\x12.v1.AIConversationR\fconversation\"C\n" +
 	"\x18GetAIConversationRequest\x12'\n" +
@@ -893,6 +923,7 @@ func file_proto_v1_conversation_proto_init() {
 		return
 	}
 	file_proto_v1_conversation_proto_msgTypes[1].OneofWrappers = []any{}
+	file_proto_v1_conversation_proto_msgTypes[2].OneofWrappers = []any{}
 	file_proto_v1_conversation_proto_msgTypes[3].OneofWrappers = []any{}
 	file_proto_v1_conversation_proto_msgTypes[13].OneofWrappers = []any{}
 	type x struct{}

@@ -8,11 +8,32 @@ import {
 } from "@assistant-ui/react";
 import { timestampDate } from "@bufbuild/protobuf/wkt";
 import { createAssistantStream } from "assistant-stream";
-import { useMemo, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { ThreadHistoryProvider } from "./ThreadHistoryProvider";
+
+type PendingProject = {
+  projectId?: string;
+};
+
+type AgentThreadListContextValue = {
+  prepareNewThread: (projectId?: string) => void;
+  preparedProjectId?: string;
+};
+
+const AgentThreadListContext =
+  createContext<AgentThreadListContextValue | null>(null);
 
 function createAdapter(
   onInitialize?: (conversationId: string) => void,
+  getProjectIdForNewThread?: () => string | undefined,
 ): RemoteThreadListAdapter {
   return {
     unstable_Provider: ThreadHistoryProvider,
@@ -27,7 +48,9 @@ function createAdapter(
         threads: conversations.map((t) => ({
           status: t.isArchived ? "archived" : "regular",
           remoteId: t.conversationId,
+          externalId: t.projectId,
           title: t.title,
+          custom: { projectId: t.projectId },
           lastMessageAt: t.lastUpdatedAt
             ? timestampDate(t.lastUpdatedAt)
             : undefined,
@@ -35,7 +58,8 @@ function createAdapter(
       };
     },
     async fetch(threadId: string) {
-      // TODO: assert that threadId is referring to remote and not local
+      // NOTE: threadId here refers to the remote ID and not the client id
+      // its just poorly named
       const { conversation } = await conversationClient.getAIConversation({
         conversationId: threadId,
       });
@@ -45,22 +69,26 @@ function createAdapter(
       return {
         status: conversation.isArchived ? "archived" : "regular",
         remoteId: conversation.conversationId,
+        externalId: conversation.projectId,
         title: conversation.title,
+        custom: { projectId: conversation.projectId },
         lastMessageAt: conversation.lastUpdatedAt
           ? timestampDate(conversation.lastUpdatedAt)
           : undefined,
       };
     },
     async initialize(threadId: string) {
+      const projectId = getProjectIdForNewThread?.();
       const { conversation } = await conversationClient.createAIConversation({
         title: "New Conversation",
         clientId: threadId,
+        projectId,
       });
       if (!conversation) {
         throw new Error();
       }
       onInitialize?.(conversation.conversationId);
-      return { remoteId: conversation.conversationId, externalId: undefined };
+      return { remoteId: conversation.conversationId, externalId: projectId };
     },
     async rename(remoteId: string, newTitle: string) {
       await conversationClient.updateAIConversation({
@@ -78,7 +106,6 @@ function createAdapter(
       if (!title) {
         throw new Error();
       }
-      // TODO: assert that I also have to make the backend call to update the title
       await conversationClient.updateAIConversation({
         conversationId: remoteId,
         title: title,
@@ -107,25 +134,61 @@ function createAdapter(
   };
 }
 
+export function useAgentThreadList(): AgentThreadListContextValue {
+  const context = useContext(AgentThreadListContext);
+  if (!context) {
+    throw new Error("useAgentThreadList must be used within ThreadProvider");
+  }
+  return context;
+}
+
 type ThreadProviderProps = {
   children: ReactNode;
   runtimeHook: () => AssistantRuntime;
   onInitialize?: (conversationId: string) => void;
+  projectId?: string;
 };
 
 export function ThreadProvider({
   children,
   runtimeHook,
   onInitialize,
+  projectId,
 }: ThreadProviderProps) {
-  const adapter = useMemo(() => createAdapter(onInitialize), [onInitialize]);
+  const pendingProjectRef = useRef<PendingProject | undefined>(undefined);
+  const [preparedProjectId, setPreparedProjectId] = useState<
+    string | undefined
+  >(projectId);
+  const prepareNewThread = useCallback((projectId?: string) => {
+    pendingProjectRef.current = { projectId };
+    setPreparedProjectId(projectId);
+  }, []);
+  const getProjectIdForNewThread = useCallback(() => {
+    const pendingProject = pendingProjectRef.current;
+    pendingProjectRef.current = undefined;
+    setPreparedProjectId(projectId);
+    if (pendingProject) {
+      return pendingProject.projectId;
+    }
+    return projectId;
+  }, [projectId]);
+  const threadListContextValue = useMemo(
+    () => ({ prepareNewThread, preparedProjectId }),
+    [prepareNewThread, preparedProjectId],
+  );
+  const adapter = useMemo(
+    () => createAdapter(onInitialize, getProjectIdForNewThread),
+    [getProjectIdForNewThread, onInitialize],
+  );
   const runtime = useRemoteThreadListRuntime({
     adapter,
     runtimeHook,
   });
   return (
-    <AssistantRuntimeProvider runtime={runtime}>
-      {children}
-    </AssistantRuntimeProvider>
+    <AgentThreadListContext.Provider value={threadListContextValue}>
+      <AssistantRuntimeProvider runtime={runtime}>
+        {children}
+      </AssistantRuntimeProvider>
+    </AgentThreadListContext.Provider>
   );
 }

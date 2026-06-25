@@ -72,7 +72,7 @@ const archiveAIConversation = `-- name: ArchiveAIConversation :one
 UPDATE ai_conversations
 SET is_archived = TRUE
 WHERE id = $1 AND conversation_owner_id = $2
-RETURNING id, title, conversation_owner_id, last_updated_at, is_archived, client_id
+RETURNING id, title, conversation_owner_id, last_updated_at, is_archived, client_id, project_id
 `
 
 type ArchiveAIConversationParams struct {
@@ -90,6 +90,7 @@ func (q *Queries) ArchiveAIConversation(ctx context.Context, arg ArchiveAIConver
 		&i.LastUpdatedAt,
 		&i.IsArchived,
 		&i.ClientID,
+		&i.ProjectID,
 	)
 	return i, err
 }
@@ -171,7 +172,7 @@ func (q *Queries) DeleteAIConversation(ctx context.Context, arg DeleteAIConversa
 }
 
 const getAIConversationByClientID = `-- name: GetAIConversationByClientID :one
-SELECT id, title, conversation_owner_id, last_updated_at, is_archived, client_id
+SELECT id, title, conversation_owner_id, last_updated_at, is_archived, client_id, project_id
 FROM ai_conversations
 WHERE client_id = $1 AND conversation_owner_id = $2
 `
@@ -191,6 +192,7 @@ func (q *Queries) GetAIConversationByClientID(ctx context.Context, arg GetAIConv
 		&i.LastUpdatedAt,
 		&i.IsArchived,
 		&i.ClientID,
+		&i.ProjectID,
 	)
 	return i, err
 }
@@ -224,20 +226,26 @@ func (q *Queries) GetAIConversationMessageForConversation(ctx context.Context, a
 }
 
 const getOrCreateAIConversation = `-- name: GetOrCreateAIConversation :one
-INSERT INTO ai_conversations (title, conversation_owner_id, client_id) 
-VALUES ($1, $2, $3) 
+INSERT INTO ai_conversations (title, conversation_owner_id, client_id, project_id) 
+VALUES ($1, $2, $3, $4) 
 ON CONFLICT (client_id) DO UPDATE SET last_updated_at = ai_conversations.last_updated_at 
-RETURNING id, title, conversation_owner_id, last_updated_at, is_archived, client_id
+RETURNING id, title, conversation_owner_id, last_updated_at, is_archived, client_id, project_id
 `
 
 type GetOrCreateAIConversationParams struct {
 	Title               string
 	ConversationOwnerID uuid.UUID
 	ClientID            sql.NullString
+	ProjectID           uuid.NullUUID
 }
 
 func (q *Queries) GetOrCreateAIConversation(ctx context.Context, arg GetOrCreateAIConversationParams) (AiConversation, error) {
-	row := q.db.QueryRowContext(ctx, getOrCreateAIConversation, arg.Title, arg.ConversationOwnerID, arg.ClientID)
+	row := q.db.QueryRowContext(ctx, getOrCreateAIConversation,
+		arg.Title,
+		arg.ConversationOwnerID,
+		arg.ClientID,
+		arg.ProjectID,
+	)
 	var i AiConversation
 	err := row.Scan(
 		&i.ID,
@@ -246,12 +254,13 @@ func (q *Queries) GetOrCreateAIConversation(ctx context.Context, arg GetOrCreate
 		&i.LastUpdatedAt,
 		&i.IsArchived,
 		&i.ClientID,
+		&i.ProjectID,
 	)
 	return i, err
 }
 
 const getUserAIConversation = `-- name: GetUserAIConversation :one
-SELECT id, title, conversation_owner_id, last_updated_at, is_archived, client_id
+SELECT id, title, conversation_owner_id, last_updated_at, is_archived, client_id, project_id
 FROM ai_conversations
 WHERE id = $1 AND conversation_owner_id = $2
 `
@@ -271,6 +280,7 @@ func (q *Queries) GetUserAIConversation(ctx context.Context, arg GetUserAIConver
 		&i.LastUpdatedAt,
 		&i.IsArchived,
 		&i.ClientID,
+		&i.ProjectID,
 	)
 	return i, err
 }
@@ -492,7 +502,7 @@ func (q *Queries) ListAIConversationRunsForMessagePath(ctx context.Context, arg 
 }
 
 const listUserAIConversations = `-- name: ListUserAIConversations :many
-SELECT id, title, conversation_owner_id, last_updated_at, is_archived, client_id
+SELECT id, title, conversation_owner_id, last_updated_at, is_archived, client_id, project_id
 FROM ai_conversations
 WHERE conversation_owner_id = $1
 ORDER BY last_updated_at DESC
@@ -514,6 +524,7 @@ func (q *Queries) ListUserAIConversations(ctx context.Context, conversationOwner
 			&i.LastUpdatedAt,
 			&i.IsArchived,
 			&i.ClientID,
+			&i.ProjectID,
 		); err != nil {
 			return nil, err
 		}
@@ -551,7 +562,7 @@ const unArchiveAIConversation = `-- name: UnArchiveAIConversation :one
 UPDATE ai_conversations
 SET is_archived = FALSE
 WHERE id = $1 AND conversation_owner_id = $2
-RETURNING id, title, conversation_owner_id, last_updated_at, is_archived, client_id
+RETURNING id, title, conversation_owner_id, last_updated_at, is_archived, client_id, project_id
 `
 
 type UnArchiveAIConversationParams struct {
@@ -569,6 +580,7 @@ func (q *Queries) UnArchiveAIConversation(ctx context.Context, arg UnArchiveAICo
 		&i.LastUpdatedAt,
 		&i.IsArchived,
 		&i.ClientID,
+		&i.ProjectID,
 	)
 	return i, err
 }
@@ -577,7 +589,7 @@ const updateAIConversationTitle = `-- name: UpdateAIConversationTitle :one
 UPDATE ai_conversations
 SET title = $1
 WHERE id = $2 AND conversation_owner_id = $3
-RETURNING id, title, conversation_owner_id, last_updated_at, is_archived, client_id
+RETURNING id, title, conversation_owner_id, last_updated_at, is_archived, client_id, project_id
 `
 
 type UpdateAIConversationTitleParams struct {
@@ -596,6 +608,7 @@ func (q *Queries) UpdateAIConversationTitle(ctx context.Context, arg UpdateAICon
 		&i.LastUpdatedAt,
 		&i.IsArchived,
 		&i.ClientID,
+		&i.ProjectID,
 	)
 	return i, err
 }

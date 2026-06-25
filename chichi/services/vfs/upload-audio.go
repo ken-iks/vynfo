@@ -158,7 +158,14 @@ func (f *FileServiceServer) UploadAudio(
 	)
 	if err != nil {
 		<-originalUploadErr
-		logger.ErrorContext(ctx, "error uploading audio segments", "uploaded_object_count", len(uploadedObjects), "error", err)
+		logger.ErrorContext(
+			ctx,
+			"error uploading audio segments",
+			"uploaded_object_count",
+			len(uploadedObjects),
+			"error",
+			err,
+		)
 		f.cleanupFailedMediaUpload(
 			ctx,
 			asset.ID,

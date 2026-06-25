@@ -51,14 +51,24 @@ message AIConversation {
     string conversation_owner_id = 3;
     bool is_archived = 4;
     google.protobuf.Timestamp last_updated_at = 5;
+    optional string project_id = 6;
 }
 
+// Creates a new conversation thread for AI chats
+// 
+// Creating a converesation with a coupled project
+// id allows you to scope the agent context to that
+// project in the same way you would have a conversation
+// thread tied to a repository for a coding agent
 message CreateAIConversationRequest {
     string title = 1;
     // you can optionally use a unique client id
     // for the conversation to enforce idempotency
     // on thread initialization
     optional string client_id = 2;
+    // NOTE: scoping a conversation to a project id cannot
+    // be undone
+    optional string project_id = 3;
 }
 
 message CreateAIConversationResponse {
