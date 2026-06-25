@@ -5,7 +5,8 @@ import type { User } from "@/gen/proto/v1/users_pb";
 import { useAuthContext } from "../providers/AuthProvider";
 import { useWorkspaceContext } from "../providers/WorkspaceProvider";
 import { AddUserDropdown } from "../shared/AddUserDropdown";
-import { SectionTitle } from "../shared/SectionTitle";
+import { ThemeToggle } from "../shared/ThemeToggle";
+import { useBreadcrumbs } from "../Breadcrumbs";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -41,7 +42,7 @@ function ProfileImage({
 
 export function Settings() {
   const navigate = useNavigate();
-  const { appUser, userId } = useAuthContext();
+  const { appUser, signOut, userId } = useAuthContext();
   const {
     workspaces,
     currentWorkspace,
@@ -51,6 +52,9 @@ export function Settings() {
     refreshWorkspaces,
   } = useWorkspaceContext();
   const [addingWorkspaceUserId, setAddingWorkspaceUserId] = useState("");
+
+  useBreadcrumbs([{ label: "Settings" }]);
+
   const displayName = appUser?.displayName || appUser?.email || "User";
   const workspaceUsersById = new Map<string, User>();
   for (const workspace of workspaces) {
@@ -90,7 +94,6 @@ export function Settings() {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-12 py-12">
-      <SectionTitle>Settings</SectionTitle>
       <Card>
         <CardHeader>
           <CardTitle>Profile</CardTitle>
@@ -109,6 +112,20 @@ export function Settings() {
               </p>
             )}
           </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Account</CardTitle>
+          <CardDescription>
+            Manage your app preferences and session
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap items-center gap-2">
+          <ThemeToggle />
+          <Button type="button" variant="outline" onClick={signOut}>
+            Sign out
+          </Button>
         </CardContent>
       </Card>
       <Card>

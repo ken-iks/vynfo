@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSnapshot } from "valtio";
 import { Card, CardContent } from "../ui/card";
+import { HeaderPortal } from "../HeaderSlot";
+import { useBreadcrumbs } from "../Breadcrumbs";
 import { useAuth } from "../providers/AuthProvider";
 import { chichiUrl, client } from "@/lib/client";
 import type {
@@ -20,15 +22,7 @@ import { editorStore } from "../stores/editor";
 import { mediaAssetStore } from "../stores/mediaAssets";
 import { EditorTimeline } from "../project-editor/EditorTimeline";
 import { CommitDialog } from "../project-editor/CommitDialog";
-import { ExportDialogue } from "../project-editor/ExportDialogue";
-import { SectionTitle } from "../shared/SectionTitle";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { VersionsSheet } from "../project-editor/VersionsSheet";
 import { cn } from "@/lib/utils";
 
 export function ProjectView({ project }: { project: ProjectMetadata }) {
@@ -59,6 +53,15 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
   const selectedBranchMetadata = branches.find(
     (b) => b.name === selectedBranch,
   );
+
+  useBreadcrumbs([
+    { label: "Projects", to: "/projects" },
+    {
+      label: selectedBranch
+        ? `${project.name} (${selectedBranch})`
+        : project.name,
+    },
+  ]);
   const isVideoReadyToPlay =
     currVideoPlayingSrc !== "" && readyVideoSrc === currVideoPlayingSrc;
   const branchVideoUrl = useCallback(
@@ -275,30 +278,30 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
     }
   };
 
+  const restoreCommit = async (commitId: string) => {
+    const branch = selectedBranchMetadata;
+    if (!branch) return;
+    const commit = await client.getCommit({ commitId, branchId: branch.id });
+    editorStore.loadState(commit.commitState);
+    await client.autoSave({
+      projectId: project.id,
+      branchId: branch.id,
+      autoSaveState: editorStore.currentState(),
+    });
+    setCurrVideoPlayingSrc(
+      branchVideoUrl(branch.id, { v: `restore-${commitId}` }),
+    );
+    setCurrAudioPlayingSrc(
+      editorStore.audioSections.length
+        ? branchVideoUrl(branch.id, { audio: "1", v: `restore-${commitId}` })
+        : "",
+    );
+  };
+
   return (
     <div className="flex min-w-0 flex-col items-center overflow-x-hidden">
-      <div
-        className={cn(
-          "flex w-2/3 min-w-0 max-w-full items-center justify-between gap-4",
-        )}
-      >
-        <SectionTitle>{project.name}</SectionTitle>
+      <HeaderPortal>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Branch</span>
-            <Select value={selectedBranch} onValueChange={handleBranchChange}>
-              <SelectTrigger size="sm">
-                <SelectValue placeholder="Select a branch" />
-              </SelectTrigger>
-              <SelectContent>
-                {branches.map((b) => (
-                  <SelectItem key={b.name} value={b.name}>
-                    {b.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
           <CommitDialog
             projectId={project.id}
             branchName={selectedBranch}
@@ -309,13 +312,17 @@ export function ProjectView({ project }: { project: ProjectMetadata }) {
             }
             onCommitSuccess={handleCommitSuccess}
           />
-          <ExportDialogue
+          <VersionsSheet
             projectId={project.id}
+            branches={branches}
+            selectedBranch={selectedBranch}
             branchId={selectedBranchMetadata?.id}
-            branchName={selectedBranch}
+            tipCommitId={selectedBranchMetadata?.tipCommitId}
+            onBranchChange={handleBranchChange}
+            onRestore={restoreCommit}
           />
         </div>
-      </div>
+      </HeaderPortal>
       <Card
         className={cn("w-2/3 min-w-0 max-w-full gap-0 overflow-hidden py-0")}
       >

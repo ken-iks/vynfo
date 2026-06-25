@@ -3,8 +3,6 @@ import { Navigate, useNavigate, useParams } from "react-router";
 import type { ProjectMetadata } from "../../gen/proto/v1/projects_pb";
 import { ProjectView } from "./ProjectView";
 import { ProjectsList } from "./ProjectsList";
-import { Button } from "../ui/button";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { useWorkspaceContext } from "../providers/WorkspaceProvider";
 import { client } from "@/lib/client";
 
@@ -27,7 +25,6 @@ export function Projects() {
 
 export function ProjectRoute() {
   const { projectId } = useParams();
-  const navigate = useNavigate();
   const { currentWorkspaceId } = useWorkspaceContext();
   const [project, setProject] = useState<ProjectMetadata>();
   const [loaded, setLoaded] = useState(false);
@@ -56,12 +53,6 @@ export function ProjectRoute() {
 
   return (
     <div className="relative h-full">
-      <div className="absolute top-2 left-2 z-10">
-        <Button variant="outline" onClick={() => navigate("/projects")}>
-          <ArrowLeftIcon className="size-4" />
-          Back to Projects
-        </Button>
-      </div>
       {project ? (
         <ProjectView project={project} />
       ) : (

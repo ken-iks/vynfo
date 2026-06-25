@@ -4,21 +4,13 @@ import { Navigate, useNavigate, useParams } from "react-router";
 import { spacesClient } from "@/lib/client";
 import type { ProjectSpace } from "@/gen/proto/v1/spaces_pb";
 import { AddUserDropdown } from "../shared/AddUserDropdown";
-import { SectionTitle } from "../shared/SectionTitle";
+import { useBreadcrumbs } from "../Breadcrumbs";
 import { DataTable } from "../shared/DataTable";
 import { useWorkspaceContext } from "../providers/WorkspaceProvider";
-import { Button } from "../ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardDescription, CardHeader } from "../ui/card";
 import { SpaceView } from "./SpaceView";
 import { useSpaces } from "./hooks/useSpaces";
 import { CreateSpaceDialogue } from "./CreateSpaceDialogue";
-import { SectionSubtitle } from "../shared/SectionSubtitle";
 
 export function Spaces() {
   const navigate = useNavigate();
@@ -35,6 +27,8 @@ export function Spaces() {
     spaceName,
     spaces,
   } = useSpaces();
+
+  useBreadcrumbs([{ label: "Reviews" }]);
 
   const columns: ColumnDef<ProjectSpace>[] = [
     {
@@ -54,15 +48,7 @@ export function Spaces() {
 
   return (
     <div className="px-12 pt-12">
-      <div className="mb-2 flex items-center justify-between">
-        <div>
-          <SectionTitle>Vynfo Spaces</SectionTitle>
-          <SectionSubtitle>
-            {" "}
-            Collaborate with workspace members and agents on your hardest
-            workflows{" "}
-          </SectionSubtitle>
-        </div>
+      <div className="mb-2 flex items-center justify-end">
         <CreateSpaceDialogue
           creating={creating}
           disabled={!currentWorkspaceId}
@@ -98,9 +84,13 @@ export function Spaces() {
 
 export function SpaceRoute() {
   const { spaceId } = useParams();
-  const navigate = useNavigate();
   const { currentWorkspaceId } = useWorkspaceContext();
   const [space, setSpace] = useState<ProjectSpace>();
+
+  useBreadcrumbs([
+    { label: "Reviews", to: "/spaces" },
+    { label: space?.name ?? "Review" },
+  ]);
 
   useEffect(() => {
     if (!spaceId || !currentWorkspaceId) return;
@@ -121,17 +111,9 @@ export function SpaceRoute() {
     <div className="flex h-full min-h-0 justify-center px-12 pb-6 pt-10">
       <Card className="h-full min-h-[82vh] w-full max-w-5xl p-0">
         <CardHeader className="border-b">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <CardTitle>{space?.name ?? "Space"}</CardTitle>
-              <CardDescription>
-                {space ? `${space.users.length} members` : "Loading space..."}
-              </CardDescription>
-            </div>
-            <Button variant="outline" onClick={() => navigate("/spaces")}>
-              Back to Spaces
-            </Button>
-          </div>
+          <CardDescription>
+            {space ? `${space.users.length} members` : "Loading space..."}
+          </CardDescription>
         </CardHeader>
         <CardContent className="flex min-h-0 flex-1 flex-col p-0">
           <SpaceView spaceId={spaceId} />

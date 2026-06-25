@@ -75,7 +75,7 @@ function AppShell() {
     <WorkspaceProvider>
       <BrowserRouter>
         <Routes>
-          <Route element={<AppLayout onSignOut={signOut} />}>
+          <Route element={<AppLayout />}>
             <Route path="/" element={<Navigate to="/projects" replace />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/projects/:projectId" element={<ProjectRoute />} />

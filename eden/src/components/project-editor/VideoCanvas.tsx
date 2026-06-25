@@ -74,6 +74,8 @@ export function VideoCanvas({ video }: { video: HTMLVideoElement | null }) {
       // playable frame lets hls.js/browser playback finish its startup path first.
       const buildSprite = () => {
         if (sprite) return;
+        // Pixi's VideoSource defaults to autoplay even if the hidden source
+        // video is paused, so disable it here to keep project previews paused.
         const videoTextureOptions = {
           resource: video,
           autoPlay: false,

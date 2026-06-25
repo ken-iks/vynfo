@@ -54,7 +54,9 @@ export const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(
           if (restoreTime > 0) {
             video.currentTime = restoreTime;
           }
-          video.play();
+          // Project previews should open paused; hls.js readiness is separate
+          // from Pixi's video texture setup, so neither layer should autoplay.
+          video.pause();
         });
 
         return () => hls.destroy();

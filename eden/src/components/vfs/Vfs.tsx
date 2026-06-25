@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { useBreadcrumbs } from "@/components/Breadcrumbs";
 import { VfsDeleteDialogue } from "./VfsDeleteDialogue";
 import { VfsMoveDialog } from "./VfsMoveDialog";
 import { VfsNameDialog } from "./VfsNameDialog";
@@ -38,6 +39,8 @@ export function Vfs() {
     uploadOpen,
     uploadParentDirectoryId,
   } = useVfs();
+
+  useBreadcrumbs([{ label: "Files" }]);
 
   return (
     <div className="space-y-4 px-12 pt-12">

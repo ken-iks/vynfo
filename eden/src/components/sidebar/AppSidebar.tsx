@@ -12,6 +12,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
 } from "../ui/sidebar";
 import { UserConfigSheet } from "./UserConfigSheet";
 
@@ -62,7 +63,12 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <SidebarGroupLabel>Vynfo</SidebarGroupLabel>
+        <div className="flex items-center justify-between gap-2 group-data-[collapsible=icon]:justify-center">
+          <SidebarGroupLabel className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
+            Vynfo
+          </SidebarGroupLabel>
+          <SidebarTrigger className="shrink-0" />
+        </div>
         <UserConfigSheet
           displayPictureUrl={appUser?.signedDisplayPhotoPath}
           displayName={displayName}

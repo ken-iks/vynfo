@@ -1,6 +1,7 @@
 import { AgentRunTimeProvider } from "@/agent-runtime/providers/AgentRuntimeProvider";
 import { Thread } from "@/components/assistant-ui/thread";
 import { useWorkspaceContext } from "@/components/providers/WorkspaceProvider";
+import { useBreadcrumbs } from "@/components/Breadcrumbs";
 import { AgentChatList } from "./AgentChatList";
 
 type AgentChatPageProps = {
@@ -9,6 +10,8 @@ type AgentChatPageProps = {
 
 export function AgentChatPage({ projectId }: AgentChatPageProps) {
   const { loadingWorkspaces } = useWorkspaceContext();
+
+  useBreadcrumbs([{ label: "Ask Murch" }]);
 
   if (loadingWorkspaces) {
     return (
