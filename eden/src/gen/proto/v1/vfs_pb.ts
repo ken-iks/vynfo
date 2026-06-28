@@ -2,9 +2,21 @@
 // @generated from file proto/v1/vfs.proto (package v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { MediaAudioMetadata, MediaImageMetadata, MediaVideoMetadata } from "./projects_pb";
+import type {
+  GenFile,
+  GenMessage,
+  GenService,
+} from "@bufbuild/protobuf/codegenv2";
+import {
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from "@bufbuild/protobuf/codegenv2";
+import type {
+  MediaAudioMetadata,
+  MediaImageMetadata,
+  MediaVideoMetadata,
+} from "./projects_pb";
 import { file_proto_v1_projects } from "./projects_pb";
 import type { EmptySchema } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_empty } from "@bufbuild/protobuf/wkt";
@@ -13,8 +25,12 @@ import type { Message } from "@bufbuild/protobuf";
 /**
  * Describes the file proto/v1/vfs.proto.
  */
-export const file_proto_v1_vfs: GenFile = /*@__PURE__*/
-  fileDesc("ChJwcm90by92MS92ZnMucHJvdG8SAnYxImAKCURpcmVjdG9yeRIKCgJpZBgBIAEoCRIUCgx3b3Jrc3BhY2VfaWQYAiABKAkSDAoEbmFtZRgDIAEoCRIjCgdlbnRyaWVzGAQgAygLMhIudjEuRGlyZWN0b3J5RW50cnkiaAoORGlyZWN0b3J5RW50cnkSKgoJZGlyZWN0b3J5GAEgASgLMhUudjEuRGlyZWN0b3J5TWV0YWRhdGFIABIiCgVhc3NldBgCIAEoCzIRLnYxLkFzc2V0TWV0YWRhdGFIAEIGCgRraW5kIi0KEURpcmVjdG9yeU1ldGFkYXRhEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkikgEKDUFzc2V0TWV0YWRhdGESJwoFdmlkZW8YASABKAsyFi52MS5NZWRpYVZpZGVvTWV0YWRhdGFIABInCgVhdWRpbxgCIAEoCzIWLnYxLk1lZGlhQXVkaW9NZXRhZGF0YUgAEicKBWltYWdlGAMgASgLMhYudjEuTWVkaWFJbWFnZU1ldGFkYXRhSABCBgoEa2luZCJ2ChZDcmVhdGVEaXJlY3RvcnlSZXF1ZXN0EgwKBG5hbWUYASABKAkSFAoMd29ya3NwYWNlX2lkGAIgASgJEiAKE3BhcmVudF9kaXJlY3RvcnlfaWQYAyABKAlIAIgBAUIWChRfcGFyZW50X2RpcmVjdG9yeV9pZCI3ChdDcmVhdGVEaXJlY3RvcnlSZXNwb25zZRIcChRjcmVhdGVkX2RpcmVjdG9yeV9pZBgBIAEoCSIvChdHZXRSb290RGlyZWN0b3J5UmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkivgEKGEdldFJvb3REaXJlY3RvcnlSZXNwb25zZRIqCgtkaXJlY3RvcmllcxgBIAMoCzIVLnYxLkRpcmVjdG9yeU1ldGFkYXRhEiYKBnZpZGVvcxgCIAMoCzIWLnYxLk1lZGlhVmlkZW9NZXRhZGF0YRImCgZpbWFnZXMYAyADKAsyFi52MS5NZWRpYUltYWdlTWV0YWRhdGESJgoGYXVkaW9zGAQgAygLMhYudjEuTWVkaWFBdWRpb01ldGFkYXRhIkkKG0dldERpcmVjdG9yeUNoaWxkcmVuUmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkSFAoMZGlyZWN0b3J5X2lkGAIgASgJIsIBChxHZXREaXJlY3RvcnlDaGlsZHJlblJlc3BvbnNlEioKC2RpcmVjdG9yaWVzGAEgAygLMhUudjEuRGlyZWN0b3J5TWV0YWRhdGESJgoGdmlkZW9zGAIgAygLMhYudjEuTWVkaWFWaWRlb01ldGFkYXRhEiYKBmltYWdlcxgDIAMoCzIWLnYxLk1lZGlhSW1hZ2VNZXRhZGF0YRImCgZhdWRpb3MYBCADKAsyFi52MS5NZWRpYUF1ZGlvTWV0YWRhdGEiUgoWUmVuYW1lRGlyZWN0b3J5UmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkSFAoMZGlyZWN0b3J5X2lkGAIgASgJEgwKBG5hbWUYAyABKAkifgoUTW92ZURpcmVjdG9yeVJlcXVlc3QSFAoMd29ya3NwYWNlX2lkGAEgASgJEhQKDGRpcmVjdG9yeV9pZBgCIAEoCRIhChRuZXdfcGFyZW50X2RpcmVjdG9yeRgDIAEoCUgAiAEBQhcKFV9uZXdfcGFyZW50X2RpcmVjdG9yeSJKChJSZW5hbWVBc3NldFJlcXVlc3QSFAoMd29ya3NwYWNlX2lkGAEgASgJEhAKCGFzc2V0X2lkGAIgASgJEgwKBG5hbWUYAyABKAkidgoQTW92ZUFzc2V0UmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkSEAoIYXNzZXRfaWQYAiABKAkSIQoUbmV3X3BhcmVudF9kaXJlY3RvcnkYAyABKAlIAIgBAUIXChVfbmV3X3BhcmVudF9kaXJlY3RvcnkiRAoWRGVsZXRlRGlyZWN0b3J5UmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkSFAoMZGlyZWN0b3J5X2lkGAIgASgJIjwKEkRlbGV0ZUFzc2V0UmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkSEAoIYXNzZXRfaWQYAiABKAkihgEKJkR1cGxpY2F0ZUZpbGVPckRpcmVjdG9yeUVudHJ5TmFtZUVycm9yEhQKDHdvcmtzcGFjZV9pZBgBIAEoCRIgChNwYXJlbnRfZGlyZWN0b3J5X2lkGAIgASgJSACIAQESDAoEbmFtZRgDIAEoCUIWChRfcGFyZW50X2RpcmVjdG9yeV9pZCJZChZEZWxldGVJblVzZUFzc2V0c0Vycm9yEhQKDHdvcmtzcGFjZV9pZBgBIAEoCRIpCgZ1c2FnZXMYAiADKAsyGS52MS5EZWxldGVJblVzZUFzc2V0VXNhZ2UiZwoVRGVsZXRlSW5Vc2VBc3NldFVzYWdlEhAKCGFzc2V0X2lkGAEgASgJEhIKCmFzc2V0X25hbWUYAiABKAkSEgoKcHJvamVjdF9pZBgDIAEoCRIUCgxwcm9qZWN0X25hbWUYBCABKAkijQEKGkluaXRpYXRlVmlkZW9Jbmdlc3RSZXF1ZXN0EhQKDHdvcmtzcGFjZV9pZBgBIAEoCRIgChNwYXJlbnRfZGlyZWN0b3J5X2lkGAIgASgJSACIAQESEAoIYXNzZXRfaWQYAyABKAkSDQoFdGl0bGUYBCABKAlCFgoUX3BhcmVudF9kaXJlY3RvcnlfaWQiSgoXSW5nZXN0UHJvZ3Jlc3NJbmRpY2F0b3ISEAoIYXNzZXRfaWQYASABKAkSHQoVY29tcGxldGlvbl9wZXJjZW50YWdlGAIgASgBIisKF0luZ2VzdEZpbmlzaGVkSW5kaWNhdG9yEhAKCGFzc2V0X2lkGAEgASgJIo8BChtJbml0aWF0ZVZpZGVvSW5nZXN0UmVzcG9uc2USLgoHb25nb2luZxgBIAEoCzIbLnYxLkluZ2VzdFByb2dyZXNzSW5kaWNhdG9ySAASLwoIZmluaXNoZWQYAiABKAsyGy52MS5Jbmdlc3RGaW5pc2hlZEluZGljYXRvckgAQg8KDWluZ2VzdF9zdGF0dXMijQEKGkluaXRpYXRlQXVkaW9Jbmdlc3RSZXF1ZXN0EhQKDHdvcmtzcGFjZV9pZBgBIAEoCRIgChNwYXJlbnRfZGlyZWN0b3J5X2lkGAIgASgJSACIAQESEAoIYXNzZXRfaWQYAyABKAkSDQoFdGl0bGUYBCABKAlCFgoUX3BhcmVudF9kaXJlY3RvcnlfaWQijwEKG0luaXRpYXRlQXVkaW9Jbmdlc3RSZXNwb25zZRIuCgdvbmdvaW5nGAEgASgLMhsudjEuSW5nZXN0UHJvZ3Jlc3NJbmRpY2F0b3JIABIvCghmaW5pc2hlZBgCIAEoCzIbLnYxLkluZ2VzdEZpbmlzaGVkSW5kaWNhdG9ySABCDwoNaW5nZXN0X3N0YXR1cyKEAQoSVXBsb2FkSW1hZ2VSZXF1ZXN0EhQKDHdvcmtzcGFjZV9pZBgBIAEoCRIgChNwYXJlbnRfZGlyZWN0b3J5X2lkGAIgASgJSACIAQESDwoHY29udGVudBgDIAEoDBINCgV0aXRsZRgEIAEoCUIWChRfcGFyZW50X2RpcmVjdG9yeV9pZCIwChNVcGxvYWRJbWFnZVJlc3BvbnNlEhkKEXVwbG9hZGVkX2Fzc2V0X2lkGAEgASgJIjMKG0dldEFzc2V0VXBsb2FkVGFyZ2V0UmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkiXAocR2V0QXNzZXRVcGxvYWRUYXJnZXRSZXNwb25zZRIQCghhc3NldF9pZBgBIAEoCRIUCgx2aWRlb190YXJnZXQYAiABKAkSFAoMYXVkaW9fdGFyZ2V0GAMgASgJMtwHCgtGaWxlU2VydmljZRJYChNJbml0aWF0ZVZpZGVvSW5nZXN0Eh4udjEuSW5pdGlhdGVWaWRlb0luZ2VzdFJlcXVlc3QaHy52MS5Jbml0aWF0ZVZpZGVvSW5nZXN0UmVzcG9uc2UwARJYChNJbml0aWF0ZUF1ZGlvSW5nZXN0Eh4udjEuSW5pdGlhdGVBdWRpb0luZ2VzdFJlcXVlc3QaHy52MS5Jbml0aWF0ZUF1ZGlvSW5nZXN0UmVzcG9uc2UwARI+CgtVcGxvYWRJbWFnZRIWLnYxLlVwbG9hZEltYWdlUmVxdWVzdBoXLnYxLlVwbG9hZEltYWdlUmVzcG9uc2USTQoQR2V0Um9vdERpcmVjdG9yeRIbLnYxLkdldFJvb3REaXJlY3RvcnlSZXF1ZXN0GhwudjEuR2V0Um9vdERpcmVjdG9yeVJlc3BvbnNlElkKFEdldERpcmVjdG9yeUNoaWxkcmVuEh8udjEuR2V0RGlyZWN0b3J5Q2hpbGRyZW5SZXF1ZXN0GiAudjEuR2V0RGlyZWN0b3J5Q2hpbGRyZW5SZXNwb25zZRJKCg9DcmVhdGVEaXJlY3RvcnkSGi52MS5DcmVhdGVEaXJlY3RvcnlSZXF1ZXN0GhsudjEuQ3JlYXRlRGlyZWN0b3J5UmVzcG9uc2USRQoPUmVuYW1lRGlyZWN0b3J5EhoudjEuUmVuYW1lRGlyZWN0b3J5UmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRJBCg1Nb3ZlRGlyZWN0b3J5EhgudjEuTW92ZURpcmVjdG9yeVJlcXVlc3QaFi5nb29nbGUucHJvdG9idWYuRW1wdHkSRQoPRGVsZXRlRGlyZWN0b3J5EhoudjEuRGVsZXRlRGlyZWN0b3J5UmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRI9CgtSZW5hbWVBc3NldBIWLnYxLlJlbmFtZUFzc2V0UmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRI5CglNb3ZlQXNzZXQSFC52MS5Nb3ZlQXNzZXRSZXF1ZXN0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5Ej0KC0RlbGV0ZUFzc2V0EhYudjEuRGVsZXRlQXNzZXRSZXF1ZXN0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5ElkKFEdldEFzc2V0VXBsb2FkVGFyZ2V0Eh8udjEuR2V0QXNzZXRVcGxvYWRUYXJnZXRSZXF1ZXN0GiAudjEuR2V0QXNzZXRVcGxvYWRUYXJnZXRSZXNwb25zZUIeWhx2eW5mby5jb20vdnluZm8vZ2VuL3Byb3RvL3YxYgZwcm90bzM", [file_proto_v1_projects, file_google_protobuf_empty]);
+export const file_proto_v1_vfs: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    "ChJwcm90by92MS92ZnMucHJvdG8SAnYxImAKCURpcmVjdG9yeRIKCgJpZBgBIAEoCRIUCgx3b3Jrc3BhY2VfaWQYAiABKAkSDAoEbmFtZRgDIAEoCRIjCgdlbnRyaWVzGAQgAygLMhIudjEuRGlyZWN0b3J5RW50cnkiaAoORGlyZWN0b3J5RW50cnkSKgoJZGlyZWN0b3J5GAEgASgLMhUudjEuRGlyZWN0b3J5TWV0YWRhdGFIABIiCgVhc3NldBgCIAEoCzIRLnYxLkFzc2V0TWV0YWRhdGFIAEIGCgRraW5kIi0KEURpcmVjdG9yeU1ldGFkYXRhEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkikgEKDUFzc2V0TWV0YWRhdGESJwoFdmlkZW8YASABKAsyFi52MS5NZWRpYVZpZGVvTWV0YWRhdGFIABInCgVhdWRpbxgCIAEoCzIWLnYxLk1lZGlhQXVkaW9NZXRhZGF0YUgAEicKBWltYWdlGAMgASgLMhYudjEuTWVkaWFJbWFnZU1ldGFkYXRhSABCBgoEa2luZCJ2ChZDcmVhdGVEaXJlY3RvcnlSZXF1ZXN0EgwKBG5hbWUYASABKAkSFAoMd29ya3NwYWNlX2lkGAIgASgJEiAKE3BhcmVudF9kaXJlY3RvcnlfaWQYAyABKAlIAIgBAUIWChRfcGFyZW50X2RpcmVjdG9yeV9pZCI3ChdDcmVhdGVEaXJlY3RvcnlSZXNwb25zZRIcChRjcmVhdGVkX2RpcmVjdG9yeV9pZBgBIAEoCSIvChdHZXRSb290RGlyZWN0b3J5UmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkivgEKGEdldFJvb3REaXJlY3RvcnlSZXNwb25zZRIqCgtkaXJlY3RvcmllcxgBIAMoCzIVLnYxLkRpcmVjdG9yeU1ldGFkYXRhEiYKBnZpZGVvcxgCIAMoCzIWLnYxLk1lZGlhVmlkZW9NZXRhZGF0YRImCgZpbWFnZXMYAyADKAsyFi52MS5NZWRpYUltYWdlTWV0YWRhdGESJgoGYXVkaW9zGAQgAygLMhYudjEuTWVkaWFBdWRpb01ldGFkYXRhIkkKG0dldERpcmVjdG9yeUNoaWxkcmVuUmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkSFAoMZGlyZWN0b3J5X2lkGAIgASgJIsIBChxHZXREaXJlY3RvcnlDaGlsZHJlblJlc3BvbnNlEioKC2RpcmVjdG9yaWVzGAEgAygLMhUudjEuRGlyZWN0b3J5TWV0YWRhdGESJgoGdmlkZW9zGAIgAygLMhYudjEuTWVkaWFWaWRlb01ldGFkYXRhEiYKBmltYWdlcxgDIAMoCzIWLnYxLk1lZGlhSW1hZ2VNZXRhZGF0YRImCgZhdWRpb3MYBCADKAsyFi52MS5NZWRpYUF1ZGlvTWV0YWRhdGEiUgoWUmVuYW1lRGlyZWN0b3J5UmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkSFAoMZGlyZWN0b3J5X2lkGAIgASgJEgwKBG5hbWUYAyABKAkifgoUTW92ZURpcmVjdG9yeVJlcXVlc3QSFAoMd29ya3NwYWNlX2lkGAEgASgJEhQKDGRpcmVjdG9yeV9pZBgCIAEoCRIhChRuZXdfcGFyZW50X2RpcmVjdG9yeRgDIAEoCUgAiAEBQhcKFV9uZXdfcGFyZW50X2RpcmVjdG9yeSJKChJSZW5hbWVBc3NldFJlcXVlc3QSFAoMd29ya3NwYWNlX2lkGAEgASgJEhAKCGFzc2V0X2lkGAIgASgJEgwKBG5hbWUYAyABKAkidgoQTW92ZUFzc2V0UmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkSEAoIYXNzZXRfaWQYAiABKAkSIQoUbmV3X3BhcmVudF9kaXJlY3RvcnkYAyABKAlIAIgBAUIXChVfbmV3X3BhcmVudF9kaXJlY3RvcnkiRAoWRGVsZXRlRGlyZWN0b3J5UmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkSFAoMZGlyZWN0b3J5X2lkGAIgASgJIjwKEkRlbGV0ZUFzc2V0UmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkSEAoIYXNzZXRfaWQYAiABKAkihgEKJkR1cGxpY2F0ZUZpbGVPckRpcmVjdG9yeUVudHJ5TmFtZUVycm9yEhQKDHdvcmtzcGFjZV9pZBgBIAEoCRIgChNwYXJlbnRfZGlyZWN0b3J5X2lkGAIgASgJSACIAQESDAoEbmFtZRgDIAEoCUIWChRfcGFyZW50X2RpcmVjdG9yeV9pZCJZChZEZWxldGVJblVzZUFzc2V0c0Vycm9yEhQKDHdvcmtzcGFjZV9pZBgBIAEoCRIpCgZ1c2FnZXMYAiADKAsyGS52MS5EZWxldGVJblVzZUFzc2V0VXNhZ2UiZwoVRGVsZXRlSW5Vc2VBc3NldFVzYWdlEhAKCGFzc2V0X2lkGAEgASgJEhIKCmFzc2V0X25hbWUYAiABKAkSEgoKcHJvamVjdF9pZBgDIAEoCRIUCgxwcm9qZWN0X25hbWUYBCABKAkijQEKGkluaXRpYXRlVmlkZW9Jbmdlc3RSZXF1ZXN0EhQKDHdvcmtzcGFjZV9pZBgBIAEoCRIgChNwYXJlbnRfZGlyZWN0b3J5X2lkGAIgASgJSACIAQESEAoIYXNzZXRfaWQYAyABKAkSDQoFdGl0bGUYBCABKAlCFgoUX3BhcmVudF9kaXJlY3RvcnlfaWQiSgoXSW5nZXN0UHJvZ3Jlc3NJbmRpY2F0b3ISEAoIYXNzZXRfaWQYASABKAkSHQoVY29tcGxldGlvbl9wZXJjZW50YWdlGAIgASgBIisKF0luZ2VzdEZpbmlzaGVkSW5kaWNhdG9yEhAKCGFzc2V0X2lkGAEgASgJIo8BChtJbml0aWF0ZVZpZGVvSW5nZXN0UmVzcG9uc2USLgoHb25nb2luZxgBIAEoCzIbLnYxLkluZ2VzdFByb2dyZXNzSW5kaWNhdG9ySAASLwoIZmluaXNoZWQYAiABKAsyGy52MS5Jbmdlc3RGaW5pc2hlZEluZGljYXRvckgAQg8KDWluZ2VzdF9zdGF0dXMijQEKGkluaXRpYXRlQXVkaW9Jbmdlc3RSZXF1ZXN0EhQKDHdvcmtzcGFjZV9pZBgBIAEoCRIgChNwYXJlbnRfZGlyZWN0b3J5X2lkGAIgASgJSACIAQESEAoIYXNzZXRfaWQYAyABKAkSDQoFdGl0bGUYBCABKAlCFgoUX3BhcmVudF9kaXJlY3RvcnlfaWQijwEKG0luaXRpYXRlQXVkaW9Jbmdlc3RSZXNwb25zZRIuCgdvbmdvaW5nGAEgASgLMhsudjEuSW5nZXN0UHJvZ3Jlc3NJbmRpY2F0b3JIABIvCghmaW5pc2hlZBgCIAEoCzIbLnYxLkluZ2VzdEZpbmlzaGVkSW5kaWNhdG9ySABCDwoNaW5nZXN0X3N0YXR1cyKEAQoSVXBsb2FkSW1hZ2VSZXF1ZXN0EhQKDHdvcmtzcGFjZV9pZBgBIAEoCRIgChNwYXJlbnRfZGlyZWN0b3J5X2lkGAIgASgJSACIAQESDwoHY29udGVudBgDIAEoDBINCgV0aXRsZRgEIAEoCUIWChRfcGFyZW50X2RpcmVjdG9yeV9pZCIwChNVcGxvYWRJbWFnZVJlc3BvbnNlEhkKEXVwbG9hZGVkX2Fzc2V0X2lkGAEgASgJIjMKG0dldEFzc2V0VXBsb2FkVGFyZ2V0UmVxdWVzdBIUCgx3b3Jrc3BhY2VfaWQYASABKAkiXAocR2V0QXNzZXRVcGxvYWRUYXJnZXRSZXNwb25zZRIQCghhc3NldF9pZBgBIAEoCRIUCgx2aWRlb190YXJnZXQYAiABKAkSFAoMYXVkaW9fdGFyZ2V0GAMgASgJMtwHCgtGaWxlU2VydmljZRJYChNJbml0aWF0ZVZpZGVvSW5nZXN0Eh4udjEuSW5pdGlhdGVWaWRlb0luZ2VzdFJlcXVlc3QaHy52MS5Jbml0aWF0ZVZpZGVvSW5nZXN0UmVzcG9uc2UwARJYChNJbml0aWF0ZUF1ZGlvSW5nZXN0Eh4udjEuSW5pdGlhdGVBdWRpb0luZ2VzdFJlcXVlc3QaHy52MS5Jbml0aWF0ZUF1ZGlvSW5nZXN0UmVzcG9uc2UwARI+CgtVcGxvYWRJbWFnZRIWLnYxLlVwbG9hZEltYWdlUmVxdWVzdBoXLnYxLlVwbG9hZEltYWdlUmVzcG9uc2USTQoQR2V0Um9vdERpcmVjdG9yeRIbLnYxLkdldFJvb3REaXJlY3RvcnlSZXF1ZXN0GhwudjEuR2V0Um9vdERpcmVjdG9yeVJlc3BvbnNlElkKFEdldERpcmVjdG9yeUNoaWxkcmVuEh8udjEuR2V0RGlyZWN0b3J5Q2hpbGRyZW5SZXF1ZXN0GiAudjEuR2V0RGlyZWN0b3J5Q2hpbGRyZW5SZXNwb25zZRJKCg9DcmVhdGVEaXJlY3RvcnkSGi52MS5DcmVhdGVEaXJlY3RvcnlSZXF1ZXN0GhsudjEuQ3JlYXRlRGlyZWN0b3J5UmVzcG9uc2USRQoPUmVuYW1lRGlyZWN0b3J5EhoudjEuUmVuYW1lRGlyZWN0b3J5UmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRJBCg1Nb3ZlRGlyZWN0b3J5EhgudjEuTW92ZURpcmVjdG9yeVJlcXVlc3QaFi5nb29nbGUucHJvdG9idWYuRW1wdHkSRQoPRGVsZXRlRGlyZWN0b3J5EhoudjEuRGVsZXRlRGlyZWN0b3J5UmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRI9CgtSZW5hbWVBc3NldBIWLnYxLlJlbmFtZUFzc2V0UmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eRI5CglNb3ZlQXNzZXQSFC52MS5Nb3ZlQXNzZXRSZXF1ZXN0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5Ej0KC0RlbGV0ZUFzc2V0EhYudjEuRGVsZXRlQXNzZXRSZXF1ZXN0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5ElkKFEdldEFzc2V0VXBsb2FkVGFyZ2V0Eh8udjEuR2V0QXNzZXRVcGxvYWRUYXJnZXRSZXF1ZXN0GiAudjEuR2V0QXNzZXRVcGxvYWRUYXJnZXRSZXNwb25zZUIeWhx2eW5mby5jb20vdnluZm8vZ2VuL3Byb3RvL3YxYgZwcm90bzM",
+    [file_proto_v1_projects, file_google_protobuf_empty],
+  );
 
 /**
  * Directories can contain either assets (files) or subdirectories themselves
@@ -47,7 +63,8 @@ export type Directory = Message<"v1.Directory"> & {
  * Describes the message v1.Directory.
  * Use `create(DirectorySchema)` to create a new message.
  */
-export const DirectorySchema: GenMessage<Directory> = /*@__PURE__*/
+export const DirectorySchema: GenMessage<Directory> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 0);
 
 /**
@@ -57,26 +74,30 @@ export type DirectoryEntry = Message<"v1.DirectoryEntry"> & {
   /**
    * @generated from oneof v1.DirectoryEntry.kind
    */
-  kind: {
-    /**
-     * @generated from field: v1.DirectoryMetadata directory = 1;
-     */
-    value: DirectoryMetadata;
-    case: "directory";
-  } | {
-    /**
-     * @generated from field: v1.AssetMetadata asset = 2;
-     */
-    value: AssetMetadata;
-    case: "asset";
-  } | { case: undefined; value?: undefined };
+  kind:
+    | {
+        /**
+         * @generated from field: v1.DirectoryMetadata directory = 1;
+         */
+        value: DirectoryMetadata;
+        case: "directory";
+      }
+    | {
+        /**
+         * @generated from field: v1.AssetMetadata asset = 2;
+         */
+        value: AssetMetadata;
+        case: "asset";
+      }
+    | { case: undefined; value?: undefined };
 };
 
 /**
  * Describes the message v1.DirectoryEntry.
  * Use `create(DirectoryEntrySchema)` to create a new message.
  */
-export const DirectoryEntrySchema: GenMessage<DirectoryEntry> = /*@__PURE__*/
+export const DirectoryEntrySchema: GenMessage<DirectoryEntry> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 1);
 
 /**
@@ -98,7 +119,8 @@ export type DirectoryMetadata = Message<"v1.DirectoryMetadata"> & {
  * Describes the message v1.DirectoryMetadata.
  * Use `create(DirectoryMetadataSchema)` to create a new message.
  */
-export const DirectoryMetadataSchema: GenMessage<DirectoryMetadata> = /*@__PURE__*/
+export const DirectoryMetadataSchema: GenMessage<DirectoryMetadata> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 2);
 
 /**
@@ -108,32 +130,37 @@ export type AssetMetadata = Message<"v1.AssetMetadata"> & {
   /**
    * @generated from oneof v1.AssetMetadata.kind
    */
-  kind: {
-    /**
-     * @generated from field: v1.MediaVideoMetadata video = 1;
-     */
-    value: MediaVideoMetadata;
-    case: "video";
-  } | {
-    /**
-     * @generated from field: v1.MediaAudioMetadata audio = 2;
-     */
-    value: MediaAudioMetadata;
-    case: "audio";
-  } | {
-    /**
-     * @generated from field: v1.MediaImageMetadata image = 3;
-     */
-    value: MediaImageMetadata;
-    case: "image";
-  } | { case: undefined; value?: undefined };
+  kind:
+    | {
+        /**
+         * @generated from field: v1.MediaVideoMetadata video = 1;
+         */
+        value: MediaVideoMetadata;
+        case: "video";
+      }
+    | {
+        /**
+         * @generated from field: v1.MediaAudioMetadata audio = 2;
+         */
+        value: MediaAudioMetadata;
+        case: "audio";
+      }
+    | {
+        /**
+         * @generated from field: v1.MediaImageMetadata image = 3;
+         */
+        value: MediaImageMetadata;
+        case: "image";
+      }
+    | { case: undefined; value?: undefined };
 };
 
 /**
  * Describes the message v1.AssetMetadata.
  * Use `create(AssetMetadataSchema)` to create a new message.
  */
-export const AssetMetadataSchema: GenMessage<AssetMetadata> = /*@__PURE__*/
+export const AssetMetadataSchema: GenMessage<AssetMetadata> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 3);
 
 /**
@@ -164,7 +191,8 @@ export type CreateDirectoryRequest = Message<"v1.CreateDirectoryRequest"> & {
  * Describes the message v1.CreateDirectoryRequest.
  * Use `create(CreateDirectoryRequestSchema)` to create a new message.
  */
-export const CreateDirectoryRequestSchema: GenMessage<CreateDirectoryRequest> = /*@__PURE__*/
+export const CreateDirectoryRequestSchema: GenMessage<CreateDirectoryRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 4);
 
 /**
@@ -181,7 +209,8 @@ export type CreateDirectoryResponse = Message<"v1.CreateDirectoryResponse"> & {
  * Describes the message v1.CreateDirectoryResponse.
  * Use `create(CreateDirectoryResponseSchema)` to create a new message.
  */
-export const CreateDirectoryResponseSchema: GenMessage<CreateDirectoryResponse> = /*@__PURE__*/
+export const CreateDirectoryResponseSchema: GenMessage<CreateDirectoryResponse> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 5);
 
 /**
@@ -201,39 +230,42 @@ export type GetRootDirectoryRequest = Message<"v1.GetRootDirectoryRequest"> & {
  * Describes the message v1.GetRootDirectoryRequest.
  * Use `create(GetRootDirectoryRequestSchema)` to create a new message.
  */
-export const GetRootDirectoryRequestSchema: GenMessage<GetRootDirectoryRequest> = /*@__PURE__*/
+export const GetRootDirectoryRequestSchema: GenMessage<GetRootDirectoryRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 6);
 
 /**
  * @generated from message v1.GetRootDirectoryResponse
  */
-export type GetRootDirectoryResponse = Message<"v1.GetRootDirectoryResponse"> & {
-  /**
-   * @generated from field: repeated v1.DirectoryMetadata directories = 1;
-   */
-  directories: DirectoryMetadata[];
+export type GetRootDirectoryResponse =
+  Message<"v1.GetRootDirectoryResponse"> & {
+    /**
+     * @generated from field: repeated v1.DirectoryMetadata directories = 1;
+     */
+    directories: DirectoryMetadata[];
 
-  /**
-   * @generated from field: repeated v1.MediaVideoMetadata videos = 2;
-   */
-  videos: MediaVideoMetadata[];
+    /**
+     * @generated from field: repeated v1.MediaVideoMetadata videos = 2;
+     */
+    videos: MediaVideoMetadata[];
 
-  /**
-   * @generated from field: repeated v1.MediaImageMetadata images = 3;
-   */
-  images: MediaImageMetadata[];
+    /**
+     * @generated from field: repeated v1.MediaImageMetadata images = 3;
+     */
+    images: MediaImageMetadata[];
 
-  /**
-   * @generated from field: repeated v1.MediaAudioMetadata audios = 4;
-   */
-  audios: MediaAudioMetadata[];
-};
+    /**
+     * @generated from field: repeated v1.MediaAudioMetadata audios = 4;
+     */
+    audios: MediaAudioMetadata[];
+  };
 
 /**
  * Describes the message v1.GetRootDirectoryResponse.
  * Use `create(GetRootDirectoryResponseSchema)` to create a new message.
  */
-export const GetRootDirectoryResponseSchema: GenMessage<GetRootDirectoryResponse> = /*@__PURE__*/
+export const GetRootDirectoryResponseSchema: GenMessage<GetRootDirectoryResponse> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 7);
 
 /**
@@ -241,55 +273,59 @@ export const GetRootDirectoryResponseSchema: GenMessage<GetRootDirectoryResponse
  *
  * @generated from message v1.GetDirectoryChildrenRequest
  */
-export type GetDirectoryChildrenRequest = Message<"v1.GetDirectoryChildrenRequest"> & {
-  /**
-   * @generated from field: string workspace_id = 1;
-   */
-  workspaceId: string;
+export type GetDirectoryChildrenRequest =
+  Message<"v1.GetDirectoryChildrenRequest"> & {
+    /**
+     * @generated from field: string workspace_id = 1;
+     */
+    workspaceId: string;
 
-  /**
-   * @generated from field: string directory_id = 2;
-   */
-  directoryId: string;
-};
+    /**
+     * @generated from field: string directory_id = 2;
+     */
+    directoryId: string;
+  };
 
 /**
  * Describes the message v1.GetDirectoryChildrenRequest.
  * Use `create(GetDirectoryChildrenRequestSchema)` to create a new message.
  */
-export const GetDirectoryChildrenRequestSchema: GenMessage<GetDirectoryChildrenRequest> = /*@__PURE__*/
+export const GetDirectoryChildrenRequestSchema: GenMessage<GetDirectoryChildrenRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 8);
 
 /**
  * @generated from message v1.GetDirectoryChildrenResponse
  */
-export type GetDirectoryChildrenResponse = Message<"v1.GetDirectoryChildrenResponse"> & {
-  /**
-   * @generated from field: repeated v1.DirectoryMetadata directories = 1;
-   */
-  directories: DirectoryMetadata[];
+export type GetDirectoryChildrenResponse =
+  Message<"v1.GetDirectoryChildrenResponse"> & {
+    /**
+     * @generated from field: repeated v1.DirectoryMetadata directories = 1;
+     */
+    directories: DirectoryMetadata[];
 
-  /**
-   * @generated from field: repeated v1.MediaVideoMetadata videos = 2;
-   */
-  videos: MediaVideoMetadata[];
+    /**
+     * @generated from field: repeated v1.MediaVideoMetadata videos = 2;
+     */
+    videos: MediaVideoMetadata[];
 
-  /**
-   * @generated from field: repeated v1.MediaImageMetadata images = 3;
-   */
-  images: MediaImageMetadata[];
+    /**
+     * @generated from field: repeated v1.MediaImageMetadata images = 3;
+     */
+    images: MediaImageMetadata[];
 
-  /**
-   * @generated from field: repeated v1.MediaAudioMetadata audios = 4;
-   */
-  audios: MediaAudioMetadata[];
-};
+    /**
+     * @generated from field: repeated v1.MediaAudioMetadata audios = 4;
+     */
+    audios: MediaAudioMetadata[];
+  };
 
 /**
  * Describes the message v1.GetDirectoryChildrenResponse.
  * Use `create(GetDirectoryChildrenResponseSchema)` to create a new message.
  */
-export const GetDirectoryChildrenResponseSchema: GenMessage<GetDirectoryChildrenResponse> = /*@__PURE__*/
+export const GetDirectoryChildrenResponseSchema: GenMessage<GetDirectoryChildrenResponse> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 9);
 
 /**
@@ -318,12 +354,13 @@ export type RenameDirectoryRequest = Message<"v1.RenameDirectoryRequest"> & {
  * Describes the message v1.RenameDirectoryRequest.
  * Use `create(RenameDirectoryRequestSchema)` to create a new message.
  */
-export const RenameDirectoryRequestSchema: GenMessage<RenameDirectoryRequest> = /*@__PURE__*/
+export const RenameDirectoryRequestSchema: GenMessage<RenameDirectoryRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 10);
 
 /**
  * MoveDirectory will move a directory (and thus any children) to the new directory,
- * with an nil parent directory moving the directory to the root 
+ * with an nil parent directory moving the directory to the root
  *
  * @generated from message v1.MoveDirectoryRequest
  */
@@ -348,7 +385,8 @@ export type MoveDirectoryRequest = Message<"v1.MoveDirectoryRequest"> & {
  * Describes the message v1.MoveDirectoryRequest.
  * Use `create(MoveDirectoryRequestSchema)` to create a new message.
  */
-export const MoveDirectoryRequestSchema: GenMessage<MoveDirectoryRequest> = /*@__PURE__*/
+export const MoveDirectoryRequestSchema: GenMessage<MoveDirectoryRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 11);
 
 /**
@@ -377,12 +415,13 @@ export type RenameAssetRequest = Message<"v1.RenameAssetRequest"> & {
  * Describes the message v1.RenameAssetRequest.
  * Use `create(RenameAssetRequestSchema)` to create a new message.
  */
-export const RenameAssetRequestSchema: GenMessage<RenameAssetRequest> = /*@__PURE__*/
+export const RenameAssetRequestSchema: GenMessage<RenameAssetRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 12);
 
 /**
  * MoveAsset will move a directory (and thus any children) to the new directory,
- * with an nil parent directory moving the directory to the root 
+ * with an nil parent directory moving the directory to the root
  *
  * @generated from message v1.MoveAssetRequest
  */
@@ -407,7 +446,8 @@ export type MoveAssetRequest = Message<"v1.MoveAssetRequest"> & {
  * Describes the message v1.MoveAssetRequest.
  * Use `create(MoveAssetRequestSchema)` to create a new message.
  */
-export const MoveAssetRequestSchema: GenMessage<MoveAssetRequest> = /*@__PURE__*/
+export const MoveAssetRequestSchema: GenMessage<MoveAssetRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 13);
 
 /**
@@ -434,7 +474,8 @@ export type DeleteDirectoryRequest = Message<"v1.DeleteDirectoryRequest"> & {
  * Describes the message v1.DeleteDirectoryRequest.
  * Use `create(DeleteDirectoryRequestSchema)` to create a new message.
  */
-export const DeleteDirectoryRequestSchema: GenMessage<DeleteDirectoryRequest> = /*@__PURE__*/
+export const DeleteDirectoryRequestSchema: GenMessage<DeleteDirectoryRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 14);
 
 /**
@@ -459,7 +500,8 @@ export type DeleteAssetRequest = Message<"v1.DeleteAssetRequest"> & {
  * Describes the message v1.DeleteAssetRequest.
  * Use `create(DeleteAssetRequestSchema)` to create a new message.
  */
-export const DeleteAssetRequestSchema: GenMessage<DeleteAssetRequest> = /*@__PURE__*/
+export const DeleteAssetRequestSchema: GenMessage<DeleteAssetRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 15);
 
 /**
@@ -468,28 +510,30 @@ export const DeleteAssetRequestSchema: GenMessage<DeleteAssetRequest> = /*@__PUR
  *
  * @generated from message v1.DuplicateFileOrDirectoryEntryNameError
  */
-export type DuplicateFileOrDirectoryEntryNameError = Message<"v1.DuplicateFileOrDirectoryEntryNameError"> & {
-  /**
-   * @generated from field: string workspace_id = 1;
-   */
-  workspaceId: string;
+export type DuplicateFileOrDirectoryEntryNameError =
+  Message<"v1.DuplicateFileOrDirectoryEntryNameError"> & {
+    /**
+     * @generated from field: string workspace_id = 1;
+     */
+    workspaceId: string;
 
-  /**
-   * @generated from field: optional string parent_directory_id = 2;
-   */
-  parentDirectoryId?: string;
+    /**
+     * @generated from field: optional string parent_directory_id = 2;
+     */
+    parentDirectoryId?: string;
 
-  /**
-   * @generated from field: string name = 3;
-   */
-  name: string;
-};
+    /**
+     * @generated from field: string name = 3;
+     */
+    name: string;
+  };
 
 /**
  * Describes the message v1.DuplicateFileOrDirectoryEntryNameError.
  * Use `create(DuplicateFileOrDirectoryEntryNameErrorSchema)` to create a new message.
  */
-export const DuplicateFileOrDirectoryEntryNameErrorSchema: GenMessage<DuplicateFileOrDirectoryEntryNameError> = /*@__PURE__*/
+export const DuplicateFileOrDirectoryEntryNameErrorSchema: GenMessage<DuplicateFileOrDirectoryEntryNameError> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 16);
 
 /**
@@ -514,7 +558,8 @@ export type DeleteInUseAssetsError = Message<"v1.DeleteInUseAssetsError"> & {
  * Describes the message v1.DeleteInUseAssetsError.
  * Use `create(DeleteInUseAssetsErrorSchema)` to create a new message.
  */
-export const DeleteInUseAssetsErrorSchema: GenMessage<DeleteInUseAssetsError> = /*@__PURE__*/
+export const DeleteInUseAssetsErrorSchema: GenMessage<DeleteInUseAssetsError> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 17);
 
 /**
@@ -546,7 +591,8 @@ export type DeleteInUseAssetUsage = Message<"v1.DeleteInUseAssetUsage"> & {
  * Describes the message v1.DeleteInUseAssetUsage.
  * Use `create(DeleteInUseAssetUsageSchema)` to create a new message.
  */
-export const DeleteInUseAssetUsageSchema: GenMessage<DeleteInUseAssetUsage> = /*@__PURE__*/
+export const DeleteInUseAssetUsageSchema: GenMessage<DeleteInUseAssetUsage> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 18);
 
 /**
@@ -557,33 +603,35 @@ export const DeleteInUseAssetUsageSchema: GenMessage<DeleteInUseAssetUsage> = /*
  *
  * @generated from message v1.InitiateVideoIngestRequest
  */
-export type InitiateVideoIngestRequest = Message<"v1.InitiateVideoIngestRequest"> & {
-  /**
-   * @generated from field: string workspace_id = 1;
-   */
-  workspaceId: string;
+export type InitiateVideoIngestRequest =
+  Message<"v1.InitiateVideoIngestRequest"> & {
+    /**
+     * @generated from field: string workspace_id = 1;
+     */
+    workspaceId: string;
 
-  /**
-   * @generated from field: optional string parent_directory_id = 2;
-   */
-  parentDirectoryId?: string;
+    /**
+     * @generated from field: optional string parent_directory_id = 2;
+     */
+    parentDirectoryId?: string;
 
-  /**
-   * @generated from field: string asset_id = 3;
-   */
-  assetId: string;
+    /**
+     * @generated from field: string asset_id = 3;
+     */
+    assetId: string;
 
-  /**
-   * @generated from field: string title = 4;
-   */
-  title: string;
-};
+    /**
+     * @generated from field: string title = 4;
+     */
+    title: string;
+  };
 
 /**
  * Describes the message v1.InitiateVideoIngestRequest.
  * Use `create(InitiateVideoIngestRequestSchema)` to create a new message.
  */
-export const InitiateVideoIngestRequestSchema: GenMessage<InitiateVideoIngestRequest> = /*@__PURE__*/
+export const InitiateVideoIngestRequestSchema: GenMessage<InitiateVideoIngestRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 19);
 
 /**
@@ -607,7 +655,8 @@ export type IngestProgressIndicator = Message<"v1.IngestProgressIndicator"> & {
  * Describes the message v1.IngestProgressIndicator.
  * Use `create(IngestProgressIndicatorSchema)` to create a new message.
  */
-export const IngestProgressIndicatorSchema: GenMessage<IngestProgressIndicator> = /*@__PURE__*/
+export const IngestProgressIndicatorSchema: GenMessage<IngestProgressIndicator> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 20);
 
 /**
@@ -626,36 +675,42 @@ export type IngestFinishedIndicator = Message<"v1.IngestFinishedIndicator"> & {
  * Describes the message v1.IngestFinishedIndicator.
  * Use `create(IngestFinishedIndicatorSchema)` to create a new message.
  */
-export const IngestFinishedIndicatorSchema: GenMessage<IngestFinishedIndicator> = /*@__PURE__*/
+export const IngestFinishedIndicatorSchema: GenMessage<IngestFinishedIndicator> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 21);
 
 /**
  * @generated from message v1.InitiateVideoIngestResponse
  */
-export type InitiateVideoIngestResponse = Message<"v1.InitiateVideoIngestResponse"> & {
-  /**
-   * @generated from oneof v1.InitiateVideoIngestResponse.ingest_status
-   */
-  ingestStatus: {
+export type InitiateVideoIngestResponse =
+  Message<"v1.InitiateVideoIngestResponse"> & {
     /**
-     * @generated from field: v1.IngestProgressIndicator ongoing = 1;
+     * @generated from oneof v1.InitiateVideoIngestResponse.ingest_status
      */
-    value: IngestProgressIndicator;
-    case: "ongoing";
-  } | {
-    /**
-     * @generated from field: v1.IngestFinishedIndicator finished = 2;
-     */
-    value: IngestFinishedIndicator;
-    case: "finished";
-  } | { case: undefined; value?: undefined };
-};
+    ingestStatus:
+      | {
+          /**
+           * @generated from field: v1.IngestProgressIndicator ongoing = 1;
+           */
+          value: IngestProgressIndicator;
+          case: "ongoing";
+        }
+      | {
+          /**
+           * @generated from field: v1.IngestFinishedIndicator finished = 2;
+           */
+          value: IngestFinishedIndicator;
+          case: "finished";
+        }
+      | { case: undefined; value?: undefined };
+  };
 
 /**
  * Describes the message v1.InitiateVideoIngestResponse.
  * Use `create(InitiateVideoIngestResponseSchema)` to create a new message.
  */
-export const InitiateVideoIngestResponseSchema: GenMessage<InitiateVideoIngestResponse> = /*@__PURE__*/
+export const InitiateVideoIngestResponseSchema: GenMessage<InitiateVideoIngestResponse> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 22);
 
 /**
@@ -663,62 +718,69 @@ export const InitiateVideoIngestResponseSchema: GenMessage<InitiateVideoIngestRe
  *
  * @generated from message v1.InitiateAudioIngestRequest
  */
-export type InitiateAudioIngestRequest = Message<"v1.InitiateAudioIngestRequest"> & {
-  /**
-   * @generated from field: string workspace_id = 1;
-   */
-  workspaceId: string;
+export type InitiateAudioIngestRequest =
+  Message<"v1.InitiateAudioIngestRequest"> & {
+    /**
+     * @generated from field: string workspace_id = 1;
+     */
+    workspaceId: string;
 
-  /**
-   * @generated from field: optional string parent_directory_id = 2;
-   */
-  parentDirectoryId?: string;
+    /**
+     * @generated from field: optional string parent_directory_id = 2;
+     */
+    parentDirectoryId?: string;
 
-  /**
-   * @generated from field: string asset_id = 3;
-   */
-  assetId: string;
+    /**
+     * @generated from field: string asset_id = 3;
+     */
+    assetId: string;
 
-  /**
-   * @generated from field: string title = 4;
-   */
-  title: string;
-};
+    /**
+     * @generated from field: string title = 4;
+     */
+    title: string;
+  };
 
 /**
  * Describes the message v1.InitiateAudioIngestRequest.
  * Use `create(InitiateAudioIngestRequestSchema)` to create a new message.
  */
-export const InitiateAudioIngestRequestSchema: GenMessage<InitiateAudioIngestRequest> = /*@__PURE__*/
+export const InitiateAudioIngestRequestSchema: GenMessage<InitiateAudioIngestRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 23);
 
 /**
  * @generated from message v1.InitiateAudioIngestResponse
  */
-export type InitiateAudioIngestResponse = Message<"v1.InitiateAudioIngestResponse"> & {
-  /**
-   * @generated from oneof v1.InitiateAudioIngestResponse.ingest_status
-   */
-  ingestStatus: {
+export type InitiateAudioIngestResponse =
+  Message<"v1.InitiateAudioIngestResponse"> & {
     /**
-     * @generated from field: v1.IngestProgressIndicator ongoing = 1;
+     * @generated from oneof v1.InitiateAudioIngestResponse.ingest_status
      */
-    value: IngestProgressIndicator;
-    case: "ongoing";
-  } | {
-    /**
-     * @generated from field: v1.IngestFinishedIndicator finished = 2;
-     */
-    value: IngestFinishedIndicator;
-    case: "finished";
-  } | { case: undefined; value?: undefined };
-};
+    ingestStatus:
+      | {
+          /**
+           * @generated from field: v1.IngestProgressIndicator ongoing = 1;
+           */
+          value: IngestProgressIndicator;
+          case: "ongoing";
+        }
+      | {
+          /**
+           * @generated from field: v1.IngestFinishedIndicator finished = 2;
+           */
+          value: IngestFinishedIndicator;
+          case: "finished";
+        }
+      | { case: undefined; value?: undefined };
+  };
 
 /**
  * Describes the message v1.InitiateAudioIngestResponse.
  * Use `create(InitiateAudioIngestResponseSchema)` to create a new message.
  */
-export const InitiateAudioIngestResponseSchema: GenMessage<InitiateAudioIngestResponse> = /*@__PURE__*/
+export const InitiateAudioIngestResponseSchema: GenMessage<InitiateAudioIngestResponse> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 24);
 
 /**
@@ -752,7 +814,8 @@ export type UploadImageRequest = Message<"v1.UploadImageRequest"> & {
  * Describes the message v1.UploadImageRequest.
  * Use `create(UploadImageRequestSchema)` to create a new message.
  */
-export const UploadImageRequestSchema: GenMessage<UploadImageRequest> = /*@__PURE__*/
+export const UploadImageRequestSchema: GenMessage<UploadImageRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 25);
 
 /**
@@ -769,7 +832,8 @@ export type UploadImageResponse = Message<"v1.UploadImageResponse"> & {
  * Describes the message v1.UploadImageResponse.
  * Use `create(UploadImageResponseSchema)` to create a new message.
  */
-export const UploadImageResponseSchema: GenMessage<UploadImageResponse> = /*@__PURE__*/
+export const UploadImageResponseSchema: GenMessage<UploadImageResponse> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 26);
 
 /**
@@ -784,45 +848,49 @@ export const UploadImageResponseSchema: GenMessage<UploadImageResponse> = /*@__P
  *
  * @generated from message v1.GetAssetUploadTargetRequest
  */
-export type GetAssetUploadTargetRequest = Message<"v1.GetAssetUploadTargetRequest"> & {
-  /**
-   * @generated from field: string workspace_id = 1;
-   */
-  workspaceId: string;
-};
+export type GetAssetUploadTargetRequest =
+  Message<"v1.GetAssetUploadTargetRequest"> & {
+    /**
+     * @generated from field: string workspace_id = 1;
+     */
+    workspaceId: string;
+  };
 
 /**
  * Describes the message v1.GetAssetUploadTargetRequest.
  * Use `create(GetAssetUploadTargetRequestSchema)` to create a new message.
  */
-export const GetAssetUploadTargetRequestSchema: GenMessage<GetAssetUploadTargetRequest> = /*@__PURE__*/
+export const GetAssetUploadTargetRequestSchema: GenMessage<GetAssetUploadTargetRequest> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 27);
 
 /**
  * @generated from message v1.GetAssetUploadTargetResponse
  */
-export type GetAssetUploadTargetResponse = Message<"v1.GetAssetUploadTargetResponse"> & {
-  /**
-   * @generated from field: string asset_id = 1;
-   */
-  assetId: string;
+export type GetAssetUploadTargetResponse =
+  Message<"v1.GetAssetUploadTargetResponse"> & {
+    /**
+     * @generated from field: string asset_id = 1;
+     */
+    assetId: string;
 
-  /**
-   * @generated from field: string video_target = 2;
-   */
-  videoTarget: string;
+    /**
+     * @generated from field: string video_target = 2;
+     */
+    videoTarget: string;
 
-  /**
-   * @generated from field: string audio_target = 3;
-   */
-  audioTarget: string;
-};
+    /**
+     * @generated from field: string audio_target = 3;
+     */
+    audioTarget: string;
+  };
 
 /**
  * Describes the message v1.GetAssetUploadTargetResponse.
  * Use `create(GetAssetUploadTargetResponseSchema)` to create a new message.
  */
-export const GetAssetUploadTargetResponseSchema: GenMessage<GetAssetUploadTargetResponse> = /*@__PURE__*/
+export const GetAssetUploadTargetResponseSchema: GenMessage<GetAssetUploadTargetResponse> =
+  /*@__PURE__*/
   messageDesc(file_proto_v1_vfs, 28);
 
 /**
@@ -836,7 +904,7 @@ export const FileService: GenService<{
     methodKind: "server_streaming";
     input: typeof InitiateVideoIngestRequestSchema;
     output: typeof InitiateVideoIngestResponseSchema;
-  },
+  };
   /**
    * @generated from rpc v1.FileService.InitiateAudioIngest
    */
@@ -844,7 +912,7 @@ export const FileService: GenService<{
     methodKind: "server_streaming";
     input: typeof InitiateAudioIngestRequestSchema;
     output: typeof InitiateAudioIngestResponseSchema;
-  },
+  };
   /**
    * @generated from rpc v1.FileService.UploadImage
    */
@@ -852,7 +920,7 @@ export const FileService: GenService<{
     methodKind: "unary";
     input: typeof UploadImageRequestSchema;
     output: typeof UploadImageResponseSchema;
-  },
+  };
   /**
    * @generated from rpc v1.FileService.GetRootDirectory
    */
@@ -860,7 +928,7 @@ export const FileService: GenService<{
     methodKind: "unary";
     input: typeof GetRootDirectoryRequestSchema;
     output: typeof GetRootDirectoryResponseSchema;
-  },
+  };
   /**
    * @generated from rpc v1.FileService.GetDirectoryChildren
    */
@@ -868,7 +936,7 @@ export const FileService: GenService<{
     methodKind: "unary";
     input: typeof GetDirectoryChildrenRequestSchema;
     output: typeof GetDirectoryChildrenResponseSchema;
-  },
+  };
   /**
    * @generated from rpc v1.FileService.CreateDirectory
    */
@@ -876,7 +944,7 @@ export const FileService: GenService<{
     methodKind: "unary";
     input: typeof CreateDirectoryRequestSchema;
     output: typeof CreateDirectoryResponseSchema;
-  },
+  };
   /**
    * @generated from rpc v1.FileService.RenameDirectory
    */
@@ -884,7 +952,7 @@ export const FileService: GenService<{
     methodKind: "unary";
     input: typeof RenameDirectoryRequestSchema;
     output: typeof EmptySchema;
-  },
+  };
   /**
    * @generated from rpc v1.FileService.MoveDirectory
    */
@@ -892,7 +960,7 @@ export const FileService: GenService<{
     methodKind: "unary";
     input: typeof MoveDirectoryRequestSchema;
     output: typeof EmptySchema;
-  },
+  };
   /**
    * @generated from rpc v1.FileService.DeleteDirectory
    */
@@ -900,7 +968,7 @@ export const FileService: GenService<{
     methodKind: "unary";
     input: typeof DeleteDirectoryRequestSchema;
     output: typeof EmptySchema;
-  },
+  };
   /**
    * @generated from rpc v1.FileService.RenameAsset
    */
@@ -908,7 +976,7 @@ export const FileService: GenService<{
     methodKind: "unary";
     input: typeof RenameAssetRequestSchema;
     output: typeof EmptySchema;
-  },
+  };
   /**
    * @generated from rpc v1.FileService.MoveAsset
    */
@@ -916,7 +984,7 @@ export const FileService: GenService<{
     methodKind: "unary";
     input: typeof MoveAssetRequestSchema;
     output: typeof EmptySchema;
-  },
+  };
   /**
    * @generated from rpc v1.FileService.DeleteAsset
    */
@@ -924,7 +992,7 @@ export const FileService: GenService<{
     methodKind: "unary";
     input: typeof DeleteAssetRequestSchema;
     output: typeof EmptySchema;
-  },
+  };
   /**
    * @generated from rpc v1.FileService.GetAssetUploadTarget
    */
@@ -932,7 +1000,5 @@ export const FileService: GenService<{
     methodKind: "unary";
     input: typeof GetAssetUploadTargetRequestSchema;
     output: typeof GetAssetUploadTargetResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_proto_v1_vfs, 0);
-
+  };
+}> = /*@__PURE__*/ serviceDesc(file_proto_v1_vfs, 0);

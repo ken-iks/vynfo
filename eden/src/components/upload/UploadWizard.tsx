@@ -1,12 +1,11 @@
 import { ArrowPathIcon, ArrowUpTrayIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useState, type SubmitEventHandler } from "react";
 import { filesClient } from "../../lib/client";
 import { create } from "@bufbuild/protobuf";
 import {
-  UploadAudioRequestSchema,
-  UploadVideoRequestSchema,
+  InitiateAudioIngestRequestSchema,
+  InitiateVideoIngestRequestSchema,
 } from "../../gen/proto/v1/vfs_pb";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -16,83 +15,142 @@ import {
 } from "@/components/ui/dialog";
 import { DragUploadArea } from "./DragUploadArea";
 import { ProgressBar } from "./ProgressBar";
+import { UploadForm, type UploadTag } from "./UploadForm";
+import { useSignedAssetUpload } from "./useSignedAssetUpload";
+import type { UploadTarget } from "../vfs/VfsUploadDialog";
 
 interface UploaderProps {
   workspaceId: string;
   parentDirectoryId?: string;
   mediaType?: "audio" | "video";
+  target: UploadTarget;
   onUploadCompleted: (assetId: string) => void;
 }
 
 export function UploadWizard({
   workspaceId,
   parentDirectoryId,
-  mediaType = "video",
+  mediaType,
+  target,
   onUploadCompleted,
 }: UploaderProps) {
   const [mediaFile, setMediaFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [assetName, setAssetName] = useState("");
+  const [tags, setTags] = useState<UploadTag[]>([{ key: "", value: "" }]);
+  const [isIngesting, setIsIngesting] = useState(false);
   const [hasFirstResponse, setHasFirstResponse] = useState(false);
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const isAudio = mediaType === "audio";
   const uploadLabel = isAudio ? "Upload Audio" : "Upload Video";
-  const acceptedMime = isAudio ? "audio/*" : "video/mp4";
+  const acceptedMime = isAudio ? "audio/mp3" : "video/mp4";
   const buttonLabel = isAudio ? "Upload Audio" : "Initiate Upload";
+  const trimmedAssetName = assetName.trim();
+  const uploadTarget = isAudio ? target.audioTarget : target.videoTarget;
+  const {
+    isUploading: isUploadingToTarget,
+    isUploaded: isUploadedToTarget,
+    uploadError: signedUploadError,
+    clearUploadError: clearSignedUploadError,
+    waitForUpload,
+  } = useSignedAssetUpload({
+    file: mediaFile,
+    targetUrl: uploadTarget,
+    contentType: acceptedMime,
+  });
+  const visibleUploadError = uploadError ?? signedUploadError;
 
   function resetUploadState() {
-    setIsUploading(false);
+    setIsIngesting(false);
     setHasFirstResponse(false);
     setUploadPercentage(0);
   }
 
-  async function handleUpload() {
-    if (!mediaFile) {
+  function handleFileSelected(file: File) {
+    setMediaFile(file);
+    setAssetName(file.name);
+    setTags([{ key: "", value: "" }]);
+  }
+
+  function updateTagKey(index: number, key: string) {
+    setTags((currentTags) =>
+      currentTags.map((tag, tagIndex) =>
+        tagIndex === index ? { ...tag, key } : tag,
+      ),
+    );
+  }
+
+  function updateTagValue(index: number, value: string) {
+    setTags((currentTags) =>
+      currentTags.map((tag, tagIndex) =>
+        tagIndex === index ? { ...tag, value } : tag,
+      ),
+    );
+  }
+
+  function addTag() {
+    setTags((currentTags) => [...currentTags, { key: "", value: "" }]);
+  }
+
+  const handleUpload: SubmitEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault();
+
+    if (!mediaFile || trimmedAssetName.length === 0) {
       throw new Error(`upload must have a ${mediaType} set`);
     }
-    setIsUploading(true);
+    setIsIngesting(true);
     setHasFirstResponse(false);
     setUploadPercentage(0);
     setUploadError(null);
     try {
+      if (!isUploadedToTarget) {
+        const uploaded = await waitForUpload();
+        if (!uploaded) {
+          resetUploadState();
+          return;
+        }
+      }
+
       if (isAudio) {
-        const request = create(UploadAudioRequestSchema, {
+        const request = create(InitiateAudioIngestRequestSchema, {
           workspaceId,
           parentDirectoryId,
-          content: new Uint8Array(await mediaFile.arrayBuffer()),
-          title: mediaFile.name,
+          assetId: target.id,
+          title: trimmedAssetName,
+          // TODO: pass tags once the backend accepts asset tags during ingest.
         });
-        for await (const response of filesClient.uploadAudio(request)) {
+        for await (const response of filesClient.initiateAudioIngest(request)) {
           setHasFirstResponse(true);
-          switch (response.uploadStatus.case) {
+          switch (response.ingestStatus.case) {
             case "ongoing":
               setUploadPercentage(
-                response.uploadStatus.value.completionPercentage,
+                response.ingestStatus.value.completionPercentage,
               );
               break;
             case "finished":
-              onUploadCompleted(response.uploadStatus.value.audioId);
+              onUploadCompleted(response.ingestStatus.value.assetId);
               resetUploadState();
               break;
           }
         }
       } else {
-        const request = create(UploadVideoRequestSchema, {
+        const request = create(InitiateVideoIngestRequestSchema, {
           workspaceId,
           parentDirectoryId,
-          content: new Uint8Array(await mediaFile.arrayBuffer()),
-          title: mediaFile.name,
+          assetId: target.id,
+          title: trimmedAssetName,
+          // TODO: pass tags once the backend accepts asset tags during ingest.
         });
-        for await (const response of filesClient.uploadVideo(request)) {
+        for await (const response of filesClient.initiateVideoIngest(request)) {
           setHasFirstResponse(true);
-          switch (response.uploadStatus.case) {
+          switch (response.ingestStatus.case) {
             case "ongoing":
               setUploadPercentage(
-                response.uploadStatus.value.completionPercentage,
+                response.ingestStatus.value.completionPercentage,
               );
               break;
             case "finished":
-              onUploadCompleted(response.uploadStatus.value.videoId);
+              onUploadCompleted(response.ingestStatus.value.assetId);
               resetUploadState();
               break;
           }
@@ -103,11 +161,11 @@ export function UploadWizard({
       setUploadError(message);
       resetUploadState();
     }
-  }
+  };
 
   return (
     <div>
-      {isUploading ? (
+      {isIngesting ? (
         hasFirstResponse ? (
           <div className="flex items-center gap-2">
             <ArrowUpTrayIcon className="size-5 animate-pulse" />
@@ -122,32 +180,43 @@ export function UploadWizard({
       ) : (
         <>
           <DragUploadArea
-            onFileSelected={setMediaFile}
+            onFileSelected={handleFileSelected}
             selectedFile={mediaFile}
             accept={acceptedMime}
             label={uploadLabel}
-            isAcceptedFile={(file) => file.type.startsWith(`${mediaType}/`)}
+            isAcceptedFile={(file) => file.type === acceptedMime}
           />
           {mediaFile !== null && (
-            <div className="flex justify-center">
-              <Button onClick={handleUpload} disabled={!mediaFile} size="sm">
-                {buttonLabel}
-              </Button>
-            </div>
+            <UploadForm
+              assetName={assetName}
+              tags={tags}
+              submitLabel={
+                isUploadingToTarget ? "Upload When Ready" : buttonLabel
+              }
+              disabled={trimmedAssetName.length === 0}
+              onAssetNameChange={setAssetName}
+              onTagKeyChange={updateTagKey}
+              onTagValueChange={updateTagValue}
+              onAddTag={addTag}
+              onSubmit={handleUpload}
+            />
           )}
         </>
       )}
       <Dialog
-        open={uploadError !== null}
+        open={visibleUploadError !== null}
         onOpenChange={(open) => {
-          if (!open) setUploadError(null);
+          if (!open) {
+            setUploadError(null);
+            clearSignedUploadError();
+          }
         }}
       >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Error uploading</DialogTitle>
             <DialogDescription className="break-words whitespace-pre-wrap">
-              {uploadError}
+              {visibleUploadError}
             </DialogDescription>
           </DialogHeader>
         </DialogContent>

@@ -39,24 +39,36 @@ func (f *FileServiceServer) GetAssetUploadTarget(
 	logger.Info("generating pending upload targets", "asset_id", pendingAsset.AssetID.String())
 
 	videoPath, _ := shared.GetOriginalAssetPath(pendingAsset.AssetID.String(), "video")
-	videoSigned, err := f.storageClient.Bucket("vedit-v1").SignedURL(videoPath, &storage.SignedURLOptions{
-		Method:  "PUT",
-		Expires: time.Now().Add(2 * time.Minute),
-		Headers: []string{"Content-Type: video/mp4"},
-	})
+	videoSigned, err := f.storageClient.Bucket("vedit-v1").
+		SignedURL(videoPath, &storage.SignedURLOptions{
+			Method:      "PUT",
+			Expires:     time.Now().Add(2 * time.Minute),
+			ContentType: "video/mp4",
+		})
 	if err != nil {
-		logger.ErrorContext(ctx, "error generating signed url for pending video asset", "error", err)
+		logger.ErrorContext(
+			ctx,
+			"error generating signed url for pending video asset",
+			"error",
+			err,
+		)
 		return nil, err
 	}
 
 	audioPath, _ := shared.GetOriginalAssetPath(pendingAsset.AssetID.String(), "audio")
-	audioSigned, err := f.storageClient.Bucket("vedit-v1").SignedURL(audioPath, &storage.SignedURLOptions{
-		Method:  "PUT",
-		Expires: time.Now().Add(2 * time.Minute),
-		Headers: []string{"Content-Type: audio/mp3"},
-	})
+	audioSigned, err := f.storageClient.Bucket("vedit-v1").
+		SignedURL(audioPath, &storage.SignedURLOptions{
+			Method:      "PUT",
+			Expires:     time.Now().Add(2 * time.Minute),
+			ContentType: "audio/mp3",
+		})
 	if err != nil {
-		logger.ErrorContext(ctx, "error generating signed url for pending audio asset", "error", err)
+		logger.ErrorContext(
+			ctx,
+			"error generating signed url for pending audio asset",
+			"error",
+			err,
+		)
 		return nil, err
 	}
 

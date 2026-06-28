@@ -5,17 +5,17 @@ import { useRef, useState } from "react";
 interface DragUploadAreaProps {
   onFileSelected: (f: File) => void;
   selectedFile: File | null;
-  accept?: string;
-  label?: string;
-  isAcceptedFile?: (file: File) => boolean;
+  accept: string;
+  label: string;
+  isAcceptedFile: (file: File) => boolean;
 }
 
 export function DragUploadArea({
   onFileSelected,
   selectedFile,
-  accept = "video/mp4",
-  label = "Upload Video",
-  isAcceptedFile = (file) => file.type === "video/mp4",
+  accept,
+  label,
+  isAcceptedFile,
 }: DragUploadAreaProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isHovering, setIsHovering] = useState(false);

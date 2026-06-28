@@ -53,7 +53,12 @@ func (f *FileServiceServer) InitiateAudioIngest(
 		AssetID: assetId,
 	})
 	if err != nil {
-		logger.ErrorContext(ctx, "trying to upload an asset that is not in the pending assets table", "error", err)
+		logger.ErrorContext(
+			ctx,
+			"trying to upload an asset that is not in the pending assets table",
+			"error",
+			err,
+		)
 		return err
 	}
 	directoryID, err := f.uploadParentDirectoryID(ctx, workspaceID, req.Msg.ParentDirectoryId)
@@ -80,7 +85,14 @@ func (f *FileServiceServer) InitiateAudioIngest(
 	bucket := f.storageClient.Bucket("vedit-v1")
 	reader, err := bucket.Object(audioPath).NewReader(ctx)
 	if err != nil {
-		logger.ErrorContext(ctx, "asset in pending uploads, but data could not be found at path", "path", audioPath, "error", err)
+		logger.ErrorContext(
+			ctx,
+			"asset in pending uploads, but data could not be found at path",
+			"path",
+			audioPath,
+			"error",
+			err,
+		)
 		if errors.Is(err, storage.ErrObjectNotExist) {
 			return connect.NewError(connect.CodeNotFound, err)
 		}

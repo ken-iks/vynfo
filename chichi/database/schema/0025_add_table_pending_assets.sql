@@ -1,6 +1,6 @@
 -- +goose Up
 CREATE TABLE pending_assets (
-    asset_id UUID PRIMARY KEY REFERENCES assets(id) ON DELETE CASCADE,
+    asset_id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id)
 );
 
