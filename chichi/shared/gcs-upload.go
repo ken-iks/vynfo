@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"strings"
@@ -12,14 +13,14 @@ import (
 const ORIGINAL_VIDEOS_OBJECT_PATH = "original-videos"
 const ORIGINAL_AUDIOS_OBJECT_PATH = "original-audios"
 
-func GetUploadPath(assetID string, assetType string) (string, error) {
+func GetOriginalAssetPath(assetID string, assetType string) (string, error) {
 	switch assetType {
 	case "video":
 		return fmt.Sprintf("%s/%s.mp4", ORIGINAL_VIDEOS_OBJECT_PATH, assetID), nil
 	case "audio":
 		return fmt.Sprintf("%s/%s.mp3", ORIGINAL_AUDIOS_OBJECT_PATH, assetID), nil
 	default:
-		return "", fmt.Errorf("unsupported upload asset type: %s", assetType)
+		return "", fmt.Errorf("unsupported original asset type: %s", assetType)
 	}
 }
 
@@ -62,4 +63,9 @@ func UploadString(
 	withSignedUrl *storage.BucketHandle,
 ) (string, error) {
 	return UploadBytes(writer, strings.NewReader(s), objectPath, withSignedUrl)
+}
+
+func ObjectExists(ctx context.Context, bucket *storage.BucketHandle, objectPath string) error {
+	_, err := bucket.Object(objectPath).Attrs(ctx)
+	return err
 }

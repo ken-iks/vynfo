@@ -1,13 +1,15 @@
 package vfs
 
 import (
-	"bytes"
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"math"
 	"os"
 
+	"cloud.google.com/go/storage"
 	"connectrpc.com/connect"
 
 	"vynfo.com/vynfo/auth"
@@ -18,10 +20,10 @@ import (
 	vid "vynfo.com/vynfo/video"
 )
 
-func (f *FileServiceServer) UploadAudio(
+func (f *FileServiceServer) InitiateAudioIngest(
 	ctx context.Context,
-	req *connect.Request[v1.UploadAudioRequest],
-	stream *connect.ServerStream[v1.UploadAudioResponse],
+	req *connect.Request[v1.InitiateAudioIngestRequest],
+	stream *connect.ServerStream[v1.InitiateAudioIngestResponse],
 ) error {
 	user, err := auth.RequireOnboardedUser(ctx, f.queries)
 	if err != nil {
@@ -31,15 +33,28 @@ func (f *FileServiceServer) UploadAudio(
 		"user_id", user.ID.String(),
 		"workspace_id", req.Msg.GetWorkspaceId(),
 		"media_type", "audio",
-		"content_length_bytes", len(req.Msg.GetContent()),
+		"asset_id", req.Msg.GetAssetId(),
 	)
 	workspaceID, err := shared.ParseUUID(ctx, logger, "workspace_id", req.Msg.GetWorkspaceId())
 	if err != nil {
 		return err
 	}
 
+	assetId, err := shared.ParseUUID(ctx, logger, "asset_id", req.Msg.GetAssetId())
+	if err != nil {
+		return err
+	}
+
 	if err := auth.AssertUserInWorkspace(ctx, workspaceID, f.queries); err != nil {
 		return connect.NewError(connect.CodePermissionDenied, err)
+	}
+	pendingAsset, err := f.queries.GetPendingAsset(ctx, db.GetPendingAssetParams{
+		UserID:  user.ID,
+		AssetID: assetId,
+	})
+	if err != nil {
+		logger.ErrorContext(ctx, "trying to upload an asset that is not in the pending assets table", "error", err)
+		return err
 	}
 	directoryID, err := f.uploadParentDirectoryID(ctx, workspaceID, req.Msg.ParentDirectoryId)
 	if err != nil {
@@ -53,7 +68,6 @@ func (f *FileServiceServer) UploadAudio(
 	}
 	logger.InfoContext(ctx, "media upload started")
 
-	content := req.Msg.GetContent()
 	tmpFile, err := os.CreateTemp("", "temp-audio-*")
 	if err != nil {
 		logger.ErrorContext(ctx, "error opening up temporary file for writing", "error", err)
@@ -61,10 +75,21 @@ func (f *FileServiceServer) UploadAudio(
 	}
 	defer os.Remove(tmpFile.Name())
 	defer tmpFile.Close()
-	_, err = tmpFile.Write(content)
+
+	audioPath, _ := shared.GetOriginalAssetPath(assetId.String(), "audio")
+	bucket := f.storageClient.Bucket("vedit-v1")
+	reader, err := bucket.Object(audioPath).NewReader(ctx)
 	if err != nil {
+		logger.ErrorContext(ctx, "asset in pending uploads, but data could not be found at path", "path", audioPath, "error", err)
+		if errors.Is(err, storage.ErrObjectNotExist) {
+			return connect.NewError(connect.CodeNotFound, err)
+		}
+		return connect.NewError(connect.CodeInternal, err)
+	}
+	defer reader.Close()
+	if _, err := io.Copy(tmpFile, reader); err != nil {
 		logger.ErrorContext(ctx, "error writing audio to temp file", "error", err)
-		return connect.NewError(connect.CodeInvalidArgument, err)
+		return connect.NewError(connect.CodeInternal, err)
 	}
 	audioDuration, err := vid.ProbeDuration(tmpFile.Name())
 	if err != nil {
@@ -81,7 +106,8 @@ func (f *FileServiceServer) UploadAudio(
 	)
 	logger.InfoContext(ctx, "media metadata probed")
 
-	asset, err := f.queries.CreateAsset(ctx, db.CreateAssetParams{
+	asset, err := f.queries.CreateAssetWithId(ctx, db.CreateAssetWithIdParams{
+		ID:          pendingAsset.AssetID,
 		WorkspaceID: workspaceID,
 		AssetType:   "audio",
 		DisplayName: req.Msg.GetTitle(),
@@ -103,22 +129,6 @@ func (f *FileServiceServer) UploadAudio(
 	}
 	logger.InfoContext(ctx, "media asset created")
 
-	originalUploadErr := make(chan error, 1)
-	originalUploadFp, err := shared.GetUploadPath(audio.AssetID.String(), "audio")
-	if err != nil {
-		logger.ErrorContext(ctx, "error resolving original audio upload path", "error", err)
-		f.cleanupFailedMediaUpload(ctx, asset.ID, nil, "audio")
-		return connect.NewError(connect.CodeInternal, err)
-	}
-	go func(audioBytes []byte, objectPath string) {
-		bucket := f.storageClient.Bucket("vedit-v1")
-		w := bucket.Object(objectPath).NewWriter(ctx)
-		_, err := shared.UploadBytes(
-			w, bytes.NewReader(audioBytes), objectPath, nil,
-		)
-		originalUploadErr <- err
-	}(content, originalUploadFp)
-
 	segments, tmpDir, err := vid.GenerateAudioSegments(
 		tmpFile.Name(),
 		audio.AssetID.String(),
@@ -127,8 +137,7 @@ func (f *FileServiceServer) UploadAudio(
 	)
 	if err != nil {
 		logger.ErrorContext(ctx, "error initializing audio segmenter", "error", err)
-		<-originalUploadErr
-		f.cleanupFailedMediaUpload(ctx, asset.ID, []string{originalUploadFp}, "audio")
+		f.cleanupFailedMediaUpload(ctx, asset.ID, nil, "audio")
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	defer os.RemoveAll(tmpDir)
@@ -146,10 +155,10 @@ func (f *FileServiceServer) UploadAudio(
 		&manifest,
 		segments,
 		func(percentComplete float64) error {
-			return stream.Send(&v1.UploadAudioResponse{
-				UploadStatus: &v1.UploadAudioResponse_Ongoing{
-					Ongoing: &v1.UploadAudioProgressIndicator{
-						AudioId:              audio.AssetID.String(),
+			return stream.Send(&v1.InitiateAudioIngestResponse{
+				IngestStatus: &v1.InitiateAudioIngestResponse_Ongoing{
+					Ongoing: &v1.IngestProgressIndicator{
+						AssetId:              audio.AssetID.String(),
 						CompletionPercentage: percentComplete,
 					},
 				},
@@ -157,7 +166,6 @@ func (f *FileServiceServer) UploadAudio(
 		},
 	)
 	if err != nil {
-		<-originalUploadErr
 		logger.ErrorContext(
 			ctx,
 			"error uploading audio segments",
@@ -169,23 +177,11 @@ func (f *FileServiceServer) UploadAudio(
 		f.cleanupFailedMediaUpload(
 			ctx,
 			asset.ID,
-			append(uploadedObjects, originalUploadFp),
+			uploadedObjects,
 			"audio",
 		)
 		return err
 	}
-
-	if err := <-originalUploadErr; err != nil {
-		logger.ErrorContext(ctx, "error uploading original audio file", "error", err)
-		f.cleanupFailedMediaUpload(
-			ctx,
-			asset.ID,
-			append(uploadedObjects, originalUploadFp),
-			"audio",
-		)
-		return connect.NewError(connect.CodeInternal, err)
-	}
-	logger.InfoContext(ctx, "original media uploaded")
 
 	err = manifest.FinishUpload(ctx)
 	manifestPath := fmt.Sprintf("manifests/%s.m3u8", audio.AssetID.String())
@@ -194,7 +190,7 @@ func (f *FileServiceServer) UploadAudio(
 		f.cleanupFailedMediaUpload(
 			ctx,
 			asset.ID,
-			append(uploadedObjects, originalUploadFp, manifestPath),
+			append(uploadedObjects, manifestPath),
 			"audio",
 		)
 		return connect.NewError(connect.CodeInternal, err)
@@ -206,10 +202,10 @@ func (f *FileServiceServer) UploadAudio(
 		len(uploadedObjects),
 	)
 
-	msg := &v1.UploadAudioResponse{
-		UploadStatus: &v1.UploadAudioResponse_Finished{
-			Finished: &v1.UploadAudioFinishedIndicator{
-				AudioId: audio.AssetID.String(),
+	msg := &v1.InitiateAudioIngestResponse{
+		IngestStatus: &v1.InitiateAudioIngestResponse_Finished{
+			Finished: &v1.IngestFinishedIndicator{
+				AssetId: audio.AssetID.String(),
 			},
 		},
 	}
@@ -218,7 +214,7 @@ func (f *FileServiceServer) UploadAudio(
 		f.cleanupFailedMediaUpload(
 			ctx,
 			asset.ID,
-			append(uploadedObjects, manifestPath, originalUploadFp),
+			append(uploadedObjects, manifestPath),
 			"audio",
 		)
 		return err

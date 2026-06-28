@@ -146,55 +146,49 @@ message DeleteInUseAssetUsage {
     string project_name = 4;
 }
 
-// ========================  Uploader  ============================ //
+// ========================  Ingester // Uploader  ============================ //
 
-// UploadVideoRequest will upload video content to storage
-message UploadVideoRequest {
+// InitiateVideoIngest will initiate a video ingest on the provided
+// asset id IF the asset id is currently pending ingest.
+// For an asset to be currently pending ingest, the user must have generated
+// an upload target for the asset and have written the bytes to the upload target
+message InitiateVideoIngestRequest {
     string workspace_id = 1;
     optional string parent_directory_id = 2;
-    bytes content = 3;
+    string asset_id = 3;
     string title = 4;
 }
 
-// UploadProgressIndicator allows clients to play the video up
-// until the uploaded point whilst a large video is still uploaded
-message UploadProgressIndicator {
-    string video_id = 1;
+// IngestProgressIndicator allows clients to track ingest progress
+message IngestProgressIndicator {
+    string asset_id = 1;
     double completion_percentage = 2;
 }
 
-// UploadFinishedIndicator does as advertised...
-message UploadFinishedIndicator {
-    string video_id = 1;
+// IngestFinishedIndicator does as advertised...
+message IngestFinishedIndicator {
+    string asset_id = 1;
 }
 
-message UploadVideoResponse {
-    oneof upload_status {
-        UploadProgressIndicator ongoing = 1;
-        UploadFinishedIndicator finished = 2;
+message InitiateVideoIngestResponse {
+    oneof ingest_status {
+        IngestProgressIndicator ongoing = 1;
+        IngestFinishedIndicator finished = 2;
     }
 }
 
-message UploadAudioRequest {
+// InitiateAudioIngest will do the same as video ingest but just do it for audio
+message InitiateAudioIngestRequest {
     string workspace_id = 1;
     optional string parent_directory_id = 2;
-    bytes content = 3;
+    string asset_id = 3;
     string title = 4;
 }
 
-message UploadAudioProgressIndicator {
-    string audio_id = 1;
-    double completion_percentage = 2;
-}
-
-message UploadAudioFinishedIndicator {
-    string audio_id = 1;
-}
-
-message UploadAudioResponse {
-    oneof upload_status {
-        UploadAudioProgressIndicator ongoing = 1;
-        UploadAudioFinishedIndicator finished = 2;
+message InitiateAudioIngestResponse {
+    oneof ingest_status {
+        IngestProgressIndicator ongoing = 1;
+        IngestFinishedIndicator finished = 2;
     }
 }
 
@@ -210,10 +204,27 @@ message UploadImageResponse {
     string uploaded_asset_id = 1;
 }
 
+// GetAssetUploadTarget will return a target url that the asset bytes can be uploaded
+// to from the browser. The returned asset id should be used to initiate an 'ingest'.
+// And the asset is not mapped into our data model until the ingest is complete
+//
+// Current supported types:
+// - video: mp4
+// - audio: mp3
+//
+message GetAssetUploadTargetRequest {
+    string workspace_id = 1;
+}
+
+message GetAssetUploadTargetResponse {
+    string asset_id = 1;
+    string video_target = 2;
+    string audio_target = 3;
+}
 
 service FileService {
-    rpc UploadVideo(UploadVideoRequest) returns (stream UploadVideoResponse);
-    rpc UploadAudio(UploadAudioRequest) returns (stream UploadAudioResponse);
+    rpc InitiateVideoIngest(InitiateVideoIngestRequest) returns (stream InitiateVideoIngestResponse);
+    rpc InitiateAudioIngest(InitiateAudioIngestRequest) returns (stream InitiateAudioIngestResponse);
     rpc UploadImage(UploadImageRequest) returns (UploadImageResponse);
     rpc GetRootDirectory(GetRootDirectoryRequest) returns (GetRootDirectoryResponse);
     rpc GetDirectoryChildren(GetDirectoryChildrenRequest) returns (GetDirectoryChildrenResponse);
@@ -224,4 +235,5 @@ service FileService {
     rpc RenameAsset(RenameAssetRequest) returns (google.protobuf.Empty);
     rpc MoveAsset(MoveAssetRequest) returns (google.protobuf.Empty);
     rpc DeleteAsset(DeleteAssetRequest) returns (google.protobuf.Empty);
+    rpc GetAssetUploadTarget(GetAssetUploadTargetRequest) returns (GetAssetUploadTargetResponse);
 }

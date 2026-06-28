@@ -34,10 +34,12 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// FileServiceUploadVideoProcedure is the fully-qualified name of the FileService's UploadVideo RPC.
-	FileServiceUploadVideoProcedure = "/v1.FileService/UploadVideo"
-	// FileServiceUploadAudioProcedure is the fully-qualified name of the FileService's UploadAudio RPC.
-	FileServiceUploadAudioProcedure = "/v1.FileService/UploadAudio"
+	// FileServiceInitiateVideoIngestProcedure is the fully-qualified name of the FileService's
+	// InitiateVideoIngest RPC.
+	FileServiceInitiateVideoIngestProcedure = "/v1.FileService/InitiateVideoIngest"
+	// FileServiceInitiateAudioIngestProcedure is the fully-qualified name of the FileService's
+	// InitiateAudioIngest RPC.
+	FileServiceInitiateAudioIngestProcedure = "/v1.FileService/InitiateAudioIngest"
 	// FileServiceUploadImageProcedure is the fully-qualified name of the FileService's UploadImage RPC.
 	FileServiceUploadImageProcedure = "/v1.FileService/UploadImage"
 	// FileServiceGetRootDirectoryProcedure is the fully-qualified name of the FileService's
@@ -64,12 +66,15 @@ const (
 	FileServiceMoveAssetProcedure = "/v1.FileService/MoveAsset"
 	// FileServiceDeleteAssetProcedure is the fully-qualified name of the FileService's DeleteAsset RPC.
 	FileServiceDeleteAssetProcedure = "/v1.FileService/DeleteAsset"
+	// FileServiceGetAssetUploadTargetProcedure is the fully-qualified name of the FileService's
+	// GetAssetUploadTarget RPC.
+	FileServiceGetAssetUploadTargetProcedure = "/v1.FileService/GetAssetUploadTarget"
 )
 
 // FileServiceClient is a client for the v1.FileService service.
 type FileServiceClient interface {
-	UploadVideo(context.Context, *connect.Request[v1.UploadVideoRequest]) (*connect.ServerStreamForClient[v1.UploadVideoResponse], error)
-	UploadAudio(context.Context, *connect.Request[v1.UploadAudioRequest]) (*connect.ServerStreamForClient[v1.UploadAudioResponse], error)
+	InitiateVideoIngest(context.Context, *connect.Request[v1.InitiateVideoIngestRequest]) (*connect.ServerStreamForClient[v1.InitiateVideoIngestResponse], error)
+	InitiateAudioIngest(context.Context, *connect.Request[v1.InitiateAudioIngestRequest]) (*connect.ServerStreamForClient[v1.InitiateAudioIngestResponse], error)
 	UploadImage(context.Context, *connect.Request[v1.UploadImageRequest]) (*connect.Response[v1.UploadImageResponse], error)
 	GetRootDirectory(context.Context, *connect.Request[v1.GetRootDirectoryRequest]) (*connect.Response[v1.GetRootDirectoryResponse], error)
 	GetDirectoryChildren(context.Context, *connect.Request[v1.GetDirectoryChildrenRequest]) (*connect.Response[v1.GetDirectoryChildrenResponse], error)
@@ -80,6 +85,7 @@ type FileServiceClient interface {
 	RenameAsset(context.Context, *connect.Request[v1.RenameAssetRequest]) (*connect.Response[emptypb.Empty], error)
 	MoveAsset(context.Context, *connect.Request[v1.MoveAssetRequest]) (*connect.Response[emptypb.Empty], error)
 	DeleteAsset(context.Context, *connect.Request[v1.DeleteAssetRequest]) (*connect.Response[emptypb.Empty], error)
+	GetAssetUploadTarget(context.Context, *connect.Request[v1.GetAssetUploadTargetRequest]) (*connect.Response[v1.GetAssetUploadTargetResponse], error)
 }
 
 // NewFileServiceClient constructs a client for the v1.FileService service. By default, it uses the
@@ -93,16 +99,16 @@ func NewFileServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 	baseURL = strings.TrimRight(baseURL, "/")
 	fileServiceMethods := v1.File_proto_v1_vfs_proto.Services().ByName("FileService").Methods()
 	return &fileServiceClient{
-		uploadVideo: connect.NewClient[v1.UploadVideoRequest, v1.UploadVideoResponse](
+		initiateVideoIngest: connect.NewClient[v1.InitiateVideoIngestRequest, v1.InitiateVideoIngestResponse](
 			httpClient,
-			baseURL+FileServiceUploadVideoProcedure,
-			connect.WithSchema(fileServiceMethods.ByName("UploadVideo")),
+			baseURL+FileServiceInitiateVideoIngestProcedure,
+			connect.WithSchema(fileServiceMethods.ByName("InitiateVideoIngest")),
 			connect.WithClientOptions(opts...),
 		),
-		uploadAudio: connect.NewClient[v1.UploadAudioRequest, v1.UploadAudioResponse](
+		initiateAudioIngest: connect.NewClient[v1.InitiateAudioIngestRequest, v1.InitiateAudioIngestResponse](
 			httpClient,
-			baseURL+FileServiceUploadAudioProcedure,
-			connect.WithSchema(fileServiceMethods.ByName("UploadAudio")),
+			baseURL+FileServiceInitiateAudioIngestProcedure,
+			connect.WithSchema(fileServiceMethods.ByName("InitiateAudioIngest")),
 			connect.WithClientOptions(opts...),
 		),
 		uploadImage: connect.NewClient[v1.UploadImageRequest, v1.UploadImageResponse](
@@ -165,13 +171,19 @@ func NewFileServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(fileServiceMethods.ByName("DeleteAsset")),
 			connect.WithClientOptions(opts...),
 		),
+		getAssetUploadTarget: connect.NewClient[v1.GetAssetUploadTargetRequest, v1.GetAssetUploadTargetResponse](
+			httpClient,
+			baseURL+FileServiceGetAssetUploadTargetProcedure,
+			connect.WithSchema(fileServiceMethods.ByName("GetAssetUploadTarget")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // fileServiceClient implements FileServiceClient.
 type fileServiceClient struct {
-	uploadVideo          *connect.Client[v1.UploadVideoRequest, v1.UploadVideoResponse]
-	uploadAudio          *connect.Client[v1.UploadAudioRequest, v1.UploadAudioResponse]
+	initiateVideoIngest  *connect.Client[v1.InitiateVideoIngestRequest, v1.InitiateVideoIngestResponse]
+	initiateAudioIngest  *connect.Client[v1.InitiateAudioIngestRequest, v1.InitiateAudioIngestResponse]
 	uploadImage          *connect.Client[v1.UploadImageRequest, v1.UploadImageResponse]
 	getRootDirectory     *connect.Client[v1.GetRootDirectoryRequest, v1.GetRootDirectoryResponse]
 	getDirectoryChildren *connect.Client[v1.GetDirectoryChildrenRequest, v1.GetDirectoryChildrenResponse]
@@ -182,16 +194,17 @@ type fileServiceClient struct {
 	renameAsset          *connect.Client[v1.RenameAssetRequest, emptypb.Empty]
 	moveAsset            *connect.Client[v1.MoveAssetRequest, emptypb.Empty]
 	deleteAsset          *connect.Client[v1.DeleteAssetRequest, emptypb.Empty]
+	getAssetUploadTarget *connect.Client[v1.GetAssetUploadTargetRequest, v1.GetAssetUploadTargetResponse]
 }
 
-// UploadVideo calls v1.FileService.UploadVideo.
-func (c *fileServiceClient) UploadVideo(ctx context.Context, req *connect.Request[v1.UploadVideoRequest]) (*connect.ServerStreamForClient[v1.UploadVideoResponse], error) {
-	return c.uploadVideo.CallServerStream(ctx, req)
+// InitiateVideoIngest calls v1.FileService.InitiateVideoIngest.
+func (c *fileServiceClient) InitiateVideoIngest(ctx context.Context, req *connect.Request[v1.InitiateVideoIngestRequest]) (*connect.ServerStreamForClient[v1.InitiateVideoIngestResponse], error) {
+	return c.initiateVideoIngest.CallServerStream(ctx, req)
 }
 
-// UploadAudio calls v1.FileService.UploadAudio.
-func (c *fileServiceClient) UploadAudio(ctx context.Context, req *connect.Request[v1.UploadAudioRequest]) (*connect.ServerStreamForClient[v1.UploadAudioResponse], error) {
-	return c.uploadAudio.CallServerStream(ctx, req)
+// InitiateAudioIngest calls v1.FileService.InitiateAudioIngest.
+func (c *fileServiceClient) InitiateAudioIngest(ctx context.Context, req *connect.Request[v1.InitiateAudioIngestRequest]) (*connect.ServerStreamForClient[v1.InitiateAudioIngestResponse], error) {
+	return c.initiateAudioIngest.CallServerStream(ctx, req)
 }
 
 // UploadImage calls v1.FileService.UploadImage.
@@ -244,10 +257,15 @@ func (c *fileServiceClient) DeleteAsset(ctx context.Context, req *connect.Reques
 	return c.deleteAsset.CallUnary(ctx, req)
 }
 
+// GetAssetUploadTarget calls v1.FileService.GetAssetUploadTarget.
+func (c *fileServiceClient) GetAssetUploadTarget(ctx context.Context, req *connect.Request[v1.GetAssetUploadTargetRequest]) (*connect.Response[v1.GetAssetUploadTargetResponse], error) {
+	return c.getAssetUploadTarget.CallUnary(ctx, req)
+}
+
 // FileServiceHandler is an implementation of the v1.FileService service.
 type FileServiceHandler interface {
-	UploadVideo(context.Context, *connect.Request[v1.UploadVideoRequest], *connect.ServerStream[v1.UploadVideoResponse]) error
-	UploadAudio(context.Context, *connect.Request[v1.UploadAudioRequest], *connect.ServerStream[v1.UploadAudioResponse]) error
+	InitiateVideoIngest(context.Context, *connect.Request[v1.InitiateVideoIngestRequest], *connect.ServerStream[v1.InitiateVideoIngestResponse]) error
+	InitiateAudioIngest(context.Context, *connect.Request[v1.InitiateAudioIngestRequest], *connect.ServerStream[v1.InitiateAudioIngestResponse]) error
 	UploadImage(context.Context, *connect.Request[v1.UploadImageRequest]) (*connect.Response[v1.UploadImageResponse], error)
 	GetRootDirectory(context.Context, *connect.Request[v1.GetRootDirectoryRequest]) (*connect.Response[v1.GetRootDirectoryResponse], error)
 	GetDirectoryChildren(context.Context, *connect.Request[v1.GetDirectoryChildrenRequest]) (*connect.Response[v1.GetDirectoryChildrenResponse], error)
@@ -258,6 +276,7 @@ type FileServiceHandler interface {
 	RenameAsset(context.Context, *connect.Request[v1.RenameAssetRequest]) (*connect.Response[emptypb.Empty], error)
 	MoveAsset(context.Context, *connect.Request[v1.MoveAssetRequest]) (*connect.Response[emptypb.Empty], error)
 	DeleteAsset(context.Context, *connect.Request[v1.DeleteAssetRequest]) (*connect.Response[emptypb.Empty], error)
+	GetAssetUploadTarget(context.Context, *connect.Request[v1.GetAssetUploadTargetRequest]) (*connect.Response[v1.GetAssetUploadTargetResponse], error)
 }
 
 // NewFileServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -267,16 +286,16 @@ type FileServiceHandler interface {
 // and JSON codecs. They also support gzip compression.
 func NewFileServiceHandler(svc FileServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
 	fileServiceMethods := v1.File_proto_v1_vfs_proto.Services().ByName("FileService").Methods()
-	fileServiceUploadVideoHandler := connect.NewServerStreamHandler(
-		FileServiceUploadVideoProcedure,
-		svc.UploadVideo,
-		connect.WithSchema(fileServiceMethods.ByName("UploadVideo")),
+	fileServiceInitiateVideoIngestHandler := connect.NewServerStreamHandler(
+		FileServiceInitiateVideoIngestProcedure,
+		svc.InitiateVideoIngest,
+		connect.WithSchema(fileServiceMethods.ByName("InitiateVideoIngest")),
 		connect.WithHandlerOptions(opts...),
 	)
-	fileServiceUploadAudioHandler := connect.NewServerStreamHandler(
-		FileServiceUploadAudioProcedure,
-		svc.UploadAudio,
-		connect.WithSchema(fileServiceMethods.ByName("UploadAudio")),
+	fileServiceInitiateAudioIngestHandler := connect.NewServerStreamHandler(
+		FileServiceInitiateAudioIngestProcedure,
+		svc.InitiateAudioIngest,
+		connect.WithSchema(fileServiceMethods.ByName("InitiateAudioIngest")),
 		connect.WithHandlerOptions(opts...),
 	)
 	fileServiceUploadImageHandler := connect.NewUnaryHandler(
@@ -339,12 +358,18 @@ func NewFileServiceHandler(svc FileServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(fileServiceMethods.ByName("DeleteAsset")),
 		connect.WithHandlerOptions(opts...),
 	)
+	fileServiceGetAssetUploadTargetHandler := connect.NewUnaryHandler(
+		FileServiceGetAssetUploadTargetProcedure,
+		svc.GetAssetUploadTarget,
+		connect.WithSchema(fileServiceMethods.ByName("GetAssetUploadTarget")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/v1.FileService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case FileServiceUploadVideoProcedure:
-			fileServiceUploadVideoHandler.ServeHTTP(w, r)
-		case FileServiceUploadAudioProcedure:
-			fileServiceUploadAudioHandler.ServeHTTP(w, r)
+		case FileServiceInitiateVideoIngestProcedure:
+			fileServiceInitiateVideoIngestHandler.ServeHTTP(w, r)
+		case FileServiceInitiateAudioIngestProcedure:
+			fileServiceInitiateAudioIngestHandler.ServeHTTP(w, r)
 		case FileServiceUploadImageProcedure:
 			fileServiceUploadImageHandler.ServeHTTP(w, r)
 		case FileServiceGetRootDirectoryProcedure:
@@ -365,6 +390,8 @@ func NewFileServiceHandler(svc FileServiceHandler, opts ...connect.HandlerOption
 			fileServiceMoveAssetHandler.ServeHTTP(w, r)
 		case FileServiceDeleteAssetProcedure:
 			fileServiceDeleteAssetHandler.ServeHTTP(w, r)
+		case FileServiceGetAssetUploadTargetProcedure:
+			fileServiceGetAssetUploadTargetHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -374,12 +401,12 @@ func NewFileServiceHandler(svc FileServiceHandler, opts ...connect.HandlerOption
 // UnimplementedFileServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedFileServiceHandler struct{}
 
-func (UnimplementedFileServiceHandler) UploadVideo(context.Context, *connect.Request[v1.UploadVideoRequest], *connect.ServerStream[v1.UploadVideoResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("v1.FileService.UploadVideo is not implemented"))
+func (UnimplementedFileServiceHandler) InitiateVideoIngest(context.Context, *connect.Request[v1.InitiateVideoIngestRequest], *connect.ServerStream[v1.InitiateVideoIngestResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("v1.FileService.InitiateVideoIngest is not implemented"))
 }
 
-func (UnimplementedFileServiceHandler) UploadAudio(context.Context, *connect.Request[v1.UploadAudioRequest], *connect.ServerStream[v1.UploadAudioResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("v1.FileService.UploadAudio is not implemented"))
+func (UnimplementedFileServiceHandler) InitiateAudioIngest(context.Context, *connect.Request[v1.InitiateAudioIngestRequest], *connect.ServerStream[v1.InitiateAudioIngestResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("v1.FileService.InitiateAudioIngest is not implemented"))
 }
 
 func (UnimplementedFileServiceHandler) UploadImage(context.Context, *connect.Request[v1.UploadImageRequest]) (*connect.Response[v1.UploadImageResponse], error) {
@@ -420,4 +447,8 @@ func (UnimplementedFileServiceHandler) MoveAsset(context.Context, *connect.Reque
 
 func (UnimplementedFileServiceHandler) DeleteAsset(context.Context, *connect.Request[v1.DeleteAssetRequest]) (*connect.Response[emptypb.Empty], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.FileService.DeleteAsset is not implemented"))
+}
+
+func (UnimplementedFileServiceHandler) GetAssetUploadTarget(context.Context, *connect.Request[v1.GetAssetUploadTargetRequest]) (*connect.Response[v1.GetAssetUploadTargetResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("v1.FileService.GetAssetUploadTarget is not implemented"))
 }

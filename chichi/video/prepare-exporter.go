@@ -95,7 +95,7 @@ func PrepareExporter(
 }
 
 func signAsset(assetId string, client *storage.Client, assetType string) (string, error) {
-	path, err := shared.GetUploadPath(assetId, assetType)
+	path, err := shared.GetOriginalAssetPath(assetId, assetType)
 	if err != nil {
 		return "", fmt.Errorf("")
 	}

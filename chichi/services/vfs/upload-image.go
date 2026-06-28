@@ -16,10 +16,6 @@ import (
 	"vynfo.com/vynfo/shared"
 )
 
-func imageObjectPath(assetID string) string {
-	return fmt.Sprintf("images/%s", assetID)
-}
-
 func (f *FileServiceServer) UploadImage(
 	ctx context.Context,
 	req *connect.Request[v1.UploadImageRequest],
@@ -76,7 +72,8 @@ func (f *FileServiceServer) UploadImage(
 	}
 	logger = logger.With("asset_id", asset.ID.String())
 
-	objectPath := imageObjectPath(asset.ID.String())
+	objectPath := fmt.Sprintf("images/%s", asset.ID.String())
+
 	bucket := f.storageClient.Bucket("vedit-v1")
 	writer := bucket.Object(objectPath).NewWriter(ctx)
 	writer.ContentType = contentType

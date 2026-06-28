@@ -144,7 +144,7 @@ When the user asks for a specific implementation shape, make that implementation
 - If a cleaner implementation seems worthwhile, mention it briefly as an option and wait for the user to choose it before changing course.
 - Do not iterate on generated code aesthetics after the requested behavior is present.
 - If a generated API is slightly awkward but correct, stop and summarize it instead of changing the source query/schema just to make the generated API prettier.
-- For codegen-backed changes, make the source edit, run the required codegen once, check lints, and stop.
+- For codegen-backed changes, make the source edit, follow any tool-specific repo rules below, check lints, and stop.
 
 **Example:**
 
@@ -153,8 +153,8 @@ BAD — user asks for the simple tip-commit query, so the agent rewrites it with
 a join to force a nicer generated parameter type.
 
 GOOD — add `SELECT * FROM branches WHERE project_id = $1 AND tip_commit_id = $2;`,
-run sqlc, and report that sqlc represents `tip_commit_id` as nullable because
-the column is nullable.
+ask the user to run sqlc, and report that sqlc may represent `tip_commit_id`
+as nullable because the column is nullable.
 ```
 
 ### 7. Explicitly cd before running terminal commands
@@ -188,6 +188,22 @@ When the user asks how to make a specific file or code path work, inspect the ac
 - Do not suggest loosening production types, passing `None`, deleting useful type information, moving setup into the wrong layer, or otherwise making the product worse to avoid straightforward support code.
 - Do not stop at "this may be abstract" or "you could fake it" when the concrete ownership, initialization path, abstract methods, or incompatible signatures can be discovered and fixed properly.
 - If tooling reports exact missing methods or incompatible signatures, use that feedback to complete the correct implementation before responding.
+
+### 11. Do not run sqlc generate
+
+Do not run `sqlc generate`, `go run github.com/sqlc-dev/sqlc/cmd/sqlc ...`, or any other sqlc codegen command.
+
+- When a change needs sqlc output, edit the source SQL/schema files only.
+- Tell the user the exact command they should run, usually `cd chichi && sqlc generate`.
+- After the user runs sqlc, continue from the generated files if they ask for more work.
+
+### 12. Never update generated files unless explicitly instructed
+
+Do not edit generated files unless the user explicitly asks you to edit generated output.
+
+- When generated files need to change, update the source files only and tell the user the exact generation command they should run.
+- Always feel comfortable stopping to ask the user for further instructions or for help running a command.
+- Do not hand-edit generated code to keep the working tree temporarily compiling unless the user specifically requests that.
 
 <!--
 To add another rule, append:

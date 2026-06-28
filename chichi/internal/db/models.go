@@ -127,6 +127,11 @@ type Message struct {
 	ReplyCount int32
 }
 
+type PendingAsset struct {
+	AssetID uuid.UUID
+	UserID  uuid.UUID
+}
+
 type Project struct {
 	ID                 uuid.UUID
 	WorkspaceID        uuid.UUID

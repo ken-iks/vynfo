@@ -22,7 +22,7 @@ import (
 	dbgen "vynfo.com/vynfo/internal/db"
 	"vynfo.com/vynfo/messages"
 	agentbackend "vynfo.com/vynfo/services/agent-backend"
-	"vynfo.com/vynfo/services/conversation"
+	conversations "vynfo.com/vynfo/services/conversation"
 	"vynfo.com/vynfo/services/project"
 	"vynfo.com/vynfo/services/spaces"
 	"vynfo.com/vynfo/services/users"

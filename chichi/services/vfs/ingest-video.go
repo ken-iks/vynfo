@@ -1,13 +1,15 @@
 package vfs
 
 import (
-	"bytes"
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"math"
 	"os"
 
+	"cloud.google.com/go/storage"
 	"connectrpc.com/connect"
 
 	"vynfo.com/vynfo/auth"
@@ -21,10 +23,10 @@ import (
 const uploadWorkerCount = 5
 const uploadSegmentLength = 3
 
-func (f *FileServiceServer) UploadVideo(
+func (f *FileServiceServer) InitiateVideoIngest(
 	ctx context.Context,
-	req *connect.Request[v1.UploadVideoRequest],
-	stream *connect.ServerStream[v1.UploadVideoResponse],
+	req *connect.Request[v1.InitiateVideoIngestRequest],
+	stream *connect.ServerStream[v1.InitiateVideoIngestResponse],
 ) error {
 	user, err := auth.RequireOnboardedUser(ctx, f.queries)
 	if err != nil {
@@ -34,15 +36,28 @@ func (f *FileServiceServer) UploadVideo(
 		"user_id", user.ID.String(),
 		"workspace_id", req.Msg.GetWorkspaceId(),
 		"media_type", "video",
-		"content_length_bytes", len(req.Msg.GetContent()),
+		"asset_id", req.Msg.GetAssetId(),
 	)
 	workspaceID, err := shared.ParseUUID(ctx, logger, "workspace_id", req.Msg.GetWorkspaceId())
 	if err != nil {
 		return err
 	}
 
+	assetId, err := shared.ParseUUID(ctx, logger, "asset_id", req.Msg.GetAssetId())
+	if err != nil {
+		return err
+	}
+
 	if err := auth.AssertUserInWorkspace(ctx, workspaceID, f.queries); err != nil {
 		return connect.NewError(connect.CodePermissionDenied, err)
+	}
+	pendingAsset, err := f.queries.GetPendingAsset(ctx, db.GetPendingAssetParams{
+		UserID:  user.ID,
+		AssetID: assetId,
+	})
+	if err != nil {
+		logger.ErrorContext(ctx, "trying to upload an asset that is not in the pending assets table", "error", err)
+		return err
 	}
 	directoryID, err := f.uploadParentDirectoryID(ctx, workspaceID, req.Msg.ParentDirectoryId)
 	if err != nil {
@@ -56,7 +71,6 @@ func (f *FileServiceServer) UploadVideo(
 	}
 	logger.InfoContext(ctx, "media upload started")
 
-	content := req.Msg.GetContent()
 	tmpFile, err := os.CreateTemp("", "temp-*.mp4")
 	if err != nil {
 		logger.ErrorContext(ctx, "error opening up temporary file for writing", "error", err)
@@ -64,10 +78,21 @@ func (f *FileServiceServer) UploadVideo(
 	}
 	defer os.Remove(tmpFile.Name())
 	defer tmpFile.Close()
-	_, err = tmpFile.Write(content)
+
+	videoPath, _ := shared.GetOriginalAssetPath(pendingAsset.AssetID.String(), "video")
+	bucket := f.storageClient.Bucket("vedit-v1")
+	reader, err := bucket.Object(videoPath).NewReader(ctx)
 	if err != nil {
+		logger.ErrorContext(ctx, "asset in pending uploads, but data could not be found at path", "path", videoPath, "error", err)
+		if errors.Is(err, storage.ErrObjectNotExist) {
+			return connect.NewError(connect.CodeNotFound, err)
+		}
+		return connect.NewError(connect.CodeInternal, err)
+	}
+	defer reader.Close()
+	if _, err := io.Copy(tmpFile, reader); err != nil {
 		logger.ErrorContext(ctx, "error writing video to temp file", "error", err)
-		return connect.NewError(connect.CodeInvalidArgument, err)
+		return connect.NewError(connect.CodeInternal, err)
 	}
 	videoDuration, err := vid.ProbeDuration(tmpFile.Name())
 	if err != nil {
@@ -90,7 +115,8 @@ func (f *FileServiceServer) UploadVideo(
 	)
 	logger.InfoContext(ctx, "media metadata probed")
 
-	asset, err := f.queries.CreateAsset(ctx, db.CreateAssetParams{
+	asset, err := f.queries.CreateAssetWithId(ctx, db.CreateAssetWithIdParams{
+		ID:          pendingAsset.AssetID,
 		WorkspaceID: workspaceID,
 		AssetType:   "video",
 		DisplayName: req.Msg.GetTitle(),
@@ -113,22 +139,6 @@ func (f *FileServiceServer) UploadVideo(
 	}
 	logger.InfoContext(ctx, "media asset created")
 
-	originalUploadErr := make(chan error, 1)
-	originalUploadFp, err := shared.GetUploadPath(video.AssetID.String(), "video")
-	if err != nil {
-		logger.ErrorContext(ctx, "error resolving original video upload path", "error", err)
-		f.cleanupFailedMediaUpload(ctx, asset.ID, nil, "video")
-		return connect.NewError(connect.CodeInternal, err)
-	}
-	go func(videoBytes []byte, objectPath string) {
-		bucket := f.storageClient.Bucket("vedit-v1")
-		w := bucket.Object(objectPath).NewWriter(ctx)
-		_, err := shared.UploadBytes(
-			w, bytes.NewReader(videoBytes), objectPath, nil,
-		)
-		originalUploadErr <- err
-	}(content, originalUploadFp)
-
 	segements, tmpDir, err := vid.GenerateSegments(
 		tmpFile.Name(),
 		video.AssetID.String(),
@@ -137,8 +147,7 @@ func (f *FileServiceServer) UploadVideo(
 	)
 	if err != nil {
 		logger.ErrorContext(ctx, "error initializing segemnter", "error", err)
-		<-originalUploadErr
-		f.cleanupFailedMediaUpload(ctx, asset.ID, []string{originalUploadFp}, "video")
+		f.cleanupFailedMediaUpload(ctx, asset.ID, nil, "video")
 		return connect.NewError(connect.CodeInternal, err)
 	}
 	defer os.RemoveAll(tmpDir)
@@ -156,10 +165,10 @@ func (f *FileServiceServer) UploadVideo(
 		&manifest,
 		segements,
 		func(percentComplete float64) error {
-			return stream.Send(&v1.UploadVideoResponse{
-				UploadStatus: &v1.UploadVideoResponse_Ongoing{
-					Ongoing: &v1.UploadProgressIndicator{
-						VideoId:              video.AssetID.String(),
+			return stream.Send(&v1.InitiateVideoIngestResponse{
+				IngestStatus: &v1.InitiateVideoIngestResponse_Ongoing{
+					Ongoing: &v1.IngestProgressIndicator{
+						AssetId:              video.AssetID.String(),
 						CompletionPercentage: percentComplete,
 					},
 				},
@@ -167,7 +176,6 @@ func (f *FileServiceServer) UploadVideo(
 		},
 	)
 	if err != nil {
-		<-originalUploadErr
 		logger.ErrorContext(
 			ctx,
 			"error uploading video segments",
@@ -179,23 +187,11 @@ func (f *FileServiceServer) UploadVideo(
 		f.cleanupFailedMediaUpload(
 			ctx,
 			asset.ID,
-			append(uploadedObjects, originalUploadFp),
+			uploadedObjects,
 			"video",
 		)
 		return err
 	}
-
-	if err := <-originalUploadErr; err != nil {
-		logger.ErrorContext(ctx, "error uploading original video file", "error", err)
-		f.cleanupFailedMediaUpload(
-			ctx,
-			asset.ID,
-			append(uploadedObjects, originalUploadFp),
-			"video",
-		)
-		return connect.NewError(connect.CodeInternal, err)
-	}
-	logger.InfoContext(ctx, "original media uploaded")
 
 	err = manifest.FinishUpload(ctx)
 	manifestPath := fmt.Sprintf("manifests/%s.m3u8", video.AssetID.String())
@@ -204,7 +200,7 @@ func (f *FileServiceServer) UploadVideo(
 		f.cleanupFailedMediaUpload(
 			ctx,
 			asset.ID,
-			append(uploadedObjects, originalUploadFp, manifestPath),
+			append(uploadedObjects, manifestPath),
 			"video",
 		)
 		return connect.NewError(connect.CodeInternal, err)
@@ -216,10 +212,10 @@ func (f *FileServiceServer) UploadVideo(
 		len(uploadedObjects),
 	)
 
-	msg := &v1.UploadVideoResponse{
-		UploadStatus: &v1.UploadVideoResponse_Finished{
-			Finished: &v1.UploadFinishedIndicator{
-				VideoId: video.AssetID.String(),
+	msg := &v1.InitiateVideoIngestResponse{
+		IngestStatus: &v1.InitiateVideoIngestResponse_Finished{
+			Finished: &v1.IngestFinishedIndicator{
+				AssetId: video.AssetID.String(),
 			},
 		},
 	}
@@ -228,7 +224,7 @@ func (f *FileServiceServer) UploadVideo(
 		f.cleanupFailedMediaUpload(
 			ctx,
 			asset.ID,
-			append(uploadedObjects, manifestPath, originalUploadFp),
+			append(uploadedObjects, manifestPath),
 			"video",
 		)
 		return err

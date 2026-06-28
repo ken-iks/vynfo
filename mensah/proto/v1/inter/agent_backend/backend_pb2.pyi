@@ -12,12 +12,7 @@ class AuthenticateUserAndPromptRequest(_message.Message):
     user_id: str
     workspace_id: str
     prompt: str
-    def __init__(
-        self,
-        user_id: _Optional[str] = ...,
-        workspace_id: _Optional[str] = ...,
-        prompt: _Optional[str] = ...,
-    ) -> None: ...
+    def __init__(self, user_id: _Optional[str] = ..., workspace_id: _Optional[str] = ..., prompt: _Optional[str] = ...) -> None: ...
 
 class AuthenticateUserAndPromptResponse(_message.Message):
     __slots__ = ("valid",)

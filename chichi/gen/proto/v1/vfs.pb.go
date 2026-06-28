@@ -1205,31 +1205,34 @@ func (x *DeleteInUseAssetUsage) GetProjectName() string {
 	return ""
 }
 
-// UploadVideoRequest will upload video content to storage
-type UploadVideoRequest struct {
+// InitiateVideoIngest will initiate a video ingest on the provided
+// asset id IF the asset id is currently pending ingest.
+// For an asset to be currently pending ingest, the user must have generated
+// an upload target for the asset and have written the bytes to the upload target
+type InitiateVideoIngestRequest struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	WorkspaceId       string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	ParentDirectoryId *string                `protobuf:"bytes,2,opt,name=parent_directory_id,json=parentDirectoryId,proto3,oneof" json:"parent_directory_id,omitempty"`
-	Content           []byte                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
+	AssetId           string                 `protobuf:"bytes,3,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
 	Title             string                 `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
 
-func (x *UploadVideoRequest) Reset() {
-	*x = UploadVideoRequest{}
+func (x *InitiateVideoIngestRequest) Reset() {
+	*x = InitiateVideoIngestRequest{}
 	mi := &file_proto_v1_vfs_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UploadVideoRequest) String() string {
+func (x *InitiateVideoIngestRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UploadVideoRequest) ProtoMessage() {}
+func (*InitiateVideoIngestRequest) ProtoMessage() {}
 
-func (x *UploadVideoRequest) ProtoReflect() protoreflect.Message {
+func (x *InitiateVideoIngestRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_v1_vfs_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1241,63 +1244,62 @@ func (x *UploadVideoRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UploadVideoRequest.ProtoReflect.Descriptor instead.
-func (*UploadVideoRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use InitiateVideoIngestRequest.ProtoReflect.Descriptor instead.
+func (*InitiateVideoIngestRequest) Descriptor() ([]byte, []int) {
 	return file_proto_v1_vfs_proto_rawDescGZIP(), []int{19}
 }
 
-func (x *UploadVideoRequest) GetWorkspaceId() string {
+func (x *InitiateVideoIngestRequest) GetWorkspaceId() string {
 	if x != nil {
 		return x.WorkspaceId
 	}
 	return ""
 }
 
-func (x *UploadVideoRequest) GetParentDirectoryId() string {
+func (x *InitiateVideoIngestRequest) GetParentDirectoryId() string {
 	if x != nil && x.ParentDirectoryId != nil {
 		return *x.ParentDirectoryId
 	}
 	return ""
 }
 
-func (x *UploadVideoRequest) GetContent() []byte {
+func (x *InitiateVideoIngestRequest) GetAssetId() string {
 	if x != nil {
-		return x.Content
+		return x.AssetId
 	}
-	return nil
+	return ""
 }
 
-func (x *UploadVideoRequest) GetTitle() string {
+func (x *InitiateVideoIngestRequest) GetTitle() string {
 	if x != nil {
 		return x.Title
 	}
 	return ""
 }
 
-// UploadProgressIndicator allows clients to play the video up
-// until the uploaded point whilst a large video is still uploaded
-type UploadProgressIndicator struct {
+// IngestProgressIndicator allows clients to track ingest progress
+type IngestProgressIndicator struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
-	VideoId              string                 `protobuf:"bytes,1,opt,name=video_id,json=videoId,proto3" json:"video_id,omitempty"`
+	AssetId              string                 `protobuf:"bytes,1,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
 	CompletionPercentage float64                `protobuf:"fixed64,2,opt,name=completion_percentage,json=completionPercentage,proto3" json:"completion_percentage,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
 
-func (x *UploadProgressIndicator) Reset() {
-	*x = UploadProgressIndicator{}
+func (x *IngestProgressIndicator) Reset() {
+	*x = IngestProgressIndicator{}
 	mi := &file_proto_v1_vfs_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UploadProgressIndicator) String() string {
+func (x *IngestProgressIndicator) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UploadProgressIndicator) ProtoMessage() {}
+func (*IngestProgressIndicator) ProtoMessage() {}
 
-func (x *UploadProgressIndicator) ProtoReflect() protoreflect.Message {
+func (x *IngestProgressIndicator) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_v1_vfs_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1309,47 +1311,47 @@ func (x *UploadProgressIndicator) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UploadProgressIndicator.ProtoReflect.Descriptor instead.
-func (*UploadProgressIndicator) Descriptor() ([]byte, []int) {
+// Deprecated: Use IngestProgressIndicator.ProtoReflect.Descriptor instead.
+func (*IngestProgressIndicator) Descriptor() ([]byte, []int) {
 	return file_proto_v1_vfs_proto_rawDescGZIP(), []int{20}
 }
 
-func (x *UploadProgressIndicator) GetVideoId() string {
+func (x *IngestProgressIndicator) GetAssetId() string {
 	if x != nil {
-		return x.VideoId
+		return x.AssetId
 	}
 	return ""
 }
 
-func (x *UploadProgressIndicator) GetCompletionPercentage() float64 {
+func (x *IngestProgressIndicator) GetCompletionPercentage() float64 {
 	if x != nil {
 		return x.CompletionPercentage
 	}
 	return 0
 }
 
-// UploadFinishedIndicator does as advertised...
-type UploadFinishedIndicator struct {
+// IngestFinishedIndicator does as advertised...
+type IngestFinishedIndicator struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	VideoId       string                 `protobuf:"bytes,1,opt,name=video_id,json=videoId,proto3" json:"video_id,omitempty"`
+	AssetId       string                 `protobuf:"bytes,1,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UploadFinishedIndicator) Reset() {
-	*x = UploadFinishedIndicator{}
+func (x *IngestFinishedIndicator) Reset() {
+	*x = IngestFinishedIndicator{}
 	mi := &file_proto_v1_vfs_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UploadFinishedIndicator) String() string {
+func (x *IngestFinishedIndicator) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UploadFinishedIndicator) ProtoMessage() {}
+func (*IngestFinishedIndicator) ProtoMessage() {}
 
-func (x *UploadFinishedIndicator) ProtoReflect() protoreflect.Message {
+func (x *IngestFinishedIndicator) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_v1_vfs_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1361,43 +1363,43 @@ func (x *UploadFinishedIndicator) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UploadFinishedIndicator.ProtoReflect.Descriptor instead.
-func (*UploadFinishedIndicator) Descriptor() ([]byte, []int) {
+// Deprecated: Use IngestFinishedIndicator.ProtoReflect.Descriptor instead.
+func (*IngestFinishedIndicator) Descriptor() ([]byte, []int) {
 	return file_proto_v1_vfs_proto_rawDescGZIP(), []int{21}
 }
 
-func (x *UploadFinishedIndicator) GetVideoId() string {
+func (x *IngestFinishedIndicator) GetAssetId() string {
 	if x != nil {
-		return x.VideoId
+		return x.AssetId
 	}
 	return ""
 }
 
-type UploadVideoResponse struct {
+type InitiateVideoIngestResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to UploadStatus:
+	// Types that are valid to be assigned to IngestStatus:
 	//
-	//	*UploadVideoResponse_Ongoing
-	//	*UploadVideoResponse_Finished
-	UploadStatus  isUploadVideoResponse_UploadStatus `protobuf_oneof:"upload_status"`
+	//	*InitiateVideoIngestResponse_Ongoing
+	//	*InitiateVideoIngestResponse_Finished
+	IngestStatus  isInitiateVideoIngestResponse_IngestStatus `protobuf_oneof:"ingest_status"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UploadVideoResponse) Reset() {
-	*x = UploadVideoResponse{}
+func (x *InitiateVideoIngestResponse) Reset() {
+	*x = InitiateVideoIngestResponse{}
 	mi := &file_proto_v1_vfs_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UploadVideoResponse) String() string {
+func (x *InitiateVideoIngestResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UploadVideoResponse) ProtoMessage() {}
+func (*InitiateVideoIngestResponse) ProtoMessage() {}
 
-func (x *UploadVideoResponse) ProtoReflect() protoreflect.Message {
+func (x *InitiateVideoIngestResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_v1_vfs_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1409,76 +1411,77 @@ func (x *UploadVideoResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UploadVideoResponse.ProtoReflect.Descriptor instead.
-func (*UploadVideoResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use InitiateVideoIngestResponse.ProtoReflect.Descriptor instead.
+func (*InitiateVideoIngestResponse) Descriptor() ([]byte, []int) {
 	return file_proto_v1_vfs_proto_rawDescGZIP(), []int{22}
 }
 
-func (x *UploadVideoResponse) GetUploadStatus() isUploadVideoResponse_UploadStatus {
+func (x *InitiateVideoIngestResponse) GetIngestStatus() isInitiateVideoIngestResponse_IngestStatus {
 	if x != nil {
-		return x.UploadStatus
+		return x.IngestStatus
 	}
 	return nil
 }
 
-func (x *UploadVideoResponse) GetOngoing() *UploadProgressIndicator {
+func (x *InitiateVideoIngestResponse) GetOngoing() *IngestProgressIndicator {
 	if x != nil {
-		if x, ok := x.UploadStatus.(*UploadVideoResponse_Ongoing); ok {
+		if x, ok := x.IngestStatus.(*InitiateVideoIngestResponse_Ongoing); ok {
 			return x.Ongoing
 		}
 	}
 	return nil
 }
 
-func (x *UploadVideoResponse) GetFinished() *UploadFinishedIndicator {
+func (x *InitiateVideoIngestResponse) GetFinished() *IngestFinishedIndicator {
 	if x != nil {
-		if x, ok := x.UploadStatus.(*UploadVideoResponse_Finished); ok {
+		if x, ok := x.IngestStatus.(*InitiateVideoIngestResponse_Finished); ok {
 			return x.Finished
 		}
 	}
 	return nil
 }
 
-type isUploadVideoResponse_UploadStatus interface {
-	isUploadVideoResponse_UploadStatus()
+type isInitiateVideoIngestResponse_IngestStatus interface {
+	isInitiateVideoIngestResponse_IngestStatus()
 }
 
-type UploadVideoResponse_Ongoing struct {
-	Ongoing *UploadProgressIndicator `protobuf:"bytes,1,opt,name=ongoing,proto3,oneof"`
+type InitiateVideoIngestResponse_Ongoing struct {
+	Ongoing *IngestProgressIndicator `protobuf:"bytes,1,opt,name=ongoing,proto3,oneof"`
 }
 
-type UploadVideoResponse_Finished struct {
-	Finished *UploadFinishedIndicator `protobuf:"bytes,2,opt,name=finished,proto3,oneof"`
+type InitiateVideoIngestResponse_Finished struct {
+	Finished *IngestFinishedIndicator `protobuf:"bytes,2,opt,name=finished,proto3,oneof"`
 }
 
-func (*UploadVideoResponse_Ongoing) isUploadVideoResponse_UploadStatus() {}
+func (*InitiateVideoIngestResponse_Ongoing) isInitiateVideoIngestResponse_IngestStatus() {}
 
-func (*UploadVideoResponse_Finished) isUploadVideoResponse_UploadStatus() {}
+func (*InitiateVideoIngestResponse_Finished) isInitiateVideoIngestResponse_IngestStatus() {}
 
-type UploadAudioRequest struct {
+// InitiateAudioIngest will do the same as video ingest but just do it for audio
+type InitiateAudioIngestRequest struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	WorkspaceId       string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	ParentDirectoryId *string                `protobuf:"bytes,2,opt,name=parent_directory_id,json=parentDirectoryId,proto3,oneof" json:"parent_directory_id,omitempty"`
-	Content           []byte                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
+	AssetId           string                 `protobuf:"bytes,3,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
 	Title             string                 `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
 
-func (x *UploadAudioRequest) Reset() {
-	*x = UploadAudioRequest{}
+func (x *InitiateAudioIngestRequest) Reset() {
+	*x = InitiateAudioIngestRequest{}
 	mi := &file_proto_v1_vfs_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UploadAudioRequest) String() string {
+func (x *InitiateAudioIngestRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UploadAudioRequest) ProtoMessage() {}
+func (*InitiateAudioIngestRequest) ProtoMessage() {}
 
-func (x *UploadAudioRequest) ProtoReflect() protoreflect.Message {
+func (x *InitiateAudioIngestRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_v1_vfs_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1490,61 +1493,64 @@ func (x *UploadAudioRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UploadAudioRequest.ProtoReflect.Descriptor instead.
-func (*UploadAudioRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use InitiateAudioIngestRequest.ProtoReflect.Descriptor instead.
+func (*InitiateAudioIngestRequest) Descriptor() ([]byte, []int) {
 	return file_proto_v1_vfs_proto_rawDescGZIP(), []int{23}
 }
 
-func (x *UploadAudioRequest) GetWorkspaceId() string {
+func (x *InitiateAudioIngestRequest) GetWorkspaceId() string {
 	if x != nil {
 		return x.WorkspaceId
 	}
 	return ""
 }
 
-func (x *UploadAudioRequest) GetParentDirectoryId() string {
+func (x *InitiateAudioIngestRequest) GetParentDirectoryId() string {
 	if x != nil && x.ParentDirectoryId != nil {
 		return *x.ParentDirectoryId
 	}
 	return ""
 }
 
-func (x *UploadAudioRequest) GetContent() []byte {
+func (x *InitiateAudioIngestRequest) GetAssetId() string {
 	if x != nil {
-		return x.Content
+		return x.AssetId
 	}
-	return nil
+	return ""
 }
 
-func (x *UploadAudioRequest) GetTitle() string {
+func (x *InitiateAudioIngestRequest) GetTitle() string {
 	if x != nil {
 		return x.Title
 	}
 	return ""
 }
 
-type UploadAudioProgressIndicator struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	AudioId              string                 `protobuf:"bytes,1,opt,name=audio_id,json=audioId,proto3" json:"audio_id,omitempty"`
-	CompletionPercentage float64                `protobuf:"fixed64,2,opt,name=completion_percentage,json=completionPercentage,proto3" json:"completion_percentage,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+type InitiateAudioIngestResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to IngestStatus:
+	//
+	//	*InitiateAudioIngestResponse_Ongoing
+	//	*InitiateAudioIngestResponse_Finished
+	IngestStatus  isInitiateAudioIngestResponse_IngestStatus `protobuf_oneof:"ingest_status"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UploadAudioProgressIndicator) Reset() {
-	*x = UploadAudioProgressIndicator{}
+func (x *InitiateAudioIngestResponse) Reset() {
+	*x = InitiateAudioIngestResponse{}
 	mi := &file_proto_v1_vfs_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UploadAudioProgressIndicator) String() string {
+func (x *InitiateAudioIngestResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UploadAudioProgressIndicator) ProtoMessage() {}
+func (*InitiateAudioIngestResponse) ProtoMessage() {}
 
-func (x *UploadAudioProgressIndicator) ProtoReflect() protoreflect.Message {
+func (x *InitiateAudioIngestResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_v1_vfs_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1556,150 +1562,51 @@ func (x *UploadAudioProgressIndicator) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UploadAudioProgressIndicator.ProtoReflect.Descriptor instead.
-func (*UploadAudioProgressIndicator) Descriptor() ([]byte, []int) {
+// Deprecated: Use InitiateAudioIngestResponse.ProtoReflect.Descriptor instead.
+func (*InitiateAudioIngestResponse) Descriptor() ([]byte, []int) {
 	return file_proto_v1_vfs_proto_rawDescGZIP(), []int{24}
 }
 
-func (x *UploadAudioProgressIndicator) GetAudioId() string {
+func (x *InitiateAudioIngestResponse) GetIngestStatus() isInitiateAudioIngestResponse_IngestStatus {
 	if x != nil {
-		return x.AudioId
-	}
-	return ""
-}
-
-func (x *UploadAudioProgressIndicator) GetCompletionPercentage() float64 {
-	if x != nil {
-		return x.CompletionPercentage
-	}
-	return 0
-}
-
-type UploadAudioFinishedIndicator struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AudioId       string                 `protobuf:"bytes,1,opt,name=audio_id,json=audioId,proto3" json:"audio_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UploadAudioFinishedIndicator) Reset() {
-	*x = UploadAudioFinishedIndicator{}
-	mi := &file_proto_v1_vfs_proto_msgTypes[25]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadAudioFinishedIndicator) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadAudioFinishedIndicator) ProtoMessage() {}
-
-func (x *UploadAudioFinishedIndicator) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_vfs_proto_msgTypes[25]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadAudioFinishedIndicator.ProtoReflect.Descriptor instead.
-func (*UploadAudioFinishedIndicator) Descriptor() ([]byte, []int) {
-	return file_proto_v1_vfs_proto_rawDescGZIP(), []int{25}
-}
-
-func (x *UploadAudioFinishedIndicator) GetAudioId() string {
-	if x != nil {
-		return x.AudioId
-	}
-	return ""
-}
-
-type UploadAudioResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to UploadStatus:
-	//
-	//	*UploadAudioResponse_Ongoing
-	//	*UploadAudioResponse_Finished
-	UploadStatus  isUploadAudioResponse_UploadStatus `protobuf_oneof:"upload_status"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UploadAudioResponse) Reset() {
-	*x = UploadAudioResponse{}
-	mi := &file_proto_v1_vfs_proto_msgTypes[26]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadAudioResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadAudioResponse) ProtoMessage() {}
-
-func (x *UploadAudioResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_vfs_proto_msgTypes[26]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadAudioResponse.ProtoReflect.Descriptor instead.
-func (*UploadAudioResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_vfs_proto_rawDescGZIP(), []int{26}
-}
-
-func (x *UploadAudioResponse) GetUploadStatus() isUploadAudioResponse_UploadStatus {
-	if x != nil {
-		return x.UploadStatus
+		return x.IngestStatus
 	}
 	return nil
 }
 
-func (x *UploadAudioResponse) GetOngoing() *UploadAudioProgressIndicator {
+func (x *InitiateAudioIngestResponse) GetOngoing() *IngestProgressIndicator {
 	if x != nil {
-		if x, ok := x.UploadStatus.(*UploadAudioResponse_Ongoing); ok {
+		if x, ok := x.IngestStatus.(*InitiateAudioIngestResponse_Ongoing); ok {
 			return x.Ongoing
 		}
 	}
 	return nil
 }
 
-func (x *UploadAudioResponse) GetFinished() *UploadAudioFinishedIndicator {
+func (x *InitiateAudioIngestResponse) GetFinished() *IngestFinishedIndicator {
 	if x != nil {
-		if x, ok := x.UploadStatus.(*UploadAudioResponse_Finished); ok {
+		if x, ok := x.IngestStatus.(*InitiateAudioIngestResponse_Finished); ok {
 			return x.Finished
 		}
 	}
 	return nil
 }
 
-type isUploadAudioResponse_UploadStatus interface {
-	isUploadAudioResponse_UploadStatus()
+type isInitiateAudioIngestResponse_IngestStatus interface {
+	isInitiateAudioIngestResponse_IngestStatus()
 }
 
-type UploadAudioResponse_Ongoing struct {
-	Ongoing *UploadAudioProgressIndicator `protobuf:"bytes,1,opt,name=ongoing,proto3,oneof"`
+type InitiateAudioIngestResponse_Ongoing struct {
+	Ongoing *IngestProgressIndicator `protobuf:"bytes,1,opt,name=ongoing,proto3,oneof"`
 }
 
-type UploadAudioResponse_Finished struct {
-	Finished *UploadAudioFinishedIndicator `protobuf:"bytes,2,opt,name=finished,proto3,oneof"`
+type InitiateAudioIngestResponse_Finished struct {
+	Finished *IngestFinishedIndicator `protobuf:"bytes,2,opt,name=finished,proto3,oneof"`
 }
 
-func (*UploadAudioResponse_Ongoing) isUploadAudioResponse_UploadStatus() {}
+func (*InitiateAudioIngestResponse_Ongoing) isInitiateAudioIngestResponse_IngestStatus() {}
 
-func (*UploadAudioResponse_Finished) isUploadAudioResponse_UploadStatus() {}
+func (*InitiateAudioIngestResponse_Finished) isInitiateAudioIngestResponse_IngestStatus() {}
 
 // UploadImageRequest will upload image content to storage
 type UploadImageRequest struct {
@@ -1714,7 +1621,7 @@ type UploadImageRequest struct {
 
 func (x *UploadImageRequest) Reset() {
 	*x = UploadImageRequest{}
-	mi := &file_proto_v1_vfs_proto_msgTypes[27]
+	mi := &file_proto_v1_vfs_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1726,7 +1633,7 @@ func (x *UploadImageRequest) String() string {
 func (*UploadImageRequest) ProtoMessage() {}
 
 func (x *UploadImageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_vfs_proto_msgTypes[27]
+	mi := &file_proto_v1_vfs_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1739,7 +1646,7 @@ func (x *UploadImageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadImageRequest.ProtoReflect.Descriptor instead.
 func (*UploadImageRequest) Descriptor() ([]byte, []int) {
-	return file_proto_v1_vfs_proto_rawDescGZIP(), []int{27}
+	return file_proto_v1_vfs_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *UploadImageRequest) GetWorkspaceId() string {
@@ -1779,7 +1686,7 @@ type UploadImageResponse struct {
 
 func (x *UploadImageResponse) Reset() {
 	*x = UploadImageResponse{}
-	mi := &file_proto_v1_vfs_proto_msgTypes[28]
+	mi := &file_proto_v1_vfs_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1791,7 +1698,7 @@ func (x *UploadImageResponse) String() string {
 func (*UploadImageResponse) ProtoMessage() {}
 
 func (x *UploadImageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_v1_vfs_proto_msgTypes[28]
+	mi := &file_proto_v1_vfs_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1804,12 +1711,123 @@ func (x *UploadImageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadImageResponse.ProtoReflect.Descriptor instead.
 func (*UploadImageResponse) Descriptor() ([]byte, []int) {
-	return file_proto_v1_vfs_proto_rawDescGZIP(), []int{28}
+	return file_proto_v1_vfs_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *UploadImageResponse) GetUploadedAssetId() string {
 	if x != nil {
 		return x.UploadedAssetId
+	}
+	return ""
+}
+
+// GetAssetUploadTarget will return a target url that the asset bytes can be uploaded
+// to from the browser. The returned asset id should be used to initiate an 'ingest'.
+// And the asset is not mapped into our data model until the ingest is complete
+//
+// Current supported types:
+// - video: mp4
+// - audio: mp3
+type GetAssetUploadTargetRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	WorkspaceId   string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAssetUploadTargetRequest) Reset() {
+	*x = GetAssetUploadTargetRequest{}
+	mi := &file_proto_v1_vfs_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAssetUploadTargetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAssetUploadTargetRequest) ProtoMessage() {}
+
+func (x *GetAssetUploadTargetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_vfs_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAssetUploadTargetRequest.ProtoReflect.Descriptor instead.
+func (*GetAssetUploadTargetRequest) Descriptor() ([]byte, []int) {
+	return file_proto_v1_vfs_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *GetAssetUploadTargetRequest) GetWorkspaceId() string {
+	if x != nil {
+		return x.WorkspaceId
+	}
+	return ""
+}
+
+type GetAssetUploadTargetResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AssetId       string                 `protobuf:"bytes,1,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
+	VideoTarget   string                 `protobuf:"bytes,2,opt,name=video_target,json=videoTarget,proto3" json:"video_target,omitempty"`
+	AudioTarget   string                 `protobuf:"bytes,3,opt,name=audio_target,json=audioTarget,proto3" json:"audio_target,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAssetUploadTargetResponse) Reset() {
+	*x = GetAssetUploadTargetResponse{}
+	mi := &file_proto_v1_vfs_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAssetUploadTargetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAssetUploadTargetResponse) ProtoMessage() {}
+
+func (x *GetAssetUploadTargetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_v1_vfs_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAssetUploadTargetResponse.ProtoReflect.Descriptor instead.
+func (*GetAssetUploadTargetResponse) Descriptor() ([]byte, []int) {
+	return file_proto_v1_vfs_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *GetAssetUploadTargetResponse) GetAssetId() string {
+	if x != nil {
+		return x.AssetId
+	}
+	return ""
+}
+
+func (x *GetAssetUploadTargetResponse) GetVideoTarget() string {
+	if x != nil {
+		return x.VideoTarget
+	}
+	return ""
+}
+
+func (x *GetAssetUploadTargetResponse) GetAudioTarget() string {
+	if x != nil {
+		return x.AudioTarget
 	}
 	return ""
 }
@@ -1896,37 +1914,32 @@ const file_proto_v1_vfs_proto_rawDesc = "" +
 	"asset_name\x18\x02 \x01(\tR\tassetName\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x03 \x01(\tR\tprojectId\x12!\n" +
-	"\fproject_name\x18\x04 \x01(\tR\vprojectName\"\xb4\x01\n" +
-	"\x12UploadVideoRequest\x12!\n" +
+	"\fproject_name\x18\x04 \x01(\tR\vprojectName\"\xbd\x01\n" +
+	"\x1aInitiateVideoIngestRequest\x12!\n" +
 	"\fworkspace_id\x18\x01 \x01(\tR\vworkspaceId\x123\n" +
-	"\x13parent_directory_id\x18\x02 \x01(\tH\x00R\x11parentDirectoryId\x88\x01\x01\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\fR\acontent\x12\x14\n" +
+	"\x13parent_directory_id\x18\x02 \x01(\tH\x00R\x11parentDirectoryId\x88\x01\x01\x12\x19\n" +
+	"\basset_id\x18\x03 \x01(\tR\aassetId\x12\x14\n" +
 	"\x05title\x18\x04 \x01(\tR\x05titleB\x16\n" +
 	"\x14_parent_directory_id\"i\n" +
-	"\x17UploadProgressIndicator\x12\x19\n" +
-	"\bvideo_id\x18\x01 \x01(\tR\avideoId\x123\n" +
+	"\x17IngestProgressIndicator\x12\x19\n" +
+	"\basset_id\x18\x01 \x01(\tR\aassetId\x123\n" +
 	"\x15completion_percentage\x18\x02 \x01(\x01R\x14completionPercentage\"4\n" +
-	"\x17UploadFinishedIndicator\x12\x19\n" +
-	"\bvideo_id\x18\x01 \x01(\tR\avideoId\"\x9a\x01\n" +
-	"\x13UploadVideoResponse\x127\n" +
-	"\aongoing\x18\x01 \x01(\v2\x1b.v1.UploadProgressIndicatorH\x00R\aongoing\x129\n" +
-	"\bfinished\x18\x02 \x01(\v2\x1b.v1.UploadFinishedIndicatorH\x00R\bfinishedB\x0f\n" +
-	"\rupload_status\"\xb4\x01\n" +
-	"\x12UploadAudioRequest\x12!\n" +
+	"\x17IngestFinishedIndicator\x12\x19\n" +
+	"\basset_id\x18\x01 \x01(\tR\aassetId\"\xa2\x01\n" +
+	"\x1bInitiateVideoIngestResponse\x127\n" +
+	"\aongoing\x18\x01 \x01(\v2\x1b.v1.IngestProgressIndicatorH\x00R\aongoing\x129\n" +
+	"\bfinished\x18\x02 \x01(\v2\x1b.v1.IngestFinishedIndicatorH\x00R\bfinishedB\x0f\n" +
+	"\ringest_status\"\xbd\x01\n" +
+	"\x1aInitiateAudioIngestRequest\x12!\n" +
 	"\fworkspace_id\x18\x01 \x01(\tR\vworkspaceId\x123\n" +
-	"\x13parent_directory_id\x18\x02 \x01(\tH\x00R\x11parentDirectoryId\x88\x01\x01\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\fR\acontent\x12\x14\n" +
+	"\x13parent_directory_id\x18\x02 \x01(\tH\x00R\x11parentDirectoryId\x88\x01\x01\x12\x19\n" +
+	"\basset_id\x18\x03 \x01(\tR\aassetId\x12\x14\n" +
 	"\x05title\x18\x04 \x01(\tR\x05titleB\x16\n" +
-	"\x14_parent_directory_id\"n\n" +
-	"\x1cUploadAudioProgressIndicator\x12\x19\n" +
-	"\baudio_id\x18\x01 \x01(\tR\aaudioId\x123\n" +
-	"\x15completion_percentage\x18\x02 \x01(\x01R\x14completionPercentage\"9\n" +
-	"\x1cUploadAudioFinishedIndicator\x12\x19\n" +
-	"\baudio_id\x18\x01 \x01(\tR\aaudioId\"\xa4\x01\n" +
-	"\x13UploadAudioResponse\x12<\n" +
-	"\aongoing\x18\x01 \x01(\v2 .v1.UploadAudioProgressIndicatorH\x00R\aongoing\x12>\n" +
-	"\bfinished\x18\x02 \x01(\v2 .v1.UploadAudioFinishedIndicatorH\x00R\bfinishedB\x0f\n" +
-	"\rupload_status\"\xb4\x01\n" +
+	"\x14_parent_directory_id\"\xa2\x01\n" +
+	"\x1bInitiateAudioIngestResponse\x127\n" +
+	"\aongoing\x18\x01 \x01(\v2\x1b.v1.IngestProgressIndicatorH\x00R\aongoing\x129\n" +
+	"\bfinished\x18\x02 \x01(\v2\x1b.v1.IngestFinishedIndicatorH\x00R\bfinishedB\x0f\n" +
+	"\ringest_status\"\xb4\x01\n" +
 	"\x12UploadImageRequest\x12!\n" +
 	"\fworkspace_id\x18\x01 \x01(\tR\vworkspaceId\x123\n" +
 	"\x13parent_directory_id\x18\x02 \x01(\tH\x00R\x11parentDirectoryId\x88\x01\x01\x12\x18\n" +
@@ -1934,10 +1947,16 @@ const file_proto_v1_vfs_proto_rawDesc = "" +
 	"\x05title\x18\x04 \x01(\tR\x05titleB\x16\n" +
 	"\x14_parent_directory_id\"A\n" +
 	"\x13UploadImageResponse\x12*\n" +
-	"\x11uploaded_asset_id\x18\x01 \x01(\tR\x0fuploadedAssetId2\xd1\x06\n" +
-	"\vFileService\x12@\n" +
-	"\vUploadVideo\x12\x16.v1.UploadVideoRequest\x1a\x17.v1.UploadVideoResponse0\x01\x12@\n" +
-	"\vUploadAudio\x12\x16.v1.UploadAudioRequest\x1a\x17.v1.UploadAudioResponse0\x01\x12>\n" +
+	"\x11uploaded_asset_id\x18\x01 \x01(\tR\x0fuploadedAssetId\"@\n" +
+	"\x1bGetAssetUploadTargetRequest\x12!\n" +
+	"\fworkspace_id\x18\x01 \x01(\tR\vworkspaceId\"\x7f\n" +
+	"\x1cGetAssetUploadTargetResponse\x12\x19\n" +
+	"\basset_id\x18\x01 \x01(\tR\aassetId\x12!\n" +
+	"\fvideo_target\x18\x02 \x01(\tR\vvideoTarget\x12!\n" +
+	"\faudio_target\x18\x03 \x01(\tR\vaudioTarget2\xdc\a\n" +
+	"\vFileService\x12X\n" +
+	"\x13InitiateVideoIngest\x12\x1e.v1.InitiateVideoIngestRequest\x1a\x1f.v1.InitiateVideoIngestResponse0\x01\x12X\n" +
+	"\x13InitiateAudioIngest\x12\x1e.v1.InitiateAudioIngestRequest\x1a\x1f.v1.InitiateAudioIngestResponse0\x01\x12>\n" +
 	"\vUploadImage\x12\x16.v1.UploadImageRequest\x1a\x17.v1.UploadImageResponse\x12M\n" +
 	"\x10GetRootDirectory\x12\x1b.v1.GetRootDirectoryRequest\x1a\x1c.v1.GetRootDirectoryResponse\x12Y\n" +
 	"\x14GetDirectoryChildren\x12\x1f.v1.GetDirectoryChildrenRequest\x1a .v1.GetDirectoryChildrenResponse\x12J\n" +
@@ -1947,7 +1966,8 @@ const file_proto_v1_vfs_proto_rawDesc = "" +
 	"\x0fDeleteDirectory\x12\x1a.v1.DeleteDirectoryRequest\x1a\x16.google.protobuf.Empty\x12=\n" +
 	"\vRenameAsset\x12\x16.v1.RenameAssetRequest\x1a\x16.google.protobuf.Empty\x129\n" +
 	"\tMoveAsset\x12\x14.v1.MoveAssetRequest\x1a\x16.google.protobuf.Empty\x12=\n" +
-	"\vDeleteAsset\x12\x16.v1.DeleteAssetRequest\x1a\x16.google.protobuf.EmptyB\x1eZ\x1cvynfo.com/vynfo/gen/proto/v1b\x06proto3"
+	"\vDeleteAsset\x12\x16.v1.DeleteAssetRequest\x1a\x16.google.protobuf.Empty\x12Y\n" +
+	"\x14GetAssetUploadTarget\x12\x1f.v1.GetAssetUploadTargetRequest\x1a .v1.GetAssetUploadTargetResponseB\x1eZ\x1cvynfo.com/vynfo/gen/proto/v1b\x06proto3"
 
 var (
 	file_proto_v1_vfs_proto_rawDescOnce sync.Once
@@ -1982,16 +2002,16 @@ var file_proto_v1_vfs_proto_goTypes = []any{
 	(*DuplicateFileOrDirectoryEntryNameError)(nil), // 16: v1.DuplicateFileOrDirectoryEntryNameError
 	(*DeleteInUseAssetsError)(nil),                 // 17: v1.DeleteInUseAssetsError
 	(*DeleteInUseAssetUsage)(nil),                  // 18: v1.DeleteInUseAssetUsage
-	(*UploadVideoRequest)(nil),                     // 19: v1.UploadVideoRequest
-	(*UploadProgressIndicator)(nil),                // 20: v1.UploadProgressIndicator
-	(*UploadFinishedIndicator)(nil),                // 21: v1.UploadFinishedIndicator
-	(*UploadVideoResponse)(nil),                    // 22: v1.UploadVideoResponse
-	(*UploadAudioRequest)(nil),                     // 23: v1.UploadAudioRequest
-	(*UploadAudioProgressIndicator)(nil),           // 24: v1.UploadAudioProgressIndicator
-	(*UploadAudioFinishedIndicator)(nil),           // 25: v1.UploadAudioFinishedIndicator
-	(*UploadAudioResponse)(nil),                    // 26: v1.UploadAudioResponse
-	(*UploadImageRequest)(nil),                     // 27: v1.UploadImageRequest
-	(*UploadImageResponse)(nil),                    // 28: v1.UploadImageResponse
+	(*InitiateVideoIngestRequest)(nil),             // 19: v1.InitiateVideoIngestRequest
+	(*IngestProgressIndicator)(nil),                // 20: v1.IngestProgressIndicator
+	(*IngestFinishedIndicator)(nil),                // 21: v1.IngestFinishedIndicator
+	(*InitiateVideoIngestResponse)(nil),            // 22: v1.InitiateVideoIngestResponse
+	(*InitiateAudioIngestRequest)(nil),             // 23: v1.InitiateAudioIngestRequest
+	(*InitiateAudioIngestResponse)(nil),            // 24: v1.InitiateAudioIngestResponse
+	(*UploadImageRequest)(nil),                     // 25: v1.UploadImageRequest
+	(*UploadImageResponse)(nil),                    // 26: v1.UploadImageResponse
+	(*GetAssetUploadTargetRequest)(nil),            // 27: v1.GetAssetUploadTargetRequest
+	(*GetAssetUploadTargetResponse)(nil),           // 28: v1.GetAssetUploadTargetResponse
 	(*MediaVideoMetadata)(nil),                     // 29: v1.MediaVideoMetadata
 	(*MediaAudioMetadata)(nil),                     // 30: v1.MediaAudioMetadata
 	(*MediaImageMetadata)(nil),                     // 31: v1.MediaImageMetadata
@@ -2013,13 +2033,13 @@ var file_proto_v1_vfs_proto_depIdxs = []int32{
 	31, // 12: v1.GetDirectoryChildrenResponse.images:type_name -> v1.MediaImageMetadata
 	30, // 13: v1.GetDirectoryChildrenResponse.audios:type_name -> v1.MediaAudioMetadata
 	18, // 14: v1.DeleteInUseAssetsError.usages:type_name -> v1.DeleteInUseAssetUsage
-	20, // 15: v1.UploadVideoResponse.ongoing:type_name -> v1.UploadProgressIndicator
-	21, // 16: v1.UploadVideoResponse.finished:type_name -> v1.UploadFinishedIndicator
-	24, // 17: v1.UploadAudioResponse.ongoing:type_name -> v1.UploadAudioProgressIndicator
-	25, // 18: v1.UploadAudioResponse.finished:type_name -> v1.UploadAudioFinishedIndicator
-	19, // 19: v1.FileService.UploadVideo:input_type -> v1.UploadVideoRequest
-	23, // 20: v1.FileService.UploadAudio:input_type -> v1.UploadAudioRequest
-	27, // 21: v1.FileService.UploadImage:input_type -> v1.UploadImageRequest
+	20, // 15: v1.InitiateVideoIngestResponse.ongoing:type_name -> v1.IngestProgressIndicator
+	21, // 16: v1.InitiateVideoIngestResponse.finished:type_name -> v1.IngestFinishedIndicator
+	20, // 17: v1.InitiateAudioIngestResponse.ongoing:type_name -> v1.IngestProgressIndicator
+	21, // 18: v1.InitiateAudioIngestResponse.finished:type_name -> v1.IngestFinishedIndicator
+	19, // 19: v1.FileService.InitiateVideoIngest:input_type -> v1.InitiateVideoIngestRequest
+	23, // 20: v1.FileService.InitiateAudioIngest:input_type -> v1.InitiateAudioIngestRequest
+	25, // 21: v1.FileService.UploadImage:input_type -> v1.UploadImageRequest
 	6,  // 22: v1.FileService.GetRootDirectory:input_type -> v1.GetRootDirectoryRequest
 	8,  // 23: v1.FileService.GetDirectoryChildren:input_type -> v1.GetDirectoryChildrenRequest
 	4,  // 24: v1.FileService.CreateDirectory:input_type -> v1.CreateDirectoryRequest
@@ -2029,20 +2049,22 @@ var file_proto_v1_vfs_proto_depIdxs = []int32{
 	12, // 28: v1.FileService.RenameAsset:input_type -> v1.RenameAssetRequest
 	13, // 29: v1.FileService.MoveAsset:input_type -> v1.MoveAssetRequest
 	15, // 30: v1.FileService.DeleteAsset:input_type -> v1.DeleteAssetRequest
-	22, // 31: v1.FileService.UploadVideo:output_type -> v1.UploadVideoResponse
-	26, // 32: v1.FileService.UploadAudio:output_type -> v1.UploadAudioResponse
-	28, // 33: v1.FileService.UploadImage:output_type -> v1.UploadImageResponse
-	7,  // 34: v1.FileService.GetRootDirectory:output_type -> v1.GetRootDirectoryResponse
-	9,  // 35: v1.FileService.GetDirectoryChildren:output_type -> v1.GetDirectoryChildrenResponse
-	5,  // 36: v1.FileService.CreateDirectory:output_type -> v1.CreateDirectoryResponse
-	32, // 37: v1.FileService.RenameDirectory:output_type -> google.protobuf.Empty
-	32, // 38: v1.FileService.MoveDirectory:output_type -> google.protobuf.Empty
-	32, // 39: v1.FileService.DeleteDirectory:output_type -> google.protobuf.Empty
-	32, // 40: v1.FileService.RenameAsset:output_type -> google.protobuf.Empty
-	32, // 41: v1.FileService.MoveAsset:output_type -> google.protobuf.Empty
-	32, // 42: v1.FileService.DeleteAsset:output_type -> google.protobuf.Empty
-	31, // [31:43] is the sub-list for method output_type
-	19, // [19:31] is the sub-list for method input_type
+	27, // 31: v1.FileService.GetAssetUploadTarget:input_type -> v1.GetAssetUploadTargetRequest
+	22, // 32: v1.FileService.InitiateVideoIngest:output_type -> v1.InitiateVideoIngestResponse
+	24, // 33: v1.FileService.InitiateAudioIngest:output_type -> v1.InitiateAudioIngestResponse
+	26, // 34: v1.FileService.UploadImage:output_type -> v1.UploadImageResponse
+	7,  // 35: v1.FileService.GetRootDirectory:output_type -> v1.GetRootDirectoryResponse
+	9,  // 36: v1.FileService.GetDirectoryChildren:output_type -> v1.GetDirectoryChildrenResponse
+	5,  // 37: v1.FileService.CreateDirectory:output_type -> v1.CreateDirectoryResponse
+	32, // 38: v1.FileService.RenameDirectory:output_type -> google.protobuf.Empty
+	32, // 39: v1.FileService.MoveDirectory:output_type -> google.protobuf.Empty
+	32, // 40: v1.FileService.DeleteDirectory:output_type -> google.protobuf.Empty
+	32, // 41: v1.FileService.RenameAsset:output_type -> google.protobuf.Empty
+	32, // 42: v1.FileService.MoveAsset:output_type -> google.protobuf.Empty
+	32, // 43: v1.FileService.DeleteAsset:output_type -> google.protobuf.Empty
+	28, // 44: v1.FileService.GetAssetUploadTarget:output_type -> v1.GetAssetUploadTargetResponse
+	32, // [32:45] is the sub-list for method output_type
+	19, // [19:32] is the sub-list for method input_type
 	19, // [19:19] is the sub-list for extension type_name
 	19, // [19:19] is the sub-list for extension extendee
 	0,  // [0:19] is the sub-list for field type_name
@@ -2069,15 +2091,15 @@ func file_proto_v1_vfs_proto_init() {
 	file_proto_v1_vfs_proto_msgTypes[16].OneofWrappers = []any{}
 	file_proto_v1_vfs_proto_msgTypes[19].OneofWrappers = []any{}
 	file_proto_v1_vfs_proto_msgTypes[22].OneofWrappers = []any{
-		(*UploadVideoResponse_Ongoing)(nil),
-		(*UploadVideoResponse_Finished)(nil),
+		(*InitiateVideoIngestResponse_Ongoing)(nil),
+		(*InitiateVideoIngestResponse_Finished)(nil),
 	}
 	file_proto_v1_vfs_proto_msgTypes[23].OneofWrappers = []any{}
-	file_proto_v1_vfs_proto_msgTypes[26].OneofWrappers = []any{
-		(*UploadAudioResponse_Ongoing)(nil),
-		(*UploadAudioResponse_Finished)(nil),
+	file_proto_v1_vfs_proto_msgTypes[24].OneofWrappers = []any{
+		(*InitiateAudioIngestResponse_Ongoing)(nil),
+		(*InitiateAudioIngestResponse_Finished)(nil),
 	}
-	file_proto_v1_vfs_proto_msgTypes[27].OneofWrappers = []any{}
+	file_proto_v1_vfs_proto_msgTypes[25].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

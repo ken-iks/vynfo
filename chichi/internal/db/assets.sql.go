@@ -70,6 +70,38 @@ func (q *Queries) CreateAsset(ctx context.Context, arg CreateAssetParams) (Asset
 	return i, err
 }
 
+const createAssetWithId = `-- name: CreateAssetWithId :one
+INSERT INTO assets (id, workspace_id, asset_type, display_name, directory_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, workspace_id, asset_type, display_name, created_at, directory_id
+`
+
+type CreateAssetWithIdParams struct {
+	ID          uuid.UUID
+	WorkspaceID uuid.UUID
+	AssetType   string
+	DisplayName string
+	DirectoryID uuid.NullUUID
+}
+
+func (q *Queries) CreateAssetWithId(ctx context.Context, arg CreateAssetWithIdParams) (Asset, error) {
+	row := q.db.QueryRowContext(ctx, createAssetWithId,
+		arg.ID,
+		arg.WorkspaceID,
+		arg.AssetType,
+		arg.DisplayName,
+		arg.DirectoryID,
+	)
+	var i Asset
+	err := row.Scan(
+		&i.ID,
+		&i.WorkspaceID,
+		&i.AssetType,
+		&i.DisplayName,
+		&i.CreatedAt,
+		&i.DirectoryID,
+	)
+	return i, err
+}
+
 const deleteAsset = `-- name: DeleteAsset :exec
 DELETE FROM assets WHERE id = $1
 `

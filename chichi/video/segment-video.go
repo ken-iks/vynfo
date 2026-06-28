@@ -110,6 +110,10 @@ func GenerateSegments(
 			}
 			slog.Debug("ffmpeg", "output", scanner.Text())
 		}
+		if err := scanner.Err(); err != nil {
+			yield(VideoSegment{}, err)
+			return
+		}
 		if err := cmd.Wait(); err != nil {
 			yield(VideoSegment{}, err)
 			return

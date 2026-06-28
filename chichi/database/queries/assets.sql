@@ -1,6 +1,9 @@
 -- name: CreateAsset :one
 INSERT INTO assets (workspace_id, asset_type, display_name, directory_id) VALUES ($1, $2, $3, $4) RETURNING *;
 
+-- name: CreateAssetWithId :one
+INSERT INTO assets (id, workspace_id, asset_type, display_name, directory_id) VALUES ($1, $2, $3, $4, $5) RETURNING *;
+
 -- name: AddProjectAsset :exec
 INSERT INTO project_assets (project_id, asset_id) VALUES ($1, $2)
 ON CONFLICT (project_id, asset_id) DO NOTHING;
