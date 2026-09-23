@@ -1,1 +1,1 @@
-Web based video editor.
+Web based video editor
