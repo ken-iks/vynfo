@@ -1,3 +1,1 @@
-# Vynfo
-
-Vynfo is a web video editor.
+Web based video editor.
