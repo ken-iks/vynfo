@@ -5,9 +5,9 @@ modules:
     excludes:
       - .pnpm-store
       - node_modules
-      - eden/.pnpm-store
-      - eden/node_modules
-      - mensah/.venv
+      - web/.pnpm-store
+      - web/node_modules
+      - agent/.venv
 lint:
   use:
     - STANDARD

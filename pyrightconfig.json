@@ -1,15 +1,15 @@
 {
   "include": [
-    "mensah"
+    "agent"
   ],
-  "venvPath": "mensah",
+  "venvPath": "agent",
   "venv": ".venv",
   "executionEnvironments": [
     {
-      "root": "mensah",
+      "root": "agent",
       "extraPaths": [
-        "mensah",
-        "mensah/src"
+        "agent",
+        "agent/src"
       ]
     }
   ]

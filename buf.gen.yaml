@@ -3,47 +3,47 @@ version: v2
 plugins:
   # 1. Go Protobuf (Structs)
   - local: protoc-gen-go
-    out: chichi/gen
+    out: backend/gen
     opt: paths=source_relative
   # 2. Go Connect (Server/Client logic)
   - local: protoc-gen-connect-go
-    out: chichi/gen
+    out: backend/gen
     opt: paths=source_relative
     exclude_types:
       - v1.inter.agent_backend
   # 3. Go gRPC (Internal Agent Server/Client logic)
   - local: protoc-gen-go-grpc
-    out: chichi/gen
+    out: backend/gen
     opt: paths=source_relative
     types:
       - v1.inter.agent_runtime
       - v1.inter.agent_backend
   # 4. TypeScript Protobuf (Classes/Interfaces)
-  - local: ./eden/node_modules/.bin/protoc-gen-es
-    out: eden/src/gen
+  - local: ./web/node_modules/.bin/protoc-gen-es
+    out: web/src/gen
     opt: target=ts
     exclude_types:
       - v1.inter.agent_backend
   # 5. Python Protobuf (Classes/Interfaces)
   - remote: buf.build/protocolbuffers/python
-    out: mensah
+    out: agent
     types:
       - v1.inter.agent_runtime
       - v1.inter.agent_backend
   # 6. Python Protobuf type stubs
   - remote: buf.build/protocolbuffers/pyi
-    out: mensah
+    out: agent
     types:
       - v1.inter.agent_runtime
       - v1.inter.agent_backend
   # 7. Python gRPC (Internal Agent Server/Client logic)
   - remote: buf.build/grpc/python
-    out: mensah
+    out: agent
     types:
       - v1.inter.agent_runtime
       - v1.inter.agent_backend
-  - local: ["uv", "--directory", "mensah", "run", "protoc-gen-mypy_grpc"]
-    out: mensah
+  - local: ["uv", "--directory", "agent", "run", "protoc-gen-mypy_grpc"]
+    out: agent
     strategy: all
     types:
       - v1.inter.agent_runtime
