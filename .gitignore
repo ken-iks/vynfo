@@ -3,7 +3,11 @@
 .pnpm-store
 chichi/external/
 chichi/segments/
+deploy/
+.vscode/
+README.md
 .DS_Store
-
+eden/
+.github/*
 __pycache__/
 *.py[cod]
